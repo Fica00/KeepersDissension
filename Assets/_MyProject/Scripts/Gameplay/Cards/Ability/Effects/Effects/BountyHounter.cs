@@ -9,7 +9,8 @@ public class BountyHounter : AbilityEffect
     {
         RemoveAction();
 
-        if (PhotonManager.IsMasterClient)
+        // if (PhotonManager.IsMasterClient)
+        if (true)
         {
             GameplayManager.Instance.LootChanges[0] += amount;
         }
@@ -17,6 +18,7 @@ public class BountyHounter : AbilityEffect
         {
             GameplayManager.Instance.LootChanges[1] += amount;
         }
+
         isActive = true;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
         OnActivated?.Invoke();
@@ -24,7 +26,7 @@ public class BountyHounter : AbilityEffect
     
     public override void ActivateForOther()
     {
-        if (PhotonManager.IsMasterClient)
+        if (true)
         {
             GameplayManager.Instance.LootChanges[1] += amount;
         }
@@ -45,7 +47,7 @@ public class BountyHounter : AbilityEffect
 
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         isActive = false;
-        if (PhotonManager.IsMasterClient)
+        if (true)
         {
             GameplayManager.Instance.LootChanges[0] -= amount;
         }

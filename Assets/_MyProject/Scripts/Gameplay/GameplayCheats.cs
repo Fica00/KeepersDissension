@@ -23,7 +23,7 @@ public class GameplayCheats : MonoBehaviour
         UnlimitedActions = false;
         CheckForCD = true;
         HasUnlimitedGold = false;
-        gameObject.SetActive(PhotonManager.Instance.IsTestingRoom);
+        gameObject.SetActive(GameConfig.IsTestingRoom);
     }
 
     private void OnEnable()

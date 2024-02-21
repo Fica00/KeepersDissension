@@ -65,8 +65,8 @@ public class MatchMakingHandler : MonoBehaviour
         {
             case MatchMode.Debug:
             case MatchMode.Normal:
-                PhotonManager.Instance.JoinRandomRoom();
-                PhotonManager.OnIJoinedRoom += JoinedRandomRoom;
+                // PhotonManager.Instance.JoinRandomRoom();
+                // PhotonManager.OnIJoinedRoom += JoinedRandomRoom;
                 break;
             case MatchMode.Private:
                 friendlyMatchUI.Activate();
@@ -78,7 +78,7 @@ public class MatchMakingHandler : MonoBehaviour
 
     private void JoinedRandomRoom()
     {
-        PhotonManager.OnIJoinedRoom -= JoinedRandomRoom;
+        // PhotonManager.OnIJoinedRoom -= JoinedRandomRoom;
         FinishedSettingUpFriendlyMatch();
     }
 

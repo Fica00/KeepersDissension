@@ -14,13 +14,13 @@ public class GameplayUIPVP : GameplayUI
     
     private void LeaveRoom()
     {
-        PhotonManager.OnILeftRoom += ShowMainMenu;
-        PhotonManager.Instance.LeaveRoom();
+        // PhotonManager.OnILeftRoom += ShowMainMenu;
+        // PhotonManager.Instance.LeaveRoom();
     }
 
     private void ShowMainMenu()
     {
-        PhotonManager.OnILeftRoom -= ShowMainMenu;
-        SceneManager.LoadMainMenu();
+        // PhotonManager.OnILeftRoom -= ShowMainMenu;
+        // SceneManager.LoadMainMenu();
     }
 }

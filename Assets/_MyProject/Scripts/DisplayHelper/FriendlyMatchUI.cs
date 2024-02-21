@@ -32,15 +32,16 @@ public class FriendlyMatchUI : MonoBehaviour
             UIManager.Instance.ShowOkDialog("Please enter room name");
             return;
         }
-        PhotonManager.OnIJoinedRoom += ShowRoomName;
-        PhotonManager.Instance.JoinFriendlyRoom(_roomName);
+        // PhotonManager.OnIJoinedRoom += ShowRoomName;
+        // PhotonManager.Instance.JoinFriendlyRoom(_roomName);
         ManageInteractables(false);
     }
 
     private void ShowRoomName()
     {
-        PhotonManager.OnIJoinedRoom -= ShowRoomName;
-        UIManager.Instance.ShowOkDialog("Room successfully created, room name: "+PhotonManager.Instance.CurrentRoomName);
+        // PhotonManager.OnIJoinedRoom -= ShowRoomName;
+        UIManager.Instance.ShowOkDialog("Room successfully created, room name: "+123);
+        // UIManager.Instance.ShowOkDialog("Room successfully created, room name: "+PhotonManager.Instance.CurrentRoomName);
         MatchMakingHandler.Instance.FinishedSettingUpFriendlyMatch();
         gameObject.SetActive(false);
     }

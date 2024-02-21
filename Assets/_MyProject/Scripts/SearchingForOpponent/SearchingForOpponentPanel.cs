@@ -15,33 +15,34 @@ public class SearchingForOpponentPanel : MonoBehaviour
     private void OnEnable()
     {
         cancelSearch.onClick.AddListener(CancelSearching);
-        PhotonManager.OnILeftRoom += HideSearching;
-        PhotonManager.OnOpponentJoinedRoom += StartGameplay;
+        // PhotonManager.OnILeftRoom += HideSearching;
+        // PhotonManager.OnOpponentJoinedRoom += StartGameplay;
     }
 
     private void OnDisable()
     {
         cancelSearch.onClick.RemoveListener(CancelSearching);
-        PhotonManager.OnILeftRoom -= HideSearching;
-        PhotonManager.OnOpponentJoinedRoom -= StartGameplay;
+        // PhotonManager.OnILeftRoom -= HideSearching;
+        // PhotonManager.OnOpponentJoinedRoom -= StartGameplay;
     }
 
     private void ShowSearching()
     {        
-        cancelSearch.interactable = PhotonManager.IsMasterClient;
+        // cancelSearch.interactable = PhotonManager.IsMasterClient;
+        cancelSearch.interactable = true;
         gameObject.SetActive(true);
     }
 
     private void CancelSearching()
     {
         cancelSearch.interactable = false;
-        PhotonManager.OnILeftRoom += LeftRoom;
-        PhotonManager.Instance.LeaveRoom();
+        // PhotonManager.OnILeftRoom += LeftRoom;
+        // PhotonManager.Instance.LeaveRoom();
     }
 
     private void LeftRoom()
     {
-        PhotonManager.OnILeftRoom -= LeftRoom;
+        // PhotonManager.OnILeftRoom -= LeftRoom;
         HideSearching();
     }
 

@@ -3,20 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Newtonsoft.Json;
-using Photon.Pun;
 using UnityEngine;
 using System.Linq;
 
 public class GameplayManagerPVP : GameplayManager
 {
-    private PhotonView photonView;
     private Action<int> opponentCheckForMarkerCallback;
 
     protected override void Awake()
     {
         base.Awake();
-        photonView = GetComponent<PhotonView>();
-        if (PhotonManager.Instance.IsTestingRoom)
+        if (GameConfig.IsTestingRoom)
         {
             AmountOfAbilitiesPlayerCanBuy = 1000;
         }
@@ -24,13 +21,13 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OnEnable()
     {
-        PhotonManager.OnOpponentLeftRoom += OpponentLeftRoom;
+        // PhotonManager.OnOpponentLeftRoom += OpponentLeftRoom;
         WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
     private void OnDisable()
     {
-        PhotonManager.OnOpponentLeftRoom -= OpponentLeftRoom;
+        // PhotonManager.OnOpponentLeftRoom -= OpponentLeftRoom;
     }
 
     private void OpponentLeftRoom()
@@ -47,8 +44,8 @@ public class GameplayManagerPVP : GameplayManager
     protected override void SetupTable()
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);
-        OpponentPlayer.Setup(Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.FACTION_ID, false)),
-            false);
+        // OpponentPlayer.Setup(Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.FACTION_ID, false)),
+        //     false);
         MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
         GameplayUI.Instance.SetupTableBackground();
         GameplayUI.Instance.SetupActionAndTurnDisplay();
@@ -57,7 +54,8 @@ public class GameplayManagerPVP : GameplayManager
     protected override void DecideWhoPlaysFirst()
     {
         int _opponentMatchesPlayed =
-            Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.MATCHES_PLAYED, false));
+            // Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.MATCHES_PLAYED, false));
+            1;
         if (_opponentMatchesPlayed < DataManager.Instance.PlayerData.MatchesPlayed)
         {
             IsMyTurn = false;
@@ -71,7 +69,8 @@ public class GameplayManagerPVP : GameplayManager
         }
 
         DateTime _opponentDateCreated =
-            DateUtilities.Convert(PhotonManager.GetProperty(PhotonManager.DATE_CREATED, false));
+            // DateUtilities.Convert(PhotonManager.GetProperty(PhotonManager.DATE_CREATED, false));
+            DateTime.Now;
         if (_opponentDateCreated < DataManager.Instance.PlayerData.DateCreated)
         {
             IsMyTurn = false;
@@ -84,7 +83,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        IsMyTurn = PhotonManager.IsMasterClient;
+        // IsMyTurn = PhotonManager.IsMasterClient;
     }
 
     protected override IEnumerator WaitUntilTheEndOfTurn()
@@ -109,7 +108,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void Resign()
     {
         StopGame(false);
-        photonView.RPC(nameof(OpponentResigned), RpcTarget.Others);
+        // //photonView.RPC(nameof(OpponentResigned), RpcTarget.Others);
     }
 
     public override void StopGame(bool _didIWin)
@@ -240,7 +239,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void TellOpponentThatIFinishedPlacingCards()
     {
-        photonView.RPC(nameof(OpponentPlacedStartingCards), RpcTarget.Others);
+        // //photonView.RPC(nameof(OpponentPlacedStartingCards), RpcTarget.Others);
     }
 
     public override void PlaceStartingWall()
@@ -286,7 +285,7 @@ public class GameplayManagerPVP : GameplayManager
             _card.Display.Setup(_card as Card);
         }
 
-        photonView.RPC(nameof(OpponentPlacedCard), RpcTarget.Others, _cardId, _positionId,_dontCheckIfPlayerHasIt);
+        //photonView.RPC(nameof(OpponentPlacedCard), RpcTarget.Others, _cardId, _positionId,_dontCheckIfPlayerHasIt);
         PlaceCard(MyPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
 
@@ -323,7 +322,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
     {
         HandleAddAbilityToPlayer(_isMyPlayer,_abilityId);
-        photonView.RPC(nameof(MasterAddedAbilityToPlayer), RpcTarget.Others, _isMyPlayer, _abilityId);
+        //photonView.RPC(nameof(MasterAddedAbilityToPlayer), RpcTarget.Others, _isMyPlayer, _abilityId);
     }
 
     private void HandleAddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
@@ -342,7 +341,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void AddAbilityToShop(int _abilityId)
     {
-        photonView.RPC(nameof(MasterAddedAbilityToShop), RpcTarget.All, _abilityId);
+        //photonView.RPC(nameof(MasterAddedAbilityToShop), RpcTarget.All, _abilityId);
     }
 
     public override void ExecuteCardAction(CardAction _action, bool _tellOpponent = true)
@@ -350,7 +349,7 @@ public class GameplayManagerPVP : GameplayManager
         PlayCardAction(_action);
         if (_tellOpponent)
         {
-            photonView.RPC(nameof(OpponentExecutedAction), RpcTarget.Others, JsonConvert.SerializeObject(_action));
+            //photonView.RPC(nameof(OpponentExecutedAction), RpcTarget.Others, JsonConvert.SerializeObject(_action));
         }
     }
     
@@ -776,7 +775,8 @@ public class GameplayManagerPVP : GameplayManager
             
             if (_attackingPlayer.IsMy)
             {
-                int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
+                // int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
+                int _additionalMatter = 1;
                 if (_defendingCard is Minion)
                 {
                     GetMatter(2+_additionalMatter, true);
@@ -794,7 +794,8 @@ public class GameplayManagerPVP : GameplayManager
             }
             else
             {
-                int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
+                // int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
+                int _additionalMatter = 1;
                 if (_defendingCard is Minion)
                 {
                     GetMatter(2+_additionalMatter, false);
@@ -976,7 +977,7 @@ public class GameplayManagerPVP : GameplayManager
     {
         MyPlayer.StrangeMatter += OpponentPlayer.StrangeMatter;
 
-        photonView.RPC(nameof(OpponentLootedMe), RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentLootedMe), RpcTarget.Others);
     }
 
     private void GiveLoot()
@@ -985,7 +986,7 @@ public class GameplayManagerPVP : GameplayManager
         IEnumerator GiveLootRoutine()
         {
             yield return new WaitForSeconds(2);
-            photonView.RPC(nameof(OpponentGiveYouLoot),RpcTarget.Others,MyPlayer.StrangeMatter);
+            //photonView.RPC(nameof(OpponentGiveYouLoot),RpcTarget.Others,MyPlayer.StrangeMatter);
             MyPlayer.StrangeMatter = 0;
         }
     }
@@ -1124,7 +1125,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameState = GameplayState.Waiting;
             MyPlayer.Actions=0;
-            photonView.RPC(nameof(OpponentFinishedAttackResponse), RpcTarget.Others);
+            //photonView.RPC(nameof(OpponentFinishedAttackResponse), RpcTarget.Others);
             return;
         }
 
@@ -1141,22 +1142,22 @@ public class GameplayManagerPVP : GameplayManager
         Finished = true;
         IsMyTurn = false;
 
-        photonView.RPC(nameof(OpponentFinishedHisMove), RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentFinishedHisMove), RpcTarget.Others);
     }
 
     private void TellOpponentThatIUpdatedWhiteStrangeMatter()
     {
-        photonView.RPC(nameof(OpponentUpdatedWhiteStrangeMatter), RpcTarget.Others, MyPlayer.StrangeMatter);
+        //photonView.RPC(nameof(OpponentUpdatedWhiteStrangeMatter), RpcTarget.Others, MyPlayer.StrangeMatter);
     }
 
     private void TellOpponentToUpdateWhiteStrangeMatterReserves()
     {
-        photonView.RPC(nameof(UpdateWhiteStrangeMatterInReserve), RpcTarget.Others, WhiteStrangeMatter.AmountInEconomy);
+        //photonView.RPC(nameof(UpdateWhiteStrangeMatterInReserve), RpcTarget.Others, WhiteStrangeMatter.AmountInEconomy);
     }
 
     public override void ForceUpdatePlayerActions()
     {
-        photonView.RPC(nameof(OpponentForcedActionsUpdate), RpcTarget.Others, MyPlayer.Actions);
+        //photonView.RPC(nameof(OpponentForcedActionsUpdate), RpcTarget.Others, MyPlayer.Actions);
     }
 
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack=null, bool _placeMinion=true)
@@ -1175,7 +1176,7 @@ public class GameplayManagerPVP : GameplayManager
             else
             {
                 //50 is just a place holder, wont be used anyway
-                photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, 50,_placeMinion);
+                //photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, 50,_placeMinion);
                 HandlBoughtMinion(_cardBase, _cost, 50, _cardId,_placeMinion);
                 GameState = _gameState;
                 _callBack?.Invoke();
@@ -1187,7 +1188,7 @@ public class GameplayManagerPVP : GameplayManager
 
             void FinishRevive(int _positionId)
             {
-                photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, _positionId,_placeMinion);
+                //photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, _positionId,_placeMinion);
                 HandlBoughtMinion(_cardBase, _cost, _positionId, _cardId,_placeMinion);
                 GameState = _gameState;
                 _callBack?.Invoke();
@@ -1227,7 +1228,7 @@ public class GameplayManagerPVP : GameplayManager
 
             void FinishRevive(int _positionId)
             {
-                photonView.RPC(nameof(OpponentBuiltWall), RpcTarget.Others, _cardId, _cost, _positionId);
+                //photonView.RPC(nameof(OpponentBuiltWall), RpcTarget.Others, _cardId, _cost, _positionId);
                 HandleBuildWall(_cardBase, _cost, _positionId, _cardId);
                 GameState = _state;
                 if (_cost>0)
@@ -1251,7 +1252,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void UnchainGuardian()
     {
         HandleUnchainGuardian(true);
-        photonView.RPC(nameof(OpponentUnchainedGuardian), RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentUnchainedGuardian), RpcTarget.Others);
     }
 
     private void HandleUnchainGuardian(bool _isMy)
@@ -1267,7 +1268,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void ManageBlockaderAbility(bool _status)
     {
         ChangeBlockaderAbility(true,_status);
-        photonView.RPC(nameof(OpponentsBlockaderPassive), RpcTarget.Others, _status);
+        //photonView.RPC(nameof(OpponentsBlockaderPassive), RpcTarget.Others, _status);
     }
 
     private void ChangeBlockaderAbility(bool _isMy, bool _status)
@@ -1386,13 +1387,13 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentSomething(string _text)
     {
-        photonView.RPC(nameof(OpponentUsedSomething),RpcTarget.Others, _text);
+        //photonView.RPC(nameof(OpponentUsedSomething),RpcTarget.Others, _text);
     }
 
     public override void ChangeOwnerOfCard(int _placeId)
     {
         HandleChangeOwnerOfCard(_placeId);
-        photonView.RPC(nameof(OpponentRequestedChangeOfCardOwner),RpcTarget.Others,_placeId);
+        //photonView.RPC(nameof(OpponentRequestedChangeOfCardOwner),RpcTarget.Others,_placeId);
     }
 
     private void HandleChangeOwnerOfCard(int _placeId)
@@ -1404,7 +1405,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void OpponentCardDiedInMyPosition(int _cardId)
     {
         HandleOpponentCardDiedInMyPosition(_cardId, true);
-        photonView.RPC(nameof(OpponentSaidThatTheMyCardInHisPositionDied),RpcTarget.Others,_cardId);
+        //photonView.RPC(nameof(OpponentSaidThatTheMyCardInHisPositionDied),RpcTarget.Others,_cardId);
     }
 
     private void HandleOpponentCardDiedInMyPosition(int _cardId, bool _isCardMy)
@@ -1426,7 +1427,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ChangeMovementForCard(int _placeId, bool _status)
     {
-        photonView.RPC(nameof(OpponentChangedMovementForCard),RpcTarget.Others,_placeId,_status);
+        //photonView.RPC(nameof(OpponentChangedMovementForCard),RpcTarget.Others,_placeId,_status);
         HandleChangeMovementForCard(_placeId,_status);
     }
 
@@ -1444,7 +1445,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void ChangeCanFlyToDodge(int _cardId, bool _status)
     {
         HandleChangeCanFlyToDodge(_cardId,_status,true);
-        photonView.RPC(nameof(OpponentChangedCanFlyToDodge),RpcTarget.Others,_cardId,_status);
+        //photonView.RPC(nameof(OpponentChangedCanFlyToDodge),RpcTarget.Others,_cardId,_status);
     }
 
     private void HandleChangeCanFlyToDodge(int _cardId, bool _status, bool _isMy)
@@ -1467,7 +1468,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void TryDestroyMarkers(List<int> _places)
     {
         HandleTryToDestroyMarkers(_places);
-        photonView.RPC(nameof(OpponentWantsToTryAndDestroyMarkers),RpcTarget.Others,JsonConvert.SerializeObject(_places));
+        //photonView.RPC(nameof(OpponentWantsToTryAndDestroyMarkers),RpcTarget.Others,JsonConvert.SerializeObject(_places));
     }
 
     private void HandleTryToDestroyMarkers(List<int> _places)
@@ -1505,7 +1506,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void MarkMarkerAsBomb(int _placeId)
     {
         HandleMarkMarkerAsBomb(_placeId);
-        photonView.RPC(nameof(OpponentMarkedBomb),RpcTarget.Others,_placeId);
+        //photonView.RPC(nameof(OpponentMarkedBomb),RpcTarget.Others,_placeId);
     }
 
     private void HandleMarkMarkerAsBomb(int _placeId)
@@ -1540,7 +1541,7 @@ public class GameplayManagerPVP : GameplayManager
     
     public override void FinishedReductionAction()
     {
-        photonView.RPC(nameof(OpponentFinishedReductionAction),RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentFinishedReductionAction),RpcTarget.Others);
     }
 
     public override void BombExploded(int _placeId)
@@ -1550,7 +1551,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             yield return new WaitForSeconds(0.3f);
             HandleBombExploded(_placeId);
-            photonView.RPC(nameof(OpponentSaidThatBombExploded),RpcTarget.Others,_placeId);
+            //photonView.RPC(nameof(OpponentSaidThatBombExploded),RpcTarget.Others,_placeId);
         }
     }
 
@@ -1636,7 +1637,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void HandleSnowUltimate(bool _status)
     {
         HandleSnowUltimate(_status,true);
-        photonView.RPC(nameof(OpponentUsedSnowUltimate),RpcTarget.Others,_status);
+        //photonView.RPC(nameof(OpponentUsedSnowUltimate),RpcTarget.Others,_status);
     }
 
     private void HandleSnowUltimate(bool _status, bool _didIUse)
@@ -1662,7 +1663,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             int _placeId = _ability.GetTablePlace().Id;
             HandleActivateAbility(_cardId,true,_placeId);
-            photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
+            //photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
         }
         void PlaceAbility(int _placeId)
         {
@@ -1672,7 +1673,7 @@ public class GameplayManagerPVP : GameplayManager
                 return;
             }
             HandleActivateAbility(_cardId,true,_placeId);
-            photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
+            //photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
         }
     }
 
@@ -1695,7 +1696,7 @@ public class GameplayManagerPVP : GameplayManager
                 MyPlayer.Actions--;
             }
         }
-        photonView.RPC(nameof(OpponentBoughtAbilityFromShop),RpcTarget.Others,_abilityId);
+        //photonView.RPC(nameof(OpponentBoughtAbilityFromShop),RpcTarget.Others,_abilityId);
     }
 
     private void HandleBuyAbilityFromShop(int _abilityId, bool _didIBuy)
@@ -1718,7 +1719,7 @@ public class GameplayManagerPVP : GameplayManager
                 MyPlayer.Actions--;
             }
         }
-        photonView.RPC(nameof(OpponentBoughtAbilityFromHand),RpcTarget.Others,_abilityId);
+        //photonView.RPC(nameof(OpponentBoughtAbilityFromHand),RpcTarget.Others,_abilityId);
     }
 
     private void HandleBuyAbilityFromHand(int _abilityId, bool _didIBuy)
@@ -1891,7 +1892,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void ManageBombExplosion(bool _state)
     {
         HandleBombExplosion(true, _state);
-        photonView.RPC(nameof(OpponentChangedBomberExplode),RpcTarget.Others,_state);
+        //photonView.RPC(nameof(OpponentChangedBomberExplode),RpcTarget.Others,_state);
     }
 
     private void HandleBombExplosion(bool _isMy, bool _state)
@@ -1902,7 +1903,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void ManageChangeOrgAttack(int _amount)
     {
         HandleChangeOrgAttack(_amount,true);
-        photonView.RPC(nameof(OpponentChangedOrgesDamage),RpcTarget.Others,_amount);
+        //photonView.RPC(nameof(OpponentChangedOrgesDamage),RpcTarget.Others,_amount);
     }
 
     private void HandleChangeOrgAttack(int _amount, bool _isMy)
@@ -1921,7 +1922,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void PlaceAbilityOnTable(int _abilityId,int _placeId)
     {
         PlaceAbilityOnTable(_abilityId,true,_placeId);
-        photonView.RPC(nameof(OpponentReturnedAbilityToPlace),RpcTarget.Others,_abilityId, _placeId);
+        //photonView.RPC(nameof(OpponentReturnedAbilityToPlace),RpcTarget.Others,_abilityId, _placeId);
     }
 
     private void PlaceAbilityOnTable(int _cardId, bool _isMy, int _placeId)
@@ -1934,7 +1935,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ReturnAbilityFromActivationField(int _abilityId)
     {
-        photonView.RPC(nameof(OpponentReturnAbilityToHand),RpcTarget.Others,_abilityId);
+        //photonView.RPC(nameof(OpponentReturnAbilityToHand),RpcTarget.Others,_abilityId);
         HandleReturnAbilityFromActivationField(_abilityId);
     }
 
@@ -1951,7 +1952,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void BuyMatter()
     {
         HandleBuyMatter(true);
-        photonView.RPC(nameof(OpponentBoughtStrangeMatter),RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentBoughtStrangeMatter),RpcTarget.Others);
     }
 
     private void HandleBuyMatter(bool _didIBuy)
@@ -1968,7 +1969,7 @@ public class GameplayManagerPVP : GameplayManager
             _callBack?.Invoke(_markerWithBombId);
             return;
         }
-        photonView.RPC(nameof(OpponentAskedIfThereIsBombInMarkers),RpcTarget.Others,JsonConvert.SerializeObject(_markers));
+        //photonView.RPC(nameof(OpponentAskedIfThereIsBombInMarkers),RpcTarget.Others,JsonConvert.SerializeObject(_markers));
     }
 
     private int CheckForBomb(List<int> _markers)
@@ -2010,12 +2011,12 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentToRemoveStrangeMatter(int _amount)
     {
-        photonView.RPC(nameof(OpponentSaidToRemoveStrangeMatter),RpcTarget.Others,_amount);
+        //photonView.RPC(nameof(OpponentSaidToRemoveStrangeMatter),RpcTarget.Others,_amount);
     }
 
     public override void VetoCard(AbilityCard _card)
     {
-        photonView.RPC(nameof(OpponentToldYouToVetoCardOnField),RpcTarget.Others,_card.Details.Id);
+        //photonView.RPC(nameof(OpponentToldYouToVetoCardOnField),RpcTarget.Others,_card.Details.Id);
     }
 
     private void HandleVetoCard(AbilityCard _card)
@@ -2033,28 +2034,28 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentToPlaceFirstCardCasters()
     {
-        photonView.RPC(nameof(OpponentWantsMeToActivateFirstAbilityCasters),RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentWantsMeToActivateFirstAbilityCasters),RpcTarget.Others);
     }
 
     public override void OpponentPlacedFirstAbilityForCasters()
     {
-        photonView.RPC(nameof(TellOpponentThatIPlacedFirstCardForCasters),RpcTarget.Others);
+        //photonView.RPC(nameof(TellOpponentThatIPlacedFirstCardForCasters),RpcTarget.Others);
     }
 
     public override void FinishCasters()
     {
-        photonView.RPC(nameof(OpponentSaidFinishCasters), RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentSaidFinishCasters), RpcTarget.Others);
     }
 
     public override void UpdateHealth(int _cardId, bool _status, int _health)
     {
-      photonView.RPC(nameof(OpponentUpdatedHealth),RpcTarget.Others,_cardId,_status,_health);   
+      //photonView.RPC(nameof(OpponentUpdatedHealth),RpcTarget.Others,_cardId,_status,_health);   
     }
 
     public override void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
     {
         HandleDestroyBombWithoutActivatingIt(_cardId,_isMy);
-        photonView.RPC(nameof(OpponentWantsToDestroyBombWithoutActivatingIt),RpcTarget.Others,_cardId,_isMy);
+        //photonView.RPC(nameof(OpponentWantsToDestroyBombWithoutActivatingIt),RpcTarget.Others,_cardId,_isMy);
     }
 
     private void HandleDestroyBombWithoutActivatingIt(int _cardId,bool _isMy)
@@ -2066,13 +2067,13 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentToUseStealth(int _cardId, int _stealthFromPlace, int _placeMinionsFrom)
     {
-        photonView.RPC(nameof(OpponentSaidToUseStealth),RpcTarget.Others,_cardId,_stealthFromPlace,_placeMinionsFrom);
+        //photonView.RPC(nameof(OpponentSaidToUseStealth),RpcTarget.Others,_cardId,_stealthFromPlace,_placeMinionsFrom);
     }
 
     public override void ChangeSprite(int _cardPlace, int _cardId, int _spriteId,bool _showPlaceAnimation=false)
     {
         HandleChangeSprite(_cardPlace,_cardId,_spriteId,_showPlaceAnimation);
-        photonView.RPC(nameof(OpponentSaidToChangeSprite),RpcTarget.Others,_cardPlace,_cardId,_spriteId,_showPlaceAnimation);
+        //photonView.RPC(nameof(OpponentSaidToChangeSprite),RpcTarget.Others,_cardPlace,_cardId,_spriteId,_showPlaceAnimation);
     }
 
     private void HandleChangeSprite(int _cardPlace, int _cardId, int _spriteId,bool _showPlaceAnimation)
@@ -2121,7 +2122,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void RequestResponseAction(int _cardId)
     {
         ForceResponseAction(_cardId);
-        photonView.RPC(nameof(OpponentGotResponseAction),RpcTarget.Others);
+        //photonView.RPC(nameof(OpponentGotResponseAction),RpcTarget.Others);
     }
 
     public override void PlayAudioOnBoth(string _key, CardBase _cardBase)
@@ -2134,7 +2135,7 @@ public class GameplayManagerPVP : GameplayManager
         Card _card = _cardBase as Card;
         
         HandlePlayAudio(_key,_card.Details.Id,true);
-        photonView.RPC(nameof(OpponentSaidToPlayAudio),RpcTarget.Others,_key,_card.Details.Id);
+        //photonView.RPC(nameof(OpponentSaidToPlayAudio),RpcTarget.Others,_key,_card.Details.Id);
     }
 
     private void HandlePlayAudio(string _key, int _cardId, bool _isMy)
@@ -2153,43 +2154,37 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentThatIUsedUltimate()
     {
-        photonView.RPC(nameof(OpponentUsedHisUltimate),RpcTarget.Others);   
+        //photonView.RPC(nameof(OpponentUsedHisUltimate),RpcTarget.Others);   
     }
 
-    [PunRPC]
     private void OpponentUsedHisUltimate()
     {
         Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
         _keeper.SpecialAbilities[0].CanUseAbility = false;
     }
 
-    [PunRPC]
     private void OpponentResigned()
     {
         UIManager.Instance.ShowOkDialog("Opponent resigned");
         StopGame(true);
     }
 
-    [PunRPC]
     private void OpponentPlacedCard(int _cardId, int _positionId, bool _dontCheckIfPlayerHasIt)
     {
         _positionId = ConvertOpponentsPosition(_positionId);
         PlaceCard(OpponentPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
 
-    [PunRPC]
     private void OpponentPlacedStartingCards()
     {
         HasOpponentPlacedStartingCards = true;
     }
 
-    [PunRPC]
     private void MasterAddedAbilityToPlayer(bool _isMyPlayer, int _abilityId)
     {
        HandleAddAbilityToPlayer(!_isMyPlayer, _abilityId);
     }
 
-    [PunRPC]
     private void MasterAddedAbilityToShop(int _abilityId)
     {
         AbilityCard _ability = AbilityCardsManagerBase.Instance.DrawAbilityCard(_abilityId);
@@ -2201,7 +2196,6 @@ public class GameplayManagerPVP : GameplayManager
         AbilityCardsManagerBase.Instance.AddAbilityToShop(_ability);
     }
 
-    [PunRPC]
     private void OpponentExecutedAction(string _actionJson)
     {
         CardAction _action = JsonConvert.DeserializeObject<CardAction>(_actionJson);
@@ -2215,20 +2209,17 @@ public class GameplayManagerPVP : GameplayManager
         PlayCardAction(_action);
     }
 
-    [PunRPC]
     private void OpponentFinishedHisMove()
     {
         OpponentFinished = true;
         IsMyTurn = true;
     }
 
-    [PunRPC]
     private void OpponentUpdatedWhiteStrangeMatter(int _amount)
     {
         OpponentPlayer.StrangeMatter = _amount;
     }
 
-    [PunRPC]
     private void UpdateWhiteStrangeMatterInReserve(int _amount)
     {
         WhiteStrangeMatter.SetAmountInEconomyWithoutNotify(_amount);
@@ -2240,13 +2231,11 @@ public class GameplayManagerPVP : GameplayManager
         return _totalAmountOfFields - _position;
     }
 
-    [PunRPC]
     private void OpponentForcedActionsUpdate(int _amount)
     {
         OpponentPlayer.Actions = _amount;
     }
 
-    [PunRPC]
     private void OpponentFinishedAttackResponse()
     {
         StartCoroutine(OpponentFinished());
@@ -2269,7 +2258,6 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    [PunRPC]
     private void OpponentBoughtMinion(int _cardId, int _price, int _positionId, bool _placeMinion)
     {
         CardBase _revivedCard = FindObjectsOfType<Card>().ToList().Find(
@@ -2280,7 +2268,6 @@ public class GameplayManagerPVP : GameplayManager
         HandlBoughtMinion(_revivedCard, _price, _positionId, _cardId,_placeMinion);
     }
 
-    [PunRPC]
     private void OpponentBuiltWall(int _cardId, int _price, int _positionId)
     {
         CardBase _builtWall = FindObjectsOfType<Card>().ToList().Find(
@@ -2291,51 +2278,43 @@ public class GameplayManagerPVP : GameplayManager
         HandleBuildWall(_builtWall, _price, _positionId, _cardId);
     }
 
-    [PunRPC]
     private void OpponentLootedMe()
     {
         MyPlayer.StrangeMatter = 0;
     }
 
-    [PunRPC]
     private void OpponentUnchainedGuardian()
     {
         HandleUnchainGuardian(false);
     }
 
-    [PunRPC]
     private void OpponentsBlockaderPassive(bool _status)
     {
         ChangeBlockaderAbility(false,_status);
     }
 
-    [PunRPC]
     private void OpponentRequestedChangeOfCardOwner(int _placeId)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleChangeOwnerOfCard(_placeId);
     }
 
-    [PunRPC]
     private void OpponentSaidThatTheMyCardInHisPositionDied(int _cardId)
     {
         HandleOpponentCardDiedInMyPosition(_cardId, false);
     }
 
-    [PunRPC]
     private void OpponentChangedMovementForCard(int _placeId, bool _status)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleChangeMovementForCard(_placeId,_status);
     }
 
-    [PunRPC]
     private void OpponentChangedCanFlyToDodge(int _cardId, bool _status)
     {
         HandleChangeCanFlyToDodge(_cardId,_status, false);
     }
 
-    [PunRPC]
     private void OpponentGotResponseAction()
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
@@ -2345,7 +2324,6 @@ public class GameplayManagerPVP : GameplayManager
         UIManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
 
-    [PunRPC]
     private void OpponentWantsToTryAndDestroyMarkers(string _placesString)
     {
         List<int> _places = JsonConvert.DeserializeObject<List<int>>(_placesString);
@@ -2361,27 +2339,23 @@ public class GameplayManagerPVP : GameplayManager
         HandleTryToDestroyMarkers(_places);
     }
 
-    [PunRPC]
     private void OpponentSaidThatBombExploded(int _placeId)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleBombExploded(_placeId);
     }
 
-    [PunRPC]
     private void OpponentUsedSnowUltimate(bool _status)
     {
         HandleSnowUltimate(_status,false);
     }
 
-    [PunRPC]
     private void OpponentActivatedAbility(int _abilityId, int _placeId)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleActivateAbility(_abilityId, false, _placeId);
     }
 
-    [PunRPC]
     private void OpponentBoughtAbilityFromShop(int _abilityId)
     {
         HandleBuyAbilityFromShop(_abilityId,false);
@@ -2389,38 +2363,32 @@ public class GameplayManagerPVP : GameplayManager
         CloseAllPanels();
     }
 
-    [PunRPC]
     private void OpponentBoughtAbilityFromHand(int _abilityId)
     {
         HandleBuyAbilityFromHand(_abilityId,false);
         UIManager.Instance.ShowOkDialog("Opponent bought ability from his hand");
     }
 
-    [PunRPC]
     private void OpponentChangedBomberExplode(bool _state)
     {
         HandleBombExplosion(false,_state);
     }
 
-    [PunRPC]
     private void OpponentChangedOrgesDamage(int _amount)
     {
         HandleChangeOrgAttack(_amount,false);
     }
 
-    [PunRPC]
     private void OpponentUsedSomething(string _text)
     {
         UIManager.Instance.ShowOkDialog(_text);
     }
 
-    [PunRPC]
     private void OpponentReturnedAbilityToPlace(int _abilityId, int _placeId)
     {
         PlaceAbilityOnTable(_abilityId, false, ConvertOpponentsPosition(_placeId));
     }
 
-    [PunRPC]
     private void OpponentReturnAbilityToHand(int _abilityId)
     {
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList()
@@ -2430,26 +2398,22 @@ public class GameplayManagerPVP : GameplayManager
         UIManager.Instance.ShowOkDialog("Opponent took card from activation field");
     }
 
-    [PunRPC]
     private void OpponentBoughtStrangeMatter()
     {
         HandleBuyMatter(false);
     }
 
-    [PunRPC]
     private void OpponentFinishedReductionAction()
     {
         Reduction _reduction = FindObjectOfType<Reduction>();
         _reduction.OpponentFinishedAction();
     }
 
-    [PunRPC]
     private void OpponentGiveYouLoot(int _amount)
     {
         MyPlayer.StrangeMatter += _amount;
     }
 
-    [PunRPC]
     private void OpponentAskedIfThereIsBombInMarkers(string _markerIds)
     {
         List<int> _markerPlaces = JsonConvert.DeserializeObject<List<int>>(_markerIds);
@@ -2458,29 +2422,25 @@ public class GameplayManagerPVP : GameplayManager
             _markerPlaces[_i] = ConvertOpponentsPosition(_markerPlaces[_i]);
         }
         int _hasBomb = CheckForBomb(_markerPlaces);
-        photonView.RPC(nameof(OpponentRespondedForBombQuestion),RpcTarget.Others,_hasBomb);
+        //photonView.RPC(nameof(OpponentRespondedForBombQuestion),RpcTarget.Others,_hasBomb);
     }
 
-    [PunRPC]
     private void OpponentRespondedForBombQuestion(int _markerId)
     {
         opponentCheckForMarkerCallback?.Invoke(ConvertOpponentsPosition(_markerId));
     }
 
-    [PunRPC]
     private void OpponentMarkedBomb(int _placeId)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleMarkMarkerAsBomb(_placeId);
     }
 
-    [PunRPC]
     private void OpponentSaidToRemoveStrangeMatter(int _amount)
     {
         MyPlayer.RemoveStrangeMatter(_amount);
     }
 
-    [PunRPC]
     private void OpponentToldYouToVetoCardOnField(int _cardId)
     {
         var _abilityCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _cardId);
@@ -2493,7 +2453,7 @@ public class GameplayManagerPVP : GameplayManager
             PlaceAbilityOnTable(_cardId,_abilityCard.GetTablePlace().Id);
         }
         HandleVetoCard(_abilityCard);
-        photonView.RPC(nameof(OpponentPlacedVetoedCard),RpcTarget.Others,_cardId);
+        //photonView.RPC(nameof(OpponentPlacedVetoedCard),RpcTarget.Others,_cardId);
         StartCoroutine(Rotate());
         
         IEnumerator Rotate()
@@ -2503,47 +2463,40 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    [PunRPC]
     private void OpponentPlacedVetoedCard(int _cardId)
     {
         HandleVetoCard(FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id==_cardId));
     }
 
-    [PunRPC]
     private void OpponentWantsMeToActivateFirstAbilityCasters()
     {
         Casters _casters = FindObjectOfType<Casters>();
         _casters.ActivateForOpponentFirst();
     }
 
-    [PunRPC]
     private void TellOpponentThatIPlacedFirstCardForCasters()
     {
         Casters _casters = FindObjectOfType<Casters>();
         _casters.ActivateForMe();
     }
 
-    [PunRPC]
     private void OpponentSaidFinishCasters()
     {
         Casters _casters = FindObjectOfType<Casters>();
         _casters.FinishCasters();
     }
 
-    [PunRPC]
     private void OpponentUpdatedHealth(int _cardId, bool _isMy, int _health)
     {
         FindObjectsOfType<Card>().ToList().Find(_card => _card.Details.Id == _cardId && _card.My == !_isMy).Stats
             .Health = _health;
     }
 
-    [PunRPC]
     private void OpponentWantsToDestroyBombWithoutActivatingIt(int _cardId,bool _isMy)
     {
         HandleDestroyBombWithoutActivatingIt(_cardId, !_isMy);
     }
 
-    [PunRPC]
     private void OpponentSaidToUseStealth(int _cardId, int _placeId, int _placeMinionsFrom)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
@@ -2568,13 +2521,11 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    [PunRPC]
     private void OpponentSaidToChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation)
     {
         HandleChangeSprite(ConvertOpponentsPosition(_cardPlace),_cardId,_spriteId,_showPlaceAnimation);   
     }
 
-    [PunRPC]
     private void OpponentSaidToPlayAudio(string _key, int _cardId)
     {
         HandlePlayAudio(_key,_cardId,false);

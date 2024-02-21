@@ -24,18 +24,11 @@ public class Initializator : MonoBehaviour
    private void InitSOs()
    {
       FactionSO.Init();
-      InitPhoton();
-   }
-
-   private void InitPhoton()
-   {
-      PhotonManager.OnFinishedInit += InitFirebase;
-      PhotonManager.Init();
+      InitFirebase();
    }
 
    private void InitFirebase()
    {
-      PhotonManager.OnFinishedInit -= InitFirebase;
       FirebaseManager.Instance.Init(Authenticate);
    }
 
