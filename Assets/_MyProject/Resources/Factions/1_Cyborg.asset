@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d9df8ca35551c4478c2202cba4caeb5, type: 3}
+  m_Name: 1_Cyborg
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Cyborg
+  NameSprite: {fileID: 21300000, guid: 042d3f34a952e4a63b7aa3643c2f180a, type: 3}
+  Board: {fileID: 21300000, guid: 491e481711cb2fc478baf1b560f8ec05, type: 3}
+  CardBackground: {fileID: 21300000, guid: ad59f2c5121973d428772fdb5cdf54cf, type: 3}
+  BombSprite: {fileID: 21300000, guid: 035ed9c477dcca7489aae491269e0265, type: 3}
