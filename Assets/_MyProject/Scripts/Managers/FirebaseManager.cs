@@ -5,17 +5,19 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
-using Newtonsoft.Json;
+using FirebaseMultiplayer.Room;
 
 public class FirebaseManager : MonoBehaviour
 {
     private const string USERS_KEY = "users";
     private const string GAME_DATA_KEY = "gameData";
-    
-    public static FirebaseManager Instance;
-    public FirebaseAuthentication Authentication = new ();
-    private DatabaseReference database;
+    private const string ROOMS_KEY = "rooms";
 
+    public static FirebaseManager Instance;
+    public FirebaseAuthentication Authentication = new();
+    public RoomHandler RoomHandler = new();
+    private DatabaseReference database;
+    
     private void Awake()
     {
         if (Instance == null)
@@ -37,6 +39,7 @@ public class FirebaseManager : MonoBehaviour
             {
                 Authentication.Init(FirebaseAuth.DefaultInstance);
                 database = FirebaseDatabase.DefaultInstance.RootReference;
+                RoomHandler.Init(database, $"{GAME_DATA_KEY}/{ROOMS_KEY}");
                 _callBack?.Invoke();
             }
             else
@@ -63,6 +66,7 @@ public class FirebaseManager : MonoBehaviour
             {
                 _callBack?.Invoke(false);
             }
+
             string _result = _task.Result.GetRawJsonValue();
             DataManager.Instance.SetPlayerData(_result);
             CollectGameData(_callBack);
@@ -92,7 +96,7 @@ public class FirebaseManager : MonoBehaviour
     {
         database.Child(USERS_KEY).Child(Authentication.UserId).SetRawJsonValueAsync(_data).ContinueWithOnMainThread(_task =>
         {
-            if (_task.IsCanceled||_task.IsFaulted)
+            if (_task.IsCanceled || _task.IsFaulted)
             {
                 Debug.Log("Failed to save player data");
                 _callBack?.Invoke(false);
@@ -102,7 +106,7 @@ public class FirebaseManager : MonoBehaviour
             _callBack?.Invoke(true);
         });
     }
-    
+
     public void SendPasswordResetEmail(string _email, Action<bool> _callBack)
     {
         Authentication.SendPasswordResetEmail(_email, _result =>
@@ -111,7 +115,7 @@ public class FirebaseManager : MonoBehaviour
             _callBack?.Invoke(_result.IsSuccessful);
         });
     }
-    
+
     public void SaveValue<T>(string _path, T _value)
     {
         database.Child(USERS_KEY).Child(Authentication.UserId).Child(_path).SetValueAsync(_value);

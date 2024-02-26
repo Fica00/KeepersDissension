@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using FirebaseGameplay.Responses;
+using FirebaseMultiplayer.Room;
 using UnityEngine;
 
 public class MatchMakingHandler : MonoBehaviour
@@ -65,8 +68,13 @@ public class MatchMakingHandler : MonoBehaviour
         {
             case MatchMode.Debug:
             case MatchMode.Normal:
-                // PhotonManager.Instance.JoinRandomRoom();
-                // PhotonManager.OnIJoinedRoom += JoinedRandomRoom;
+                RoomPlayer _playerData = new RoomPlayer
+                {
+                    Id = FirebaseManager.Instance.Authentication.UserId,
+                    FactionId = DataManager.Instance.PlayerData.FactionId,
+                    DateCrated = DataManager.Instance.PlayerData.DateCreated
+                };
+                FirebaseManager.Instance.RoomHandler.JoinRandomRoom(_playerData,HandleJoinRandomRoom);
                 break;
             case MatchMode.Private:
                 friendlyMatchUI.Activate();
@@ -76,14 +84,65 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void JoinedRandomRoom()
+    private void HandleJoinRandomRoom(JoinRoom _response)
     {
-        // PhotonManager.OnIJoinedRoom -= JoinedRandomRoom;
-        FinishedSettingUpFriendlyMatch();
+        if (_response.Success)
+        {
+            FinishedSettingUpFriendlyMatch();
+        }
+        else
+        {
+            string _roomName = "Test room";
+            RoomData _roomData = new RoomData
+            {
+                Name =_roomName,
+                Id = Guid.NewGuid().ToString(),
+                Type = RoomType.Normal,
+                Status = RoomStatus.SearchingForOpponent,
+                Owner = FirebaseManager.Instance.Authentication.UserId,
+                RoomPlayers = new List<RoomPlayer>
+                {
+                    new (){ Id = FirebaseManager.Instance.Authentication.UserId, FactionId = DataManager.Instance.PlayerData.FactionId, DateCrated = 
+                    DataManager.Instance.PlayerData.DateCreated }
+                }
+            };
+            FirebaseManager.Instance.RoomHandler.CreateRoom(_roomData, HandeCreateRoom);
+        }
     }
 
+    private void HandeCreateRoom(CreateRoom _response)
+    {
+        if (_response.Success)
+        {
+            FinishedSettingUpFriendlyMatch();
+        }
+        else
+        {
+            Debug.Log("Failed to create room!");
+        }
+    }
     public void FinishedSettingUpFriendlyMatch()
     {
         searchingForOpponentPanel.Activate();
+        FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
+        if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count==2)
+        {
+            StartGameplay();
+        }
+        else
+        {
+            RoomHandler.OnPlayerJoined += PlayerJoined;
+        }
+    }
+
+    private void PlayerJoined(RoomPlayer _)
+    {
+        StartGameplay();
+    }
+
+
+    private void StartGameplay()
+    {
+        SceneManager.LoadGameplay();
     }
 }

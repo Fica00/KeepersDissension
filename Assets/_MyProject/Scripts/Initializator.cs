@@ -68,7 +68,8 @@ public class Initializator : MonoBehaviour
       {
          UIManager.Instance.ShowOkDialog("Something went wrong while collecting data");
       }
-      
+
+      FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);
       SceneManager.LoadMainMenu();
    }
 
