@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.3069224, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4803,7 +4803,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 672549750}
-  - component: {fileID: 672549752}
   - component: {fileID: 672549751}
   m_Layer: 5
   m_Name: AbilityCardsManager
@@ -4851,28 +4850,6 @@ MonoBehaviour:
     type: 3}
   abilityShopDisplayHolder: {fileID: 1293477663}
   amountOfCardsInShop: 3
---- !u!114 &672549752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 672549749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 2
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &674888751
 GameObject:
   m_ObjectHideFlags: 0
@@ -9556,7 +9533,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1241439616}
-  - component: {fileID: 1241439618}
   - component: {fileID: 1241439617}
   m_Layer: 0
   m_Name: GameplayManager
@@ -9634,28 +9610,6 @@ MonoBehaviour:
   healthTracker: {fileID: 1497496152}
   LootChanges: 0000000000000000
   IdOfCardWithResponseAction: 0
---- !u!114 &1241439618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1241439615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 1
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &1246050847
 GameObject:
   m_ObjectHideFlags: 0
@@ -35630,7 +35584,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -8736367
+      value: -8756873
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}

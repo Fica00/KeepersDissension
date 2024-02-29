@@ -5,10 +5,13 @@ using DG.Tweening;
 using Newtonsoft.Json;
 using UnityEngine;
 using System.Linq;
+using FirebaseMultiplayer.Room;
+using GameplayActions;
 
 public class GameplayManagerPVP : GameplayManager
 {
     private Action<int> opponentCheckForMarkerCallback;
+    private RoomHandler roomHandler;
 
     protected override void Awake()
     {
@@ -17,20 +20,47 @@ public class GameplayManagerPVP : GameplayManager
         {
             AmountOfAbilitiesPlayerCanBuy = 1000;
         }
+
+        roomHandler = FirebaseManager.Instance.RoomHandler;
     }
 
     private void OnEnable()
     {
-        // PhotonManager.OnOpponentLeftRoom += OpponentLeftRoom;
-        WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
+        RoomHandler.OnNewAction += ProcessAction;
+        RoomHandler.OnPlayerLeft += OpponentLeftRoom;
     }
 
     private void OnDisable()
     {
-        // PhotonManager.OnOpponentLeftRoom -= OpponentLeftRoom;
+        RoomHandler.OnNewAction += ProcessAction;
+        RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
     }
 
-    private void OpponentLeftRoom()
+    private void ProcessAction(GameplayActionBase _action)
+    {
+        Debug.Log(JsonConvert.SerializeObject(_action));
+        return;
+        switch (_action)
+        {
+            case FinishedPlacingLifeForce _:
+                HasOpponentPlacedStartingCards =true;
+                break;
+            case FinishedPlacingStartingCards _:
+                HasOpponentPlacedStartingCards = true;
+                break;
+            case PlaceCard _placeCard:
+                int _positionId = ConvertOpponentsPosition(_placeCard.PositionId);
+                PlaceCard(OpponentPlayer, _placeCard.CardId, _positionId,_placeCard.DontCheckIfPlayerHasIt);
+                break;
+            case Resign _:
+                StopGame(true);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(_action));
+        }
+    }
+
+    private void OpponentLeftRoom(RoomPlayer _obj)
     {
         if (HasGameEnded)
         {
@@ -41,21 +71,35 @@ public class GameplayManagerPVP : GameplayManager
         StopGame(true);
     }
 
+    protected override void SetupPlayers()
+    {
+        List<GameplayPlayerData> _playerData = new();
+        foreach (var _player in roomHandler.RoomData.RoomPlayers)
+        {
+            _playerData.Add(new GameplayPlayerData
+            {
+                PlayerId = _player.Id,
+                WhiteMatter = 0
+            });
+        }
+
+        roomHandler.SetStartingPlayerData(_playerData);
+    }
+
     protected override void SetupTable()
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);
-        // OpponentPlayer.Setup(Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.FACTION_ID, false)),
-        //     false);
-        MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
+        RoomPlayer _opponent = roomHandler.GetOpponent();
+        OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.SetupTableBackground();
         GameplayUI.Instance.SetupActionAndTurnDisplay();
     }
 
     protected override void DecideWhoPlaysFirst()
     {
+        RoomPlayer _opponent = roomHandler.GetOpponent();
         int _opponentMatchesPlayed =
-            // Convert.ToInt32(PhotonManager.GetProperty(PhotonManager.MATCHES_PLAYED, false));
-            1;
+            Convert.ToInt32(_opponent.MatchesPlayed);
         if (_opponentMatchesPlayed < DataManager.Instance.PlayerData.MatchesPlayed)
         {
             IsMyTurn = false;
@@ -68,9 +112,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        DateTime _opponentDateCreated =
-            // DateUtilities.Convert(PhotonManager.GetProperty(PhotonManager.DATE_CREATED, false));
-            DateTime.Now;
+        DateTime _opponentDateCreated = _opponent.DateCrated;
         if (_opponentDateCreated < DataManager.Instance.PlayerData.DateCreated)
         {
             IsMyTurn = false;
@@ -83,7 +125,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        // IsMyTurn = PhotonManager.IsMasterClient;
+        IsMyTurn = roomHandler.IsOwner;
     }
 
     protected override IEnumerator WaitUntilTheEndOfTurn()
@@ -108,7 +150,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void Resign()
     {
         StopGame(false);
-        // //photonView.RPC(nameof(OpponentResigned), RpcTarget.Others);
+        roomHandler.AddAction(new Resign());
     }
 
     public override void StopGame(bool _didIWin)
@@ -122,7 +164,8 @@ public class GameplayManagerPVP : GameplayManager
     protected override IEnumerator HandlePlacingLifeForceAndGuardian()
     {
         yield return PlaceLifeForceAndGuardian();
-        TellOpponentThatIFinishedPlacingCards();
+        roomHandler.AddAction(new FinishedPlacingLifeForce());
+        yield return new WaitForSeconds(300);
         yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
         HasOpponentPlacedStartingCards = false;
         yield return new WaitForSeconds(0.5f);
@@ -143,14 +186,14 @@ public class GameplayManagerPVP : GameplayManager
         if (IsMyTurn)
         {
             yield return PlaceRestOfStartingCards();
-            TellOpponentThatIFinishedPlacingCards();
+            roomHandler.AddAction(new FinishedPlacingStartingCards());
             yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
         }
         else
         {
             yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
             yield return PlaceRestOfStartingCards();
-            TellOpponentThatIFinishedPlacingCards();
+            roomHandler.AddAction(new FinishedPlacingStartingCards());
         }
     }
 
@@ -237,11 +280,6 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    private void TellOpponentThatIFinishedPlacingCards()
-    {
-        // //photonView.RPC(nameof(OpponentPlacedStartingCards), RpcTarget.Others);
-    }
-
     public override void PlaceStartingWall()
     {
         Place(29);
@@ -285,13 +323,20 @@ public class GameplayManagerPVP : GameplayManager
             _card.Display.Setup(_card as Card);
         }
 
-        //photonView.RPC(nameof(OpponentPlacedCard), RpcTarget.Others, _cardId, _positionId,_dontCheckIfPlayerHasIt);
+        roomHandler.AddAction(new PlaceCard
+        {
+            CardId = _cardId,
+            PositionId = _positionId,
+            DontCheckIfPlayerHasIt = _dontCheckIfPlayerHasIt
+        });
         PlaceCard(MyPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
 
+    // Got to this point :)
+    
     private void PlaceCard(GameplayPlayer _player, int _cardId, int _positionId, bool _dontCheckIfPlayerHasIt = false)
     {
-        CardBase _card = null;
+        CardBase _card;
         if (!_dontCheckIfPlayerHasIt)
         {
             _card = _player.GetCard(_cardId);

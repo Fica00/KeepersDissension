@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Firebase.Database;
 using Firebase.Extensions;
 using FirebaseGameplay.Responses;
+using GameplayActions;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -12,8 +13,12 @@ namespace FirebaseMultiplayer.Room
     {
         public static Action<RoomPlayer> OnPlayerJoined;
         public static Action<RoomPlayer> OnPlayerLeft;
-        
+        public static Action<GameplayActionBase> OnNewAction;
+        public static Action OnILeftRoom;
+
         private DatabaseReference database;
+
+        private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
 
         private string roomsPath;
         private RoomData roomData;
@@ -21,6 +26,7 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsOwner => roomData.Owner == localPlayerId;
         public RoomData RoomData => roomData;
+        private string RoomPath => roomsPath + "/" + roomData.Id;
 
         public void Init(DatabaseReference _database, string _roomsPath)
         {
@@ -33,12 +39,12 @@ namespace FirebaseMultiplayer.Room
             localPlayerId = _localPlayerId;
         }
 
-        public void LeaveRoom(string _playerId)
+        public void LeaveRoom()
         {
             RoomPlayer _myPlayer = default;
             foreach (var _player in roomData.RoomPlayers)
             {
-                if (_player.Id==_playerId)
+                if (_player.Id==localPlayerId)
                 {
                     _myPlayer = _player;
                     break;
@@ -50,18 +56,21 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            roomData.RoomPlayers.Remove(_myPlayer);
-            
-            string _roomPath = roomsPath + "/" + roomData.Id;
-            database.Child(_roomPath).Child(nameof(roomData.RoomPlayers)).SetValueAsync(roomData.RoomPlayers);
-            UnsubscribeFromRoom();
-            
+            string _data = JsonConvert.SerializeObject(new { roomId = roomData.Id, playerId = localPlayerId});
+            WebRequests.Instance.Post(LEAVE_ROOM,_data , _ =>
+            {
+                roomData.RoomPlayers.Remove(_myPlayer);
+                UnsubscribeFromRoom();
+                OnILeftRoom?.Invoke();
+            }, _ =>
+            {
+                Debug.Log(_);
+            });
         }
 
         public void SubscribeToRoom()
         {
-            string _roomPath = roomsPath + "/" + roomData.Id;
-            database.Child(_roomPath).ValueChanged += RoomUpdated;
+            database.Child(RoomPath).ValueChanged += RoomUpdated;
         }
 
         public void UnsubscribeFromRoom()
@@ -71,8 +80,7 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            string _roomPath = roomsPath + "/" + roomData.Id;
-            database.Child(_roomPath).ValueChanged -= RoomUpdated;
+            database.Child(RoomPath).ValueChanged -= RoomUpdated;
             roomData = null;
         }
 
@@ -96,6 +104,7 @@ namespace FirebaseMultiplayer.Room
 
             CheckIfPlayerJoined(_newData);
             CheckIfPlayerLeft(_newData);
+            CheckForNewAction(_newData);
             roomData = _newData;
         }
 
@@ -122,6 +131,34 @@ namespace FirebaseMultiplayer.Room
                 }
                 
                 OnPlayerLeft?.Invoke(_player);
+            }
+        }
+
+        private void CheckForNewAction(RoomData _newData)
+        {
+            foreach (var _action in _newData.Actions)
+            {
+                bool _found = false;
+                foreach (var _oldActionId in roomData.Actions.Keys)
+                {
+                    if (_action.Key==_oldActionId)
+                    {
+                        _found = true;
+                        break;
+                    }
+                }
+
+                if (_found)
+                {
+                    continue;
+                }
+
+                if (_action.Value.Owner == localPlayerId)
+                {
+                    continue;
+                }
+                
+                OnNewAction?.Invoke(_action.Value);
             }
         }
 
@@ -169,6 +206,45 @@ namespace FirebaseMultiplayer.Room
                 _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
 
             });
+        }
+
+        public RoomPlayer GetOpponent()
+        {
+            foreach (var _player in roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    continue;
+                }
+
+                return _player;
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+
+        public void SetStartingPlayerData(List<GameplayPlayerData> _data)
+        {
+            roomData.GameplayData.PlayersData = _data;
+            if (IsOwner)
+            {
+                database.Child(RoomPath).Child(nameof(roomData.GameplayData)).Child(nameof(roomData.GameplayData.PlayersData)).SetRawJsonValueAsync
+                (JsonConvert.SerializeObject(_data)).ContinueWithOnMainThread(_task =>
+                {
+                    Debug.Log(_task.Exception);
+                    Debug.Log(_task.Status);
+                    Debug.Log(_task.IsCompleted);
+                });
+                
+            }
+        }
+
+        public void AddAction(GameplayActionBase _action)
+        {
+            _action.Owner = localPlayerId;
+            string _actionId = Guid.NewGuid().ToString();
+            roomData.Actions.Add(_actionId,_action);
+            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_action));
         }
     }
 }

@@ -72,7 +72,8 @@ public class MatchMakingHandler : MonoBehaviour
                 {
                     Id = FirebaseManager.Instance.Authentication.UserId,
                     FactionId = DataManager.Instance.PlayerData.FactionId,
-                    DateCrated = DataManager.Instance.PlayerData.DateCreated
+                    DateCrated = DataManager.Instance.PlayerData.DateCreated,
+                    MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
                 };
                 FirebaseManager.Instance.RoomHandler.JoinRandomRoom(_playerData,HandleJoinRandomRoom);
                 break;
@@ -103,7 +104,7 @@ public class MatchMakingHandler : MonoBehaviour
                 RoomPlayers = new List<RoomPlayer>
                 {
                     new (){ Id = FirebaseManager.Instance.Authentication.UserId, FactionId = DataManager.Instance.PlayerData.FactionId, DateCrated = 
-                    DataManager.Instance.PlayerData.DateCreated }
+                    DataManager.Instance.PlayerData.DateCreated , MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed}
                 }
             };
             FirebaseManager.Instance.RoomHandler.CreateRoom(_roomData, HandeCreateRoom);

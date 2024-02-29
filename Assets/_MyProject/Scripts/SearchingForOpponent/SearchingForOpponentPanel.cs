@@ -1,4 +1,5 @@
 using System;
+using FirebaseMultiplayer.Room;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,20 +16,18 @@ public class SearchingForOpponentPanel : MonoBehaviour
     private void OnEnable()
     {
         cancelSearch.onClick.AddListener(CancelSearching);
-        // PhotonManager.OnILeftRoom += HideSearching;
-        // PhotonManager.OnOpponentJoinedRoom += StartGameplay;
+        RoomHandler.OnILeftRoom += HideSearching;
     }
 
     private void OnDisable()
     {
         cancelSearch.onClick.RemoveListener(CancelSearching);
-        // PhotonManager.OnILeftRoom -= HideSearching;
-        // PhotonManager.OnOpponentJoinedRoom -= StartGameplay;
+        RoomHandler.OnILeftRoom -= HideSearching;
     }
 
     private void ShowSearching()
     {        
-        // cancelSearch.interactable = PhotonManager.IsMasterClient;
+        cancelSearch.interactable = FirebaseManager.Instance.RoomHandler.IsOwner;
         cancelSearch.interactable = true;
         gameObject.SetActive(true);
     }
@@ -36,25 +35,12 @@ public class SearchingForOpponentPanel : MonoBehaviour
     private void CancelSearching()
     {
         cancelSearch.interactable = false;
-        // PhotonManager.OnILeftRoom += LeftRoom;
-        // PhotonManager.Instance.LeaveRoom();
-    }
-
-    private void LeftRoom()
-    {
-        // PhotonManager.OnILeftRoom -= LeftRoom;
-        HideSearching();
+        FirebaseManager.Instance.RoomHandler.LeaveRoom();
     }
 
     private void HideSearching()
     {
         OnCanceledSearch?.Invoke();
         gameObject.SetActive(false);
-    }
-
-    private void StartGameplay()
-    {
-        cancelSearch.interactable = false;
-        SceneManager.LoadGameplay();
     }
 }

@@ -77,3 +77,36 @@ exports.joinRandomRoom = onRequest((req, res) => {
         res.status(500).send({ success: false, message: "Failed to fetch rooms." });
     });
 });
+
+exports.leaveRoom = onRequest((req, res) => {
+    const { roomId, playerId } = req.body;
+
+    const roomRef = db.ref(`${GAME_KEY}/${ROOMS_KEY}/${roomId}`);
+
+    roomRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+            return res.status(200).json({ success: false, message: "Room not found." });
+        }
+
+        const room = snapshot.val();
+        const updatedRoomPlayers = room.RoomPlayers.filter(player => player.Id !== playerId);
+
+        if (updatedRoomPlayers.length === 0 && room.Status === 0) {
+            // If no players are left in the room and room status is 0, delete the room
+            roomRef.remove()
+                .then(() => res.json({ success: true, message: "Room deleted successfully" }))
+                .catch(error => {
+                    console.error("Error deleting room: ", error);
+                    res.status(500).json({ success: false, message: "Failed to delete room" });
+                });
+        } else {
+            // Otherwise, just update the room's players list
+            roomRef.update({ RoomPlayers: updatedRoomPlayers })
+                .then(() => res.json({ success: true, message: "Left room successfully", roomId: roomId }))
+                .catch(error => {
+                    console.error("Error leaving room: ", error);
+                    res.status(500).json({ success: false, message: "Failed to leave room" });
+                });
+        }
+    });
+});
