@@ -44,7 +44,7 @@ public class GameplayManager : MonoBehaviour
     public bool IsSettingUpTable =>
         GameState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
 
-        [HideInInspector] public CardAction LastAction;
+    [HideInInspector] public CardAction LastAction;
     [HideInInspector] public GameplayState GameState;
     [SerializeField] protected HealthTracker healthTracker;
 
@@ -62,11 +62,11 @@ public class GameplayManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return new WaitForSeconds(5);
         SetupPlayers();
         SetupTable();
-        return;
         MyPlayer.UpdatedActions += TryEndTurn;
         DataManager.Instance.PlayerData.PlayMusic = DataManager.Instance.PlayerData.PlayMusic; 
         StartCoroutine(GameplayRoutine());
@@ -119,6 +119,8 @@ public class GameplayManager : MonoBehaviour
         }
 
         healthTracker.Setup();
+        
+        yield break;
         while (!HasGameEnded)
         {
             Finished = false;
@@ -231,6 +233,7 @@ public class GameplayManager : MonoBehaviour
     {
         throw new NotImplementedException();
     }
+    
     public virtual void SpawnBombEffect(int _placeId)
     {
         throw new NotImplementedException();

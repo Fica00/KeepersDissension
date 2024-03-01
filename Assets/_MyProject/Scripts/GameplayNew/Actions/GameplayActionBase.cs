@@ -6,6 +6,6 @@ namespace GameplayActions
     public class GameplayActionBase
     {
         public string Owner;
-        public virtual ActionType Type => ActionType.None;
+        public ActionType Type;
     }
 }

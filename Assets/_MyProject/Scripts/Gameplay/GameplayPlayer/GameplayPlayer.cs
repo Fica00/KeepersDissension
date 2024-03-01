@@ -82,6 +82,11 @@ public class GameplayPlayer : MonoBehaviour
         Transform _cardsHolder = tableSideHandler.CardsHolder;
         foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSO))
         {
+            if (_cardInDeck==null)
+            {
+                Debug.Log("Somehow lost this card???");
+                continue;
+            }
             Card _card = CardsManager.Instance.CreateCard(_cardInDeck.Details.Id, IsMy);
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);

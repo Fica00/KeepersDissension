@@ -32,31 +32,33 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OnDisable()
     {
-        RoomHandler.OnNewAction += ProcessAction;
+        RoomHandler.OnNewAction -= ProcessAction;
         RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
     }
 
-    private void ProcessAction(GameplayActionBase _action)
+    private void ProcessAction(ActionData _action)
     {
-        Debug.Log(JsonConvert.SerializeObject(_action));
-        return;
-        switch (_action)
+        Debug.Log(_action.JsonData);
+        switch (_action.Data.Type)
         {
-            case FinishedPlacingLifeForce _:
-                HasOpponentPlacedStartingCards =true;
+            case ActionType.None:
                 break;
-            case FinishedPlacingStartingCards _:
-                HasOpponentPlacedStartingCards = true;
-                break;
-            case PlaceCard _placeCard:
+            case ActionType.PlaceCard:
+                PlaceCard _placeCard = JsonConvert.DeserializeObject<PlaceCard>(_action.JsonData);
                 int _positionId = ConvertOpponentsPosition(_placeCard.PositionId);
                 PlaceCard(OpponentPlayer, _placeCard.CardId, _positionId,_placeCard.DontCheckIfPlayerHasIt);
                 break;
-            case Resign _:
+            case ActionType.Resign:
                 StopGame(true);
                 break;
+            case ActionType.FinishedPlacingLifeForce:
+                HasOpponentPlacedStartingCards = true;
+                break;
+            case ActionType.FinishedPlacingStartingCards:
+                HasOpponentPlacedStartingCards =true;
+                break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(_action));
+                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -90,9 +92,11 @@ public class GameplayManagerPVP : GameplayManager
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);
         RoomPlayer _opponent = roomHandler.GetOpponent();
+        Debug.Log(_opponent.Id);
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.SetupTableBackground();
         GameplayUI.Instance.SetupActionAndTurnDisplay();
+        Debug.Log("Finished setup");
     }
 
     protected override void DecideWhoPlaysFirst()
@@ -150,7 +154,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void Resign()
     {
         StopGame(false);
-        roomHandler.AddAction(new Resign());
+        roomHandler.AddAction(ActionType.Resign, string.Empty);
     }
 
     public override void StopGame(bool _didIWin)
@@ -164,8 +168,7 @@ public class GameplayManagerPVP : GameplayManager
     protected override IEnumerator HandlePlacingLifeForceAndGuardian()
     {
         yield return PlaceLifeForceAndGuardian();
-        roomHandler.AddAction(new FinishedPlacingLifeForce());
-        yield return new WaitForSeconds(300);
+        roomHandler.AddAction(ActionType.FinishedPlacingLifeForce, string.Empty);
         yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
         HasOpponentPlacedStartingCards = false;
         yield return new WaitForSeconds(0.5f);
@@ -186,14 +189,14 @@ public class GameplayManagerPVP : GameplayManager
         if (IsMyTurn)
         {
             yield return PlaceRestOfStartingCards();
-            roomHandler.AddAction(new FinishedPlacingStartingCards());
+            roomHandler.AddAction(ActionType.FinishedPlacingStartingCards, string.Empty);
             yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
         }
         else
         {
             yield return new WaitUntil(() => HasOpponentPlacedStartingCards);
             yield return PlaceRestOfStartingCards();
-            roomHandler.AddAction(new FinishedPlacingStartingCards());
+            roomHandler.AddAction(ActionType.FinishedPlacingStartingCards, string.Empty);
         }
     }
 
@@ -323,12 +326,11 @@ public class GameplayManagerPVP : GameplayManager
             _card.Display.Setup(_card as Card);
         }
 
-        roomHandler.AddAction(new PlaceCard
+        PlaceCard _placeCard = new PlaceCard
         {
-            CardId = _cardId,
-            PositionId = _positionId,
-            DontCheckIfPlayerHasIt = _dontCheckIfPlayerHasIt
-        });
+            CardId = _cardId, PositionId = _positionId, DontCheckIfPlayerHasIt = _dontCheckIfPlayerHasIt
+        };
+        roomHandler.AddAction(ActionType.PlaceCard, JsonConvert.SerializeObject(_placeCard));
         PlaceCard(MyPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
 

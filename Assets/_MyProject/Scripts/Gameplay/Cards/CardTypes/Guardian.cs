@@ -52,7 +52,9 @@ public class Guardian: Card
     {
         Stats.UpdatedHealth += ShowHealth;
         ShowHealth();
-        StartCoroutine(ShowCainRoutine());
+        //todo uncomment me
+        chain.gameObject.SetActive(false);
+        //StartCoroutine(ShowCainRoutine());
     }
 
     private void OnEnable()

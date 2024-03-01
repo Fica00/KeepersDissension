@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Firebase.Database;
-using Firebase.Extensions;
 using FirebaseGameplay.Responses;
 using GameplayActions;
 using Newtonsoft.Json;
@@ -13,12 +12,14 @@ namespace FirebaseMultiplayer.Room
     {
         public static Action<RoomPlayer> OnPlayerJoined;
         public static Action<RoomPlayer> OnPlayerLeft;
-        public static Action<GameplayActionBase> OnNewAction;
+        public static Action<ActionData> OnNewAction;
         public static Action OnILeftRoom;
 
         private DatabaseReference database;
 
         private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
+        private const string JOIN_RANDOM_ROOM = "https://joinrandomroom-e3mmrpwoya-uc.a.run.app";
+        private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
 
         private string roomsPath;
         private RoomData roomData;
@@ -153,7 +154,7 @@ namespace FirebaseMultiplayer.Room
                     continue;
                 }
 
-                if (_action.Value.Owner == localPlayerId)
+                if (_action.Value.Data.Owner == localPlayerId)
                 {
                     continue;
                 }
@@ -177,10 +178,9 @@ namespace FirebaseMultiplayer.Room
         
         public void JoinRandomRoom(RoomPlayer _playerData, Action<JoinRoom> _callBack)
         {
-            string _uri = "https://joinrandomroom-e3mmrpwoya-uc.a.run.app";
             string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData) });
 
-            WebRequests.Instance.Post(_uri, _postData, 
+            WebRequests.Instance.Post(JOIN_RANDOM_ROOM, _postData, 
                 _response =>
                 {
                     var _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);
@@ -194,10 +194,9 @@ namespace FirebaseMultiplayer.Room
 
         public void CreateRoom(RoomData _roomData, Action<CreateRoom> _callBack)
         {
-            string _uri = "https://createroom-e3mmrpwoya-uc.a.run.app";
             string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData) });
 
-            WebRequests.Instance.Post(_uri, _postData, _response =>
+            WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
                 roomData = _roomData;
                 _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
@@ -228,23 +227,19 @@ namespace FirebaseMultiplayer.Room
             roomData.GameplayData.PlayersData = _data;
             if (IsOwner)
             {
-                database.Child(RoomPath).Child(nameof(roomData.GameplayData)).Child(nameof(roomData.GameplayData.PlayersData)).SetRawJsonValueAsync
-                (JsonConvert.SerializeObject(_data)).ContinueWithOnMainThread(_task =>
-                {
-                    Debug.Log(_task.Exception);
-                    Debug.Log(_task.Status);
-                    Debug.Log(_task.IsCompleted);
-                });
-                
+                database.Child(RoomPath).Child(nameof(roomData.GameplayData)).Child(nameof(roomData.GameplayData.PlayersData))
+                    .SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
+
             }
         }
 
-        public void AddAction(GameplayActionBase _action)
+        public void AddAction(ActionType _type, string _jsonData)
         {
-            _action.Owner = localPlayerId;
             string _actionId = Guid.NewGuid().ToString();
-            roomData.Actions.Add(_actionId,_action);
-            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_action));
+            GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
+            ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData };
+            roomData.Actions.Add(_actionId,_data);
+            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
         }
     }
 }
