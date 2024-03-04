@@ -3,10 +3,10 @@ using System;
 namespace GameplayActions
 {
     [Serializable]
-    public class PlaceCard
+    public class OpponentBuiltWall
     {
         public int CardId;
+        public int Cost;
         public int PositionId;
-        public bool DontCheckIfPlayerHasIt;
     }
 }

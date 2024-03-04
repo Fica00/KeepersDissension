@@ -3,10 +3,11 @@ using System;
 namespace GameplayActions
 {
     [Serializable]
-    public class PlaceCard
+    public class OpponentBoughtMinion
     {
         public int CardId;
+        public int Cost; 
         public int PositionId;
-        public bool DontCheckIfPlayerHasIt;
+        public bool PlaceMinion;
     }
 }

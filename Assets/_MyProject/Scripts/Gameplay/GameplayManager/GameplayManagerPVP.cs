@@ -16,12 +16,12 @@ public class GameplayManagerPVP : GameplayManager
     protected override void Awake()
     {
         base.Awake();
-        if (FirebaseManager.Instance.RoomHandler.IsTestingRoom)
+        roomHandler = FirebaseManager.Instance.RoomHandler;
+
+        if (roomHandler.IsTestingRoom)
         {
             AmountOfAbilitiesPlayerCanBuy = 1000;
         }
-
-        roomHandler = FirebaseManager.Instance.RoomHandler;
     }
 
     private void OnEnable()
@@ -38,7 +38,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void ProcessAction(ActionData _action)
     {
-        Debug.Log(_action.JsonData);
+        Debug.Log("----- " + _action.JsonData);
         switch (_action.Data.Type)
         {
             case ActionType.None:
@@ -46,7 +46,7 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.PlaceCard:
                 PlaceCard _placeCard = JsonConvert.DeserializeObject<PlaceCard>(_action.JsonData);
                 int _positionId = ConvertOpponentsPosition(_placeCard.PositionId);
-                PlaceCard(OpponentPlayer, _placeCard.CardId, _positionId,_placeCard.DontCheckIfPlayerHasIt);
+                PlaceCard(OpponentPlayer, _placeCard.CardId, _positionId, _placeCard.DontCheckIfPlayerHasIt);
                 break;
             case ActionType.Resign:
                 StopGame(true);
@@ -55,7 +55,60 @@ public class GameplayManagerPVP : GameplayManager
                 HasOpponentPlacedStartingCards = true;
                 break;
             case ActionType.FinishedPlacingStartingCards:
-                HasOpponentPlacedStartingCards =true;
+                HasOpponentPlacedStartingCards = true;
+                break;
+            case ActionType.AddAbilityToPlayer:
+                AddAbilityCardToPlayer _addAbilityToPlayer = JsonConvert.DeserializeObject<AddAbilityCardToPlayer>(_action.JsonData);
+                MasterAddedAbilityToPlayer(_addAbilityToPlayer.IsMyPlayer, _addAbilityToPlayer.AbilityId);
+                break;
+            case ActionType.AddAbilityToShop:
+                AddAbilityToShop _addAbilityToShop = JsonConvert.DeserializeObject<AddAbilityToShop>(_action.JsonData);
+                MasterAddedAbilityToShop(_addAbilityToShop.AbilityId);
+                break;
+            case ActionType.ExecuteCardAction:
+                ExecuteCardAction _executeCardAction = JsonConvert.DeserializeObject<ExecuteCardAction>(_action.JsonData);
+                OpponentExecutedAction(_executeCardAction.JsonData);
+                break;
+            case ActionType.OpponentTookLoot:
+                OpponentLootedMe();
+                break;
+            case ActionType.GiveLoot:
+                GiveLoot _giveLoot = JsonConvert.DeserializeObject<GiveLoot>(_action.JsonData);
+                OpponentGiveYouLoot(_giveLoot.Amount);
+                break;
+            case ActionType.OpponentFinishedAttackResponse:
+                OpponentFinishedAttackResponse();
+                break;
+            case ActionType.OpponentEndedTurn:
+                OpponentFinishedHisMove();
+                break;
+            case ActionType.OpponentUpdatedHisStrangeMatter:
+                OpponentUpdateWhiteMatter _opponentUpdatedMatter = JsonConvert.DeserializeObject<OpponentUpdateWhiteMatter>(_action.JsonData);
+                OpponentUpdatedWhiteStrangeMatter(_opponentUpdatedMatter.Amount);
+                break;
+            case ActionType.OpponentUpdatedStrangeMatterInReserve:
+                OpponentUpdatedWhiteMatterInReserve _opponentUpdatedMatterInReserve = JsonConvert.DeserializeObject<OpponentUpdatedWhiteMatterInReserve>(_action.JsonData);
+                UpdateWhiteStrangeMatterInReserve(_opponentUpdatedMatterInReserve.Amount);
+                break;
+            case ActionType.ForceUpdateOpponentAction:
+                ForceUpdateOpponentAction _forceUpdateOpponentAction = JsonConvert.DeserializeObject<ForceUpdateOpponentAction>(_action.JsonData);
+                OpponentForcedActionsUpdate(_forceUpdateOpponentAction.Amount);
+                break;
+            case ActionType.OpponentBoughtMinion:
+                OpponentBoughtMinion _opponentBoughtMinion = JsonConvert.DeserializeObject<OpponentBoughtMinion>(_action.JsonData);
+                OpponentBoughtMinion(_opponentBoughtMinion.CardId,_opponentBoughtMinion.Cost,_opponentBoughtMinion.PositionId,_opponentBoughtMinion
+                .PlaceMinion);
+                break;
+            case ActionType.OpponentBuiltWall:
+                OpponentBuiltWall _opponentBuiltWall = JsonConvert.DeserializeObject<OpponentBuiltWall>(_action.JsonData);
+                OpponentBuiltWall(_opponentBuiltWall.CardId,_opponentBuiltWall.Cost,_opponentBuiltWall.PositionId);
+                break;
+            case ActionType.OpponentUnchainedGuardian:
+                OpponentUnchainedGuardian();
+                break;
+            case ActionType.OpponentsBlockaderPassive:
+                OpponentsBlockaderPassive _blockaderPassive = JsonConvert.DeserializeObject<OpponentsBlockaderPassive>(_action.JsonData);
+                OpponentsBlockaderPassive(_blockaderPassive.Status);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -92,11 +145,9 @@ public class GameplayManagerPVP : GameplayManager
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);
         RoomPlayer _opponent = roomHandler.GetOpponent();
-        Debug.Log(_opponent.Id);
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.SetupTableBackground();
         GameplayUI.Instance.SetupActionAndTurnDisplay();
-        Debug.Log("Finished setup");
     }
 
     protected override void DecideWhoPlaysFirst()
@@ -333,8 +384,6 @@ public class GameplayManagerPVP : GameplayManager
         roomHandler.AddAction(ActionType.PlaceCard, JsonConvert.SerializeObject(_placeCard));
         PlaceCard(MyPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
-
-    // Got to this point :)
     
     private void PlaceCard(GameplayPlayer _player, int _cardId, int _positionId, bool _dontCheckIfPlayerHasIt = false)
     {
@@ -365,11 +414,12 @@ public class GameplayManagerPVP : GameplayManager
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
         OnPlacedCard?.Invoke(_card);
     }
-
+    
     public override void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
     {
         HandleAddAbilityToPlayer(_isMyPlayer,_abilityId);
-        //photonView.RPC(nameof(MasterAddedAbilityToPlayer), RpcTarget.Others, _isMyPlayer, _abilityId);
+        AddAbilityCardToPlayer _abilityData = new AddAbilityCardToPlayer { IsMyPlayer = _isMyPlayer, AbilityId = _abilityId };
+        roomHandler.AddAction(ActionType.AddAbilityToPlayer, JsonConvert.SerializeObject(_abilityData));
     }
 
     private void HandleAddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
@@ -388,7 +438,9 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void AddAbilityToShop(int _abilityId)
     {
-        //photonView.RPC(nameof(MasterAddedAbilityToShop), RpcTarget.All, _abilityId);
+        AddAbilityToShop _data = new AddAbilityToShop { AbilityId = _abilityId };
+        roomHandler.AddAction(ActionType.AddAbilityToShop, JsonConvert.SerializeObject(_data));
+        MasterAddedAbilityToShop(_abilityId);
     }
 
     public override void ExecuteCardAction(CardAction _action, bool _tellOpponent = true)
@@ -396,7 +448,8 @@ public class GameplayManagerPVP : GameplayManager
         PlayCardAction(_action);
         if (_tellOpponent)
         {
-            //photonView.RPC(nameof(OpponentExecutedAction), RpcTarget.Others, JsonConvert.SerializeObject(_action));
+            ExecuteCardAction _execute = new ExecuteCardAction { JsonData = JsonConvert.SerializeObject(_action) };
+            roomHandler.AddAction(ActionType.ExecuteCardAction, JsonConvert.SerializeObject(_execute));
         }
     }
     
@@ -1023,8 +1076,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void TakeLoot()
     {
         MyPlayer.StrangeMatter += OpponentPlayer.StrangeMatter;
-
-        //photonView.RPC(nameof(OpponentLootedMe), RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentTookLoot,string.Empty);
     }
 
     private void GiveLoot()
@@ -1033,8 +1085,9 @@ public class GameplayManagerPVP : GameplayManager
         IEnumerator GiveLootRoutine()
         {
             yield return new WaitForSeconds(2);
-            //photonView.RPC(nameof(OpponentGiveYouLoot),RpcTarget.Others,MyPlayer.StrangeMatter);
             MyPlayer.StrangeMatter = 0;
+            GiveLoot _giveLoot = new GiveLoot { Amount = MyPlayer.StrangeMatter };
+            roomHandler.AddAction(ActionType.GiveLoot, JsonConvert.SerializeObject(_giveLoot));
         }
     }
 
@@ -1172,7 +1225,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameState = GameplayState.Waiting;
             MyPlayer.Actions=0;
-            //photonView.RPC(nameof(OpponentFinishedAttackResponse), RpcTarget.Others);
+            roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
             return;
         }
 
@@ -1189,24 +1242,27 @@ public class GameplayManagerPVP : GameplayManager
         Finished = true;
         IsMyTurn = false;
 
-        //photonView.RPC(nameof(OpponentFinishedHisMove), RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentEndedTurn,string.Empty);
     }
-
+    
     private void TellOpponentThatIUpdatedWhiteStrangeMatter()
     {
-        //photonView.RPC(nameof(OpponentUpdatedWhiteStrangeMatter), RpcTarget.Others, MyPlayer.StrangeMatter);
+        OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
+        roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
     }
 
     private void TellOpponentToUpdateWhiteStrangeMatterReserves()
     {
-        //photonView.RPC(nameof(UpdateWhiteStrangeMatterInReserve), RpcTarget.Others, WhiteStrangeMatter.AmountInEconomy);
+        OpponentUpdatedWhiteMatterInReserve _data = new OpponentUpdatedWhiteMatterInReserve { Amount = WhiteStrangeMatter.AmountInEconomy };
+        roomHandler.AddAction(ActionType.OpponentUpdatedStrangeMatterInReserve, JsonConvert.SerializeObject(_data));
     }
 
     public override void ForceUpdatePlayerActions()
     {
-        //photonView.RPC(nameof(OpponentForcedActionsUpdate), RpcTarget.Others, MyPlayer.Actions);
+        ForceUpdateOpponentAction _data = new ForceUpdateOpponentAction { Amount = MyPlayer.Actions };
+        roomHandler.AddAction(ActionType.ForceUpdateOpponentAction, JsonConvert.SerializeObject(_data));
     }
-
+    
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack=null, bool _placeMinion=true)
     {
         GameplayState _gameState = GameState;
@@ -1223,8 +1279,9 @@ public class GameplayManagerPVP : GameplayManager
             else
             {
                 //50 is just a place holder, wont be used anyway
-                //photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, 50,_placeMinion);
-                HandlBoughtMinion(_cardBase, _cost, 50, _cardId,_placeMinion);
+                OpponentBoughtMinion _boughtData = new OpponentBoughtMinion { CardId = _cardId, Cost = _cost, PositionId = 50, PlaceMinion = _placeMinion };
+                roomHandler.AddAction(ActionType.OpponentBoughtMinion, JsonConvert.SerializeObject(_boughtData));
+                HandleBoughtMinion(_cardBase, _cost, 50, _cardId,_placeMinion);
                 GameState = _gameState;
                 _callBack?.Invoke();
                 if (_cost>0)
@@ -1235,8 +1292,10 @@ public class GameplayManagerPVP : GameplayManager
 
             void FinishRevive(int _positionId)
             {
-                //photonView.RPC(nameof(OpponentBoughtMinion), RpcTarget.Others, _cardId, _cost, _positionId,_placeMinion);
-                HandlBoughtMinion(_cardBase, _cost, _positionId, _cardId,_placeMinion);
+                OpponentBoughtMinion _boughtData = new OpponentBoughtMinion { CardId = _cardId, Cost = _cost, PositionId = _positionId, PlaceMinion = 
+                _placeMinion };
+                roomHandler.AddAction(ActionType.OpponentBoughtMinion, JsonConvert.SerializeObject(_boughtData));
+                HandleBoughtMinion(_cardBase, _cost, _positionId, _cardId,_placeMinion);
                 GameState = _gameState;
                 _callBack?.Invoke();
                 if (_cost>0)
@@ -1247,7 +1306,7 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    private void HandlBoughtMinion(CardBase _cardBase, int _cost, int _positionId, int _cardId, bool _placeMinion)
+    private void HandleBoughtMinion(CardBase _cardBase, int _cost, int _positionId, int _cardId, bool _placeMinion)
     {
         GameplayPlayer _player = _cardBase.My ? MyPlayer : OpponentPlayer;
         if (_player.IsMy)
@@ -1259,6 +1318,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             PlaceCard(_player, _cardId, _positionId);
         }
+        
         _cardBase.HasDied = false;
     }
 
@@ -1275,7 +1335,8 @@ public class GameplayManagerPVP : GameplayManager
 
             void FinishRevive(int _positionId)
             {
-                //photonView.RPC(nameof(OpponentBuiltWall), RpcTarget.Others, _cardId, _cost, _positionId);
+                OpponentBuiltWall _data = new OpponentBuiltWall { CardId = _cardId, Cost = _cost, PositionId = _positionId };
+                roomHandler.AddAction(ActionType.OpponentBuiltWall, JsonConvert.SerializeObject(_data));
                 HandleBuildWall(_cardBase, _cost, _positionId, _cardId);
                 GameState = _state;
                 if (_cost>0)
@@ -1299,7 +1360,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void UnchainGuardian()
     {
         HandleUnchainGuardian(true);
-        //photonView.RPC(nameof(OpponentUnchainedGuardian), RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentUnchainedGuardian,string.Empty);
     }
 
     private void HandleUnchainGuardian(bool _isMy)
@@ -1315,7 +1376,8 @@ public class GameplayManagerPVP : GameplayManager
     public override void ManageBlockaderAbility(bool _status)
     {
         ChangeBlockaderAbility(true,_status);
-        //photonView.RPC(nameof(OpponentsBlockaderPassive), RpcTarget.Others, _status);
+        OpponentsBlockaderPassive _data = new OpponentsBlockaderPassive { Status = _status };
+        roomHandler.AddAction(ActionType.OpponentsBlockaderPassive, JsonConvert.SerializeObject(_data));
     }
 
     private void ChangeBlockaderAbility(bool _isMy, bool _status)
@@ -1323,113 +1385,115 @@ public class GameplayManagerPVP : GameplayManager
         FindObjectsOfType<BlockaderCard>().ToList().Find(_blockader => _blockader.IsMy==_isMy).CanBlock = _status;
     }
 
-   public override void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace, 
-    CardMovementType _movementType, bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack, bool 
-    _ignoreMarkers=true, bool _ignoreWalls=false)
-{
-    TableHandler.ActionsHandler.ClearPossibleActions();
-    StartCoroutine(SelectPlaceForSpecialAbilityRoutine());
-    IEnumerator SelectPlaceForSpecialAbilityRoutine()
-    {
-        List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition,_movementType,_range,_includeSelf);
-        foreach (var _availablePlace in _availablePlaces.ToList())
-        {
-            bool _isOccupied = _availablePlace.IsOccupied;
+    // Got to this point :)
 
-            if (_lookForPlace == PlaceLookFor.Empty && _isOccupied)
+    public override void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace, CardMovementType _movementType,
+        bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack, bool _ignoreMarkers = true, bool _ignoreWalls = false)
+    {
+        TableHandler.ActionsHandler.ClearPossibleActions();
+        StartCoroutine(SelectPlaceForSpecialAbilityRoutine());
+
+        IEnumerator SelectPlaceForSpecialAbilityRoutine()
+        {
+            List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition, _movementType, _range, _includeSelf);
+            foreach (var _availablePlace in _availablePlaces.ToList())
             {
-                if (_includeSelf)
+                bool _isOccupied = _availablePlace.IsOccupied;
+
+                if (_lookForPlace == PlaceLookFor.Empty && _isOccupied)
                 {
-                    if (_startingPosition != _availablePlace.Id)
+                    if (_includeSelf)
+                    {
+                        if (_startingPosition != _availablePlace.Id)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            continue;
+                        }
+                    }
+                    else if (!(_availablePlace.ContainsMarker && _ignoreMarkers))
                     {
                         _availablePlaces.Remove(_availablePlace);
-                        continue;   
+                        continue;
                     }
                 }
-                else if (!(_availablePlace.ContainsMarker && _ignoreMarkers))
+
+                if (_lookForPlace == PlaceLookFor.Occupied && !_isOccupied)
                 {
                     _availablePlaces.Remove(_availablePlace);
-                    continue;   
+                    continue;
                 }
-            }
 
-            if (_lookForPlace == PlaceLookFor.Occupied && !_isOccupied)
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            if (!_includeSelf && _startingPosition == _availablePlace.Id)
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            if (_lookForPlace == PlaceLookFor.Occupied)
-            {
-                List<CardBase> _cardsAtPlace = _availablePlace.GetCards();
-                foreach (var _cardAtPlace in _cardsAtPlace)
+                if (!_includeSelf && _startingPosition == _availablePlace.Id)
                 {
-                    if (_cardAtPlace.My && _lookFor == LookForCardOwner.Enemy)
+                    _availablePlaces.Remove(_availablePlace);
+                    continue;
+                }
+
+                if (_lookForPlace == PlaceLookFor.Occupied)
+                {
+                    List<CardBase> _cardsAtPlace = _availablePlace.GetCards();
+                    foreach (var _cardAtPlace in _cardsAtPlace)
                     {
-                        _availablePlaces.Remove(_availablePlace);
-                        break;
-                    }
-                    
-                    if (!_cardAtPlace.My && _lookFor == LookForCardOwner.My)
-                    {
-                        _availablePlaces.Remove(_availablePlace);
-                        break;
+                        if (_cardAtPlace.My && _lookFor == LookForCardOwner.Enemy)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            break;
+                        }
+
+                        if (!_cardAtPlace.My && _lookFor == LookForCardOwner.My)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        foreach (var _availablePlace in _availablePlaces.ToList())
-        {
-            if (_availablePlace.ContainsWall && _ignoreWalls)
+            foreach (var _availablePlace in _availablePlaces.ToList())
             {
-                _availablePlaces.Remove(_availablePlace);
-            }
-        }
-
-        foreach (var _availablePlace in _availablePlaces)
-        {
-            _availablePlace.SetColor(Color.green);
-        }
-
-        if (_availablePlaces.Count == 0)
-        {
-            _callBack?.Invoke(-1);
-            yield break;
-        }
-
-        CardTableInteractions.OnPlaceClicked += SelectPlace;
-        bool _hasSelectedPlace = false;
-        int _selectedPlaceId = 0;
-
-        yield return new WaitUntil(() => _hasSelectedPlace);
-
-        foreach (var _availablePlace in _availablePlaces)
-        {
-            _availablePlace.SetColor(Color.white);
-        }
-
-        _callBack?.Invoke(_selectedPlaceId);
-
-        void SelectPlace(TablePlaceHandler _place)
-        {
-            if (!_availablePlaces.Contains(_place))
-            {
-                return;
+                if (_availablePlace.ContainsWall && _ignoreWalls)
+                {
+                    _availablePlaces.Remove(_availablePlace);
+                }
             }
 
-            CardTableInteractions.OnPlaceClicked -= SelectPlace;
-            _selectedPlaceId = _place.Id;
-            _hasSelectedPlace = true;
+            foreach (var _availablePlace in _availablePlaces)
+            {
+                _availablePlace.SetColor(Color.green);
+            }
+
+            if (_availablePlaces.Count == 0)
+            {
+                _callBack?.Invoke(-1);
+                yield break;
+            }
+
+            CardTableInteractions.OnPlaceClicked += SelectPlace;
+            bool _hasSelectedPlace = false;
+            int _selectedPlaceId = 0;
+
+            yield return new WaitUntil(() => _hasSelectedPlace);
+
+            foreach (var _availablePlace in _availablePlaces)
+            {
+                _availablePlace.SetColor(Color.white);
+            }
+
+            _callBack?.Invoke(_selectedPlaceId);
+
+            void SelectPlace(TablePlaceHandler _place)
+            {
+                if (!_availablePlaces.Contains(_place))
+                {
+                    return;
+                }
+
+                CardTableInteractions.OnPlaceClicked -= SelectPlace;
+                _selectedPlaceId = _place.Id;
+                _hasSelectedPlace = true;
+            }
         }
     }
-}
 
 
     public override void TellOpponentSomething(string _text)
@@ -2312,7 +2376,7 @@ public class GameplayManagerPVP : GameplayManager
 
         _positionId = ConvertOpponentsPosition(_positionId);
 
-        HandlBoughtMinion(_revivedCard, _price, _positionId, _cardId,_placeMinion);
+        HandleBoughtMinion(_revivedCard, _price, _positionId, _cardId,_placeMinion);
     }
 
     private void OpponentBuiltWall(int _cardId, int _price, int _positionId)
