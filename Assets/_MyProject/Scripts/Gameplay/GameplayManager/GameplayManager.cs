@@ -120,7 +120,6 @@ public class GameplayManager : MonoBehaviour
 
         healthTracker.Setup();
         
-        yield break;
         while (!HasGameEnded)
         {
             Finished = false;

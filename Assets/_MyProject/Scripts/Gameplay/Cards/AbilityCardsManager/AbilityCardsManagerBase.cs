@@ -23,7 +23,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
     {
         Instance = this;
         abilities = CardsManager.Instance.GetAbilityCards();
-        if (GameConfig.IsTestingRoom)
+        if (FirebaseManager.Instance.RoomHandler.IsTestingRoom)
         {
             amountOfStartingAbilities = 0;
             amountOfCardsInShop = abilities.Count;
@@ -35,7 +35,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
             shopAbilityDisplay.Add(_abilityDisplay);
         }
 
-        abilities = GameConfig.IsTestingRoom 
+        abilities = FirebaseManager.Instance.RoomHandler.IsTestingRoom 
             ? abilities.OrderBy(_ability => _ability.Details.Foreground.name).ToList() 
             : abilities.OrderBy(_ => Guid.NewGuid()).ToList();
         
@@ -114,8 +114,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
 
     public void Setup()
     {
-        // if (!PhotonManager.IsMasterClient)
-        if (!true)
+        if (!FirebaseManager.Instance.RoomHandler.IsOwner)
         {
             return;
         }

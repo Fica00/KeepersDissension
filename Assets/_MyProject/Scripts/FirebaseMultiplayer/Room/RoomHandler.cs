@@ -29,6 +29,8 @@ namespace FirebaseMultiplayer.Room
         public RoomData RoomData => roomData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
 
+        public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
+
         public void Init(DatabaseReference _database, string _roomsPath)
         {
             database = _database;
@@ -176,9 +178,10 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
         
-        public void JoinRandomRoom(RoomPlayer _playerData, Action<JoinRoom> _callBack)
+        public void JoinRandomRoom(RoomPlayer _playerData,RoomType _type, Action<JoinRoom> _callBack, string _name=default)
         {
-            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData) });
+            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData), RoomType = _type, Name = _name
+             });
 
             WebRequests.Instance.Post(JOIN_RANDOM_ROOM, _postData, 
                 _response =>
@@ -188,7 +191,10 @@ namespace FirebaseMultiplayer.Room
                     _callBack?.Invoke(_responseData);
                 }, _response =>
                 {
-                    _callBack?.Invoke(JsonConvert.DeserializeObject<JoinRoom>(_response));
+                    JoinRoom _data = JsonConvert.DeserializeObject<JoinRoom>(_response);
+                    _data.Type = _type;
+                    _data.Name = _name;
+                    _callBack?.Invoke(_data);
                 }, _includeHeader: false);
         }
 

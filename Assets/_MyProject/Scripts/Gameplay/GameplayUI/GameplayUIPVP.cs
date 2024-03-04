@@ -1,3 +1,5 @@
+using FirebaseMultiplayer.Room;
+
 public class GameplayUIPVP : GameplayUI
 {
     public override void ShowResult(bool _didIWin)
@@ -14,13 +16,13 @@ public class GameplayUIPVP : GameplayUI
     
     private void LeaveRoom()
     {
-        // PhotonManager.OnILeftRoom += ShowMainMenu;
-        // PhotonManager.Instance.LeaveRoom();
+        RoomHandler.OnILeftRoom += ShowMainMenu;
+        FirebaseManager.Instance.RoomHandler.LeaveRoom();
     }
 
     private void ShowMainMenu()
     {
-        // PhotonManager.OnILeftRoom -= ShowMainMenu;
-        // SceneManager.LoadMainMenu();
+        RoomHandler.OnILeftRoom -= ShowMainMenu;
+        SceneManager.LoadMainMenu();
     }
 }

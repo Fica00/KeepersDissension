@@ -13,10 +13,10 @@ public class MatchMakingHandler : MonoBehaviour
     [SerializeField] private GameObject chooseFaction;
     [SerializeField] private SearchingForOpponentPanel searchingForOpponentPanel;
     [SerializeField] private FriendlyMatchUI friendlyMatchUI;
+
+    private Action joinRoomCallBack;
     
     private MatchMode mode;
-    public MatchMode Mode => mode;
-
     private void OnEnable()
     {
         SearchingForOpponentPanel.OnCanceledSearch += ShowMainMenu;
@@ -64,24 +64,43 @@ public class MatchMakingHandler : MonoBehaviour
             ShowMainMenu();
             return;
         }
+        
         switch (mode)
         {
-            case MatchMode.Debug:
-            case MatchMode.Normal:
-                RoomPlayer _playerData = new RoomPlayer
-                {
-                    Id = FirebaseManager.Instance.Authentication.UserId,
-                    FactionId = DataManager.Instance.PlayerData.FactionId,
-                    DateCrated = DataManager.Instance.PlayerData.DateCreated,
-                    MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
-                };
-                FirebaseManager.Instance.RoomHandler.JoinRandomRoom(_playerData,HandleJoinRandomRoom);
-                break;
             case MatchMode.Private:
                 friendlyMatchUI.Activate();
-                break;
+                return;
+        }
+
+        JoinRandomRoom();
+    }
+
+    public void JoinRandomRoom(Action _callBack=null)
+    {
+        joinRoomCallBack = _callBack;
+        RoomPlayer _playerData = new RoomPlayer
+        {
+            Id = FirebaseManager.Instance.Authentication.UserId,
+            FactionId = DataManager.Instance.PlayerData.FactionId,
+            DateCrated = DataManager.Instance.PlayerData.DateCreated,
+            MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
+        };
+        
+        FirebaseManager.Instance.RoomHandler.JoinRandomRoom(_playerData,MatchModeToRoomType(mode),HandleJoinRandomRoom);
+    }
+
+    RoomType MatchModeToRoomType(MatchMode _mode)
+    {
+        switch (_mode)
+        {
+            case MatchMode.Normal:
+                return RoomType.Normal;
+            case MatchMode.Private:
+                return RoomType.Friendly;
+            case MatchMode.Debug:
+                return RoomType.Debug;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(_mode), _mode, null);
         }
     }
 
@@ -89,16 +108,15 @@ public class MatchMakingHandler : MonoBehaviour
     {
         if (_response.Success)
         {
-            FinishedSettingUpFriendlyMatch();
+            FinishSettingUpMatch();
         }
         else
         {
-            string _roomName = "Test room";
             RoomData _roomData = new RoomData
             {
-                Name =_roomName,
+                Name =_response.Name,
                 Id = Guid.NewGuid().ToString(),
-                Type = RoomType.Normal,
+                Type = _response.Type,
                 Status = RoomStatus.SearchingForOpponent,
                 Owner = FirebaseManager.Instance.Authentication.UserId,
                 RoomPlayers = new List<RoomPlayer>
@@ -115,17 +133,19 @@ public class MatchMakingHandler : MonoBehaviour
     {
         if (_response.Success)
         {
-            FinishedSettingUpFriendlyMatch();
+            FinishSettingUpMatch();
         }
         else
         {
             Debug.Log("Failed to create room!");
         }
     }
-    public void FinishedSettingUpFriendlyMatch()
+    
+    public void FinishSettingUpMatch()
     {
         searchingForOpponentPanel.Activate();
         FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
+        joinRoomCallBack?.Invoke();
         if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count==2)
         {
             StartGameplay();

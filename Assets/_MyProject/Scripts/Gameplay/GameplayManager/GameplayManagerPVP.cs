@@ -16,7 +16,7 @@ public class GameplayManagerPVP : GameplayManager
     protected override void Awake()
     {
         base.Awake();
-        if (GameConfig.IsTestingRoom)
+        if (FirebaseManager.Instance.RoomHandler.IsTestingRoom)
         {
             AmountOfAbilitiesPlayerCanBuy = 1000;
         }

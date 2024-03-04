@@ -6,6 +6,7 @@ namespace FirebaseMultiplayer.Room
     public enum RoomType
     {
         Friendly = 0,
-        Normal = 1
+        Normal = 1,
+        Debug=2
     }
 }
