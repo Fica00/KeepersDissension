@@ -87,7 +87,8 @@ public class GameplayManagerPVP : GameplayManager
                 OpponentUpdatedWhiteStrangeMatter(_opponentUpdatedMatter.Amount);
                 break;
             case ActionType.OpponentUpdatedStrangeMatterInReserve:
-                OpponentUpdatedWhiteMatterInReserve _opponentUpdatedMatterInReserve = JsonConvert.DeserializeObject<OpponentUpdatedWhiteMatterInReserve>(_action.JsonData);
+                OpponentUpdatedWhiteMatterInReserve _opponentUpdatedMatterInReserve =
+                    JsonConvert.DeserializeObject<OpponentUpdatedWhiteMatterInReserve>(_action.JsonData);
                 UpdateWhiteStrangeMatterInReserve(_opponentUpdatedMatterInReserve.Amount);
                 break;
             case ActionType.ForceUpdateOpponentAction:
@@ -96,12 +97,12 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.OpponentBoughtMinion:
                 OpponentBoughtMinion _opponentBoughtMinion = JsonConvert.DeserializeObject<OpponentBoughtMinion>(_action.JsonData);
-                OpponentBoughtMinion(_opponentBoughtMinion.CardId,_opponentBoughtMinion.Cost,_opponentBoughtMinion.PositionId,_opponentBoughtMinion
-                .PlaceMinion);
+                OpponentBoughtMinion(_opponentBoughtMinion.CardId, _opponentBoughtMinion.Cost, _opponentBoughtMinion.PositionId,
+                    _opponentBoughtMinion.PlaceMinion);
                 break;
             case ActionType.OpponentBuiltWall:
                 OpponentBuiltWall _opponentBuiltWall = JsonConvert.DeserializeObject<OpponentBuiltWall>(_action.JsonData);
-                OpponentBuiltWall(_opponentBuiltWall.CardId,_opponentBuiltWall.Cost,_opponentBuiltWall.PositionId);
+                OpponentBuiltWall(_opponentBuiltWall.CardId, _opponentBuiltWall.Cost, _opponentBuiltWall.PositionId);
                 break;
             case ActionType.OpponentUnchainedGuardian:
                 OpponentUnchainedGuardian();
@@ -109,6 +110,23 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.OpponentsBlockaderPassive:
                 OpponentsBlockaderPassive _blockaderPassive = JsonConvert.DeserializeObject<OpponentsBlockaderPassive>(_action.JsonData);
                 OpponentsBlockaderPassive(_blockaderPassive.Status);
+                break;
+            case ActionType.TellOpponentSomething:
+                TellOpponentSomething _tellOpponentSomething = JsonConvert.DeserializeObject<TellOpponentSomething>(_action.JsonData);
+                OpponentSaidSomething(_tellOpponentSomething.Message);
+                break;
+            case ActionType.ChangeOwner:
+                ChangeOwner _changeOwner = JsonConvert.DeserializeObject<ChangeOwner>(_action.JsonData);
+                OpponentRequestedChangeOfCardOwner(_changeOwner.PlaceId);
+                break;
+            case ActionType.MyCardDiedInOpponentPossession:
+                MyCardDiedInOpponentsPossession _cardDiedInMyPossession =
+                    JsonConvert.DeserializeObject<MyCardDiedInOpponentsPossession>(_action.JsonData);
+                OpponentSaidThatTheMyCardInHisPositionDied(_cardDiedInMyPossession.CardId);
+                break;
+            case ActionType.OpponentChangedMovement:
+                OpponentChangedMovementForCard _changedMovement = JsonConvert.DeserializeObject<OpponentChangedMovementForCard>(_action.JsonData);
+                OpponentChangedMovementForCard(_changedMovement.PlaceId,_changedMovement.Status);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -1384,9 +1402,7 @@ public class GameplayManagerPVP : GameplayManager
     {
         FindObjectsOfType<BlockaderCard>().ToList().Find(_blockader => _blockader.IsMy==_isMy).CanBlock = _status;
     }
-
-    // Got to this point :)
-
+    
     public override void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace, CardMovementType _movementType,
         bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack, bool _ignoreMarkers = true, bool _ignoreWalls = false)
     {
@@ -1498,13 +1514,15 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentSomething(string _text)
     {
-        //photonView.RPC(nameof(OpponentUsedSomething),RpcTarget.Others, _text);
+        TellOpponentSomething _message = new TellOpponentSomething { Message = _text };
+        roomHandler.AddAction(ActionType.TellOpponentSomething, JsonConvert.SerializeObject(_message));
     }
 
     public override void ChangeOwnerOfCard(int _placeId)
     {
         HandleChangeOwnerOfCard(_placeId);
-        //photonView.RPC(nameof(OpponentRequestedChangeOfCardOwner),RpcTarget.Others,_placeId);
+        ChangeOwner _data = new ChangeOwner { PlaceId = _placeId };
+        roomHandler.AddAction(ActionType.ChangeOwner, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleChangeOwnerOfCard(int _placeId)
@@ -1516,7 +1534,8 @@ public class GameplayManagerPVP : GameplayManager
     public override void OpponentCardDiedInMyPosition(int _cardId)
     {
         HandleOpponentCardDiedInMyPosition(_cardId, true);
-        //photonView.RPC(nameof(OpponentSaidThatTheMyCardInHisPositionDied),RpcTarget.Others,_cardId);
+        MyCardDiedInOpponentsPossession _myCardDiedInOpponentsPossession = new MyCardDiedInOpponentsPossession { CardId = _cardId };
+        roomHandler.AddAction(ActionType.MyCardDiedInOpponentPossession, JsonConvert.SerializeObject(_myCardDiedInOpponentsPossession));
     }
 
     private void HandleOpponentCardDiedInMyPosition(int _cardId, bool _isCardMy)
@@ -1538,10 +1557,11 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ChangeMovementForCard(int _placeId, bool _status)
     {
-        //photonView.RPC(nameof(OpponentChangedMovementForCard),RpcTarget.Others,_placeId,_status);
+        OpponentChangedMovementForCard _data = new OpponentChangedMovementForCard { PlaceId = _placeId, Status = _status };
+        roomHandler.AddAction(ActionType.OpponentChangedMovement, JsonConvert.SerializeObject(_data));
         HandleChangeMovementForCard(_placeId,_status);
     }
-
+    
     private void HandleChangeMovementForCard(int _placeId,bool _status)
     {
         CardBase _cardAtPlace = TableHandler.GetPlace(_placeId).GetCardNoWall();
@@ -1552,6 +1572,8 @@ public class GameplayManagerPVP : GameplayManager
         
         _cardAtPlace.CanMove = _status;
     }
+
+    // Got to this point :)
 
     public override void ChangeCanFlyToDodge(int _cardId, bool _status)
     {
@@ -2490,7 +2512,7 @@ public class GameplayManagerPVP : GameplayManager
         HandleChangeOrgAttack(_amount,false);
     }
 
-    private void OpponentUsedSomething(string _text)
+    private void OpponentSaidSomething(string _text)
     {
         UIManager.Instance.ShowOkDialog(_text);
     }

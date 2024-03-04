@@ -23,6 +23,10 @@ namespace GameplayActions
         OpponentBoughtMinion=15,
         OpponentBuiltWall=16,
         OpponentUnchainedGuardian = 17,
-        OpponentsBlockaderPassive = 18
+        OpponentsBlockaderPassive = 18,
+        TellOpponentSomething = 19,
+        ChangeOwner=20,
+        MyCardDiedInOpponentPossession=21,
+        OpponentChangedMovement=22,
     }
 }
