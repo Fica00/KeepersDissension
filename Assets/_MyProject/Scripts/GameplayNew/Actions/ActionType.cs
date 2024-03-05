@@ -37,6 +37,15 @@ namespace GameplayActions
         OpponentActivatedAbility=29,
         OpponentBoughtAbilityFromShop=30,
         OpponentBoughtAbilityFromHand=31,
-        
+        OpponentChangedBomberExplode=32,
+        OpponentChangedOrgesDamage=33,
+        OpponentReturnedAbilityToPlace=34,
+        OpponentReturnAbilityToHand=35,
+        OpponentBoughtStrangeMatter=36,
+        OpponentAskedIfThereIsBombInMarkers=37,
+        OpponentSaidToRemoveStrangeMatter=38,
+        OpponentToldYouToVetoCardOnField=39,
+        OpponentWantsMeToActivateFirstAbilityCasters=40,
+        TellOpponentThatIPlacedFirstCardForCasters=41
     }
 }
