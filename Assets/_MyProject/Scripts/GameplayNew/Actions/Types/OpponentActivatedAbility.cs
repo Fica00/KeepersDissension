@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 
 namespace GameplayActions
 {
     [Serializable]
-    public class OpponentChangedCanFlyToDodge
+    public class OpponentActivatedAbility
     {
         public int CardId;
-        public bool Status;
+        public int Place;
     }
 }

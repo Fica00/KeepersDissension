@@ -126,7 +126,45 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.OpponentChangedMovement:
                 OpponentChangedMovementForCard _changedMovement = JsonConvert.DeserializeObject<OpponentChangedMovementForCard>(_action.JsonData);
-                OpponentChangedMovementForCard(_changedMovement.PlaceId,_changedMovement.Status);
+                OpponentChangedMovementForCard(_changedMovement.PlaceId, _changedMovement.Status);
+                break;
+            case ActionType.OpponentChangedCanFlyToDodge:
+                OpponentChangedCanFlyToDodge _flyToDodge = JsonConvert.DeserializeObject<OpponentChangedCanFlyToDodge>(_action.JsonData);
+                OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status);
+                break;
+            case ActionType.OpponentWantsToTryAndDestroyMarkers:
+                OpponentWantsToTryAndDestroyMarkers _opponentWantsToTryAndDestroyMarkers =
+                    JsonConvert.DeserializeObject<OpponentWantsToTryAndDestroyMarkers>(_action.JsonData);
+                OpponentWantsToTryAndDestroyMarkers(_opponentWantsToTryAndDestroyMarkers.JsonData);
+                break;
+            case ActionType.OpponentMarkedBomb:
+                OpponentMarkedBomb _opponentMarkedBomb = JsonConvert.DeserializeObject<OpponentMarkedBomb>(_action.JsonData);
+                OpponentMarkedBomb(_opponentMarkedBomb.PlaceId);
+                break;
+            case ActionType.OpponentFinishedReductionAction:
+                OpponentFinishedReductionAction();
+                break;
+            case ActionType.OpponentSaidThatBombExploded:
+                OpponentSaidThatBombExploded _opponentSaidThatBombExploded = JsonConvert.DeserializeObject<OpponentSaidThatBombExploded>(_action.JsonData);
+                OpponentSaidThatBombExploded(_opponentSaidThatBombExploded.PlaceId);
+                break;
+            case ActionType.OpponentUsedSnowUltimate:
+                OpponentUsedSnowUltimate _opponentUsedSnowUltimate = JsonConvert.DeserializeObject<OpponentUsedSnowUltimate>(_action.JsonData);
+                OpponentUsedSnowUltimate(_opponentUsedSnowUltimate.Status);
+                break;
+            case ActionType.OpponentActivatedAbility:
+                OpponentActivatedAbility _opponentActivatedAbility = JsonConvert.DeserializeObject<OpponentActivatedAbility>(_action.JsonData);
+                OpponentActivatedAbility(_opponentActivatedAbility.CardId,_opponentActivatedAbility.Place);
+                break;
+            case ActionType.OpponentBoughtAbilityFromShop:
+                OpponentBoughtAbilityFromShop _opponentBoughtAbilityFromShop =
+                    JsonConvert.DeserializeObject<OpponentBoughtAbilityFromShop>(_action.JsonData);
+                OpponentBoughtAbilityFromShop(_opponentBoughtAbilityFromShop.AbilityId);
+                break;
+            case ActionType.OpponentBoughtAbilityFromHand:
+                OpponentBoughtAbilityFromHand _opponentBoughtAbilityFromHand =
+                    JsonConvert.DeserializeObject<OpponentBoughtAbilityFromHand>(_action.JsonData);
+                OpponentBoughtAbilityFromHand(_opponentBoughtAbilityFromHand.AbilityId);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -1572,13 +1610,12 @@ public class GameplayManagerPVP : GameplayManager
         
         _cardAtPlace.CanMove = _status;
     }
-
-    // Got to this point :)
-
+    
     public override void ChangeCanFlyToDodge(int _cardId, bool _status)
     {
         HandleChangeCanFlyToDodge(_cardId,_status,true);
-        //photonView.RPC(nameof(OpponentChangedCanFlyToDodge),RpcTarget.Others,_cardId,_status);
+        OpponentChangedCanFlyToDodge _data = new OpponentChangedCanFlyToDodge { CardId = _cardId, Status = _status };
+        roomHandler.AddAction(ActionType.OpponentChangedCanFlyToDodge, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleChangeCanFlyToDodge(int _cardId, bool _status, bool _isMy)
@@ -1601,7 +1638,8 @@ public class GameplayManagerPVP : GameplayManager
     public override void TryDestroyMarkers(List<int> _places)
     {
         HandleTryToDestroyMarkers(_places);
-        //photonView.RPC(nameof(OpponentWantsToTryAndDestroyMarkers),RpcTarget.Others,JsonConvert.SerializeObject(_places));
+        OpponentWantsToTryAndDestroyMarkers _data = new OpponentWantsToTryAndDestroyMarkers { JsonData = JsonConvert.SerializeObject(_places) };
+        roomHandler.AddAction(ActionType.OpponentWantsToTryAndDestroyMarkers, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleTryToDestroyMarkers(List<int> _places)
@@ -1639,7 +1677,8 @@ public class GameplayManagerPVP : GameplayManager
     public override void MarkMarkerAsBomb(int _placeId)
     {
         HandleMarkMarkerAsBomb(_placeId);
-        //photonView.RPC(nameof(OpponentMarkedBomb),RpcTarget.Others,_placeId);
+        OpponentMarkedBomb _data = new OpponentMarkedBomb { PlaceId = _placeId };
+        roomHandler.AddAction(ActionType.OpponentMarkedBomb, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleMarkMarkerAsBomb(int _placeId)
@@ -1674,7 +1713,7 @@ public class GameplayManagerPVP : GameplayManager
     
     public override void FinishedReductionAction()
     {
-        //photonView.RPC(nameof(OpponentFinishedReductionAction),RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentFinishedReductionAction,string.Empty);
     }
 
     public override void BombExploded(int _placeId)
@@ -1684,7 +1723,8 @@ public class GameplayManagerPVP : GameplayManager
         {
             yield return new WaitForSeconds(0.3f);
             HandleBombExploded(_placeId);
-            //photonView.RPC(nameof(OpponentSaidThatBombExploded),RpcTarget.Others,_placeId);
+            OpponentSaidThatBombExploded _data = new OpponentSaidThatBombExploded { PlaceId = _placeId };
+            roomHandler.AddAction(ActionType.OpponentSaidThatBombExploded, JsonConvert.SerializeObject(_data));
         }
     }
 
@@ -1770,7 +1810,8 @@ public class GameplayManagerPVP : GameplayManager
     public override void HandleSnowUltimate(bool _status)
     {
         HandleSnowUltimate(_status,true);
-        //photonView.RPC(nameof(OpponentUsedSnowUltimate),RpcTarget.Others,_status);
+        OpponentUsedSnowUltimate _data = new OpponentUsedSnowUltimate { Status = _status };
+        roomHandler.AddAction(ActionType.OpponentUsedSnowUltimate, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleSnowUltimate(bool _status, bool _didIUse)
@@ -1796,8 +1837,10 @@ public class GameplayManagerPVP : GameplayManager
         {
             int _placeId = _ability.GetTablePlace().Id;
             HandleActivateAbility(_cardId,true,_placeId);
-            //photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
+            OpponentActivatedAbility _data = new OpponentActivatedAbility { CardId = _cardId, Place = _placeId };
+            roomHandler.AddAction(ActionType.OpponentActivatedAbility, JsonConvert.SerializeObject(_data));
         }
+        
         void PlaceAbility(int _placeId)
         {
             if (_placeId==-1)
@@ -1806,7 +1849,8 @@ public class GameplayManagerPVP : GameplayManager
                 return;
             }
             HandleActivateAbility(_cardId,true,_placeId);
-            //photonView.RPC(nameof(OpponentActivatedAbility),RpcTarget.Others,_cardId,_placeId);
+            OpponentActivatedAbility _data = new OpponentActivatedAbility { CardId = _cardId, Place = _placeId };
+            roomHandler.AddAction(ActionType.OpponentActivatedAbility, JsonConvert.SerializeObject(_data));
         }
     }
 
@@ -1829,7 +1873,9 @@ public class GameplayManagerPVP : GameplayManager
                 MyPlayer.Actions--;
             }
         }
-        //photonView.RPC(nameof(OpponentBoughtAbilityFromShop),RpcTarget.Others,_abilityId);
+
+        OpponentBoughtAbilityFromShop _data = new OpponentBoughtAbilityFromShop { AbilityId = _abilityId };
+        roomHandler.AddAction(ActionType.OpponentBoughtAbilityFromShop, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleBuyAbilityFromShop(int _abilityId, bool _didIBuy)
@@ -1852,7 +1898,9 @@ public class GameplayManagerPVP : GameplayManager
                 MyPlayer.Actions--;
             }
         }
-        //photonView.RPC(nameof(OpponentBoughtAbilityFromHand),RpcTarget.Others,_abilityId);
+
+        OpponentBoughtAbilityFromHand _data = new OpponentBoughtAbilityFromHand { AbilityId = _abilityId };
+        roomHandler.AddAction(ActionType.OpponentBoughtAbilityFromHand, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleBuyAbilityFromHand(int _abilityId, bool _didIBuy)
@@ -1863,7 +1911,7 @@ public class GameplayManagerPVP : GameplayManager
         _player.AmountOfAbilitiesPlayerCanBuy--;
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
     }
-
+    
     public override int PushCardForward(int _startingPlace, int _endingPlace,int _chanceForPush=100)
     {
         Card _pushedCard = TableHandler.GetPlace(_endingPlace).GetCard();
@@ -2021,6 +2069,8 @@ public class GameplayManagerPVP : GameplayManager
             ExecuteCardAction(_damage);
         }
     }
+
+    // Got to this point :)
 
     public override void ManageBombExplosion(bool _state)
     {

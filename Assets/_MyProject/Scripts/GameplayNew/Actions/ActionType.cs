@@ -28,5 +28,15 @@ namespace GameplayActions
         ChangeOwner=20,
         MyCardDiedInOpponentPossession=21,
         OpponentChangedMovement=22,
+        OpponentChangedCanFlyToDodge=23,
+        OpponentWantsToTryAndDestroyMarkers=24,
+        OpponentMarkedBomb=25,
+        OpponentFinishedReductionAction=26,
+        OpponentSaidThatBombExploded=27,
+        OpponentUsedSnowUltimate=28,
+        OpponentActivatedAbility=29,
+        OpponentBoughtAbilityFromShop=30,
+        OpponentBoughtAbilityFromHand=31,
+        
     }
 }
