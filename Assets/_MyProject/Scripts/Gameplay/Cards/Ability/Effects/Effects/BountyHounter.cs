@@ -9,8 +9,7 @@ public class BountyHounter : AbilityEffect
     {
         RemoveAction();
 
-        // if (PhotonManager.IsMasterClient)
-        if (true)
+        if (FirebaseManager.Instance.RoomHandler.IsOwner)
         {
             GameplayManager.Instance.LootChanges[0] += amount;
         }
@@ -26,7 +25,7 @@ public class BountyHounter : AbilityEffect
     
     public override void ActivateForOther()
     {
-        if (true)
+        if (FirebaseManager.Instance.RoomHandler.IsOwner)
         {
             GameplayManager.Instance.LootChanges[1] += amount;
         }
@@ -47,7 +46,7 @@ public class BountyHounter : AbilityEffect
 
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         isActive = false;
-        if (true)
+        if (FirebaseManager.Instance.RoomHandler.IsOwner)
         {
             GameplayManager.Instance.LootChanges[0] -= amount;
         }

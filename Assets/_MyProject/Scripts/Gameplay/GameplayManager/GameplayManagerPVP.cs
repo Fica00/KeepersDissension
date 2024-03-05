@@ -45,8 +45,7 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.PlaceCard:
                 PlaceCard _placeCard = JsonConvert.DeserializeObject<PlaceCard>(_action.JsonData);
-                int _positionId = ConvertOpponentsPosition(_placeCard.PositionId);
-                PlaceCard(OpponentPlayer, _placeCard.CardId, _positionId, _placeCard.DontCheckIfPlayerHasIt);
+                OpponentPlacedCard(_placeCard.CardId,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt);
                 break;
             case ActionType.Resign:
                 StopGame(true);
@@ -210,6 +209,47 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.TellOpponentThatIPlacedFirstCardForCasters:
                 TellOpponentThatIPlacedFirstCardForCasters();
                 break;
+            case ActionType.OpponentSaidFinishCasters:
+                OpponentSaidFinishCasters();
+                break;
+            case ActionType.OpponentUpdatedHealth:
+                OpponentUpdatedHealth _opponentUpdatedHealth = JsonConvert.DeserializeObject<OpponentUpdatedHealth>(_action.JsonData);
+                OpponentUpdatedHealth(_opponentUpdatedHealth.CardId,_opponentUpdatedHealth.Status,_opponentUpdatedHealth.Health);
+                break;
+            case ActionType.OpponentWantsToDestroyBombWithoutActivatingIt:
+            OpponentWantsToDestroyBombWithoutActivatingIt _opponentWantsToDestroyBombWithoutActivatingIt =
+                JsonConvert.DeserializeObject<OpponentWantsToDestroyBombWithoutActivatingIt>(_action.JsonData);
+            OpponentWantsToDestroyBombWithoutActivatingIt(_opponentWantsToDestroyBombWithoutActivatingIt.CardId,
+            _opponentWantsToDestroyBombWithoutActivatingIt.IsMy);
+                break;
+            case ActionType.OpponentSaidToUseStealth:
+                OpponentSaidToUseStealth _opponentSaidToUseStealth = JsonConvert.DeserializeObject<OpponentSaidToUseStealth>(_action.JsonData);
+                OpponentSaidToUseStealth(_opponentSaidToUseStealth.CardId,_opponentSaidToUseStealth.StealthFromPlace,_opponentSaidToUseStealth.PlaceMinionsFrom);
+                break;
+            case ActionType.OpponentSaidToChangeSprite:
+                OpponentSaidToChangeSprite _opponentSaidToChangeSprite = JsonConvert.DeserializeObject<OpponentSaidToChangeSprite>(_action.JsonData);
+                OpponentSaidToChangeSprite(_opponentSaidToChangeSprite.CardPlace,_opponentSaidToChangeSprite.CardId,_opponentSaidToChangeSprite
+                .SpriteId,_opponentSaidToChangeSprite.ShowPlaceAnimation);
+                break;
+            case ActionType.OpponentGotResponseAction:
+                OpponentGotResponseAction();
+                break;
+            case ActionType.OpponentSaidToPlayAudio:
+                OpponentSaidToPlayAudio _opponentSaidToPlayAudio = JsonConvert.DeserializeObject<OpponentSaidToPlayAudio>(_action.JsonData);
+                OpponentSaidToPlayAudio(_opponentSaidToPlayAudio.Key,_opponentSaidToPlayAudio.CardId);
+                break;
+            case ActionType.OpponentUsedHisUltimate:
+                OpponentUsedHisUltimate();
+                break;
+            case ActionType.OpponentRespondedForBombQuestion:
+                OpponentRespondedForBombQuestion _opponentRespondedForBombQuestion =
+                    JsonConvert.DeserializeObject<OpponentRespondedForBombQuestion>(_action.JsonData);
+                OpponentRespondedForBombQuestion(_opponentRespondedForBombQuestion.Amount);
+                break;
+            case ActionType.OpponentPlacedVetoedCard:
+                OpponentPlacedVetoedCard _opponentPlacedVetoedCard = JsonConvert.DeserializeObject<OpponentPlacedVetoedCard>(_action.JsonData);
+                OpponentPlacedVetoedCard(_opponentPlacedVetoedCard.CardId);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -222,7 +262,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        UIManager.Instance.ShowOkDialog("Opponent has left!");
+        UIManager.Instance.ShowOkDialog("Opponent resigned");
         StopGame(true);
     }
 
@@ -2274,23 +2314,23 @@ public class GameplayManagerPVP : GameplayManager
     {
         roomHandler.AddAction(ActionType.TellOpponentThatIPlacedFirstCardForCasters,string.Empty);
     }
-
-    // Got to this point :)
-
+    
     public override void FinishCasters()
     {
-        //photonView.RPC(nameof(OpponentSaidFinishCasters), RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentSaidFinishCasters,string.Empty);
     }
 
     public override void UpdateHealth(int _cardId, bool _status, int _health)
     {
-      //photonView.RPC(nameof(OpponentUpdatedHealth),RpcTarget.Others,_cardId,_status,_health);   
+        OpponentUpdatedHealth _data = new OpponentUpdatedHealth { CardId = _cardId, Status = _status, Health = _health };
+        roomHandler.AddAction(ActionType.OpponentUpdatedHealth, JsonConvert.SerializeObject(_data));
     }
 
     public override void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
     {
         HandleDestroyBombWithoutActivatingIt(_cardId,_isMy);
-        //photonView.RPC(nameof(OpponentWantsToDestroyBombWithoutActivatingIt),RpcTarget.Others,_cardId,_isMy);
+        OpponentWantsToDestroyBombWithoutActivatingIt _data = new OpponentWantsToDestroyBombWithoutActivatingIt { CardId = _cardId, IsMy = _isMy };
+        roomHandler.AddAction(ActionType.OpponentWantsToDestroyBombWithoutActivatingIt,JsonConvert.SerializeObject(_data));
     }
 
     private void HandleDestroyBombWithoutActivatingIt(int _cardId,bool _isMy)
@@ -2299,16 +2339,22 @@ public class GameplayManagerPVP : GameplayManager
        GameplayPlayer _player = _bomber.My ? MyPlayer : OpponentPlayer;
        _player.DestroyWithoutNotify(_bomber);
     }
-
+    
     public override void TellOpponentToUseStealth(int _cardId, int _stealthFromPlace, int _placeMinionsFrom)
     {
-        //photonView.RPC(nameof(OpponentSaidToUseStealth),RpcTarget.Others,_cardId,_stealthFromPlace,_placeMinionsFrom);
+        OpponentSaidToUseStealth _data =
+            new OpponentSaidToUseStealth { CardId = _cardId, StealthFromPlace = _stealthFromPlace, PlaceMinionsFrom = _placeMinionsFrom };
+        roomHandler.AddAction(ActionType.OpponentSaidToUseStealth, JsonConvert.SerializeObject(_data));
     }
 
     public override void ChangeSprite(int _cardPlace, int _cardId, int _spriteId,bool _showPlaceAnimation=false)
     {
         HandleChangeSprite(_cardPlace,_cardId,_spriteId,_showPlaceAnimation);
-        //photonView.RPC(nameof(OpponentSaidToChangeSprite),RpcTarget.Others,_cardPlace,_cardId,_spriteId,_showPlaceAnimation);
+        OpponentSaidToChangeSprite _data = new OpponentSaidToChangeSprite
+        {
+            CardPlace = _cardPlace, CardId = _cardId, SpriteId = _spriteId, ShowPlaceAnimation = _showPlaceAnimation
+        };
+        roomHandler.AddAction(ActionType.OpponentSaidToChangeSprite, JsonConvert.SerializeObject(_data));
     }
 
     private void HandleChangeSprite(int _cardPlace, int _cardId, int _spriteId,bool _showPlaceAnimation)
@@ -2357,7 +2403,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void RequestResponseAction(int _cardId)
     {
         ForceResponseAction(_cardId);
-        //photonView.RPC(nameof(OpponentGotResponseAction),RpcTarget.Others);
+        roomHandler.AddAction(ActionType.OpponentGotResponseAction,string.Empty);
     }
 
     public override void PlayAudioOnBoth(string _key, CardBase _cardBase)
@@ -2370,7 +2416,8 @@ public class GameplayManagerPVP : GameplayManager
         Card _card = _cardBase as Card;
         
         HandlePlayAudio(_key,_card.Details.Id,true);
-        //photonView.RPC(nameof(OpponentSaidToPlayAudio),RpcTarget.Others,_key,_card.Details.Id);
+        OpponentSaidToPlayAudio _data = new OpponentSaidToPlayAudio { Key = _key, CardId = _card.Details.Id };
+        roomHandler.AddAction(ActionType.OpponentSaidToPlayAudio, JsonConvert.SerializeObject(_data));
     }
 
     private void HandlePlayAudio(string _key, int _cardId, bool _isMy)
@@ -2389,7 +2436,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void TellOpponentThatIUsedUltimate()
     {
-        //photonView.RPC(nameof(OpponentUsedHisUltimate),RpcTarget.Others);   
+        roomHandler.AddAction(ActionType.OpponentUsedHisUltimate,string.Empty);
     }
 
     private void OpponentUsedHisUltimate()
@@ -2398,21 +2445,10 @@ public class GameplayManagerPVP : GameplayManager
         _keeper.SpecialAbilities[0].CanUseAbility = false;
     }
 
-    private void OpponentResigned()
-    {
-        UIManager.Instance.ShowOkDialog("Opponent resigned");
-        StopGame(true);
-    }
-
     private void OpponentPlacedCard(int _cardId, int _positionId, bool _dontCheckIfPlayerHasIt)
     {
         _positionId = ConvertOpponentsPosition(_positionId);
         PlaceCard(OpponentPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
-    }
-
-    private void OpponentPlacedStartingCards()
-    {
-        HasOpponentPlacedStartingCards = true;
     }
 
     private void MasterAddedAbilityToPlayer(bool _isMyPlayer, int _abilityId)
@@ -2657,7 +2693,8 @@ public class GameplayManagerPVP : GameplayManager
             _markerPlaces[_i] = ConvertOpponentsPosition(_markerPlaces[_i]);
         }
         int _hasBomb = CheckForBomb(_markerPlaces);
-        //photonView.RPC(nameof(OpponentRespondedForBombQuestion),RpcTarget.Others,_hasBomb);
+        OpponentRespondedForBombQuestion _data = new OpponentRespondedForBombQuestion { Amount = _hasBomb };
+        roomHandler.AddAction(ActionType.OpponentRespondedForBombQuestion, JsonConvert.SerializeObject(_data));
     }
 
     private void OpponentRespondedForBombQuestion(int _markerId)
@@ -2688,7 +2725,8 @@ public class GameplayManagerPVP : GameplayManager
             PlaceAbilityOnTable(_cardId,_abilityCard.GetTablePlace().Id);
         }
         HandleVetoCard(_abilityCard);
-        //photonView.RPC(nameof(OpponentPlacedVetoedCard),RpcTarget.Others,_cardId);
+        OpponentPlacedVetoedCard _data = new OpponentPlacedVetoedCard { CardId = _cardId };
+        roomHandler.AddAction(ActionType.OpponentPlacedVetoedCard, JsonConvert.SerializeObject(_data));
         StartCoroutine(Rotate());
         
         IEnumerator Rotate()

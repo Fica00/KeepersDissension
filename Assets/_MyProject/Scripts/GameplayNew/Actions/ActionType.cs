@@ -46,6 +46,16 @@ namespace GameplayActions
         OpponentSaidToRemoveStrangeMatter=38,
         OpponentToldYouToVetoCardOnField=39,
         OpponentWantsMeToActivateFirstAbilityCasters=40,
-        TellOpponentThatIPlacedFirstCardForCasters=41
+        TellOpponentThatIPlacedFirstCardForCasters=41,
+        OpponentSaidFinishCasters=42,
+        OpponentUpdatedHealth=43,
+        OpponentWantsToDestroyBombWithoutActivatingIt=44,
+        OpponentSaidToUseStealth=45,
+        OpponentSaidToChangeSprite=46,
+        OpponentGotResponseAction=47,
+        OpponentSaidToPlayAudio=48,
+        OpponentUsedHisUltimate=49,
+        OpponentRespondedForBombQuestion = 50,
+        OpponentPlacedVetoedCard=51
     }
 }

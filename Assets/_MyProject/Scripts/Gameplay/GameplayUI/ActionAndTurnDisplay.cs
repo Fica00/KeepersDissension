@@ -20,8 +20,7 @@ public class ActionAndTurnDisplay : MonoBehaviour
         myPlayer.UpdatedActions += ShowMyAction;
         opponentPlayer.UpdatedActions += ShowOpponentsAction;
         actionsDisplay.enabled = true;
-        // if (PhotonManager.IsMasterClient)
-        if(true)
+        if(FirebaseManager.Instance.RoomHandler.IsOwner)
         {
             ShowMyAction();
         }
