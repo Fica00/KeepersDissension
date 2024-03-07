@@ -52,9 +52,7 @@ public class Guardian: Card
     {
         Stats.UpdatedHealth += ShowHealth;
         ShowHealth();
-        //todo uncomment me
         chain.gameObject.SetActive(false);
-        //StartCoroutine(ShowCainRoutine());
     }
 
     private void OnEnable()
@@ -114,10 +112,13 @@ public class Guardian: Card
         healthDisplay.text = Stats.Health.ToString(CultureInfo.InvariantCulture);
     }
 
+    public void ShowChain()
+    {
+        StartCoroutine(ShowCainRoutine());
+    }
+    
     private IEnumerator ShowCainRoutine()
     {
-        chain.gameObject.SetActive(false);
-        yield return new WaitForSeconds(5f);
         chain.gameObject.SetActive(true);
         LifeForce _lifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My == My);
         chain.gameObject.SetActive(true);

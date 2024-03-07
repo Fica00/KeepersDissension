@@ -7,10 +7,7 @@ public class OrgCard : CardSpecialAbility
 {
     private void Start()
     {
-        if (Card.My)
-        {
-            GameplayManager.Instance.ManageChangeOrgAttack(1);
-        }
+        Card.Stats.Damage = 1;
     }
 
     public override void UseAbility()

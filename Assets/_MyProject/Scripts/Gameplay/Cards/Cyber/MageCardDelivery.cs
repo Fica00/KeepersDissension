@@ -5,7 +5,6 @@ public class MageCardDelivery : CardSpecialAbility
     private void Start()
     {
         Player.OnStartedTurn += ResetAbilities;
-        ResetAbilities();
     }
 
     private void OnDisable()

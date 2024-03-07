@@ -11,11 +11,7 @@ public class BomberCard : CardSpecialAbility
     private void OnEnable()
     {
         CardBase.OnGotDestroyed += CheckForCard;
-    }
-
-    private void Start()
-    {
-        GameplayManager.Instance.ManageBombExplosion(true);
+        ExplodeOnDeath = true;
     }
     
     private void OnDisable()

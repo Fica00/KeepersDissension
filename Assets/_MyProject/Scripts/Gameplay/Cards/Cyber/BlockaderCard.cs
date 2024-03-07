@@ -7,7 +7,7 @@ public class BlockaderCard : CardSpecialAbility
     private void Start()
     {
         Player.OnStartedTurn += ResetAbilities;
-        ResetAbilities();
+        CanBlock = true;
     }
 
     private void OnDisable()

@@ -6,7 +6,7 @@ public class MageCardStun : CardSpecialAbility
     private void Start()
     {
         Player.OnStartedTurn += ResetAbilities;
-        ResetAbilities();
+        CanUseAbility = true;
     }
 
     private void OnDisable()

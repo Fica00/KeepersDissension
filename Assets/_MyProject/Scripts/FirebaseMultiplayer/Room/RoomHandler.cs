@@ -28,6 +28,7 @@ namespace FirebaseMultiplayer.Room
         public bool IsOwner => roomData.Owner == localPlayerId;
         public RoomData RoomData => roomData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
+        private int actionCounter;
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
 
@@ -74,6 +75,7 @@ namespace FirebaseMultiplayer.Room
         public void SubscribeToRoom()
         {
             database.Child(RoomPath).ValueChanged += RoomUpdated;
+            actionCounter = 0;
         }
 
         public void UnsubscribeFromRoom()
@@ -242,10 +244,12 @@ namespace FirebaseMultiplayer.Room
         public void AddAction(ActionType _type, string _jsonData)
         {
             string _actionId = Guid.NewGuid().ToString();
+            _actionId = actionCounter+_actionId;
             GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
             ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData };
             roomData.Actions.Add(_actionId,_data);
             database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
+            actionCounter++;
         }
     }
 }

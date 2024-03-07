@@ -38,7 +38,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void ProcessAction(ActionData _action)
     {
-        Debug.Log("----- " + _action.JsonData);
+        Debug.Log(_action.Data.Type+"----- " + _action.JsonData);
         switch (_action.Data.Type)
         {
             case ActionType.None:
@@ -340,6 +340,14 @@ public class GameplayManagerPVP : GameplayManager
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
+    }
+
+    protected override void LastPreparation()
+    {
+        foreach (var _guardian in FindObjectsOfType<Guardian>())
+        {
+            _guardian.ShowChain();
+        }
     }
 
     public override void Resign()
@@ -1015,8 +1023,7 @@ public class GameplayManagerPVP : GameplayManager
             
             if (_attackingPlayer.IsMy)
             {
-                // int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
-                int _additionalMatter = 1;
+                int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
                 if (_defendingCard is Minion)
                 {
                     GetMatter(2+_additionalMatter, true);
@@ -1034,8 +1041,7 @@ public class GameplayManagerPVP : GameplayManager
             }
             else
             {
-                // int _additionalMatter = PhotonManager.IsMasterClient ? LootChanges[0] : LootChanges[1];
-                int _additionalMatter = 1;
+                int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
                 if (_defendingCard is Minion)
                 {
                     GetMatter(2+_additionalMatter, false);

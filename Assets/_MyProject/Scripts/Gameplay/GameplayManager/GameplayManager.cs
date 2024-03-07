@@ -62,9 +62,8 @@ public class GameplayManager : MonoBehaviour
         Instance = this;
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
-        yield return new WaitForSeconds(5);
         SetupPlayers();
         SetupTable();
         MyPlayer.UpdatedActions += TryEndTurn;
@@ -119,7 +118,7 @@ public class GameplayManager : MonoBehaviour
         }
 
         healthTracker.Setup();
-        
+        LastPreparation();
         while (!HasGameEnded)
         {
             Finished = false;
@@ -130,6 +129,11 @@ public class GameplayManager : MonoBehaviour
             yield return WaitUntilTheEndOfTurn(); //second players turn
             yield return new WaitForSeconds(1); //sync up
         }
+    }
+
+    protected virtual void LastPreparation()
+    {
+        throw new Exception();
     }
 
     protected virtual void DecideWhoPlaysFirst()
