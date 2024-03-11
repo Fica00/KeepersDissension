@@ -31,41 +31,11 @@ public class BomberCard : CardSpecialAbility
             return;
         }
 
-        List<TablePlaceHandler> _availablePlaces =
-            GameplayManager.Instance.TableHandler.GetPlacesAround(TablePlaceHandler.Id,
-                CardMovementType.EightDirections);
-
-        foreach (var _availablePlace in _availablePlaces.ToList())
+        if (!_cardBase.My)
         {
-            if (!_availablePlace.IsOccupied)
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            CardBase _cardBaseOnPlace = _availablePlace.GetCard();
-            Card _card = (Card)_cardBaseOnPlace;
-            if (_card==null)
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            CardAction _action = new CardAction()
-            {
-                FirstCardId = Card.Details.Id,
-                SecondCardId = _card.Details.Id,
-                StartingPlaceId = TablePlaceHandler.Id,
-                FinishingPlaceId = _availablePlace.Id,
-                Type = CardActionType.Attack,
-                Cost = 0,
-                CanTransferLoot = false,
-                IsMy = CardBase.My,
-                Damage = bombDamage
-            };
-
-            GameplayManager.Instance.ExecuteCardAction(_action, false);
-            GameplayManager.Instance.SpawnBombEffect(TablePlaceHandler.Id);
+            return;
         }
+        
+        GameplayManager.Instance.BombExploded(_cardBase.GetTablePlace().Id);
     }
 }

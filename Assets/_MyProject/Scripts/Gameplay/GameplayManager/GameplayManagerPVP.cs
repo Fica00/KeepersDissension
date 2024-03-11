@@ -34,11 +34,12 @@ public class GameplayManagerPVP : GameplayManager
     {
         RoomHandler.OnNewAction -= ProcessAction;
         RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
+        MyPlayer.UpdatedStrangeMatter -= TellOpponentThatIUpdatedWhiteStrangeMatter;
+        WhiteStrangeMatter.UpdatedAmountInEconomy -= TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
     private void ProcessAction(ActionData _action)
     {
-        Debug.Log(_action.Data.Type+"----- " + _action.JsonData);
         switch (_action.Data.Type)
         {
             case ActionType.None:
@@ -348,6 +349,9 @@ public class GameplayManagerPVP : GameplayManager
         {
             _guardian.ShowChain();
         }
+
+        MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
+        WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
     public override void Resign()
@@ -1372,6 +1376,7 @@ public class GameplayManagerPVP : GameplayManager
             GameState = GameplayState.Waiting;
             MyPlayer.Actions=0;
             roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
+            GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions,false);
             return;
         }
 
@@ -2531,6 +2536,7 @@ public class GameplayManagerPVP : GameplayManager
             {
                 UIManager.Instance.ShowOkDialog(
                     $"Opponent finished response action, you still have {MyPlayer.Actions} actions left");
+                GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions,true);
             }
         }
     }
