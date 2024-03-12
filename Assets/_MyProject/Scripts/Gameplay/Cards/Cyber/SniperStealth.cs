@@ -92,9 +92,16 @@ public class SniperStealth : CardSpecialAbility
 
             GameplayManager.Instance.ExecuteCardAction(_moveAction);
             CardBase.OnGotDestroyed += CheckDestroyedCard;
+            List<TablePlaceHandler> _changeSprites = new List<TablePlaceHandler>();
             foreach (var _place in GameplayManager.Instance.TableHandler.GetPlacesAround(_originalPlace,
                          CardMovementType.FourDirections, 1, true))
             {
+                if (_place.ContainsMarker)
+                {
+                    Debug.Log("Added");
+                    _changeSprites.Add(_place);
+                    continue;
+                }
                 if (_place.IsOccupied)
                 {
                     continue;
@@ -115,6 +122,11 @@ public class SniperStealth : CardSpecialAbility
 
                 GameplayManager.Instance.PlaceCard(_marker, _place.Id);
                 GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
+            }
+            
+            foreach (var _markerPlace in _changeSprites)
+            {
+                GameplayManager.Instance.ChangeSprite(_markerPlace.Id,_markerPlace.GetMarker().Details.Id,Card.Details.Faction.Id+1,true);
             }
         }
     }

@@ -69,6 +69,15 @@ public class FirebaseManager : MonoBehaviour
 
             string _result = _task.Result.GetRawJsonValue();
             DataManager.Instance.SetPlayerData(_result);
+            if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.DeviceId))
+            {
+                DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
+            }
+            else if(DataManager.Instance.PlayerData.DeviceId!=SystemInfo.deviceUniqueIdentifier)
+            {
+                UIManager.Instance.ShowOkDialog("Please logout from other device!");
+                _callBack?.Invoke(false);
+            }
             CollectGameData(_callBack);
         });
     }
@@ -119,5 +128,10 @@ public class FirebaseManager : MonoBehaviour
     public void SaveValue<T>(string _path, T _value)
     {
         database.Child(USERS_KEY).Child(Authentication.UserId).Child(_path).SetValueAsync(_value);
+    }
+
+    private void OnDisable()
+    {
+        DataManager.Instance.PlayerData.DeviceId = string.Empty;
     }
 }

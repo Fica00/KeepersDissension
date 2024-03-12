@@ -10,6 +10,7 @@ public class PlayerData
    private bool playMusic= true;
    private bool playSoundEffect = true;
    private bool gameplayNotifications=true;
+   private string deviceId;
    
    [JsonIgnore] public int FactionId;
 
@@ -18,6 +19,7 @@ public class PlayerData
    public static Action OnUpdatedSoundEffects;
    public static Action OnUpdatedMatchesPlayed;
    public static Action OnUpdatedGameplayNotifications;
+   public static Action OnUpdatedDeviceId;
 
    public string Name
    {
@@ -78,6 +80,16 @@ public class PlayerData
       {
          gameplayNotifications = value;
          OnUpdatedGameplayNotifications?.Invoke();
+      }
+   }
+
+   public string DeviceId
+   {
+      get => deviceId;
+      set
+      {
+         deviceId = value;
+         OnUpdatedDeviceId?.Invoke();
       }
    }
 }

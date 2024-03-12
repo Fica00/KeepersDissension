@@ -1,4 +1,3 @@
-using System;
 using FirebaseAuthHandler;
 using UnityEngine;
 
@@ -67,6 +66,7 @@ public class Initializator : MonoBehaviour
       if (!_status)
       {
          UIManager.Instance.ShowOkDialog("Something went wrong while collecting data");
+         return;
       }
 
       FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);

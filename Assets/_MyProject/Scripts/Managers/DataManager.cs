@@ -28,6 +28,7 @@ public class DataManager : MonoBehaviour
         PlayerData.OnUpdatedMusic -= SaveMusic;
         PlayerData.OnUpdatedGameplayNotifications -= SaveGameplayNotifications;
         PlayerData.OnUpdatedSoundEffects -= SaveSoundEffects;
+        PlayerData.OnUpdatedDeviceId -= SaveDeviceId;
     }
 
     public void CreateNewPlayer()
@@ -53,6 +54,7 @@ public class DataManager : MonoBehaviour
         PlayerData.OnUpdatedMusic += SaveMusic;
         PlayerData.OnUpdatedGameplayNotifications += SaveGameplayNotifications;
         PlayerData.OnUpdatedSoundEffects += SaveSoundEffects;
+        PlayerData.OnUpdatedDeviceId += SaveDeviceId;
     }
 
     private void SaveMatchesPlayed()
@@ -68,6 +70,11 @@ public class DataManager : MonoBehaviour
     private void SaveMusic()
     {
         FirebaseManager.Instance.SaveValue(nameof(PlayerData.PlayMusic), PlayerData.PlayMusic);
+    }
+
+    private void SaveDeviceId()
+    {
+        FirebaseManager.Instance.SaveValue(nameof(PlayerData.DeviceId), PlayerData.DeviceId);
     }
 
     private void SaveGameplayNotifications()

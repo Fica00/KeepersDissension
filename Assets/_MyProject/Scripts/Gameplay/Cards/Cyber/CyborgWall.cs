@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class CyborgWall : WallBase
 {
     private void OnEnable()
@@ -44,6 +46,12 @@ public class CyborgWall : WallBase
         }
 
         if (_card.GetTablePlace().Id == AttackerPlace)
+        {
+            return;
+        }
+
+        int _distance = GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace), CardBase.GetTablePlace());
+        if (_distance>1)
         {
             return;
         }

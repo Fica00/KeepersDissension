@@ -92,9 +92,7 @@ public class TableActionsHandler : MonoBehaviour
         // List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,GetRange(_card),true);
         if (_card.Stats.Range!=1)
         {
-            Debug.Log(_range);
             _range = _card.Stats.Range;
-            Debug.Log(_range);
         }
         List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,_range,true);
         switch (_type)
