@@ -28,7 +28,7 @@ exports.createRoom = onRequest((req, res) => {
     });
 });
 
-exports.joinRandomRoom = onRequest((req, res) => {
+exports.joinRoom = onRequest((req, res) => {
     const roomsRef = db.ref(`${GAME_KEY}/${ROOMS_KEY}`).orderByChild(ROOM_STATUS_KEY).equalTo(0);
     const playerData = JSON.parse(req.body.PlayerData);
 

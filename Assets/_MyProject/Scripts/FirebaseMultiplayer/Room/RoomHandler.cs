@@ -18,7 +18,7 @@ namespace FirebaseMultiplayer.Room
         private DatabaseReference database;
 
         private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
-        private const string JOIN_RANDOM_ROOM = "https://joinrandomroom-e3mmrpwoya-uc.a.run.app";
+        private const string JOIN_ROOM = "https://joinroom-e3mmrpwoya-uc.a.run.app";
         private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
 
         private string roomsPath;
@@ -180,12 +180,12 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
         
-        public void JoinRandomRoom(RoomPlayer _playerData,RoomType _type, Action<JoinRoom> _callBack, string _name=default)
+        public void JoinRoom(RoomPlayer _playerData,RoomType _type, Action<JoinRoom> _callBack, string _name=default)
         {
             string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData), RoomType = _type, Name = _name
              });
 
-            WebRequests.Instance.Post(JOIN_RANDOM_ROOM, _postData, 
+            WebRequests.Instance.Post(JOIN_ROOM, _postData, 
                 _response =>
                 {
                     var _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);

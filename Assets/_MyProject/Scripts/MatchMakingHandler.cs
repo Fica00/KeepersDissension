@@ -86,7 +86,7 @@ public class MatchMakingHandler : MonoBehaviour
             MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
         };
         
-        FirebaseManager.Instance.RoomHandler.JoinRandomRoom(_playerData,MatchModeToRoomType(mode),HandleJoinRandomRoom);
+        FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData,MatchModeToRoomType(mode),HandleJoinRandomRoom);
     }
 
     RoomType MatchModeToRoomType(MatchMode _mode)
