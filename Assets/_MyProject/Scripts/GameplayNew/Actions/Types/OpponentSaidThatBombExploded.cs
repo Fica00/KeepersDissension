@@ -6,5 +6,6 @@ namespace GameplayActions
     public class OpponentSaidThatBombExploded
     {
         public int PlaceId;
+        public bool IncludeCenter;
     }
 }

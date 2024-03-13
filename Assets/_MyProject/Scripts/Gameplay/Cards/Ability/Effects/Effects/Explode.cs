@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Explode : AbilityEffect
 {
     public static bool IsActive;
@@ -11,7 +9,6 @@ public class Explode : AbilityEffect
 
     public override void ActivateForOwner()
     {
-        Debug.Log("Active");
         IsActive = true;
         RemoveAction();
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
@@ -27,6 +24,5 @@ public class Explode : AbilityEffect
     {
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         IsActive = false;
-        Debug.Log("Not active");
     }
 }

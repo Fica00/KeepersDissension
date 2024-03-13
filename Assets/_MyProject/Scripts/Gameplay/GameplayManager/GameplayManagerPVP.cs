@@ -147,7 +147,7 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.OpponentSaidThatBombExploded:
                 OpponentSaidThatBombExploded _opponentSaidThatBombExploded =
                     JsonConvert.DeserializeObject<OpponentSaidThatBombExploded>(_action.JsonData);
-                OpponentSaidThatBombExploded(_opponentSaidThatBombExploded.PlaceId);
+                OpponentSaidThatBombExploded(_opponentSaidThatBombExploded.PlaceId, _opponentSaidThatBombExploded.IncludeCenter);
                 break;
             case ActionType.OpponentUsedSnowUltimate:
                 OpponentUsedSnowUltimate _opponentUsedSnowUltimate = JsonConvert.DeserializeObject<OpponentUsedSnowUltimate>(_action.JsonData);
@@ -839,7 +839,20 @@ public class GameplayManagerPVP : GameplayManager
                         UIManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
                         _damage = 0;
                     }
-                    else if (_action.CanBeBlocked)
+                    
+                    Grounded _grounded = FindObjectOfType<Grounded>();
+                    bool _usedGrounded = false;
+                    if (_grounded!=null && _grounded.IsActive(_attackingCard,_defendingCard) && _action.CanBeBlocked)
+                    {
+                        _damage = 0;
+                        _usedGrounded = true;
+                        if (_defendingCard.My)
+                        {
+                            ChangeMovementForCard(_defendingCard.GetTablePlace().Id,false);
+                        }
+                    }
+                    
+                    if (_action.CanBeBlocked && !_usedGrounded)
                     {
                         Armor _abilityEffect = FindObjectsOfType<AbilityEffect>().ToList().Find(_abilityEffect =>
                             _abilityEffect is Armor &&
@@ -858,16 +871,6 @@ public class GameplayManagerPVP : GameplayManager
                     HighStakes.IsActive = false;
                 }
 
-                Grounded _grounded = FindObjectOfType<Grounded>();
-                if (_grounded!=null && _grounded.IsActive(_attackingCard,_defendingCard) && _action.CanBeBlocked)
-                {
-                    _damage = 0;
-                    if (_defendingCard.My)
-                    {
-                        ChangeMovementForCard(_defendingCard.GetTablePlace().Id,false);
-                    }
-                }
-                
                 if (_defendingCard is Minion)
                 {
                     foreach (var _ability in _defendingCard.SpecialAbilities)
@@ -996,7 +999,7 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 if (Explode.IsActive)
                 {
-                    BombExploded(_defendingCard.GetTablePlace().Id);
+                    BombExploded(_defendingCard.GetTablePlace().Id, false);
                 }
                 
                 if (_defendingCard.My)
@@ -1811,24 +1814,24 @@ public class GameplayManagerPVP : GameplayManager
         roomHandler.AddAction(ActionType.OpponentFinishedReductionAction,string.Empty);
     }
 
-    public override void BombExploded(int _placeId)
+    public override void BombExploded(int _placeId, bool _includeCenter=true)
     {
         StartCoroutine(BombExplodedRoutine());
         IEnumerator BombExplodedRoutine()
         {
             yield return new WaitForSeconds(0.3f);
-            HandleBombExploded(_placeId);
-            OpponentSaidThatBombExploded _data = new OpponentSaidThatBombExploded { PlaceId = _placeId };
+            HandleBombExploded(_placeId,_includeCenter);
+            OpponentSaidThatBombExploded _data = new OpponentSaidThatBombExploded { PlaceId = _placeId , IncludeCenter = _includeCenter};
             roomHandler.AddAction(ActionType.OpponentSaidThatBombExploded, JsonConvert.SerializeObject(_data));
         }
     }
 
-    private void HandleBombExploded(int _placeId)
+    private void HandleBombExploded(int _placeId, bool _includeCenter)
     {
         SpawnBombEffect(_placeId);
         List<TablePlaceHandler> _availablePlaces =
             TableHandler.GetPlacesAround(_placeId,
-                CardMovementType.EightDirections, _includeCenter:true);
+                CardMovementType.EightDirections, _includeCenter:_includeCenter);
 
         foreach (var _availablePlace in _availablePlaces)
         {
@@ -2043,11 +2046,6 @@ public class GameplayManagerPVP : GameplayManager
         if (_placeInFrontOfPushedCard.GetCard() == null)
         {
             CardBase _pushedCardBase = _pushedCardPlace.GetCard();
-            if (!_pushedCardBase.CanMove)
-            {
-                StartCoroutine(DamagePushedCard());
-                return -1;
-            }
             
             CardAction _moveCardInFront = new CardAction
             {
@@ -2622,10 +2620,10 @@ public class GameplayManagerPVP : GameplayManager
         HandleTryToDestroyMarkers(_places);
     }
 
-    private void OpponentSaidThatBombExploded(int _placeId)
+    private void OpponentSaidThatBombExploded(int _placeId, bool _includeCenter)
     {
         _placeId = ConvertOpponentsPosition(_placeId);
-        HandleBombExploded(_placeId);
+        HandleBombExploded(_placeId,_includeCenter);
     }
 
     private void OpponentUsedSnowUltimate(bool _status)

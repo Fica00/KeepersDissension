@@ -3,6 +3,7 @@ using System.Linq;
 public class Strength : AbilityEffect
 {
     private Keeper keeper;
+    
     public override void ActivateForOwner()
     {
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);

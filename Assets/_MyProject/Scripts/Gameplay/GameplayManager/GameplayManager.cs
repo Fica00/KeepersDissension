@@ -309,7 +309,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BombExploded(int _placeId)
+    public virtual void BombExploded(int _placeId, bool _includeCenter=true)
     {
         throw new NotImplementedException();
     }
