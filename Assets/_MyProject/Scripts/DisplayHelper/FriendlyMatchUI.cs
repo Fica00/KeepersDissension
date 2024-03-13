@@ -32,7 +32,7 @@ public class FriendlyMatchUI : MonoBehaviour
             UIManager.Instance.ShowOkDialog("Please enter room name");
             return;
         }
-        MatchMakingHandler.Instance.JoinRandomRoom(ShowRoomName);
+        MatchMakingHandler.Instance.JoinRoom(ShowRoomName, _name: _roomName);
         ManageInteractables(false);
     }
 
