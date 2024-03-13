@@ -61,7 +61,7 @@ public class RegisterUI : MonoBehaviour, IPanel
         if (!_result.IsSuccessful)
         {        
             ManageInteractables(true);
-            UIManager.Instance.ShowOkDialog(_result.Message);
+            UIManager.Instance.ShowOkDialog("Email already in use");
             return;
         }
 

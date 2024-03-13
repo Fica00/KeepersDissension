@@ -49,7 +49,7 @@ public class Initializator : MonoBehaviour
       if (!_result.IsSuccessful)
       {
          AuthenticationUI.Instance.ShowLogin();
-         UIManager.Instance.ShowOkDialog(_result.Message);
+         UIManager.Instance.ShowOkDialog("Wrong email or password");
          return;
       }
 

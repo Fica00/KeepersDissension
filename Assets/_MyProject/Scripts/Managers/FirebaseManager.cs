@@ -75,8 +75,8 @@ public class FirebaseManager : MonoBehaviour
             }
             else if(DataManager.Instance.PlayerData.DeviceId!=SystemInfo.deviceUniqueIdentifier)
             {
-                UIManager.Instance.ShowOkDialog("Please logout from other device!");
-                _callBack?.Invoke(false);
+                UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
+                return;
             }
             CollectGameData(_callBack);
         });
@@ -128,10 +128,5 @@ public class FirebaseManager : MonoBehaviour
     public void SaveValue<T>(string _path, T _value)
     {
         database.Child(USERS_KEY).Child(Authentication.UserId).Child(_path).SetValueAsync(_value);
-    }
-
-    private void OnDisable()
-    {
-        DataManager.Instance.PlayerData.DeviceId = string.Empty;
     }
 }
