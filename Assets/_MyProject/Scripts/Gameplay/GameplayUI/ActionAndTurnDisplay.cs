@@ -78,8 +78,13 @@ public class ActionAndTurnDisplay : MonoBehaviour
         }
 
         actionsDisplay.color = _color;
-        actionsDisplay.sprite = actionDisplays[_number - 1];
         actionAmountDisplay.text = _number.ToString();
         turnDisplay.text = _text;
+        
+        if (actionDisplays.Length-1<_number-1)
+        {
+            return;
+        }
+        actionsDisplay.sprite = actionDisplays[_number - 1];
     }
 }

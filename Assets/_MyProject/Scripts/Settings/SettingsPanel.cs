@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class SettingsPanel : MonoBehaviour
 {
+    public static bool IsSigningOut;
     public static Action OnOpened;
     public static Action OnClosed;
     
@@ -48,6 +49,8 @@ public class SettingsPanel : MonoBehaviour
             yield return new WaitForSeconds(2);
             FirebaseManager.Instance.Authentication.SignOut();
             PlayerPrefs.DeleteAll();
+            IsSigningOut = true;
+            PlayerPrefs.Save();
             SceneManager.LoadDataCollector();
         }
     }

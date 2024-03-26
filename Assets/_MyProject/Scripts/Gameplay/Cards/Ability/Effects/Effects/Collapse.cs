@@ -1,10 +1,12 @@
 public class Collapse : AbilityEffect
 {
-   public static bool IsActive;
+   public static bool IsActiveForMe;
+   public static bool IsActiveForOpponent;
 
    private void OnEnable()
    {
-      IsActive = false;
+      IsActiveForMe = false;
+      IsActiveForOpponent = false;
    }
 
    public override void ActivateForOwner()
@@ -16,13 +18,13 @@ public class Collapse : AbilityEffect
 
    public override void ActivateForOther()
    {
-      IsActive = true;
+      IsActiveForOpponent = true;
       AbilityCard.ActiveDisplay.gameObject.SetActive(true);
    }
 
    public override void CancelEffect()
    {
-      IsActive = false;
+      IsActiveForMe = false;
       AbilityCard.ActiveDisplay.gameObject.SetActive(false);
    }
 }

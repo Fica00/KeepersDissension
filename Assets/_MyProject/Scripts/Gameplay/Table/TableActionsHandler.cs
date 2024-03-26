@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class TableActionsHandler : MonoBehaviour
@@ -300,7 +301,7 @@ public class TableActionsHandler : MonoBehaviour
             {
                 _skip = true;
                 
-                if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall)
+                if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
                 {
                     _skip = false;
                 }
@@ -321,22 +322,13 @@ public class TableActionsHandler : MonoBehaviour
 
                 if (_hasLeapfrog && _skip)
                 {
-                    var _cordsInFront = tableHandler.GetFrontIndex(_warriorCard.GetTablePlace().Id, _placeAround.Id);
-                    TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
-                    if (_placeInFront!=default && !_placeInFront.IsOccupied && !_placeInFront.IsAbility && 
-                    !_placeAround.ContainsWall)
-                    {
-                        possibleActions.Add( new CardAction()
-                        {
-                            FirstCardId = _warriorCard.Details.Id,
-                            StartingPlaceId = _warriorCard.GetTablePlace().Id,
-                            FinishingPlaceId=_placeInFront.Id,
-                            Type = CardActionType.Move,
-                            Cost = _actionCost,
-                        });
-                        _placeInFront.SetColor(Color.blue);
-                    }
+                    AddCardInFront();
                     continue;
+                }
+
+                if (_hasLeapfrog && _placeAround.ContainsWall)
+                {
+                    AddCardInFront(true);
                 }
                 
             }
@@ -380,6 +372,29 @@ public class TableActionsHandler : MonoBehaviour
             });
             
             _placeAround.SetColor(Color.blue);
+            
+            void AddCardInFront(bool _dontAddIfItIsAWall=false)
+            {
+                var _cordsInFront = tableHandler.GetFrontIndex(_warriorCard.GetTablePlace().Id, _placeAround.Id);
+                TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
+                if (_placeInFront!=default && !_placeInFront.ContainsWarrior() && !_placeInFront.IsAbility)
+                {
+                    if (_dontAddIfItIsAWall&& _placeInFront.ContainsWall)
+                    {
+                        return;
+                    }
+                    possibleActions.Add( new CardAction()
+                    {
+                        FirstCardId = _warriorCard.Details.Id,
+                        StartingPlaceId = _warriorCard.GetTablePlace().Id,
+                        FinishingPlaceId=_placeInFront.Id,
+                        Type = CardActionType.Move,
+                        Cost = _actionCost,
+                    });
+                    _placeInFront.SetColor(Color.blue);
+                }
+                
+            }
         }
     }
 
@@ -605,7 +620,7 @@ public class TableActionsHandler : MonoBehaviour
                 _triggeredActions.Add(_possibleAction);
             }
         }
-
+        
         if (_triggeredActions.Count==0)
         {
             return;
@@ -619,6 +634,7 @@ public class TableActionsHandler : MonoBehaviour
         {
             ResolveMultipleActions.Instance.Show(_triggeredActions.ToList(),ExecuteAction);
         }
+        
     }
 
     private void ExecuteAction(CardAction _action)
@@ -662,7 +678,7 @@ public class TableActionsHandler : MonoBehaviour
                 return;
             }
         }
-        
+
         YesExecute(_action);
     }
 
@@ -697,6 +713,23 @@ public class TableActionsHandler : MonoBehaviour
             }
             
             return;
+        }
+
+        if (_action.Type is CardActionType.Move or CardActionType.SwitchPlace or CardActionType.RamAbility)
+        {
+            if (Hinder.IsActive)
+            {
+                foreach (var _placeInRange in GameplayManager.Instance.TableHandler.GetPlacesAround(_action.StartingPlaceId, CardMovementType
+                .EightDirections))
+                {
+                    if (!_placeInRange.IsOccupied || _placeInRange.GetCard() is not Keeper)
+                    {
+                        continue;
+                    }
+                    UIManager.Instance.ShowOkDialog("This card can't move due Hinder effect");
+                    return;
+                }
+            }
         }
         
         CardAction _newAction = new CardAction
@@ -738,7 +771,7 @@ public class TableActionsHandler : MonoBehaviour
                 return;
             }
         }
-
+        
         TablePlaceHandler _tablePlace = GameplayManager.Instance.TableHandler.GetPlace(_action.StartingPlaceId);
         Card _card = null;
         foreach (var _cardBase in _tablePlace.GetCards())

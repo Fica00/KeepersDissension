@@ -712,6 +712,8 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             }
         }
+        
+        OnGonnaSwitchPlace?.Invoke(_firstCard,_secondCard);
 
         _firstCard.MoveToPosition(_destination);
         _secondCard.MoveToPosition(_startingDestination);
@@ -795,6 +797,17 @@ public class GameplayManagerPVP : GameplayManager
             }
             
             float _damage = _action.Damage != -1 ? _action.Damage : _attackingCard.Stats.Damage;
+            Grounded _grounded = FindObjectOfType<Grounded>();
+            bool _usedGrounded = false;
+            if (_grounded!=null && _grounded.IsActive(_attackingCard,_defendingCard) && _action.CanBeBlocked)
+            {
+                _damage = 0;
+                _usedGrounded = true;
+                if (_defendingCard.My)
+                {
+                    ChangeMovementForCard(_defendingCard.GetTablePlace().Id,false);
+                }
+            }
             if (_dealDamage)
             {
                 //hunter ability
@@ -839,19 +852,7 @@ public class GameplayManagerPVP : GameplayManager
                         UIManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
                         _damage = 0;
                     }
-                    
-                    Grounded _grounded = FindObjectOfType<Grounded>();
-                    bool _usedGrounded = false;
-                    if (_grounded!=null && _grounded.IsActive(_attackingCard,_defendingCard) && _action.CanBeBlocked)
-                    {
-                        _damage = 0;
-                        _usedGrounded = true;
-                        if (_defendingCard.My)
-                        {
-                            ChangeMovementForCard(_defendingCard.GetTablePlace().Id,false);
-                        }
-                    }
-                    
+
                     if (_action.CanBeBlocked && !_usedGrounded)
                     {
                         Armor _abilityEffect = FindObjectsOfType<AbilityEffect>().ToList().Find(_abilityEffect =>
@@ -2257,9 +2258,9 @@ public class GameplayManagerPVP : GameplayManager
         int _placeWithBomb = -1;
         foreach (var _markerPlaceId in _markers)
         {
-            foreach (var _bomberMinefield in FindObjectsOfType<BomberMinefield>())
+            foreach (var _ in FindObjectsOfType<BomberMinefield>())
             {
-                _placeWithBomb= Check(_bomberMinefield.BombMarkers,_markerPlaceId);
+                _placeWithBomb= Check(BomberMinefield.BombMarkers,_markerPlaceId);
                 if (_placeWithBomb!=-1)
                 {
                     return _placeWithBomb;

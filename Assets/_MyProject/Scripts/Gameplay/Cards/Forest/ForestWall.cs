@@ -29,6 +29,10 @@ public class ForestWall : WallBase
         {
             GameplayManager.Instance.PlayAudioOnBoth("Leaves55",CardBase);
         }
+        else
+        {
+            return;
+        }
 
         TablePlaceHandler _cardPlace = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace);
         if (_cardPlace == null)
@@ -40,6 +44,22 @@ public class ForestWall : WallBase
         {
             return;
         }
+        
+        CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
+        if (Collapse.IsActiveForMe)
+        {
+            if (!_attacker.My)
+            {
+                DamageAttacker(AttackerPlace);
+            }
+        }
+        else if (Collapse.IsActiveForOpponent)
+        {
+            if (_attacker.My)
+            {
+                DamageAttacker(AttackerPlace);
+            }
+        }
 
         int _distance = GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_cardPlace, Card.GetTablePlace());
         if (_distance <= 1)
@@ -47,22 +67,13 @@ public class ForestWall : WallBase
             StartCoroutine(TryToHeal(_cardObject));
         }
 
-        if (!CardBase.My)
-        {
-            if (Collapse.IsActive)
-            {
-                DamageAttacker(AttackerPlace);
-            }
-        }
-
-        if (Immunity.IsActiveForMe || Immunity.IsActiveForOpponent)
+        if (Immunity.IsActiveForMe && _attacker.My)
         {
             return;
         }
-
-        if (Collapse.IsActive)
+        if (Immunity.IsActiveForOpponent && !_attacker.My)
         {
-            DamageAttacker(AttackerPlace);
+            return;
         }
     }
 

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class SnowWall : WallBase
 {
     private int attackerPlace;
@@ -28,17 +30,34 @@ public class SnowWall : WallBase
 
         if (!CardBase.My)
         {
-            if (Collapse.IsActive)
-            {
-                DamageAttacker(attackerPlace);
-            }
             return;
         }
         
-        if (Immunity.IsActiveForMe || Immunity.IsActiveForOpponent)
+        CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(attackerPlace).GetCard();
+        if (Collapse.IsActiveForMe)
+        {
+            if (!_attacker.My)
+            {
+                DamageAttacker(attackerPlace);
+            }
+        }
+        else if (Collapse.IsActiveForOpponent)
+        {
+            if (_attacker.My)
+            {
+                DamageAttacker(attackerPlace);
+            }
+        }
+        
+        if (Immunity.IsActiveForMe && _attacker.My)
         {
             return;
         }
+        if (Immunity.IsActiveForOpponent && !_attacker.My)
+        {
+            return;
+        }
+        
 
         if (attackerPlace==TablePlaceHandler.Id)
         {
@@ -47,11 +66,6 @@ public class SnowWall : WallBase
         
         GameplayManager.Instance.ChangeMovementForCard(attackerPlace, false);
         GameplayManager.Instance.MyPlayer.OnStartedTurn += Unsubscribe;
-        
-        if (Collapse.IsActive)
-        {
-            DamageAttacker(attackerPlace);
-        }
     }
 
     private void Unsubscribe()

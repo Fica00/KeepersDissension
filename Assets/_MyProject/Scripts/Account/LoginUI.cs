@@ -15,6 +15,7 @@ public class LoginUI : MonoBehaviour, IPanel
     public void Setup()
     {
         holder.SetActive(true);
+        HandleInteractables(true);
     }
 
     private void OnEnable()

@@ -119,7 +119,7 @@ namespace FirebaseAuthHandler
                 }
                 else if (_task.IsFaulted)
                 {
-                    _result.Message = "SignIn encountered an error: " + _task.Exception;
+                    _result.Message = "Email or password incorrect";
                 }
                 else
                 {

@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
 {
     private Dictionary<CardBase,List<Card>> markers = new ();
-    private static List<CardBase> bombMarkers = new ();
+    public static List<CardBase> BombMarkers;
 
-    public List<CardBase> BombMarkers => bombMarkers;
 
     private void OnEnable()
     {
         CardBase.OnGotDestroyed += CheckDestroyedCard;
         GameplayManager.OnFoundBombMarker += DestroyRestOfCards;
-        bombMarkers = new List<CardBase>();
     }
 
     private void DestroyRestOfCards(CardBase _card)
@@ -48,7 +47,6 @@ public class BomberMinefield : CardSpecialAbility
         GameplayManager.OnFoundBombMarker -= DestroyRestOfCards;
     }
     
-
     public override void UseAbility()
     {
         if (Player.Actions<=0)
@@ -62,7 +60,7 @@ public class BomberMinefield : CardSpecialAbility
             return;
         }
 
-        if (bombMarkers.Count >= 3)
+        if (BombMarkers.Count >= 3)
         {
             UIManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
             return;
@@ -77,7 +75,29 @@ public class BomberMinefield : CardSpecialAbility
         });
     }
 
-    private void YesUseMinefield(Action _callBack=null)
+    public void UseAbilityFree()
+    {
+        if (Player.Actions<=0)
+        {
+            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            return;
+        }
+
+        if (!GameplayManager.Instance.MyTurn)
+        {
+            return;
+        }
+
+        if (BombMarkers.Count >= 3)
+        {
+            UIManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
+            return;
+        }
+
+        YesUseMinefield(false);
+    }
+    
+    private void YesUseMinefield(bool _checkActions=true,Action _callBack=null)
     {
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, 1, PlaceLookFor.Empty,
             CardMovementType.EightDirections, false, LookForCardOwner.My, PlaceBomb);
@@ -91,7 +111,7 @@ public class BomberMinefield : CardSpecialAbility
                 OnActivated?.Invoke();
                 return;
             }
-
+            
             TablePlaceHandler _tablePlace = GameplayManager.Instance.TableHandler.GetPlace(_placeId);
             if (_tablePlace.IsOccupied && !_tablePlace.ContainsMarker)
             {
@@ -100,7 +120,7 @@ public class BomberMinefield : CardSpecialAbility
                 return;
             }
 
-            foreach (var _marker in bombMarkers)
+            foreach (var _marker in BombMarkers)
             {
                 if (_marker.GetTablePlace().Id==_placeId)
                 {
@@ -110,13 +130,13 @@ public class BomberMinefield : CardSpecialAbility
                 }
             }
             
-            if (Player.Actions<=0 && !Casters.IsActive)
+            if (Player.Actions<=0 && !Casters.IsActive && _checkActions)
             {
                 UIManager.Instance.ShowOkDialog("You don't have anymore actions");
                 OnActivated?.Invoke();
                 return;
             }
-            
+
             if (Card is not Keeper)
             {
                 if (Card.Details.Faction.IsCyber)
@@ -136,8 +156,12 @@ public class BomberMinefield : CardSpecialAbility
                     GameplayManager.Instance.PlayAudioOnBoth("ThisIsWhatILiveFor", Card);
                 }
             }
-
-            Player.Actions--;
+            
+            if (_checkActions)
+            {
+                Player.Actions--;
+            }
+            
             List<Card> _markers = new List<Card>();
             CardBase _bombMarker = null;
             List<TablePlaceHandler> _placesWithMarkers = new List<TablePlaceHandler>();
@@ -153,7 +177,7 @@ public class BomberMinefield : CardSpecialAbility
                     if (_place.Id == _placeId)
                     {
                         _bombMarker = _marker;
-                        bombMarkers.Add(_marker);
+                        BombMarkers.Add(_marker);
                     }
                     continue;
                 }
@@ -172,14 +196,17 @@ public class BomberMinefield : CardSpecialAbility
 
                 if (_place.Id == _placeId)
                 {
+                    Debug.Log("Added",gameObject);
                     _bombMarker = _marker;
-                    bombMarkers.Add(_marker);
+                    BombMarkers.Add(_marker);
                 }
 
+                
                 GameplayManager.Instance.PlaceCard(_marker, _place.Id);
                 GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
             }
 
+            
             foreach (var _markerPlace in _placesWithMarkers)
             {
                 GameplayManager.Instance.ChangeSprite(_markerPlace.Id,_markerPlace.GetMarker().Details.Id,Card.Details.Faction.Id+1,true);
@@ -188,6 +215,21 @@ public class BomberMinefield : CardSpecialAbility
             _callBack?.Invoke();
             OnActivated?.Invoke();
             markers.Add(_bombMarker,_markers);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            foreach (var (_bomMarker,_restMarkers) in markers)
+            {
+                Debug.Log(_bomMarker.name,_bomMarker.gameObject);
+                foreach (var _marker in _restMarkers)
+                {
+                    Debug.Log(_marker.name,_marker.gameObject);
+                }
+            }
         }
     }
 
@@ -204,13 +246,13 @@ public class BomberMinefield : CardSpecialAbility
             }
         }
 
-        if (!bombMarkers.Contains(_card))
+        if (!BombMarkers.Contains(_card))
         {
             return;
         }
 
-        bombMarkers.Remove(_card);
+        BombMarkers.Remove(_card);
         
-       GameplayManager.Instance.BombExploded(_card.GetTablePlace().Id);
+        GameplayManager.Instance.BombExploded(_card.GetTablePlace().Id);
     }
 }

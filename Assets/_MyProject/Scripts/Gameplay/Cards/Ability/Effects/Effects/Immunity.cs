@@ -2,7 +2,6 @@ public class Immunity : AbilityEffect
 {
    public static bool IsActiveForMe;
    public static bool IsActiveForOpponent;
-
    private void OnEnable()
    {
       IsActiveForMe = false;
@@ -21,19 +20,21 @@ public class Immunity : AbilityEffect
 
    public override void ActivateForOther()
    {
-      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-      GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableEffectDisplay;
       IsActiveForOpponent = true;
-   }
-
-   private void DisableEffectDisplay()
-   {
-      AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+      GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableEffect;
    }
 
    private void DisableEffect()
    {
-      GameplayManager.Instance.MyPlayer.OnEndedTurn -= DisableEffect;
+      if (IsActiveForMe)
+      {
+         GameplayManager.Instance.MyPlayer.OnEndedTurn -= DisableEffect;
+      }
+      else
+      {
+         GameplayManager.Instance.OpponentPlayer.OnEndedTurn -= DisableEffect;
+      }
       IsActiveForMe = false;
       IsActiveForOpponent = false;
       AbilityCard.ActiveDisplay.gameObject.SetActive(false);

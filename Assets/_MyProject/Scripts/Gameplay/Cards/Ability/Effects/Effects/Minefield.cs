@@ -29,14 +29,14 @@ public class Minefield : AbilityEffect
         _bomberMinefield.IsBaseCardsEffect = false;
         _bomberMinefield.Setup(false,sprite);
         _bomberMinefield.OnActivated += Finish;
-        _bomberMinefield.UseAbility();
+        _bomberMinefield.UseAbilityFree();
         
         player.OnEndedTurn += RemoveEffect;
     }
 
     private void Finish()
     {
-        BomberMinefield _bomberMinefield = keeper.EffectsHolder.AddComponent<BomberMinefield>();
+        BomberMinefield _bomberMinefield = keeper.EffectsHolder.GetComponent<BomberMinefield>();
         _bomberMinefield.OnActivated -= Finish;
         OnActivated?.Invoke();
     }

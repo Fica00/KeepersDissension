@@ -9,6 +9,7 @@ public class GameplayManager : MonoBehaviour
     public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
+    public static Action<CardBase, CardBase> OnGonnaSwitchPlace;
     public static Action<CardBase> OnPlacedCard;
     public static Action<Keeper> OnKeeperDied;
     public static GameplayManager Instance;
@@ -60,6 +61,7 @@ public class GameplayManager : MonoBehaviour
     protected virtual void Awake()
     {
         Instance = this;
+        BomberMinefield.BombMarkers = new List<CardBase>();
     }
 
     private void Start()

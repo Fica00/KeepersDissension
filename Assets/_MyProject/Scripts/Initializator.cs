@@ -17,7 +17,7 @@ public class Initializator : MonoBehaviour
 
    private void OnDisable()
    {
-      SplashAnimation.OnFinished += InitSOs;
+      SplashAnimation.OnFinished -= InitSOs;
    }
 
    private void InitSOs()
@@ -40,6 +40,12 @@ public class Initializator : MonoBehaviour
       }
       else
       {
+         if (SettingsPanel.IsSigningOut)
+         {
+            SettingsPanel.IsSigningOut = false;
+            AuthenticationUI.Instance.ShowLogin();
+            return;
+         }
          FirebaseManager.Instance.Authentication.SignInEmail(_credentials.Email, _credentials.Password, FinishSignIn);
       }
    }
@@ -65,7 +71,7 @@ public class Initializator : MonoBehaviour
    {
       if (!_status)
       {
-         UIManager.Instance.ShowOkDialog("Something went wrong while collecting data");
+         AuthenticationUI.Instance.ShowLogin();
          return;
       }
 

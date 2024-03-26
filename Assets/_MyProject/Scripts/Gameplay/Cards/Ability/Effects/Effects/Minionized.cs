@@ -48,6 +48,8 @@ public class Minionized : AbilityEffect
         Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
         startingHealth = _myKeeper.Stats.Health;
+        _myKeeper.Stats.MaxHealth = 1;
+        _opponentKeeper.Stats.MaxHealth = 1;
         _myKeeper.Stats.Health = 1;
         _opponentKeeper.Stats.Health = 1;
 
@@ -69,6 +71,7 @@ public class Minionized : AbilityEffect
         player.OnEndedTurn -= LowerCounter;
         GameplayManager.OnKeeperDied -= CheckKeeper;
         Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        _keeper.Stats.MaxHealth = -1;
         if (!hasDied)
         {
             _keeper.Stats.Health = startingHealth;
@@ -77,6 +80,7 @@ public class Minionized : AbilityEffect
         {
             _keeper.Stats.Health = 5;
         }
+
         
         GameplayManager.Instance.UpdateHealth(_keeper.Details.Id,true,(int)_keeper.Stats.Health);
     }

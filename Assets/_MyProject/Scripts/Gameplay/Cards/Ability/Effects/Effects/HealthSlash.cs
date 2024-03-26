@@ -21,12 +21,13 @@ public class HealthSlash : AbilityEffect
     {
         int _newHealth = (int)Math.Ceiling(_keeper.Stats.Health / 2.0);
         int _damage = (int)_keeper.Stats.Health - _newHealth;
+
         if (_damage<1)
         {
             _damage = 1;
         }
+        
         TablePlaceHandler _tablePlace = _keeper.GetTablePlace();
-        Debug.Log(_damage);
         CardAction _attackAction = new CardAction
         {
             StartingPlaceId = _tablePlace.Id,

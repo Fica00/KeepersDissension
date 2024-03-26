@@ -21,71 +21,71 @@ public class DragonWall : WallBase
 
         if (!CardBase.My)
         {
-            if (AttackerPlace == -1)
+            return;
+        }
+        
+        GameplayManager.Instance.PlayAudioOnBoth("FireCrackle", CardBase);
+
+        CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
+        if (Collapse.IsActiveForMe)
+        {
+            if (!_attacker.My)
             {
-                return;
+                DamageAttacker(AttackerPlace);
             }
-            if (Collapse.IsActive)
+        }
+        else if (Collapse.IsActiveForOpponent)
+        {
+            if (_attacker.My)
             {
                 DamageAttacker(AttackerPlace);
             }
         }
         
-        GameplayManager.Instance.PlayAudioOnBoth("FireCrackle", CardBase);
-
-        if (Immunity.IsActiveForMe || Immunity.IsActiveForOpponent)
+        if (Immunity.IsActiveForMe && _attacker.My)
         {
             return;
         }
-
-        if (Card.My)
+        if (Immunity.IsActiveForOpponent && !_attacker.My)
         {
-            foreach (var _placeAround in 
-                     GameplayManager.Instance.TableHandler.GetPlacesAround(
-                         Card.GetTablePlace().Id,
-                         CardMovementType.EightDirections,_includeCenter:false))
-            {
-                if (!_placeAround.IsOccupied)
-                {
-                    continue;
-                }
-
-                if (!_placeAround.ContainsWarrior())
-                {
-                    continue;
-                }
-
-                Card _cardThatCanBeAttacked = _placeAround.GetCard();
-                
-                Debug.Log("Damagging",_placeAround.gameObject);
-
-                CardAction _attackAction = new CardAction
-                {
-                    StartingPlaceId = _placeAround.Id,
-                    FirstCardId = _cardThatCanBeAttacked.Details.Id,
-                    FinishingPlaceId = _placeAround.Id,
-                    SecondCardId = _cardThatCanBeAttacked.Details.Id,
-                    Type = CardActionType.Attack,
-                    Cost = 0,
-                    IsMy = true,
-                    CanTransferLoot = false,
-                    Damage = 1,
-                    CanCounter = false,
-                    GiveLoot = false
-                };
-            
-                GameplayManager.Instance.ExecuteCardAction(_attackAction);
-            }
+            return;
         }
         
-
-        if (Collapse.IsActive)
+        foreach (var _placeAround in 
+                 GameplayManager.Instance.TableHandler.GetPlacesAround(
+                     Card.GetTablePlace().Id,
+                     CardMovementType.EightDirections,_includeCenter:false))
         {
-            if (AttackerPlace == -1)
+            if (!_placeAround.IsOccupied)
             {
-                return;
+                continue;
             }
-            DamageAttacker(AttackerPlace);
+
+            if (!_placeAround.ContainsWarrior())
+            {
+                continue;
+            }
+
+            Card _cardThatCanBeAttacked = _placeAround.GetCard();
+                
+            Debug.Log("Damagging",_placeAround.gameObject);
+
+            CardAction _attackAction = new CardAction
+            {
+                StartingPlaceId = _placeAround.Id,
+                FirstCardId = _cardThatCanBeAttacked.Details.Id,
+                FinishingPlaceId = _placeAround.Id,
+                SecondCardId = _cardThatCanBeAttacked.Details.Id,
+                Type = CardActionType.Attack,
+                Cost = 0,
+                IsMy = true,
+                CanTransferLoot = false,
+                Damage = 1,
+                CanCounter = false,
+                GiveLoot = false
+            };
+            
+            GameplayManager.Instance.ExecuteCardAction(_attackAction);
         }
     }
 }

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class CyborgWall : WallBase
 {
     private void OnEnable()
@@ -28,19 +26,32 @@ public class CyborgWall : WallBase
         {
             GameplayManager.Instance.PlayAudioOnBoth("CyborgWall",CardBase);
         }
-
-        Card _attackingCard = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCardNoWall();
-
-        if (!CardBase.My)
+        else
         {
-            if (Collapse.IsActive)
-            {
-                DamageAttacker(_attackingCard.GetTablePlace().Id);
-            }
             return;
         }
 
-        if (Immunity.IsActiveForMe || Immunity.IsActiveForOpponent)
+        CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
+        if (Collapse.IsActiveForMe)
+        {
+            if (!_attacker.My)
+            {
+                DamageAttacker(AttackerPlace);
+            }
+        }
+        else if (Collapse.IsActiveForOpponent)
+        {
+            if (_attacker.My)
+            {
+                DamageAttacker(AttackerPlace);
+            }
+        }
+        
+        if (Immunity.IsActiveForMe && _attacker.My)
+        {
+            return;
+        }
+        if (Immunity.IsActiveForOpponent && !_attacker.My)
         {
             return;
         }
@@ -57,9 +68,5 @@ public class CyborgWall : WallBase
         }
 
         GameplayManager.Instance.PushCardBack(AttackerPlace,_card.GetTablePlace().Id, 100);
-        if (Collapse.IsActive)
-        {
-            DamageAttacker(_attackingCard.GetTablePlace().Id);
-        }
     }
 }

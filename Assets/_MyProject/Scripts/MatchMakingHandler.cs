@@ -127,7 +127,6 @@ public class MatchMakingHandler : MonoBehaviour
                 }
             };
             
-            Debug.Log(JsonConvert.SerializeObject(_roomData));
             FirebaseManager.Instance.RoomHandler.CreateRoom(_roomData, HandeCreateRoom);
         }
     }
