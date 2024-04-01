@@ -20,7 +20,6 @@ namespace AuthDemo
         {
             signOut.onClick.AddListener(SignOut);
             signInAnonymous.onClick.AddListener(SignInAsAnonymous);
-            signInGoogle.onClick.AddListener(SignInGoogle);
             signUpEmail.onClick.AddListener(SignUpEmail);
             signInEmail.onClick.AddListener(SignInEmail);
         }
@@ -29,7 +28,6 @@ namespace AuthDemo
         {
             signOut.onClick.RemoveListener(SignOut);
             signInAnonymous.onClick.RemoveListener(SignInAsAnonymous);
-            signInGoogle.onClick.RemoveListener(SignInGoogle);
             signUpEmail.onClick.RemoveListener(SignUpEmail);
             signInEmail.onClick.RemoveListener(SignInEmail);
         }
@@ -49,17 +47,6 @@ namespace AuthDemo
             
             ManageInteractables(false);
             FirebaseManager.Authentication.SignInAnonymous(HandleSignIn);
-        }
-
-        private void SignInGoogle()
-        {
-            if (!CanSignIn())
-            {
-                return;
-            }
-            
-            ManageInteractables(false);
-            FirebaseManager.Authentication.SignInGoogle(HandleSignIn);
         }
 
         private void SignUpEmail()

@@ -51,25 +51,6 @@ namespace FirebaseAuthHandler
             });
         }
 
-        public void SignInGoogle(Action<SignInResult> _callBack)
-        {
-            if (Application.isEditor || Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                _callBack?.Invoke(new SignInResult { IsSuccessful = false, Message = "Unsupported platform" });
-                return;
-            }
-
-            (bool _canSignIn, SignInResult _signInResult) = CanSignIn();
-
-            if (!_canSignIn)
-            {
-                _callBack?.Invoke(_signInResult);
-                return;
-            }
-
-            GoogleSignInHandler.SignIn(_result => { HandleGoogleSignIn(_result, _callBack); });
-        }
-
         private void HandleGoogleSignIn(GoogleSignInResult _result, Action<SignInResult> _callBack)
         {
             if (!_result.IsSuccessful)
