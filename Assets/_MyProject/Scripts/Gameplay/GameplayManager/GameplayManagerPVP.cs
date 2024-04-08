@@ -10,7 +10,7 @@ using GameplayActions;
 
 public class GameplayManagerPVP : GameplayManager
 {
-    private Action<int> opponentCheckForMarkerCallback;
+    private Action<List<int>> opponentCheckForMarkerCallback;
     private RoomHandler roomHandler;
 
     protected override void Awake()
@@ -245,7 +245,7 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.OpponentRespondedForBombQuestion:
                 OpponentRespondedForBombQuestion _opponentRespondedForBombQuestion =
                     JsonConvert.DeserializeObject<OpponentRespondedForBombQuestion>(_action.JsonData);
-                OpponentRespondedForBombQuestion(_opponentRespondedForBombQuestion.Amount);
+                OpponentRespondedForBombQuestion(_opponentRespondedForBombQuestion.BombPlaces);
                 break;
             case ActionType.OpponentPlacedVetoedCard:
                 OpponentPlacedVetoedCard _opponentPlacedVetoedCard = JsonConvert.DeserializeObject<OpponentPlacedVetoedCard>(_action.JsonData);
@@ -730,6 +730,8 @@ public class GameplayManagerPVP : GameplayManager
     {
         if (Truce.IsActive&& _action.CanBeBlocked)
         {
+            GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
+            _player.Actions--;
             UIManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
             return;
         }
@@ -808,6 +810,7 @@ public class GameplayManagerPVP : GameplayManager
                     ChangeMovementForCard(_defendingCard.GetTablePlace().Id,false);
                 }
             }
+            
             if (_dealDamage)
             {
                 //hunter ability
@@ -887,7 +890,7 @@ public class GameplayManagerPVP : GameplayManager
                 _defendingCard.Stats.Health -= _damage;
             }
 
-            if (_defendingCard.CanFlyToDodgeAttack)
+            if (_defendingCard.CanFlyToDodgeAttack&& _action.CanBeBlocked)
             {
                 _defendingCard.CanFlyToDodgeAttack = false;
                 _attackingPlayer.Actions -= _action.Cost;
@@ -2239,36 +2242,29 @@ public class GameplayManagerPVP : GameplayManager
         EconomyPanelHandler.Instance.ShowBoughtMatter(_didIBuy);
     }
     
-    public override void CheckForBombInMarkers(List<int> _markers,Action<int> _callBack)
+    public override void CheckForBombInMarkers(List<int> _markers,Action<List<int>> _callBack)
     {
         opponentCheckForMarkerCallback = _callBack;
-        int _markerWithBombId = CheckForBomb(_markers);
-        if (_markerWithBombId!=-1)
-        {
-            _callBack?.Invoke(_markerWithBombId);
-            return;
-        }
-
         OpponentAskedIfThereIsBombInMarkers _data = new OpponentAskedIfThereIsBombInMarkers { Data = JsonConvert.SerializeObject(_markers) };
         roomHandler.AddAction(ActionType.OpponentAskedIfThereIsBombInMarkers, JsonConvert.SerializeObject(_data));
     }
 
-    private int CheckForBomb(List<int> _markers)
+    private List<int> CheckForBomb(List<int> _markers)
     {
-        int _placeWithBomb = -1;
+        List<int> _placesWithBomb = new List<int>();
         foreach (var _markerPlaceId in _markers)
         {
             foreach (var _ in FindObjectsOfType<BomberMinefield>())
             {
-                _placeWithBomb= Check(BomberMinefield.BombMarkers,_markerPlaceId);
+                int _placeWithBomb= Check(BomberMinefield.BombMarkers,_markerPlaceId);
                 if (_placeWithBomb!=-1)
                 {
-                    return _placeWithBomb;
+                    _placesWithBomb.Add(_placeWithBomb);
                 }
             }
         }
 
-        return _placeWithBomb;
+        return _placesWithBomb;
 
         int Check(List<CardBase> _possibleMarkers, int _markerPlaceId)
         {
@@ -2703,14 +2699,19 @@ public class GameplayManagerPVP : GameplayManager
         {
             _markerPlaces[_i] = ConvertOpponentsPosition(_markerPlaces[_i]);
         }
-        int _hasBomb = CheckForBomb(_markerPlaces);
-        OpponentRespondedForBombQuestion _data = new OpponentRespondedForBombQuestion { Amount = _hasBomb };
+        List<int> _hasBomb = CheckForBomb(_markerPlaces);
+        OpponentRespondedForBombQuestion _data = new OpponentRespondedForBombQuestion { BombPlaces = _hasBomb };
         roomHandler.AddAction(ActionType.OpponentRespondedForBombQuestion, JsonConvert.SerializeObject(_data));
     }
 
-    private void OpponentRespondedForBombQuestion(int _markerId)
+    private void OpponentRespondedForBombQuestion(List<int> _markerId)
     {
-        opponentCheckForMarkerCallback?.Invoke(ConvertOpponentsPosition(_markerId));
+        List<int> _places = new List<int>();
+        foreach (var _marker in _markerId)
+        {
+            _places.Add(ConvertOpponentsPosition(_marker));
+        }
+        opponentCheckForMarkerCallback?.Invoke(_places);
     }
 
     private void OpponentMarkedBomb(int _placeId)

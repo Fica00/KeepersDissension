@@ -86,13 +86,14 @@ public class ScoutVision : CardSpecialAbility
             
             GameplayManager.Instance.CheckForBombInMarkers(_markerPositions,DestroyMarker);
 
-            void DestroyMarker(int _hasBomb)
+            void DestroyMarker(List<int> _bombPlaces)
             {
-                if (_hasBomb!=-1)
+                foreach (var _markerPlace in _bombPlaces)
                 {
-                    GameplayManager.Instance.MarkMarkerAsBomb(_hasBomb);
-                    _markerPositions.Remove(_hasBomb);
+                    GameplayManager.Instance.MarkMarkerAsBomb(_markerPlace);
+                    _markerPositions.Remove(_markerPlace);
                 }
+                
                 GameplayManager.Instance.TryDestroyMarkers(_markerPositions);
             }
         }

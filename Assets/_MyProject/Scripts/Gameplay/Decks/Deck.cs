@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Deck
 {
-    public List<Card> Cards = new List<Card>();
-    public List<AbilityCard> Abilities = new List<AbilityCard>();
+    public List<Card> Cards = new();
+    public List<AbilityCard> Abilities = new();
 
     public void AddNewCard(Card _card)
     {

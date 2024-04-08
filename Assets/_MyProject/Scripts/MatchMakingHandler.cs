@@ -84,7 +84,8 @@ public class MatchMakingHandler : MonoBehaviour
             Id = FirebaseManager.Instance.Authentication.UserId,
             FactionId = DataManager.Instance.PlayerData.FactionId,
             DateCrated = DataManager.Instance.PlayerData.DateCreated,
-            MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
+            MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed,
+            Name = DataManager.Instance.PlayerData.Name
         };
         
         FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData,MatchModeToRoomType(mode),HandleJoinRoom, _name:_name);

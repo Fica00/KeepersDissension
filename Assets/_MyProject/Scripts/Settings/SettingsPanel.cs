@@ -11,11 +11,14 @@ public class SettingsPanel : MonoBehaviour
     
     [SerializeField] private Button closeButton;
     [SerializeField] private Button logoutButton;
+    [SerializeField] private Button showProfile;
+    [SerializeField] private PlayerSettings playerSettings;
 
     private void OnEnable()
     {
         closeButton.onClick.AddListener(Close);
         logoutButton.onClick.AddListener(Logout);
+        showProfile.onClick.AddListener(ShowProfile);
         
         logoutButton.gameObject.SetActive(!SceneManager.IsGameplayScene);
     }
@@ -24,6 +27,12 @@ public class SettingsPanel : MonoBehaviour
     {
         closeButton.onClick.RemoveListener(Close);
         logoutButton.onClick.RemoveListener(Logout);
+        showProfile.onClick.RemoveListener(ShowProfile);
+    }
+
+    private void ShowProfile()
+    {
+        playerSettings.Setup();
     }
 
     private void Close()

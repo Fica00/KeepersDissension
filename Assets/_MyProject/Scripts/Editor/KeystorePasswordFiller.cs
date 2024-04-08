@@ -6,7 +6,7 @@ public class KeystorePasswordFiller
 {
     static KeystorePasswordFiller()
     {
-        PlayerSettings.keystorePass = "Kjkszpj123";
-        PlayerSettings.keyaliasPass = "Kjkszpj123";
+        UnityEditor.PlayerSettings.keystorePass = "Kjkszpj123";
+        UnityEditor.PlayerSettings.keyaliasPass = "Kjkszpj123";
     }
 }

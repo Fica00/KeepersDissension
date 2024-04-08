@@ -381,7 +381,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void CheckForBombInMarkers(List<int> _markers, Action<int> _callBack)
+    public virtual void CheckForBombInMarkers(List<int> _markers, Action<List<int>> _callBack)
     {
         throw new Exception();
     }

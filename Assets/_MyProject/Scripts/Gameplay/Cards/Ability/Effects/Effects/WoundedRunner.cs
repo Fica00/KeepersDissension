@@ -4,11 +4,12 @@ public class WoundedRunner : AbilityEffect
 {
     private Keeper keeper;
     private GameplayPlayer player;
-
+    private bool isActive;
     public override void ActivateForOwner()
     {
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         player = GameplayManager.Instance.MyPlayer;
+        isActive = true;
         Activate();
         RemoveAction();
         OnActivated?.Invoke();
@@ -37,6 +38,17 @@ public class WoundedRunner : AbilityEffect
         }
     }
 
+    private void Update()
+    {
+        if (isActive)
+        {
+            if (keeper.Stats.Health!=1)
+            {
+                CancelEffect();
+            }
+        }
+    }
+
     private void OnDisable()
     {
         CancelEffect();
@@ -49,6 +61,7 @@ public class WoundedRunner : AbilityEffect
             return;
         }
 
+        isActive = false;
         keeper.Speed = 0;
         player.OnEndedTurn -= AddSpeed;
         GameplayManager.OnCardAttacked -= AddSpeed;

@@ -2,7 +2,6 @@ using System.Linq;
 
 public class Tar : AbilityEffect
 {
-    private Guardian guardian;
     private int counter;
     public static bool IsActive;
     private bool isActiveForOpponent;
@@ -50,8 +49,6 @@ public class Tar : AbilityEffect
         }
 
         isActiveForOpponent = true;
-        guardian = FindObjectsOfType<Guardian>().ToList().Find(_element => _element.My);
-        GameplayManager.Instance.ChangeMovementForCard(guardian.GetTablePlace().Id,false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn += ChangeEffect;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
@@ -65,7 +62,6 @@ public class Tar : AbilityEffect
     private void RemoveEffect()
     {
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= RemoveEffect;        
-        GameplayManager.Instance.ChangeMovementForCard(guardian.GetTablePlace().Id,true);
         IsActive = false;
         isActiveForOpponent = false;
     }

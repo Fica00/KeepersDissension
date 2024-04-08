@@ -19,7 +19,7 @@ public class GameplayPlayer : MonoBehaviour
     [SerializeField] private CardsInHandHandler cardsInHandHandler;
     [SerializeField] private Transform destroyedCardsHolder;
 
-    private List<AbilityCard> ownedAbilities = new List<AbilityCard>();
+    private List<AbilityCard> ownedAbilities = new();
     public List<AbilityCard> OwnedAbilities => ownedAbilities;
 
     private Deck deck = new();
@@ -80,6 +80,8 @@ public class GameplayPlayer : MonoBehaviour
     private void SetupCardsInDeck()
     {
         Transform _cardsHolder = tableSideHandler.CardsHolder;
+        int _lastIdOfCard=0;
+        Card _wallCard=default;
         foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSO))
         {
             if (_cardInDeck==null)
@@ -88,6 +90,26 @@ public class GameplayPlayer : MonoBehaviour
                 continue;
             }
             Card _card = CardsManager.Instance.CreateCard(_cardInDeck.Details.Id, IsMy);
+            if (_card is Wall)
+            {
+                _wallCard = _card;
+            }
+
+            if (_card.Details.Id>_lastIdOfCard)
+            {
+                _lastIdOfCard = _card.Details.Id;
+            }
+            
+            _card.transform.SetParent(_cardsHolder);
+            _card.SetParent(_cardsHolder);
+            _card.Setup(IsMy);
+            AddCardToDeck(_card);
+        }
+
+        for (int _i = 0; _i < 30; _i++)
+        {
+            Card _card = CardsManager.Instance.CreateCard(_wallCard.Details.Id, IsMy);
+            _card.Details.Id = 500 + _i;
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy);

@@ -86,7 +86,8 @@ public class Void : AbilityEffect
                 IsMy = true,
                 CanTransferLoot = false,
                 Damage = 20,
-                CanCounter = false
+                CanCounter = false,
+                CanBeBlocked = false
             };
             GameplayManager.Instance.ExecuteCardAction(_attackAction);
         }

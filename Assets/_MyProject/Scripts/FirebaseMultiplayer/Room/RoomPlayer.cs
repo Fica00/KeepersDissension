@@ -9,5 +9,6 @@ namespace FirebaseMultiplayer.Room
         public int FactionId;
         public int MatchesPlayed;
         public DateTime DateCrated;
+        public string Name;
     }
 }

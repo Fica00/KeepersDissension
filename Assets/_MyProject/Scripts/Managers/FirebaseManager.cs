@@ -76,6 +76,9 @@ public class FirebaseManager : MonoBehaviour
             else if(DataManager.Instance.PlayerData.DeviceId!=SystemInfo.deviceUniqueIdentifier)
             {
                 UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
+                Authentication.SignOut();
+                PlayerPrefs.DeleteAll();
+                PlayerPrefs.Save();
                 _callBack?.Invoke(false);
                 return;
             }

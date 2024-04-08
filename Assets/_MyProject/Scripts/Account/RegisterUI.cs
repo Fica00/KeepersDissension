@@ -49,7 +49,7 @@ public class RegisterUI : MonoBehaviour, IPanel
             return;
         }
 
-        if (ValidateName(_name))
+        if (CredentialsValidator.ValidateName(_name))
         {
             ManageInteractables(false);
             FirebaseManager.Instance.Authentication.SignUpEmail(_email,_password, HandleRegister);
@@ -80,23 +80,6 @@ public class RegisterUI : MonoBehaviour, IPanel
         }
 
         Initializator.Instance.CollectData();
-    }
-
-    private bool ValidateName(string _name)
-    {
-        if (string.IsNullOrEmpty(_name))
-        {
-            UIManager.Instance.ShowOkDialog("Please enter name");
-            return false;
-        }
-
-        if (_name.Length is < 4 or > 10)
-        {
-            UIManager.Instance.ShowOkDialog("Name must be between 4 and 10 characters");
-            return false;
-        }
-        
-        return true;
     }
 
     private void SignUp()

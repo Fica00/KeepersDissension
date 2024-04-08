@@ -804,6 +804,27 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
+        if (_newAction.Type == CardActionType.Move || _newAction.Type == CardActionType.SwitchPlace)
+        {
+            if (_card1 != null)
+            {
+                if (_card1 is Guardian)
+                {
+                    UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability");
+                    return;
+                }
+            }
+
+            if (_card2 != null)
+            {
+                if (_card2 is Guardian)
+                {
+                    UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability");
+                    return;
+                }
+            }
+        }
+
         GameplayManager.Instance.ExecuteCardAction(_newAction);
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();

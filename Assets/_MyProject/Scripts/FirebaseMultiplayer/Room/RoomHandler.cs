@@ -74,6 +74,7 @@ namespace FirebaseMultiplayer.Room
 
         public void SubscribeToRoom()
         {
+            Debug.Log("Subscribed");
             database.Child(RoomPath).ValueChanged += RoomUpdated;
             actionCounter = 0;
         }
@@ -85,6 +86,7 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
+            Debug.Log("Unsubscribed");
             database.Child(RoomPath).ValueChanged -= RoomUpdated;
             roomData = null;
         }
@@ -104,6 +106,7 @@ namespace FirebaseMultiplayer.Room
             RoomData _newData = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
             if (_newData == null)
             {
+                Debug.Log(12333);
                 return;
             }
 
@@ -122,6 +125,7 @@ namespace FirebaseMultiplayer.Room
                     continue;
                 }
                 
+                Debug.Log(123);
                 OnPlayerJoined?.Invoke(_player);
             }
         }
