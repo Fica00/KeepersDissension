@@ -247,7 +247,7 @@ public class SniperStealth : CardSpecialAbility
         {
             if (!GameplayManager.Instance.MyTurn)
             {
-                if (CardBase.My)
+                if (CardBase.My && !GameplayManager.Instance.UsingVisionToDestroyMarkers)
                 {
                     GameplayManager.Instance.RequestResponseAction((CardBase as Card).Details.Id);
                 }

@@ -130,7 +130,7 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.OpponentChangedCanFlyToDodge:
                 OpponentChangedCanFlyToDodge _flyToDodge = JsonConvert.DeserializeObject<OpponentChangedCanFlyToDodge>(_action.JsonData);
-                OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status);
+                OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status,_flyToDodge.IsEffectedCardMy);
                 break;
             case ActionType.OpponentWantsToTryAndDestroyMarkers:
                 OpponentWantsToTryAndDestroyMarkers _opponentWantsToTryAndDestroyMarkers =
@@ -735,6 +735,7 @@ public class GameplayManagerPVP : GameplayManager
             UIManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
             return;
         }
+        
         TablePlaceHandler _attackingPosition = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _defendingPosition = TableHandler.GetPlace(_action.FinishingPlaceId);
 
@@ -896,11 +897,12 @@ public class GameplayManagerPVP : GameplayManager
                 _attackingPlayer.Actions -= _action.Cost;
                 if (!_defendingCard.My)
                 {
+                    TellOpponentToUseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
                     return;
                 }
 
                 //get first available place and fly to it, starts from 8 to skip ability spots
-                UseDelivery();
+                UseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
                 return;
             }
 
@@ -1127,49 +1129,6 @@ public class GameplayManagerPVP : GameplayManager
             }
         }
 
-        void UseDelivery()
-        {
-            List<int> _placesNearLifeForce = new List<int>(){10,12,18,17,19,9,13,19,16,23,24,25,26,27};
-            foreach (var _placeNear in _placesNearLifeForce)
-            {
-                if (CheckPlace(_placeNear))
-                {
-                    return;
-                }
-            }
-            for (int _i = 8; _i < 57; _i++)
-            {
-                if (CheckPlace(_i))
-                {
-                    return;
-                }
-            }
-        }
-
-        bool CheckPlace(int _index)
-        {
-            TablePlaceHandler _place = TableHandler.GetPlace(_index);
-            if (_place.IsOccupied)
-            {
-                return false;
-            }
-
-            CardAction _actionMove = new CardAction
-            {
-                FirstCardId = _defendingCard.Details.Id,
-                StartingPlaceId = _defendingCard.GetTablePlace().Id,
-                FinishingPlaceId = _index,
-                Type = CardActionType.Move,
-                Cost = 0,
-                IsMy = true,
-                CanTransferLoot = false,
-                Damage = -1,
-                CanCounter = false
-            };
-            ExecuteCardAction(_actionMove);
-            return true;
-        }
-
         bool TryPlaceKeeper(int _placeIndex)
         {
             TablePlaceHandler _place = TableHandler.GetPlace(_placeIndex);
@@ -1187,6 +1146,12 @@ public class GameplayManagerPVP : GameplayManager
 
             return true;
         }
+    }
+
+    private void TellOpponentToUseDelivery(int _cardId, int _startingPlace)
+    {
+        UseDelivery _delivery = new UseDelivery { CardId = _cardId, PlaceId = _startingPlace };
+        roomHandler.AddAction(ActionType.UseDelivery, JsonConvert.SerializeObject(_delivery));
     }
 
     private void ExecuteMoveAbility(CardAction _action)
@@ -1405,6 +1370,7 @@ public class GameplayManagerPVP : GameplayManager
     
     private void TellOpponentThatIUpdatedWhiteStrangeMatter()
     {
+        Debug.Log(MyPlayer.StrangeMatter);
         OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
         roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
     }
@@ -1713,10 +1679,10 @@ public class GameplayManagerPVP : GameplayManager
         _cardAtPlace.CanMove = _status;
     }
     
-    public override void ChangeCanFlyToDodge(int _cardId, bool _status)
+    public override void ChangeCanFlyToDodge(int _cardId, bool _status, bool _isCardMy)
     {
-        HandleChangeCanFlyToDodge(_cardId,_status,true);
-        OpponentChangedCanFlyToDodge _data = new OpponentChangedCanFlyToDodge { CardId = _cardId, Status = _status };
+        HandleChangeCanFlyToDodge(_cardId,_status,_isCardMy);
+        OpponentChangedCanFlyToDodge _data = new OpponentChangedCanFlyToDodge { CardId = _cardId, Status = _status, IsEffectedCardMy = _isCardMy};
         roomHandler.AddAction(ActionType.OpponentChangedCanFlyToDodge, JsonConvert.SerializeObject(_data));
     }
 
@@ -1746,6 +1712,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void HandleTryToDestroyMarkers(List<int> _places)
     {
+        UsingVisionToDestroyMarkers = true;
         foreach (var _placeId in _places)
         {
             TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
@@ -1774,6 +1741,8 @@ public class GameplayManagerPVP : GameplayManager
             GameplayPlayer _player = _cardBase.My ? MyPlayer : OpponentPlayer;
             _player.DestroyCard(_cardBase);
         }
+        
+        UsingVisionToDestroyMarkers = false;
     }
 
     public override void MarkMarkerAsBomb(int _placeId)
@@ -2303,7 +2272,7 @@ public class GameplayManagerPVP : GameplayManager
         StartCoroutine(HandleVetoRoutine());
         IEnumerator HandleVetoRoutine()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(2);
             _card.RotateToBeVertical();
             _card.IsVetoed = true;
             _card.Effect.CancelEffect();
@@ -2397,6 +2366,12 @@ public class GameplayManagerPVP : GameplayManager
                     _sprite = forestMarker;
                     break;
             }
+
+            if (_card.IsVoid && _sprite != voidMarker)
+            {
+                yield break;
+            }
+            
             bool _changedSprite = _card.Display.ChangeSprite(_sprite);
             if (_showPlaceAnimation&&_changedSprite)
             {
@@ -2494,12 +2469,15 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentUpdatedWhiteStrangeMatter(int _amount)
     {
+        Debug.Log(_amount);
         OpponentPlayer.StrangeMatter = _amount;
+        strangeMatterTracker.ShowOpponentStrangeMatter();
     }
 
     private void UpdateWhiteStrangeMatterInReserve(int _amount)
     {
         WhiteStrangeMatter.SetAmountInEconomyWithoutNotify(_amount);
+        strangeMatterTracker.ShowAmountInEconomy();
     }
 
     private int ConvertOpponentsPosition(int _position)
@@ -2588,9 +2566,9 @@ public class GameplayManagerPVP : GameplayManager
         HandleChangeMovementForCard(_placeId,_status);
     }
 
-    private void OpponentChangedCanFlyToDodge(int _cardId, bool _status)
+    private void OpponentChangedCanFlyToDodge(int _cardId, bool _status, bool _isCardMy)
     {
-        HandleChangeCanFlyToDodge(_cardId,_status, false);
+        HandleChangeCanFlyToDodge(_cardId,_status, _isCardMy);
     }
 
     private void OpponentGotResponseAction()
@@ -2727,15 +2705,26 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentToldYouToVetoCardOnField(int _cardId)
     {
-        var _abilityCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _cardId);
+        AbilityCard _abilityCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _cardId);
+        float _delay = 1;
         if (_abilityCard.GetTablePlace()==null)
         {
             PlaceAbilityOnTable(_cardId);
         }
         else
         {
-            PlaceAbilityOnTable(_cardId,_abilityCard.GetTablePlace().Id);
+            TablePlaceHandler _tablePlace = _abilityCard.GetTablePlace();
+            if (_tablePlace.IsActivationField)
+            {
+                ReturnAbilityFromActivationField(_cardId);
+                _delay++;
+            }
+            else
+            {
+                PlaceAbilityOnTable(_cardId,_tablePlace.Id);
+            }
         }
+        
         HandleVetoCard(_abilityCard);
         OpponentPlacedVetoedCard _data = new OpponentPlacedVetoedCard { CardId = _cardId };
         roomHandler.AddAction(ActionType.OpponentPlacedVetoedCard, JsonConvert.SerializeObject(_data));
@@ -2743,7 +2732,7 @@ public class GameplayManagerPVP : GameplayManager
         
         IEnumerator Rotate()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(_delay);
             FindObjectOfType<Veto>().AbilityCard.RotateToBeVertical();
         }
     }
@@ -2814,5 +2803,48 @@ public class GameplayManagerPVP : GameplayManager
     private void OpponentSaidToPlayAudio(string _key, int _cardId)
     {
         HandlePlayAudio(_key,_cardId,false);
+    }
+    
+    private void UseDelivery(int _defendingCardId, int _startingPlace)
+    {
+        List<int> _placesNearLifeForce = new List<int>(){10,12,18,17,19,9,13,19,16,23,24,25,26,27};
+        foreach (var _placeNear in _placesNearLifeForce)
+        {
+            if (CheckPlace(_placeNear,_defendingCardId,_startingPlace))
+            {
+                return;
+            }
+        }
+        for (int _i = 8; _i < 57; _i++)
+        {
+            if (CheckPlace(_i,_defendingCardId,_startingPlace))
+            {
+                return;
+            }
+        }
+    }
+    
+    private bool CheckPlace(int _index, int _defendingCardId, int _startingPlace)
+    {
+        TablePlaceHandler _place = TableHandler.GetPlace(_index);
+        if (_place.IsOccupied)
+        {
+            return false;
+        }
+
+        CardAction _actionMove = new CardAction
+        {
+            FirstCardId = _defendingCardId,
+            StartingPlaceId = _startingPlace,
+            FinishingPlaceId = _index,
+            Type = CardActionType.Move,
+            Cost = 0,
+            IsMy = true,
+            CanTransferLoot = false,
+            Damage = -1,
+            CanCounter = false
+        };
+        ExecuteCardAction(_actionMove);
+        return true;
     }
 }

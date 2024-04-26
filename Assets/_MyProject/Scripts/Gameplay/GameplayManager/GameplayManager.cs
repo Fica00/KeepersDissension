@@ -42,6 +42,10 @@ public class GameplayManager : MonoBehaviour
     protected bool HasOpponentPlacedStartingCards;
     private bool doIPlayFirst;
 
+    protected StrangeMatterTracker strangeMatterTracker;
+
+    public bool UsingVisionToDestroyMarkers;
+
     public bool IsSettingUpTable =>
         GameState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
 
@@ -61,6 +65,7 @@ public class GameplayManager : MonoBehaviour
     protected virtual void Awake()
     {
         Instance = this;
+        strangeMatterTracker = FindObjectOfType<StrangeMatterTracker>();
         BomberMinefield.BombMarkers = new List<CardBase>();
     }
 
@@ -296,7 +301,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeCanFlyToDodge(int _cardId, bool _status)
+    public virtual void ChangeCanFlyToDodge(int _cardId, bool _status,bool _isCardMy)
     {
         throw new NotImplementedException();
     }

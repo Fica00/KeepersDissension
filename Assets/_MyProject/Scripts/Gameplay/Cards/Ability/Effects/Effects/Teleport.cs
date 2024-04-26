@@ -22,6 +22,10 @@ public class Teleport : AbilityEffect
                     _range++;
                     GetPlace();
                 }
+                else
+                {
+                    Teleport(_placeId);
+                }
             });
         }
 

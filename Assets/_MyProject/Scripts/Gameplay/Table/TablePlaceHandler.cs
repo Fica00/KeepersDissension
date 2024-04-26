@@ -38,7 +38,9 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
             return false;
         }
     }
-    
+
+    public bool IsActivationField => id == 65 || id == -1;
+
     public bool ContainsPortal
     {
         get

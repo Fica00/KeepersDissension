@@ -76,6 +76,11 @@ public class ScoutVision : CardSpecialAbility
                     continue;
                 }
 
+                if (_place.GetMarker().IsVoid)
+                {
+                    continue;
+                }
+
                 _markerPositions.Add(_place.Id);
             }
 

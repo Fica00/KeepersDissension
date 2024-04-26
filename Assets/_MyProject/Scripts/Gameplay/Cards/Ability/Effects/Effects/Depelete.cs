@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Depelete : AbilityEffect
 {
@@ -15,6 +16,7 @@ public class Depelete : AbilityEffect
     {
         GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
         int _amount = Math.Min(amount,_player.StrangeMatter);
+        Debug.Log(_amount);
         _player.RemoveStrangeMatter(_amount);
     }
 }

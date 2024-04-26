@@ -7,5 +7,6 @@ namespace GameplayActions
     {
         public int CardId;
         public bool Status;
+        public bool IsEffectedCardMy;
     }
 }

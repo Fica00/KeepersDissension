@@ -21,6 +21,8 @@ public class Tar : AbilityEffect
             OnActivated?.Invoke();
             return;
         }
+
+        IsActive = true;
         counter = 1;
         GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableActiveDisplay;
         MoveToActivationField();

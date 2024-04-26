@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Tax : AbilityEffect
 {
@@ -29,20 +30,24 @@ public class Tax : AbilityEffect
             GameplayManager.Instance.GameState = _state;
             return;
         }
+        
         foreach (var _card in _availableCards)
         {
             _cards.Add(_card);
         }
+        
         ChooseCardPanel.Instance.ShowCards(_cards,SetAsTax);
 
         void SetAsTax(CardBase _selectedCard)
         {
+            Debug.Log(_selectedCard,_selectedCard.gameObject);
             selectedCard = _selectedCard;
             RemoveAction();
             OnActivated?.Invoke();
             GameplayManager.OnActivatedAbility += CheckAbility;
             GameplayManager.Instance.GameState = _state;
         }
+        
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 

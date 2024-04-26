@@ -56,6 +56,7 @@ namespace GameplayActions
         OpponentSaidToPlayAudio=48,
         OpponentUsedHisUltimate=49,
         OpponentRespondedForBombQuestion = 50,
-        OpponentPlacedVetoedCard=51
+        OpponentPlacedVetoedCard=51,
+        UseDelivery=52
     }
 }

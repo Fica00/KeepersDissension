@@ -44,13 +44,13 @@ public class StrangeMatterTracker : MonoBehaviour
         ShowAmountInEconomy();
     }
 
-    private void ShowOpponentStrangeMatter()
+    public void ShowOpponentStrangeMatter()
     {
         opponentsStrangeMatter.text = opponentPlayer.StrangeMatter.ToString();
         ShowAmountInEconomy();
     }
 
-    private void ShowAmountInEconomy()
+    public void ShowAmountInEconomy()
     {
         strangeMatterInEconomy.text = GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy.ToString();
     }

@@ -252,6 +252,7 @@ public class GameplayPlayer : MonoBehaviour
         
         StrangeMatter -= _amount;
         GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy += _amount;
+        UpdatedStrangeMatter?.Invoke();
     }
 
     public void AddOwnedAbility(int _abilityId)

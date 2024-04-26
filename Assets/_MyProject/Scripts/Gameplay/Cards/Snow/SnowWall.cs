@@ -57,9 +57,13 @@ public class SnowWall : WallBase
         {
             return;
         }
-        
 
         if (attackerPlace==TablePlaceHandler.Id)
+        {
+            return;
+        }
+
+        if (Tar.IsActive && _attacker is Guardian)
         {
             return;
         }

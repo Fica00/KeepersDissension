@@ -5,6 +5,7 @@ public class WoundedRunner : AbilityEffect
     private Keeper keeper;
     private GameplayPlayer player;
     private bool isActive;
+    
     public override void ActivateForOwner()
     {
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);

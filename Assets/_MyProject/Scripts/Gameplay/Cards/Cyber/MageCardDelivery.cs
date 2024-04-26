@@ -1,6 +1,7 @@
 public class MageCardDelivery : CardSpecialAbility
 {
     private int cardEffectedByDeliver = -1;
+    private bool isEffectedCardMy;
 
     private void Start()
     {
@@ -16,7 +17,7 @@ public class MageCardDelivery : CardSpecialAbility
     {
         if (cardEffectedByDeliver != -1)
         {
-            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,false);
+            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,false, isEffectedCardMy);
             cardEffectedByDeliver = -1;
         }
     }
@@ -47,7 +48,7 @@ public class MageCardDelivery : CardSpecialAbility
             PlaceLookFor.Occupied,
             CardMovementType.EightDirections,
             true,
-            LookForCardOwner.My,
+            LookForCardOwner.Both,
             SelectedSpot);
         
         void SelectedSpot(int _id)
@@ -73,12 +74,6 @@ public class MageCardDelivery : CardSpecialAbility
                 return;
             }
 
-            if (!_card.My)
-            {
-                UIManager.Instance.ShowOkDialog("Select friendly card");
-                return;
-            }
-            
             if (Card is not Keeper)
             {
                 if (Card.Details.Faction.IsCyber)
@@ -101,8 +96,9 @@ public class MageCardDelivery : CardSpecialAbility
             
             Player.Actions--;
             cardEffectedByDeliver = _card.Details.Id;
+            isEffectedCardMy = _card.My;
             GameplayManager.Instance.TellOpponentSomething("Opponent used his Delivery ability");
-            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,true);
+            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,true,isEffectedCardMy);
         }
     }
 }
