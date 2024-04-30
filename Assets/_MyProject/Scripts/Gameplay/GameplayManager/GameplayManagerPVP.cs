@@ -1365,6 +1365,8 @@ public class GameplayManagerPVP : GameplayManager
         Finished = true;
         IsMyTurn = false;
 
+        NotificationSender.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
+
         roomHandler.AddAction(ActionType.OpponentEndedTurn,string.Empty);
     }
     

@@ -40,6 +40,7 @@ public class FirebaseManager : MonoBehaviour
                 Authentication.Init(FirebaseAuth.DefaultInstance);
                 database = FirebaseDatabase.DefaultInstance.RootReference;
                 RoomHandler.Init(database, $"{GAME_DATA_KEY}/{ROOMS_KEY}");
+
                 _callBack?.Invoke();
             }
             else

@@ -13,11 +13,18 @@ namespace FirebaseAuthHandler
         public bool IsSignedIn => firebaseUser != null;
         public FirebaseUser FirebaseUser => firebaseUser;
         public string UserId => firebaseUser.UserId;
+        
+        private bool isEmailVerificationSent;
 
         public void Init(FirebaseAuth _auth)
         {
             auth = _auth;
             firebaseUser = auth.CurrentUser;
+
+            if (firebaseUser != null)
+            {
+                CheckEmailVerification();
+            }
         }
 
         public void SignInAnonymous(Action<SignInResult> _callBack)
@@ -106,12 +113,15 @@ namespace FirebaseAuthHandler
                 {
                     _result.IsSuccessful = true;
                     firebaseUser = _task.Result.User;
+                    isEmailVerificationSent = false;
+                    
+                    CheckEmailVerification();
                 }
 
                 _callBack?.Invoke(_result);
             });
         }
-        
+
         public void SignUpEmail(string _email, string _password, Action<SignInResult> _callBack)
         {
             (bool _canSignIn, SignInResult _signInResult) = CanSignIn();
@@ -137,9 +147,67 @@ namespace FirebaseAuthHandler
                 {
                     _result.IsSuccessful = true;
                     firebaseUser = _task.Result.User;
+                    isEmailVerificationSent = false;
+                    
+                    CheckEmailVerification();
                 }
 
                 _callBack?.Invoke(_result);
+            });
+        }
+        private void SendEmailVerification(Action<bool> _callback)
+        {
+            if (firebaseUser != null)
+            {
+                firebaseUser.SendEmailVerificationAsync().ContinueWithOnMainThread(_task =>
+                {
+                    if (_task.IsCanceled)
+                    {
+                        _callback(false);
+                    }
+                    else if (_task.IsFaulted)
+                    {
+                        _callback(false);
+                    }
+                    else
+                    {
+                        _callback(true);
+                    }
+                });
+            }
+            else
+            {
+                _callback(false);
+                Debug.Log("No signed in user to send verification email to.");
+            }
+        }
+
+        private void CheckEmailVerification()
+        {
+            firebaseUser.ReloadAsync().ContinueWithOnMainThread(_task =>
+            {
+                if (_task.IsCompleted && !_task.IsFaulted)
+                {
+                    if (firebaseUser.IsEmailVerified)
+                    {
+                        return;
+                    }
+                    
+                    if(!isEmailVerificationSent)
+                    {
+                        SendEmailVerification((_isSent) =>
+                        {
+                            Debug.Log(_isSent ? "Verification sent" : "Verification not sent");
+                            isEmailVerificationSent = _isSent;
+                        });
+                    }
+                    
+                    UIManager.Instance.ShowOkDialog("Please check your email for verification link", CheckEmailVerification);
+                }
+                else
+                {
+                    Debug.LogError("Failed to reload user data.");
+                }
             });
         }
 
@@ -161,7 +229,7 @@ namespace FirebaseAuthHandler
                     _result.Message = "Password reset email sent successfully.";
                     _result.IsSuccessful = true;
                 }
-                
+
                 _callBack?.Invoke(_result);
             });
         }
@@ -202,6 +270,7 @@ namespace FirebaseAuthHandler
 
             return _result;
         }
+
         
     }
 }

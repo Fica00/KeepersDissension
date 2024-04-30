@@ -1,5 +1,7 @@
-using FirebaseAuthHandler;
+using Firebase.Auth;
+using Firebase.Database;
 using UnityEngine;
+using SignInResult = FirebaseAuthHandler.SignInResult;
 
 public class Initializator : MonoBehaviour
 {
@@ -62,6 +64,12 @@ public class Initializator : MonoBehaviour
       CollectData();
    }
 
+   private void ManageNotifications()
+   {
+      TokenHandler.Instance.Init(FirebaseAuth.DefaultInstance, FirebaseDatabase.DefaultInstance.RootReference);
+      FirebaseNotificationHandler.Instance.Init(FirebaseAuth.DefaultInstance);
+   }
+
    public void CollectData()
    {
       FirebaseManager.Instance.CollectData(FinishInit);
@@ -76,6 +84,7 @@ public class Initializator : MonoBehaviour
       }
 
       FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);
+      ManageNotifications();
       SceneManager.LoadMainMenu();
    }
 
