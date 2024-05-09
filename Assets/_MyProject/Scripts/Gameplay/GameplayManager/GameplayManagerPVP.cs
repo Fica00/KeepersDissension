@@ -270,6 +270,7 @@ public class GameplayManagerPVP : GameplayManager
     protected override void SetupPlayers()
     {
         List<GameplayPlayerData> _playerData = new();
+        
         foreach (var _player in roomHandler.RoomData.RoomPlayers)
         {
             _playerData.Add(new GameplayPlayerData

@@ -23,6 +23,9 @@ public class GameplayCheats : MonoBehaviour
         UnlimitedActions = false;
         CheckForCD = true;
         HasUnlimitedGold = false;
+        
+        Debug.Log(FirebaseManager.Instance.RoomHandler is null);
+        
         gameObject.SetActive(FirebaseManager.Instance.RoomHandler.IsTestingRoom);
     }
 

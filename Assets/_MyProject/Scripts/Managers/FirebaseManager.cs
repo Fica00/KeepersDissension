@@ -6,6 +6,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using FirebaseMultiplayer.Room;
+using Newtonsoft.Json;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class FirebaseManager : MonoBehaviour
     public FirebaseAuthentication Authentication = new();
     public RoomHandler RoomHandler = new();
     private DatabaseReference database;
-    
+
     private void Awake()
     {
         if (Instance == null)
@@ -74,7 +75,7 @@ public class FirebaseManager : MonoBehaviour
             {
                 DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
             }
-            else if(DataManager.Instance.PlayerData.DeviceId!=SystemInfo.deviceUniqueIdentifier)
+            else if (DataManager.Instance.PlayerData.DeviceId != SystemInfo.deviceUniqueIdentifier)
             {
                 UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
                 Authentication.SignOut();
@@ -83,6 +84,7 @@ public class FirebaseManager : MonoBehaviour
                 _callBack?.Invoke(false);
                 return;
             }
+
             CollectGameData(_callBack);
         });
     }
@@ -133,5 +135,31 @@ public class FirebaseManager : MonoBehaviour
     public void SaveValue<T>(string _path, T _value)
     {
         database.Child(USERS_KEY).Child(Authentication.UserId).Child(_path).SetValueAsync(_value);
+    }
+
+    public void CheckIfRoomExists(string _roomId, Action<bool> _callBack)
+    {
+        database.Child(GAME_DATA_KEY).Child(ROOMS_KEY).Child(_roomId).GetValueAsync().ContinueWithOnMainThread(_task =>
+        {
+            if (_task.IsFaulted)
+            {
+                _callBack?.Invoke(false);
+            }
+            else if (_task.IsCompleted)
+            {
+                if (_task.Result.Exists)
+                {
+                    RoomData _roomData = JsonConvert.DeserializeObject<RoomData>(_task.Result.GetRawJsonValue());
+
+                    if (_roomData.Status == RoomStatus.Playing)
+                    {
+                        _callBack?.Invoke(true);
+                        return;
+                    }
+                }
+
+                _callBack?.Invoke(false);
+            }
+        });
     }
 }

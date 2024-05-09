@@ -29,25 +29,26 @@ public class GameplayPlayer : MonoBehaviour
 
     public int AmountOfAbilitiesPlayerCanBuy;
     public TableSideHandler TableSideHandler => tableSideHandler;
-
     public int Actions
     {
         get => actions;
         set
         {
-            if (actions>value && IsMy && GameplayCheats.UnlimitedActions)
+            if (actions > value && IsMy && GameplayCheats.UnlimitedActions)
             {
                 return;
             }
+
             actions = value;
-            if (actions<0)
+            if (actions < 0)
             {
                 actions = 0;
             }
-            else if (actions>5)
+            else if (actions > 5)
             {
                 actions = 5;
             }
+
             UpdatedActions?.Invoke();
         }
     }
@@ -57,10 +58,11 @@ public class GameplayPlayer : MonoBehaviour
         get => strangeMatter;
         set
         {
-            if (value<strangeMatter&& GameplayCheats.HasUnlimitedGold)
+            if (value < strangeMatter && GameplayCheats.HasUnlimitedGold)
             {
                 return;
             }
+
             strangeMatter = value;
             UpdatedStrangeMatter?.Invoke();
         }
@@ -80,26 +82,27 @@ public class GameplayPlayer : MonoBehaviour
     private void SetupCardsInDeck()
     {
         Transform _cardsHolder = tableSideHandler.CardsHolder;
-        int _lastIdOfCard=0;
-        Card _wallCard=default;
+        int _lastIdOfCard = 0;
+        Card _wallCard = default;
         foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSO))
         {
-            if (_cardInDeck==null)
+            if (_cardInDeck == null)
             {
                 Debug.Log("Somehow lost this card???");
                 continue;
             }
+
             Card _card = CardsManager.Instance.CreateCard(_cardInDeck.Details.Id, IsMy);
             if (_card is Wall)
             {
                 _wallCard = _card;
             }
 
-            if (_card.Details.Id>_lastIdOfCard)
+            if (_card.Details.Id > _lastIdOfCard)
             {
                 _lastIdOfCard = _card.Details.Id;
             }
-            
+
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy);
@@ -164,7 +167,7 @@ public class GameplayPlayer : MonoBehaviour
             UpdatedDeck?.Invoke();
         }
     }
-    
+
     public void RemoveAbilityFromDeck(int _cardId)
     {
         AbilityCard _drawnCard = deck.DrawAbility(_cardId);
@@ -178,7 +181,7 @@ public class GameplayPlayer : MonoBehaviour
 
     public void ShowCards(CardType _type)
     {
-        cardsInHandHandler.ShowCards(this,_type);
+        cardsInHandHandler.ShowCards(this, _type);
     }
 
     public void HideCards()
@@ -188,9 +191,9 @@ public class GameplayPlayer : MonoBehaviour
 
     public List<Card> GetCardsInDeck(CardType _type)
     {
-       return deck.Cards.FindAll(_card => _card.Details.Type == _type);
+        return deck.Cards.FindAll(_card => _card.Details.Type == _type);
     }
-    
+
     public List<AbilityCard> GetAbilities()
     {
         return deck.Abilities;
@@ -200,16 +203,16 @@ public class GameplayPlayer : MonoBehaviour
     {
         Card _card = ((Card)_cardBase);
 
-        if (_card==null)
+        if (_card == null)
         {
             return;
         }
-        
+
         if (!deck.Cards.Contains(_card))
         {
             deck.Cards.Add(_card);
         }
-        
+
         _cardBase.Destroy();
         _cardBase.ReturnFromHand();
         _card.HasDied = true;
@@ -219,16 +222,16 @@ public class GameplayPlayer : MonoBehaviour
     {
         Card _card = ((Card)_cardBase);
 
-        if (_card==null)
+        if (_card == null)
         {
             return;
         }
-        
+
         if (!deck.Cards.Contains(_card))
         {
             deck.Cards.Add(_card);
         }
-        
+
         _cardBase.ReturnFromHand();
         _card.HasDied = true;
     }
@@ -249,7 +252,7 @@ public class GameplayPlayer : MonoBehaviour
         {
             return;
         }
-        
+
         StrangeMatter -= _amount;
         GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy += _amount;
         UpdatedStrangeMatter?.Invoke();
@@ -257,9 +260,8 @@ public class GameplayPlayer : MonoBehaviour
 
     public void AddOwnedAbility(int _abilityId)
     {
-        AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList()
-            .Find(_ability => _ability.Details.Id == _abilityId);
-        
+        AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _abilityId);
+
         ownedAbilities.Add(_ability);
         cardsInHandHandler.HideCards();
         UpdatedOwnedAbilities?.Invoke(_ability);
@@ -268,7 +270,7 @@ public class GameplayPlayer : MonoBehaviour
         {
             return;
         }
-        
+
         GameplayManager.Instance.PlaceAbilityOnTable(_ability.Details.Id);
 
         if (_ability.Details.Type == AbilityCardType.Passive)

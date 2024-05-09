@@ -4,13 +4,14 @@ using UnityEngine;
 public class DataManager : MonoBehaviour
 {
     private const string AUTH_CREDENTIALS = "AuthCredentials";
+    
     public static DataManager Instance;
     public PlayerData PlayerData { get; private set; }
     public GameData GameData { get; private set; }
 
     private void Awake()
     {
-        if (Instance==null)
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -19,6 +20,7 @@ public class DataManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
     }
 
     private void OnDisable()
@@ -29,6 +31,7 @@ public class DataManager : MonoBehaviour
         PlayerData.OnUpdatedGameplayNotifications -= SaveGameplayNotifications;
         PlayerData.OnUpdatedSoundEffects -= SaveSoundEffects;
         PlayerData.OnUpdatedDeviceId -= SaveDeviceId;
+        PlayerData.OnUpdatedCurrentRoomId -= SaveCurrentRoomId;
     }
 
     public void CreateNewPlayer()
@@ -55,11 +58,17 @@ public class DataManager : MonoBehaviour
         PlayerData.OnUpdatedGameplayNotifications += SaveGameplayNotifications;
         PlayerData.OnUpdatedSoundEffects += SaveSoundEffects;
         PlayerData.OnUpdatedDeviceId += SaveDeviceId;
+        PlayerData.OnUpdatedCurrentRoomId += SaveCurrentRoomId;
     }
 
     private void SaveMatchesPlayed()
     {
         FirebaseManager.Instance.SaveValue(nameof(PlayerData.MatchesPlayed), PlayerData.MatchesPlayed);
+    }
+    
+    private void SaveCurrentRoomId()
+    {
+        FirebaseManager.Instance.SaveValue(nameof(PlayerData.CurrentRoomId), PlayerData.CurrentRoomId);
     }
 
     private void SaveName()
@@ -79,27 +88,27 @@ public class DataManager : MonoBehaviour
 
     private void SaveGameplayNotifications()
     {
-        FirebaseManager.Instance.SaveValue(nameof(PlayerData.GameplayNotifications),PlayerData.GameplayNotifications);
+        FirebaseManager.Instance.SaveValue(nameof(PlayerData.GameplayNotifications), PlayerData.GameplayNotifications);
     }
+
 
     private void SaveSoundEffects()
     {
         FirebaseManager.Instance.SaveValue(nameof(PlayerData.PlaySoundEffect), PlayerData.PlaySoundEffect);
     }
-
     public static AuthenticationCredentials GetAuthCredentials()
     {
         if (PlayerPrefs.HasKey(AUTH_CREDENTIALS))
         {
             return JsonConvert.DeserializeObject<AuthenticationCredentials>(PlayerPrefs.GetString(AUTH_CREDENTIALS));
         }
-        
+
         return null;
     }
 
     public static void SaveAuthenticationCredentials(string _email, string _password)
     {
         AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = _email, Password = _password };
-        PlayerPrefs.SetString(AUTH_CREDENTIALS,JsonConvert.SerializeObject(_credentials));
+        PlayerPrefs.SetString(AUTH_CREDENTIALS, JsonConvert.SerializeObject(_credentials));
     }
 }

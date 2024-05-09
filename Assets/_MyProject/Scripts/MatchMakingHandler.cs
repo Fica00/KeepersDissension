@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using FirebaseGameplay.Responses;
 using FirebaseMultiplayer.Room;
-using Newtonsoft.Json;
 using UnityEngine;
 
 public class MatchMakingHandler : MonoBehaviour
@@ -16,8 +15,9 @@ public class MatchMakingHandler : MonoBehaviour
     [SerializeField] private FriendlyMatchUI friendlyMatchUI;
 
     private Action friendlyMatchCreateCallBack;
-    
+
     private MatchMode mode;
+
     private void OnEnable()
     {
         SearchingForOpponentPanel.OnCanceledSearch += ShowMainMenu;
@@ -46,11 +46,12 @@ public class MatchMakingHandler : MonoBehaviour
     private void OnModeSelected(MatchMode _mode)
     {
         gameModeHandler.Close();
-        if (_mode==MatchMode.None)
+        if (_mode == MatchMode.None)
         {
             ShowMainMenu();
             return;
         }
+
         mode = _mode;
         chooseFaction.SetActive(true);
         ChooseFaction.OnChosenFaction += OnSelectedFaction;
@@ -60,12 +61,12 @@ public class MatchMakingHandler : MonoBehaviour
     {
         ChooseFaction.OnChosenFaction -= OnSelectedFaction;
         chooseFaction.SetActive(false);
-        if (DataManager.Instance.PlayerData.FactionId==-1)
+        if (DataManager.Instance.PlayerData.FactionId == -1)
         {
             ShowMainMenu();
             return;
         }
-        
+
         switch (mode)
         {
             case MatchMode.Private:
@@ -76,7 +77,7 @@ public class MatchMakingHandler : MonoBehaviour
         JoinRoom();
     }
 
-    public void JoinRoom(Action _callBack=null, string _name="")
+    public void JoinRoom(Action _callBack = null, string _name = "")
     {
         friendlyMatchCreateCallBack = _callBack;
         RoomPlayer _playerData = new RoomPlayer
@@ -87,8 +88,8 @@ public class MatchMakingHandler : MonoBehaviour
             MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed,
             Name = DataManager.Instance.PlayerData.Name
         };
-        
-        FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData,MatchModeToRoomType(mode),HandleJoinRoom, _name:_name);
+
+        FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData, MatchModeToRoomType(mode), HandleJoinRoom, _name: _name);
     }
 
     RoomType MatchModeToRoomType(MatchMode _mode)
@@ -116,19 +117,25 @@ public class MatchMakingHandler : MonoBehaviour
         {
             RoomData _roomData = new RoomData
             {
-                Name =_response.Name,
+                Name = _response.Name,
                 Id = Guid.NewGuid().ToString(),
                 Type = _response.Type,
                 Status = RoomStatus.SearchingForOpponent,
                 Owner = FirebaseManager.Instance.Authentication.UserId,
                 RoomPlayers = new List<RoomPlayer>
                 {
-                    new (){ Id = FirebaseManager.Instance.Authentication.UserId, FactionId = DataManager.Instance.PlayerData.FactionId, DateCrated = 
-                    DataManager.Instance.PlayerData.DateCreated , MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed}
+                    new()
+                    {
+                        Id = FirebaseManager.Instance.Authentication.UserId,
+                        FactionId = DataManager.Instance.PlayerData.FactionId,
+                        DateCrated = DataManager.Instance.PlayerData.DateCreated,
+                        MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
+                    }
                 }
             };
-            
+
             FirebaseManager.Instance.RoomHandler.CreateRoom(_roomData, HandeCreateRoom);
+            DataManager.Instance.PlayerData.CurrentRoomId = _roomData.Id;
         }
     }
 
@@ -143,12 +150,12 @@ public class MatchMakingHandler : MonoBehaviour
             Debug.Log("Failed to create room!");
         }
     }
-    
+
     public void FinishSettingUpMatch()
     {
         searchingForOpponentPanel.Activate();
         FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
-        if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count==2)
+        if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count == 2)
         {
             StartGameplay();
         }
