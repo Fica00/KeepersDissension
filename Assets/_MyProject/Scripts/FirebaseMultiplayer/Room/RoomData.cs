@@ -13,7 +13,7 @@ namespace FirebaseMultiplayer.Room
         public RoomStatus Status;
         public string Owner;
         public List<RoomPlayer> RoomPlayers;
-        public List<ActionData> Actions = new();
+        public Dictionary<string,ActionData> Actions = new();
         public GameplayData GameplayData = new ();
     }
 }

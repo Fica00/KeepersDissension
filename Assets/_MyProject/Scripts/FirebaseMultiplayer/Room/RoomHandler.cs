@@ -5,6 +5,7 @@ using FirebaseGameplay.Responses;
 using GameplayActions;
 using Newtonsoft.Json;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FirebaseMultiplayer.Room
 {
@@ -145,7 +146,7 @@ namespace FirebaseMultiplayer.Room
                 bool _found = false;
                 foreach (var _oldAction in roomData.Actions)
                 {
-                    if (_action == _oldAction)
+                    if (_action.Key == _oldAction.Key)
                     {
                         _found = true;
                         break;
@@ -157,12 +158,13 @@ namespace FirebaseMultiplayer.Room
                     continue;
                 }
 
-                if (_action.Data.Owner == localPlayerId)
+                var _actionValue = _action.Value;
+                if (_actionValue.Data.Owner == localPlayerId)
                 {
                     continue;
                 }
 
-                OnNewAction?.Invoke(_action);
+                OnNewAction?.Invoke(_actionValue);
             }
         }
 
@@ -236,13 +238,22 @@ namespace FirebaseMultiplayer.Room
 
         public void AddAction(ActionType _type, string _jsonData)
         {
-            int _actionId = roomData.Actions.Count;
 
             GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
             ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData };
-            roomData.Actions.Add(_data);
+            string _actionId = NewTimestampUuid();
+            roomData.Actions.Add(_actionId,_data);
 
-            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId.ToString()).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
+            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
+        }
+        
+        private static string NewTimestampUuid()
+        {
+            DateTime _now = DateTime.UtcNow;
+            long _timestamp = _now.Ticks;
+            string _timestampString = _timestamp.ToString("x");
+            string _uuid = _timestampString + Random.Range(1000,9999);
+            return _uuid;
         }
     }
 }
