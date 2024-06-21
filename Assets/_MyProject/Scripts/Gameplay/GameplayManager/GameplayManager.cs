@@ -235,7 +235,7 @@ public class GameplayManager : MonoBehaviour
         MyPlayer.Actions--;
     }
 
-    public virtual void UnchainGuardian()
+    public virtual void UnchainGuardian(bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -290,17 +290,17 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null,bool _placeMinion=true)
+    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null,bool _placeMinion=true, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuildWall(CardBase _cardBase, int _cost)
+    public virtual void BuildWall(CardBase _cardBase, int _cost, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ManageBlockaderAbility(bool _status)
+    public virtual void ManageBlockaderAbility(bool _status, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -312,27 +312,27 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeOwnerOfCard(int _placeId)
+    public virtual void ChangeOwnerOfCard(int _placeId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void OpponentCardDiedInMyPosition(int _cardId)
+    public virtual void OpponentCardDiedInMyPosition(int _cardId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeMovementForCard(int _placeId, bool _status)
+    public virtual void ChangeMovementForCard(int _placeId, bool _status, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void TellOpponentSomething(string _key)
+    public virtual void TellOpponentSomething(string _key, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeCanFlyToDodge(int _cardId, bool _status,bool _isCardMy)
+    public virtual void ChangeCanFlyToDodge(int _cardId, bool _status,bool _isCardMy,  bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -342,32 +342,32 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void TryDestroyMarkers(List<int> _places)
+    public virtual void TryDestroyMarkers(List<int> _places, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BombExploded(int _placeId, bool _includeCenter=true)
+    public virtual void BombExploded(int _placeId, bool _includeCenter=true, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void HandleSnowUltimate(bool _status)
+    public virtual void HandleSnowUltimate(bool _status, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ActivateAbility(int _cardId)
+    public virtual void ActivateAbility(int _cardId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromShop(int _abilityId)
+    public virtual void BuyAbilityFromShop(int _abilityId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromHand(int _abilityId)
+    public virtual void BuyAbilityFromHand(int _abilityId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -382,12 +382,12 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void ManageBombExplosion(bool _state)
+    public virtual void ManageBombExplosion(bool _state, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ManageChangeOrgAttack(int _amount)
+    public virtual void ManageChangeOrgAttack(int _amount, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -397,57 +397,57 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void PlaceAbilityOnTable(int _abilityId, int _placeId)
+    public virtual void PlaceAbilityOnTable(int _abilityId, int _placeId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ReturnAbilityFromActivationField(int _abilityId)
+    public virtual void ReturnAbilityFromActivationField(int _abilityId, bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuyMatter()
+    public virtual void BuyMatter( bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void FinishedReductionAction()
+    public virtual void FinishedReductionAction(bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void CheckForBombInMarkers(List<int> _markers, Action<List<int>> _callBack)
+    public virtual void CheckForBombInMarkers(List<int> _markers, Action<List<int>> _callBack, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void MarkMarkerAsBomb(int _placeId)
+    public virtual void MarkMarkerAsBomb(int _placeId, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void TellOpponentToRemoveStrangeMatter(int _amount)
+    public virtual void TellOpponentToRemoveStrangeMatter(int _amount, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void VetoCard(AbilityCard _card)
+    public virtual void VetoCard(AbilityCard _card, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void TellOpponentToPlaceFirstCardCasters()
+    public virtual void TellOpponentToPlaceFirstCardCasters(bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void OpponentPlacedFirstAbilityForCasters()
+    public virtual void OpponentPlacedFirstAbilityForCasters(bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void FinishCasters()
+    public virtual void FinishCasters(bool _tellRoom = true)
     {
         throw new Exception();
     }
@@ -465,32 +465,32 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    public virtual void UpdateHealth(int _cardId, bool _isMine, int _health)
+    public virtual void UpdateHealth(int _cardId, bool _isMine, int _health, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
+    public virtual void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void TellOpponentToUseStealth(int _cardId, int _stealthFromPlace, int _placeMinionsFrom)
+    public virtual void TellOpponentToUseStealth(int _cardId, int _stealthFromPlace, int _placeMinionsFrom, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false)
+    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void RequestResponseAction(int _cardId)
+    public virtual void RequestResponseAction(int _cardId, bool _tellRoom = true)
     {
         throw new Exception();
     }
 
-    public virtual void PlayAudioOnBoth(string _key, CardBase _card)
+    public virtual void PlayAudioOnBoth(string _key, CardBase _card, bool _tellRoom = true)
     {
         throw new Exception();
     }
@@ -781,7 +781,7 @@ public class GameplayManager : MonoBehaviour
         return _keys[_randomNumber];
     }
 
-    public virtual void TellOpponentThatIUsedUltimate()
+    public virtual void TellOpponentThatIUsedUltimate(bool _tellRoom = true)
     {
         throw new Exception();
     }
