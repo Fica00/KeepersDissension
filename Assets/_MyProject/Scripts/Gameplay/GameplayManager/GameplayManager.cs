@@ -285,7 +285,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void ForceUpdatePlayerActions()
+    public virtual void ForceUpdatePlayerActions(bool _tellRoom=true)
     {
         throw new NotImplementedException();
     }

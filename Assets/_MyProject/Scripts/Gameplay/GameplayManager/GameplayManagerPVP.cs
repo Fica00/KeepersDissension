@@ -204,11 +204,20 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.ForceUpdateOpponentAction:
                 ForceUpdateOpponentAction _forceUpdateOpponentAction = JsonConvert.DeserializeObject<ForceUpdateOpponentAction>(_action.JsonData);
-                
-                OpponentForcedActionsUpdate(_forceUpdateOpponentAction.Amount);
+                if (_action.IsMine)
+                {
+                    ForceUpdatePlayerActions(false);
+                }
+                else
+                {
+                    OpponentForcedActionsUpdate(_forceUpdateOpponentAction.Amount);
+                }
                 break;
             case ActionType.OpponentBoughtMinion:
                 OpponentBoughtMinion _opponentBoughtMinion = JsonConvert.DeserializeObject<OpponentBoughtMinion>(_action.JsonData);
+
+                asdasldkjasldk;
+                
                 OpponentBoughtMinion(_opponentBoughtMinion.CardId, _opponentBoughtMinion.Cost, _opponentBoughtMinion.PositionId,
                     _opponentBoughtMinion.PlaceMinion);
                 break;
@@ -1541,7 +1550,7 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    public override void ForceUpdatePlayerActions()
+    public override void ForceUpdatePlayerActions(bool _tellRoom = true)
     {
         ForceUpdateOpponentAction _data = new ForceUpdateOpponentAction { Amount = MyPlayer.Actions };
         roomHandler.AddAction(ActionType.ForceUpdateOpponentAction, JsonConvert.SerializeObject(_data));
