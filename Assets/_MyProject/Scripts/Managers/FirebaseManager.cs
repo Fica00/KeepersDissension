@@ -137,13 +137,13 @@ public class FirebaseManager : MonoBehaviour
         database.Child(USERS_KEY).Child(Authentication.UserId).Child(_path).SetValueAsync(_value);
     }
 
-    public void CheckIfRoomExists(string _roomId, Action<bool> _callBack)
+    public void CheckIfRoomExists(string _roomId, Action<RoomData> _callBack)
     {
         database.Child(GAME_DATA_KEY).Child(ROOMS_KEY).Child(_roomId).GetValueAsync().ContinueWithOnMainThread(_task =>
         {
             if (_task.IsFaulted)
             {
-                _callBack?.Invoke(false);
+                _callBack?.Invoke(null);
             }
             else if (_task.IsCompleted)
             {
@@ -151,14 +151,14 @@ public class FirebaseManager : MonoBehaviour
                 {
                     RoomData _roomData = JsonConvert.DeserializeObject<RoomData>(_task.Result.GetRawJsonValue());
 
-                    if (_roomData.Status == RoomStatus.Playing)
+                    if (_roomData.Status == RoomStatus.MatchedUp)
                     {
-                        _callBack?.Invoke(true);
+                        _callBack?.Invoke(_roomData);
                         return;
                     }
                 }
 
-                _callBack?.Invoke(false);
+                _callBack?.Invoke(null);
             }
         });
     }

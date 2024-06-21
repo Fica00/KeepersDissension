@@ -12,6 +12,7 @@ public class GameplayManagerPVP : GameplayManager
 {
     private Action<List<int>> opponentCheckForMarkerCallback;
     private RoomHandler roomHandler;
+    [SerializeField] private GameObject inputBlocker;
 
     protected override void Awake()
     {
@@ -38,6 +39,43 @@ public class GameplayManagerPVP : GameplayManager
         WhiteStrangeMatter.UpdatedAmountInEconomy -= TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
+    protected override IEnumerator ExecuteOldActions()
+    {
+        IsExecutingOldActions = true;
+        inputBlocker.SetActive(true);
+        List<string> _executedActions = new List<string>();
+        bool _finished = false;
+        StartCoroutine(ExecuteActions());
+        yield return new WaitUntil(() => _finished);
+
+        IEnumerator ExecuteActions()
+        {
+            int _amountOfExecutedActions = 0;
+            foreach (var _action in FirebaseManager.Instance.RoomHandler.RoomData.Actions.Values.ToList())
+            {
+                if (_executedActions.Contains(_action.Id))
+                {
+                    continue;
+                }
+                ProcessAction(_action);
+                _executedActions.Add(_action.Id);
+                yield return new WaitForSeconds(1);
+                _amountOfExecutedActions++;
+            }
+
+            if (_amountOfExecutedActions==0)
+            {
+                inputBlocker.SetActive(false);
+                IsExecutingOldActions = false;
+                _finished = true;
+            }
+            else
+            {
+                StartCoroutine(ExecuteActions());
+            }
+        }
+    }
+
     private void ProcessAction(ActionData _action)
     {
         switch (_action.Data.Type)
@@ -46,10 +84,19 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.PlaceCard:
                 PlaceCard _placeCard = JsonConvert.DeserializeObject<PlaceCard>(_action.JsonData);
-                OpponentPlacedCard(_placeCard.CardId,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt);
+                if (_action.IsMine)
+                {
+                    var _card = GetCard(_placeCard.CardId, true);
+                    Debug.Log(_card);
+                    PlaceCard(_card,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt,false);
+                }
+                else
+                {
+                    OpponentPlacedCard(_placeCard.CardId,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt);
+                }
                 break;
             case ActionType.Resign:
-                StopGame(true);
+                StopGame(!_action.IsMine);
                 break;
             case ActionType.FinishedPlacingLifeForce:
                 HasOpponentPlacedStartingCards = true;
@@ -59,40 +106,105 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.AddAbilityToPlayer:
                 AddAbilityCardToPlayer _addAbilityToPlayer = JsonConvert.DeserializeObject<AddAbilityCardToPlayer>(_action.JsonData);
-                MasterAddedAbilityToPlayer(_addAbilityToPlayer.IsMyPlayer, _addAbilityToPlayer.AbilityId);
+                if (_action.IsMine)
+                {
+                    AddAbilityToPlayer(true,_addAbilityToPlayer.AbilityId,false);
+                }
+                else
+                {
+                    MasterAddedAbilityToPlayer(_addAbilityToPlayer.IsMyPlayer, _addAbilityToPlayer.AbilityId);
+                }
                 break;
             case ActionType.AddAbilityToShop:
                 AddAbilityToShop _addAbilityToShop = JsonConvert.DeserializeObject<AddAbilityToShop>(_action.JsonData);
-                MasterAddedAbilityToShop(_addAbilityToShop.AbilityId);
+                if (_action.IsMine)
+                {
+                    AddAbilityToShop(_addAbilityToShop.AbilityId,false);
+                }
+                else
+                {
+                    MasterAddedAbilityToShop(_addAbilityToShop.AbilityId);
+                }
                 break;
             case ActionType.ExecuteCardAction:
                 ExecuteCardAction _executeCardAction = JsonConvert.DeserializeObject<ExecuteCardAction>(_action.JsonData);
-                OpponentExecutedAction(_executeCardAction.JsonData);
+
+                if (_action.IsMine)
+                {
+                    ExecuteCardAction(JsonConvert.DeserializeObject<CardAction>(_executeCardAction.JsonData),false);
+                }
+                else
+                {
+                    OpponentExecutedAction(_executeCardAction.JsonData);
+                }
                 break;
             case ActionType.OpponentTookLoot:
-                OpponentLootedMe();
+                if (_action.IsMine)
+                {
+                    TakeLoot(false);
+                }
+                else
+                {
+                    OpponentLootedMe();
+                }
                 break;
             case ActionType.GiveLoot:
                 GiveLoot _giveLoot = JsonConvert.DeserializeObject<GiveLoot>(_action.JsonData);
-                OpponentGiveYouLoot(_giveLoot.Amount);
+                if (_action.IsMine)
+                {
+                    GiveLoot(false);
+                }
+                else
+                {
+                    OpponentGiveYouLoot(_giveLoot.Amount);
+                }
                 break;
             case ActionType.OpponentFinishedAttackResponse:
-                OpponentFinishedAttackResponse();
+                if (_action.IsMine)
+                {
+                    EndTurn(false);
+                }
+                else
+                {
+                    OpponentFinishedAttackResponse();
+                }
                 break;
             case ActionType.OpponentEndedTurn:
-                OpponentFinishedHisMove();
+                if (_action.IsMine)
+                {
+                    EndTurn(false);
+                }
+                else
+                {
+                    OpponentFinishedHisMove();
+                }
                 break;
             case ActionType.OpponentUpdatedHisStrangeMatter:
                 OpponentUpdateWhiteMatter _opponentUpdatedMatter = JsonConvert.DeserializeObject<OpponentUpdateWhiteMatter>(_action.JsonData);
-                OpponentUpdatedWhiteStrangeMatter(_opponentUpdatedMatter.Amount);
+                if (_action.IsMine)
+                {
+                    TellOpponentThatIUpdatedWhiteStrangeMatter(false);
+                }
+                else
+                {
+                    OpponentUpdatedWhiteStrangeMatter(_opponentUpdatedMatter.Amount);
+                }
                 break;
             case ActionType.OpponentUpdatedStrangeMatterInReserve:
                 OpponentUpdatedWhiteMatterInReserve _opponentUpdatedMatterInReserve =
                     JsonConvert.DeserializeObject<OpponentUpdatedWhiteMatterInReserve>(_action.JsonData);
-                UpdateWhiteStrangeMatterInReserve(_opponentUpdatedMatterInReserve.Amount);
+                if (_action.IsMine)
+                {
+                    TellOpponentToUpdateWhiteStrangeMatterReserves(false);
+                }
+                else
+                {
+                    UpdateWhiteStrangeMatterInReserve(_opponentUpdatedMatterInReserve.Amount);
+                }
                 break;
             case ActionType.ForceUpdateOpponentAction:
                 ForceUpdateOpponentAction _forceUpdateOpponentAction = JsonConvert.DeserializeObject<ForceUpdateOpponentAction>(_action.JsonData);
+                
                 OpponentForcedActionsUpdate(_forceUpdateOpponentAction.Amount);
                 break;
             case ActionType.OpponentBoughtMinion:
@@ -254,6 +366,11 @@ public class GameplayManagerPVP : GameplayManager
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        Card GetCard(int _id, bool _isMy)
+        {
+            return FindObjectsOfType<Card>().ToList().Find(_card => _card.Details.Id == _id && _card.My == _isMy);
+        }
     }
 
     private void OpponentLeftRoom(RoomPlayer _obj)
@@ -355,6 +472,16 @@ public class GameplayManagerPVP : GameplayManager
         WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
+    private void TellOpponentToUpdateWhiteStrangeMatterReserves()
+    {
+        TellOpponentToUpdateWhiteStrangeMatterReserves(true);
+    }
+
+    private void TellOpponentThatIUpdatedWhiteStrangeMatter()
+    {
+        TellOpponentThatIUpdatedWhiteStrangeMatter(true);
+    }
+
     public override void Resign()
     {
         StopGame(false);
@@ -364,6 +491,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void StopGame(bool _didIWin)
     {
         HasGameEnded = true;
+        DataManager.Instance.PlayerData.CurrentRoomId=string.Empty;
         StopAllCoroutines();
 
         GameplayUI.Instance.ShowResult(_didIWin);
@@ -509,7 +637,7 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    public override void PlaceCard(CardBase _card, int _positionId, bool _dontCheckIfPlayerHasIt=false)
+    public override void PlaceCard(CardBase _card, int _positionId, bool _dontCheckIfPlayerHasIt=false, bool _tellRoom=true)
     {
         int _cardId;
         if (_card is AbilityCard _abilityCard)
@@ -534,7 +662,11 @@ public class GameplayManagerPVP : GameplayManager
         {
             CardId = _cardId, PositionId = _positionId, DontCheckIfPlayerHasIt = _dontCheckIfPlayerHasIt
         };
-        roomHandler.AddAction(ActionType.PlaceCard, JsonConvert.SerializeObject(_placeCard));
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.PlaceCard, JsonConvert.SerializeObject(_placeCard));
+        }
+        
         PlaceCard(MyPlayer, _cardId, _positionId,_dontCheckIfPlayerHasIt);
     }
     
@@ -568,11 +700,15 @@ public class GameplayManagerPVP : GameplayManager
         OnPlacedCard?.Invoke(_card);
     }
     
-    public override void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
+    public override void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId,bool _tellRoom=true)
     {
         HandleAddAbilityToPlayer(_isMyPlayer,_abilityId);
         AddAbilityCardToPlayer _abilityData = new AddAbilityCardToPlayer { IsMyPlayer = _isMyPlayer, AbilityId = _abilityId };
-        roomHandler.AddAction(ActionType.AddAbilityToPlayer, JsonConvert.SerializeObject(_abilityData));
+
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.AddAbilityToPlayer, JsonConvert.SerializeObject(_abilityData));
+        }
     }
 
     private void HandleAddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
@@ -589,10 +725,13 @@ public class GameplayManagerPVP : GameplayManager
         AbilityCardsManagerBase.Instance.RemoveAbility(_ability);
     }
 
-    public override void AddAbilityToShop(int _abilityId)
+    public override void AddAbilityToShop(int _abilityId,bool _tellRoom=true)
     {
         AddAbilityToShop _data = new AddAbilityToShop { AbilityId = _abilityId };
-        roomHandler.AddAction(ActionType.AddAbilityToShop, JsonConvert.SerializeObject(_data));
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.AddAbilityToShop, JsonConvert.SerializeObject(_data));
+        }
         MasterAddedAbilityToShop(_abilityId);
     }
 
@@ -1196,13 +1335,16 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
     
-    public override void TakeLoot()
+    public override void TakeLoot(bool _tellRoom=true)
     {
         MyPlayer.StrangeMatter += OpponentPlayer.StrangeMatter;
-        roomHandler.AddAction(ActionType.OpponentTookLoot,string.Empty);
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.OpponentTookLoot,string.Empty);
+        }
     }
 
-    private void GiveLoot()
+    private void GiveLoot(bool _tellRoom=true)
     {
         StartCoroutine(GiveLootRoutine());
         IEnumerator GiveLootRoutine()
@@ -1210,7 +1352,10 @@ public class GameplayManagerPVP : GameplayManager
             yield return new WaitForSeconds(2);
             MyPlayer.StrangeMatter = 0;
             GiveLoot _giveLoot = new GiveLoot { Amount = MyPlayer.StrangeMatter };
-            roomHandler.AddAction(ActionType.GiveLoot, JsonConvert.SerializeObject(_giveLoot));
+            if (_tellRoom)
+            {
+                roomHandler.AddAction(ActionType.GiveLoot, JsonConvert.SerializeObject(_giveLoot));
+            }
         }
     }
 
@@ -1330,7 +1475,7 @@ public class GameplayManagerPVP : GameplayManager
         
     }
 
-    public override void EndTurn()
+    public override void EndTurn(bool _tellRoom = true)
     {
         if (Casters.IsActive)
         {
@@ -1348,7 +1493,10 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameState = GameplayState.Waiting;
             MyPlayer.Actions=0;
-            roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
+            if (_tellRoom)
+            {
+                roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
+            }
             GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions,false);
             return;
         }
@@ -1368,20 +1516,29 @@ public class GameplayManagerPVP : GameplayManager
 
         NotificationSender.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
 
-        roomHandler.AddAction(ActionType.OpponentEndedTurn,string.Empty);
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.OpponentEndedTurn,string.Empty);
+        }
     }
     
-    private void TellOpponentThatIUpdatedWhiteStrangeMatter()
+    private void TellOpponentThatIUpdatedWhiteStrangeMatter(bool _tellRoom=true)
     {
         Debug.Log(MyPlayer.StrangeMatter);
         OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
-        roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
+        }
     }
 
-    private void TellOpponentToUpdateWhiteStrangeMatterReserves()
+    private void TellOpponentToUpdateWhiteStrangeMatterReserves(bool _tellRoom=true)
     {
         OpponentUpdatedWhiteMatterInReserve _data = new OpponentUpdatedWhiteMatterInReserve { Amount = WhiteStrangeMatter.AmountInEconomy };
-        roomHandler.AddAction(ActionType.OpponentUpdatedStrangeMatterInReserve, JsonConvert.SerializeObject(_data));
+        if (_tellRoom)
+        {
+            roomHandler.AddAction(ActionType.OpponentUpdatedStrangeMatterInReserve, JsonConvert.SerializeObject(_data));
+        }
     }
 
     public override void ForceUpdatePlayerActions()

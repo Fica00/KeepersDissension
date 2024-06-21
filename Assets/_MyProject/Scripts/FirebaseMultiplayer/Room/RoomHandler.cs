@@ -32,6 +32,8 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
 
+        public bool ExecuteOldActionsFirst = false;
+
         public void Init(DatabaseReference _database, string _roomsPath)
         {
             database = _database;
@@ -71,7 +73,14 @@ namespace FirebaseMultiplayer.Room
 
         public void SubscribeToRoom()
         {
-            Debug.Log("Subscribed");
+            ExecuteOldActionsFirst = false;
+            database.Child(RoomPath).ValueChanged += RoomUpdated;
+        }
+        
+        public void SubscribeToRoom(RoomData _roomData)
+        {
+            ExecuteOldActionsFirst = true;
+            roomData = _roomData;
             database.Child(RoomPath).ValueChanged += RoomUpdated;
         }
 
@@ -164,6 +173,11 @@ namespace FirebaseMultiplayer.Room
                     continue;
                 }
 
+                if (GameplayManager.Instance.IsExecutingOldActions)
+                {
+                    continue;
+                }
+                
                 OnNewAction?.Invoke(_actionValue);
             }
         }
@@ -240,8 +254,9 @@ namespace FirebaseMultiplayer.Room
         {
 
             GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
-            ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData };
             string _actionId = NewTimestampUuid();
+            ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData, Owner = FirebaseManager.Instance.Authentication.UserId, 
+            Id = _actionId};
             roomData.Actions.Add(_actionId,_data);
 
             database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));

@@ -7,6 +7,5 @@ namespace FirebaseMultiplayer.Room
     {
         SearchingForOpponent = 0,
         MatchedUp = 1,
-        Playing = 2
     }
 }

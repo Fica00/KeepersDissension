@@ -60,6 +60,8 @@ public class GameplayManager : MonoBehaviour
     public bool IsKeeperResponseAction => IdOfCardWithResponseAction == 10 || IdOfCardWithResponseAction == 60;
 
     public bool MyTurn => IsMyTurn;
+
+    public bool IsExecutingOldActions;
     
 
     protected virtual void Awake()
@@ -103,6 +105,43 @@ public class GameplayManager : MonoBehaviour
         GameState = GameplayState.WaitingForPlayersToLoad;
         yield return new WaitForSeconds(2); //just in case, wait a bit for players to load correctly
         GameState = GameplayState.SettingUpTable;
+        int _round = 0;
+        Finished = false;
+        OpponentFinished = false;
+        
+        if (FirebaseManager.Instance.RoomHandler.ExecuteOldActionsFirst)
+        {
+            yield return ExecuteOldActions();
+            healthTracker.Setup();
+            LastPreparation();
+            FinishedSetup?.Invoke();
+        }
+        else
+        {
+            yield return NewMatchRoutine();
+            IsMyTurn = doIPlayFirst;
+            healthTracker.Setup();
+            LastPreparation();
+        }
+        while (!HasGameEnded)
+        {
+            if (_round!=0)
+            {
+                Finished = false;
+                OpponentFinished = false;
+                IsMyTurn = doIPlayFirst;
+            }
+           
+            yield return WaitUntilTheEndOfTurn(); //first players turn
+            yield return new WaitForSeconds(1); //sync up
+            yield return WaitUntilTheEndOfTurn(); //second players turn
+            yield return new WaitForSeconds(1); //sync up
+            _round++;
+        }
+    }
+
+    private IEnumerator NewMatchRoutine()
+    {
         DecideWhoPlaysFirst();
         doIPlayFirst = IsMyTurn;
         ShouldIPlaceStartingWall = !IsMyTurn;
@@ -123,19 +162,11 @@ public class GameplayManager : MonoBehaviour
         {
             GameState = GameplayState.Waiting;
         }
+    }
 
-        healthTracker.Setup();
-        LastPreparation();
-        while (!HasGameEnded)
-        {
-            Finished = false;
-            OpponentFinished = false;
-            IsMyTurn = doIPlayFirst;
-            yield return WaitUntilTheEndOfTurn(); //first players turn
-            yield return new WaitForSeconds(1); //sync up
-            yield return WaitUntilTheEndOfTurn(); //second players turn
-            yield return new WaitForSeconds(1); //sync up
-        }
+    protected virtual IEnumerator ExecuteOldActions()
+    {
+        throw new Exception();
     }
 
     protected virtual void LastPreparation()
@@ -163,7 +194,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void EndTurn()
+    public virtual void EndTurn(bool _tellRoom = true)
     {
         throw new NotImplementedException();
     }
@@ -224,17 +255,17 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void PlaceCard(CardBase _card, int _positionId, bool _dontCheckIfPlayerHasIt = false)
+    public virtual void PlaceCard(CardBase _card, int _positionId, bool _dontCheckIfPlayerHasIt = false, bool _tellRoom=true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
+    public virtual void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId, bool _tellRoom=true)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToShop(int _abilityId)
+    public virtual void AddAbilityToShop(int _abilityId,bool _tellRoom=true)
     {
         throw new NotImplementedException();
     }
@@ -249,7 +280,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void TakeLoot()
+    public virtual void TakeLoot(bool _tellRoom=true)
     {
         throw new NotImplementedException();
     }

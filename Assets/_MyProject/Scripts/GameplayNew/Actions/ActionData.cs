@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace GameplayActions
 {
@@ -7,6 +8,10 @@ namespace GameplayActions
     {
         public GameplayActionBase Data;
         public string JsonData;
+        public string Owner;
+        public string Id;
+
+        [JsonIgnore] public bool IsMine => Owner == FirebaseManager.Instance.Authentication.UserId;
     }
 }
 

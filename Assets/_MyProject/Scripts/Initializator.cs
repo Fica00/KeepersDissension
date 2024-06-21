@@ -88,42 +88,35 @@ public class Initializator : MonoBehaviour
         FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);
         ManageNotifications();
 
-        Debug.Log("Player's current room id " + DataManager.Instance.PlayerData.CurrentRoomId);
+        Debug.Log(FirebaseManager.Instance.Authentication.UserId+" Player's current room id " + DataManager.Instance.PlayerData.CurrentRoomId);
 
         LoadAppropriateScene();
     }
-    
+
     private void LoadAppropriateScene()
     {
-        if (!string.IsNullOrEmpty(DataManager.Instance.PlayerData.CurrentRoomId))
+        Debug.Log(111);
+        if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.CurrentRoomId))
         {
-            FirebaseManager.Instance.CheckIfRoomExists(DataManager.Instance.PlayerData.CurrentRoomId, _result =>
-            {
-                if (_result)
-                {
-                    try
-                    {
-                        //hvata mi nullreferenceexception kada hocu da se subscribe, koliko sam skapirao posto je roomData u RoomHandleru null jer se nigde ne setuje kada se udje u igricu opet
-                        //vidim da se roomData setuje u JoinRoom i CreateRoom, ali valjda mi ne trebaju te metode jer tehnicki on nije ni leave room kada samo izadje iz igrice?
-                        
-                        FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
-                        SceneManager.LoadGameplay();
-                    }
-                    catch (Exception _exception)
-                    {
-                        Debug.Log(_exception);
-                    }
-
-                    return;
-                }
-
-                DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
-                SceneManager.LoadMainMenu();
-            });
-        }
-        else
-        {
+            Debug.Log(666);
             SceneManager.LoadMainMenu();
+            return;
         }
+        
+        FirebaseManager.Instance.CheckIfRoomExists(DataManager.Instance.PlayerData.CurrentRoomId, _roomData =>
+        {
+            if (_roomData!=null)
+            {
+                DataManager.Instance.PlayerData.FactionId =
+                    _roomData.RoomPlayers.Find(_player => _player.Id == FirebaseManager.Instance.Authentication.UserId).FactionId;
+                FirebaseManager.Instance.RoomHandler.SubscribeToRoom(_roomData);
+                SceneManager.LoadGameplay();
+                return;
+            }
+
+            Debug.Log(555);
+            DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
+            SceneManager.LoadMainMenu();
+        });
     }
 }
