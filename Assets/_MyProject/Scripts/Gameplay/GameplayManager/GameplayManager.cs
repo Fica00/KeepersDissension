@@ -113,8 +113,12 @@ public class GameplayManager : MonoBehaviour
 
         if (FirebaseManager.Instance.RoomHandler.ExecuteOldActionsFirst)
         {
+            Debug.Log("Starting executing old actions");
             yield return ExecuteOldActions();
             yield return new WaitForSeconds(2);
+            IsMyTurn = lastAction.IsMine;
+            Debug.Log("Finished executing old actions, is last action mine? "+lastAction.IsMine);
+            BlockaderCard.IgnoreSending = true;
             healthTracker.Setup();
             LastPreparation();
             FinishedSetup?.Invoke();
@@ -130,13 +134,6 @@ public class GameplayManager : MonoBehaviour
         
         while (!HasGameEnded)
         {
-            if (_round!=0)
-            {
-                Finished = false;
-                OpponentFinished = false;
-                IsMyTurn = doIPlayFirst;
-            }
-           
             yield return WaitUntilTheEndOfTurn(); //first players turn
             yield return new WaitForSeconds(1); //sync up
             yield return WaitUntilTheEndOfTurn(); //second players turn

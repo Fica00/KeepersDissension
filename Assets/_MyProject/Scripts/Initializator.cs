@@ -96,10 +96,8 @@ public class Initializator : MonoBehaviour
 
     private void LoadAppropriateScene()
     {
-        Debug.Log(111);
         if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.CurrentRoomId))
         {
-            Debug.Log(666);
             SceneManager.LoadMainMenu();
             return;
         }
@@ -115,7 +113,6 @@ public class Initializator : MonoBehaviour
                 return;
             }
 
-            Debug.Log(555);
             DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
             SceneManager.LoadMainMenu();
         });

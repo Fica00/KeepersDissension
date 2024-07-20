@@ -56,10 +56,6 @@ public class TokenHandler : MonoBehaviour
             {
                 Debug.LogError("Failed to set FCM token: " + _task.Exception);
             }
-            else
-            {
-                Debug.Log("FCM token updated successfully.");
-            }
         });
     }
 

@@ -125,10 +125,6 @@ public class GameplayPlayer : MonoBehaviour
     public void NewTurn()
     {
         Actions = GameplayManager.Instance.AmountOfActionsPerTurn;
-        if (!IsMy)
-        {
-            FirebaseManager.Instance.RoomHandler.AddAction(ActionType.StartTurn,string.Empty);
-        }
         OnStartedTurn?.Invoke();
     }
 

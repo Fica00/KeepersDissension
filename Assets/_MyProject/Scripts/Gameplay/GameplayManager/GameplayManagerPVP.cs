@@ -64,7 +64,6 @@ public class GameplayManagerPVP : GameplayManager
                     continue;
                 }
 
-                Debug.Log($"{_action.Data.Type}: {JsonConvert.SerializeObject(_action)}");
                 ProcessAction(_action);
                 if (_action.Data.Type is not (ActionType.OpponentSaidToPlayAudio or ActionType.OpponentsBlockaderPassive))
                 {
@@ -676,7 +675,6 @@ public class GameplayManagerPVP : GameplayManager
                     OpponentPlacedVetoedCard(_opponentPlacedVetoedCard.CardId);
                 }
                 break;
-            case ActionType.StartTurn: break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -756,26 +754,46 @@ public class GameplayManagerPVP : GameplayManager
     {
         if (IsMyTurn)
         {
+            Finished = false;
+            Debug.Log("Starting my turn");
             GameState = GameplayState.Playing;
             MyPlayer.NewTurn();
             if (lastAction != null)
             {
+                Debug.Log("Last action: "+JsonConvert.SerializeObject(lastAction));
                 MyPlayer.Actions = lastAction.ActionsLeft;
                 lastAction = null;
             }
+            
+            if (MyPlayer.Actions == 0)
+            {
+                Finished = true;
+                IsMyTurn = false;
+            }
             yield return new WaitUntil(() => Finished);
+            Debug.Log("Ended my turn");
             MyPlayer.EndedTurn();
         }
         else
         {
+            OpponentFinished = false;
+            Debug.Log("Starting opponents turn");
             GameState = GameplayState.Waiting;
             OpponentPlayer.NewTurn();
             if (lastAction != null)
             {
+                Debug.Log("Last action: "+JsonConvert.SerializeObject(lastAction));
                 OpponentPlayer.Actions = lastAction.ActionsLeft;
                 lastAction = null;
             }
+
+            if (OpponentPlayer.Actions == 0)
+            {
+                OpponentFinished = true;
+                IsMyTurn = true;
+            }
             yield return new WaitUntil(() => OpponentFinished);
+            Debug.Log("Ended opponents turn");
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();

@@ -45,6 +45,7 @@ public class NotificationSender : MonoBehaviour
         {
             return;
         }
+        return;
         Debug.Log("sending notif");
         WebRequests.Instance.SetUserToken(_token);
 
