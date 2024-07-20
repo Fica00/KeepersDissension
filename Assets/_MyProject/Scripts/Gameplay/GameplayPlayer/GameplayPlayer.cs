@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FirebaseMultiplayer.Room;
+using GameplayActions;
 using UnityEngine;
 
 public class GameplayPlayer : MonoBehaviour
@@ -123,6 +125,10 @@ public class GameplayPlayer : MonoBehaviour
     public void NewTurn()
     {
         Actions = GameplayManager.Instance.AmountOfActionsPerTurn;
+        if (!IsMy)
+        {
+            FirebaseManager.Instance.RoomHandler.AddAction(ActionType.StartTurn,string.Empty);
+        }
         OnStartedTurn?.Invoke();
     }
 

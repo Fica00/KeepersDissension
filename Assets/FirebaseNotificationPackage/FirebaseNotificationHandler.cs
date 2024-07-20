@@ -23,9 +23,7 @@ public class FirebaseNotificationHandler : MonoBehaviour
 
     public void Init(FirebaseAuth _auth)
     {
-        Debug.Log("Already initialized Firebase aut");
         auth = _auth;
-        //
         // if (DataManager.Instance.PlayerData.GameplayNotifications)
         // {
         

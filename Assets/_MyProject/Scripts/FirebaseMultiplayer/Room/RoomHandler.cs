@@ -252,11 +252,14 @@ namespace FirebaseMultiplayer.Room
 
         public void AddAction(ActionType _type, string _jsonData)
         {
-
+            if (GameplayManager.Instance.IsExecutingOldActions)
+            {
+                return;
+            }
             GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
             string _actionId = NewTimestampUuid();
             ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData, Owner = FirebaseManager.Instance.Authentication.UserId, 
-            Id = _actionId};
+            Id = _actionId, ActionsLeft = GameplayManager.Instance.MyPlayer.Actions};
             roomData.Actions.Add(_actionId,_data);
 
             database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));

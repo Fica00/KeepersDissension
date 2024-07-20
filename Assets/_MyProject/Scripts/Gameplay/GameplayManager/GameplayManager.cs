@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GameplayActions;
 using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
@@ -45,6 +46,7 @@ public class GameplayManager : MonoBehaviour
     protected StrangeMatterTracker strangeMatterTracker;
 
     public bool UsingVisionToDestroyMarkers;
+    protected ActionData lastAction;
 
     public bool IsSettingUpTable =>
         GameState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
@@ -108,10 +110,11 @@ public class GameplayManager : MonoBehaviour
         int _round = 0;
         Finished = false;
         OpponentFinished = false;
-        
+
         if (FirebaseManager.Instance.RoomHandler.ExecuteOldActionsFirst)
         {
             yield return ExecuteOldActions();
+            yield return new WaitForSeconds(2);
             healthTracker.Setup();
             LastPreparation();
             FinishedSetup?.Invoke();
@@ -123,6 +126,8 @@ public class GameplayManager : MonoBehaviour
             healthTracker.Setup();
             LastPreparation();
         }
+        
+        
         while (!HasGameEnded)
         {
             if (_round!=0)
@@ -142,7 +147,7 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator NewMatchRoutine()
     {
-        DecideWhoPlaysFirst();
+        IsMyTurn = DecideWhoPlaysFirst();
         doIPlayFirst = IsMyTurn;
         ShouldIPlaceStartingWall = !IsMyTurn;
 
@@ -174,7 +179,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    protected virtual void DecideWhoPlaysFirst()
+    protected virtual bool DecideWhoPlaysFirst()
     {
         throw new NotImplementedException();
     }

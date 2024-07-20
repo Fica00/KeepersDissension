@@ -27,6 +27,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OnEnable()
     {
+        DataManager.Instance.PlayerData.CurrentRoomId = FirebaseManager.Instance.RoomHandler.RoomData.Id;
         RoomHandler.OnNewAction += ProcessAction;
         RoomHandler.OnPlayerLeft += OpponentLeftRoom;
     }
@@ -57,9 +58,24 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     continue;
                 }
+
+                if (_action.IsMine && _action.Data.Type==ActionType.OpponentSaidThatBombExploded)
+                {
+                    continue;
+                }
+
+                Debug.Log($"{_action.Data.Type}: {JsonConvert.SerializeObject(_action)}");
                 ProcessAction(_action);
+                if (_action.Data.Type is not (ActionType.OpponentSaidToPlayAudio or ActionType.OpponentsBlockaderPassive))
+                {
+                    lastAction = _action;
+                }
                 _executedActions.Add(_action.Id);
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(GetWaitTime(_action.Data.Type));
+                if (_action.Data.Type == ActionType.FinishedPlacingStartingCards)
+                {
+                    ShowGuardianChains();
+                }
                 _amountOfExecutedActions++;
             }
 
@@ -76,6 +92,37 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
+    private float GetWaitTime(ActionType _type)
+    {
+        switch (_type)
+        {
+            case ActionType.None:
+                return 0;
+            case ActionType.PlaceCard:
+                return 1;
+            case ActionType.ExecuteCardAction:
+                return 1;
+            case ActionType.OpponentBoughtMinion:
+                return 1;
+            case ActionType.OpponentBuiltWall:
+                return 1;
+            case ActionType.OpponentActivatedAbility:
+                return 1;
+            case ActionType.OpponentReturnedAbilityToPlace:
+                return 1;
+            case ActionType.OpponentReturnAbilityToHand:
+                return 1;
+            case ActionType.OpponentWantsToDestroyBombWithoutActivatingIt:
+                return 1;
+            case ActionType.OpponentSaidToUseStealth:
+                return 1;
+            case ActionType.OpponentPlacedVetoedCard:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
     private void ProcessAction(ActionData _action)
     {
         switch (_action.Data.Type)
@@ -87,7 +134,6 @@ public class GameplayManagerPVP : GameplayManager
                 if (_action.IsMine)
                 {
                     var _card = GetCard(_placeCard.CardId, true);
-                    Debug.Log(_card);
                     PlaceCard(_card,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt,false);
                 }
                 else
@@ -215,6 +261,7 @@ public class GameplayManagerPVP : GameplayManager
                 break;
             case ActionType.OpponentBoughtMinion:
                 OpponentBoughtMinion _opponentBoughtMinion = JsonConvert.DeserializeObject<OpponentBoughtMinion>(_action.JsonData);
+                
                 if (_action.IsMine)
                 {
                     BuyMinion(GetCard(_opponentBoughtMinion.CardId ,false), _opponentBoughtMinion.Cost, null, _opponentBoughtMinion.PlaceMinion, false);
@@ -578,7 +625,7 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.OpponentGotResponseAction:
                 if (_action.IsMine)
                 {
-                    //RequestResponseAction(false);
+                    RequestResponseAction(IdOfCardWithResponseAction,false);
                 }
                 else
                 {
@@ -629,6 +676,7 @@ public class GameplayManagerPVP : GameplayManager
                     OpponentPlacedVetoedCard(_opponentPlacedVetoedCard.CardId);
                 }
                 break;
+            case ActionType.StartTurn: break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -675,37 +723,33 @@ public class GameplayManagerPVP : GameplayManager
         GameplayUI.Instance.SetupActionAndTurnDisplay();
     }
 
-    protected override void DecideWhoPlaysFirst()
+    protected override bool DecideWhoPlaysFirst()
     {
         RoomPlayer _opponent = roomHandler.GetOpponent();
         int _opponentMatchesPlayed =
             Convert.ToInt32(_opponent.MatchesPlayed);
         if (_opponentMatchesPlayed < DataManager.Instance.PlayerData.MatchesPlayed)
         {
-            IsMyTurn = false;
-            return;
+            return false;
         }
 
         if (_opponentMatchesPlayed > DataManager.Instance.PlayerData.MatchesPlayed)
         {
-            IsMyTurn = true;
-            return;
+            return true;
         }
 
         DateTime _opponentDateCreated = _opponent.DateCrated;
         if (_opponentDateCreated < DataManager.Instance.PlayerData.DateCreated)
         {
-            IsMyTurn = false;
-            return;
+            return false;
         }
 
         if (_opponentDateCreated > DataManager.Instance.PlayerData.DateCreated)
         {
-            IsMyTurn = true;
-            return;
+            return true;
         }
 
-        IsMyTurn = roomHandler.IsOwner;
+        return roomHandler.IsOwner;
     }
 
     protected override IEnumerator WaitUntilTheEndOfTurn()
@@ -714,6 +758,11 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameState = GameplayState.Playing;
             MyPlayer.NewTurn();
+            if (lastAction != null)
+            {
+                MyPlayer.Actions = lastAction.ActionsLeft;
+                lastAction = null;
+            }
             yield return new WaitUntil(() => Finished);
             MyPlayer.EndedTurn();
         }
@@ -721,6 +770,11 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameState = GameplayState.Waiting;
             OpponentPlayer.NewTurn();
+            if (lastAction != null)
+            {
+                OpponentPlayer.Actions = lastAction.ActionsLeft;
+                lastAction = null;
+            }
             yield return new WaitUntil(() => OpponentFinished);
             OpponentPlayer.EndedTurn();
         }
@@ -729,13 +783,17 @@ public class GameplayManagerPVP : GameplayManager
 
     protected override void LastPreparation()
     {
+        ShowGuardianChains();
+        MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
+        WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
+    }
+
+    protected void ShowGuardianChains()
+    {
         foreach (var _guardian in FindObjectsOfType<Guardian>())
         {
             _guardian.ShowChain();
         }
-
-        MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
-        WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
     }
 
     private void TellOpponentToUpdateWhiteStrangeMatterReserves()

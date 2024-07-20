@@ -57,6 +57,7 @@ namespace GameplayActions
         OpponentUsedHisUltimate=49,
         OpponentRespondedForBombQuestion = 50,
         OpponentPlacedVetoedCard=51,
-        UseDelivery=52
+        UseDelivery=52,
+        StartTurn = 53
     }
 }

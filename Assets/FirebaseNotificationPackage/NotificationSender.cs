@@ -22,6 +22,10 @@ public class NotificationSender : MonoBehaviour
 
     public void SendNotificationToUser(string _userId, string _title, string _body)
     {
+        if (GameplayManager.Instance.IsExecutingOldActions)
+        {
+            return;
+        }
         TokenHandler.Instance.GetTokenForUser(_userId, _token =>
         {
             Debug.Log(_userId);
@@ -37,6 +41,10 @@ public class NotificationSender : MonoBehaviour
 
     private void SendNotificationToToken(string _token, string _title, string _body)
     {
+        if (GameplayManager.Instance.IsExecutingOldActions)
+        {
+            return;
+        }
         Debug.Log("sending notif");
         WebRequests.Instance.SetUserToken(_token);
 

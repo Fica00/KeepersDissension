@@ -10,6 +10,7 @@ public class Initializator : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         Instance = this;
     }
 
