@@ -12,7 +12,9 @@ public class ShowCardElarged : MonoBehaviour
     [SerializeField] private GameObject animationHolder;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button flipButton;
+    [SerializeField] private Button flip2Button;
     [SerializeField] private Image cardDisplay;
+    [SerializeField] private Image abilityDisplay;
     
     private bool isShowingFrontSide;
     private Sprite frontImage;
@@ -25,6 +27,7 @@ public class ShowCardElarged : MonoBehaviour
         CardHandInteractions.OnCardPressed += Show;
         AbilityShopDisplay.OnCardPressed += Show;
         flipButton.onClick.AddListener(Flip);
+        flip2Button.onClick.AddListener(Flip);
         closeButton.onClick.AddListener(Close);
     }
 
@@ -34,6 +37,7 @@ public class ShowCardElarged : MonoBehaviour
         CardHandInteractions.OnCardPressed -= Show;
         AbilityShopDisplay.OnCardPressed -= Show;
         flipButton.onClick.RemoveListener(Flip);
+        flip2Button.onClick.RemoveListener(Flip);
         closeButton.onClick.RemoveListener(Close);
     }
 
@@ -85,34 +89,10 @@ public class ShowCardElarged : MonoBehaviour
         OnShowed?.Invoke();
     }
 
-    private void ShowCard(CardBase _card)
-    {
-        cardDisplay.transform.eulerAngles = new Vector3(0, 0, 90);
-        TablePlaceHandler _tablePlace = _card.GetTablePlace();
-        if (_tablePlace==null)
-        {
-            Close();
-            return;
-        }
-        List<CardBase> _cardsOnField = _tablePlace.GetCards();
-        if (_cardsOnField == null||_cardsOnField.Count==0)
-        {
-            Close();
-            return;
-        }
-
-        if (_cardsOnField.Count==1)
-        {
-            ShowCard(_cardsOnField[0] as Card);
-        }
-        else
-        {
-            ResolveMultipleActions.Instance.Show(_cardsOnField,ShowCard);
-        }
-    }
-
     private void ShowCard(Card _card)
     {
+        cardDisplay.gameObject.SetActive(true);
+        abilityDisplay.gameObject.SetActive(false);
         frontImage = _card.Details.Foreground;
         backImage = _card.Details.Background;
         cardDisplay.sprite = frontImage;
@@ -125,13 +105,24 @@ public class ShowCardElarged : MonoBehaviour
 
     private void ShowAbility(AbilityCard _abilityCard)
     {
+        cardDisplay.gameObject.SetActive(false);
+        abilityDisplay.gameObject.SetActive(true);
         if (isShowingFrontSide)
         {
-            cardDisplay.transform.eulerAngles = new Vector3(0, 0, 0);
+            abilityDisplay.transform.eulerAngles = new Vector3(0, 0, 0);
         }
+        
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+
+        float targetSize = Mathf.Min(screenWidth, screenHeight) * 0.9f;
+
+        RectTransform rectTransform = abilityDisplay.GetComponent<RectTransform>();
+        float aspectRatio = _abilityCard.Details.Foreground.rect.width / _abilityCard.Details.Foreground.rect.height;
+        rectTransform.sizeDelta = new Vector2(targetSize, targetSize / aspectRatio);
         frontImage = _abilityCard.Details.Foreground;
         backImage = _abilityCard.Details.Background;
-        cardDisplay.sprite = frontImage;
+        abilityDisplay.sprite = frontImage;
     }
 
     private void Flip()
@@ -146,6 +137,7 @@ public class ShowCardElarged : MonoBehaviour
             isShowingFrontSide = !isShowingFrontSide;
             _cardBaseTransform.DOScale(Vector3.one,0.5f);
             cardDisplay.sprite = isShowingFrontSide ? frontImage : backImage;
+            abilityDisplay.sprite = isShowingFrontSide ? frontImage : backImage;
         });
     }
     
