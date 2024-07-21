@@ -136,6 +136,7 @@ public class Reduction : AbilityEffect
 
     public void OpponentFinishedAction()
     {
+        Debug.Log("000");
         opponentFinished = true;
         UIManager.Instance.ShowOkDialog("Opponent selected warrior");
         CheckForEnd();
@@ -156,6 +157,7 @@ public class Reduction : AbilityEffect
         }
         
         GameplayManager.Instance.GameState = state;
+        GameplayManager.Instance.MyPlayer.Actions--;
         OnActivated?.Invoke();
     }
 }

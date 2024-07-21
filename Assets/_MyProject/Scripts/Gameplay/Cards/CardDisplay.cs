@@ -40,6 +40,10 @@ public class CardDisplay: CardDisplayBase
 
     private void TryShowRedBox()
     {
+        if (redBorder==null)
+        {
+            return;
+        }
         redBorder.SetActive(false);
         if (card.My)
         {

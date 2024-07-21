@@ -1866,7 +1866,6 @@ public class GameplayManagerPVP : GameplayManager
     
     private void TellOpponentThatIUpdatedWhiteStrangeMatter(bool _tellRoom=true)
     {
-        Debug.Log(MyPlayer.StrangeMatter);
         OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
         if (_tellRoom)
         {
@@ -3111,7 +3110,6 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentUpdatedWhiteStrangeMatter(int _amount)
     {
-        Debug.Log(_amount);
         OpponentPlayer.StrangeMatter = _amount;
         strangeMatterTracker.ShowOpponentStrangeMatter();
     }
