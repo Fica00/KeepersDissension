@@ -79,7 +79,7 @@ public class TableActionsHandler : MonoBehaviour
 
         int _placeId = _clickedPlace.Id;
 
-        CardMovementType _movementType = _card.Speed != 0 ? CardMovementType.EightDirections : _card.MovementType;
+        CardMovementType _movementType = _card.MovementType;
         int _range = _card.Speed != 0 ? _card.Speed : 1;
         List<TablePlaceHandler> _movablePlaces;
         if (_range==1)
@@ -358,7 +358,7 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
             }
-            else if (player.Actions<_actionCost)
+            if (player.Actions<_actionCost)
             {
                 continue;
             }
@@ -563,10 +563,6 @@ public class TableActionsHandler : MonoBehaviour
                         continue;
                     }
 
-                    if (_placeWithWall.GetCards().Count != 1)
-                    {
-                        continue;
-                    }
                 }
 
                 if (_placeWithWall.GetCards().Count > 1 && _attackedCard is Minion && _attackingCard.Stats.Range <= 1)

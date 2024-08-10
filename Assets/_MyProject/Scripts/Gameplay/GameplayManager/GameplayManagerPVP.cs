@@ -2610,7 +2610,7 @@ public class GameplayManagerPVP : GameplayManager
             ExecuteCardAction(_moveCardInFront);
             return _pushedCardPlace.Id;
         }
-        
+
         StartCoroutine(DamagePushedCard());
         return -1;
 

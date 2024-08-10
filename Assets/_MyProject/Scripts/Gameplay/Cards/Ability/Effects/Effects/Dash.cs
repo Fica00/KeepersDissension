@@ -1,9 +1,11 @@
 using System.Linq;
+using UnityEngine;
 
 public class Dash : AbilityEffect
 {
     private Keeper keeper;
     private GameplayPlayer player;
+    private bool applied;
     
     public override void ActivateForOwner()
     {
@@ -23,12 +25,37 @@ public class Dash : AbilityEffect
     {
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My==_isMy);
         player.OnEndedTurn += AddSpeed;
+        GameplayManager.OnCardMoved += AddSpeed;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        AddSpeed();
+    }
+
+    private void AddSpeed(CardBase _card, int _starting, int _ending)
+    {
+        if (_card is not Keeper _keeper)
+        {
+            return;
+        }
+        if(_keeper != keeper)
+        {
+            return;
+        }
+
+        Debug.Log(111);
+        applied = false;
+        AddSpeed();
     }
 
     private void AddSpeed()
     {
-        keeper.Speed=1;
+        if (applied)
+        {
+            Debug.Log(222);
+            return;
+        }
+            Debug.Log(333);
+        applied = true;
+        keeper.Speed+=2;
     }
 
     public override void CancelEffect()
@@ -38,6 +65,7 @@ public class Dash : AbilityEffect
             return;
         }
         player.OnEndedTurn -= AddSpeed;
+        GameplayManager.OnCardMoved -= AddSpeed;
         player = null;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }

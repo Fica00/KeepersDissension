@@ -42,6 +42,16 @@ public class BlockaderRam : CardSpecialAbility
         }
         else
         {
+            if (_cardInFrontOfSecondCard is PortalCard)
+            {
+                Portal _portal = FindObjectOfType<Portal>();
+                var _card = GameplayManager.Instance.TableHandler.GetPlace(_placeIdOfSecondCard).GetCard();
+                var _direction = GameplayManager.Instance.TableHandler.GetFrontIndex(_placeIdOfFirstCard, _placeIdOfSecondCard);
+                var _place = GameplayManager.Instance.TableHandler.GetPlace(_direction);
+                _portal.CheckCard(_card, _placeIdOfSecondCard, _place.Id);
+                GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
+                return;
+            }
             //damage second card
             CardAction _damageAction = new CardAction
             {

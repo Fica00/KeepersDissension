@@ -88,14 +88,13 @@ public class Initializator : MonoBehaviour
 
         FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);
         ManageNotifications();
-
-        Debug.Log(FirebaseManager.Instance.Authentication.UserId+" Player's current room id " + DataManager.Instance.PlayerData.CurrentRoomId);
-
         LoadAppropriateScene();
     }
 
     private void LoadAppropriateScene()
     {
+        SceneManager.LoadMainMenu();
+        return;
         if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.CurrentRoomId))
         {
             SceneManager.LoadMainMenu();

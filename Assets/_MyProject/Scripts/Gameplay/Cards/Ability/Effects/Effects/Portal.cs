@@ -20,7 +20,6 @@ public class Portal : AbilityEffect
         void OnPlaceSelected(int _selectedPlace)
         {
             Card _portal = CardsManager.Instance.CreateCard(portalId, true);
-            Debug.Log(_portal.name,_portal.gameObject);
             GameplayManager.Instance.PlaceCard(_portal,_selectedPlace, true);
             portals.Add(_portal);
             if (portals.Count==2)
@@ -41,7 +40,7 @@ public class Portal : AbilityEffect
         }
     }
 
-    private void CheckCard(CardBase _cardThatMoved, int _startingPosition, int _finishingPosition)
+    public void CheckCard(CardBase _cardThatMoved, int _startingPosition, int _finishingPosition)
     {
         StartCoroutine(CheckRoutine());
 
