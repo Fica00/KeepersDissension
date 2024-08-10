@@ -19,7 +19,7 @@ public class HealthSlash : AbilityEffect
 
     private void ApplyEffect(Keeper _keeper)
     {
-        int _newHealth = (int)Math.Ceiling(_keeper.Stats.Health / 2.0);
+        int _newHealth = (int)Math.Floor(_keeper.Stats.Health / 2.0);
         int _damage = (int)_keeper.Stats.Health - _newHealth;
 
         if (_damage<1)

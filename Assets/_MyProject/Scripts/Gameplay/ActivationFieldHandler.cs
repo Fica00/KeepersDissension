@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -55,7 +54,7 @@ public class ActivationFieldHandler : MonoBehaviour
             _card.transform.SetParent(cardsHolder);
             _card.PositionInHand();
             _card.transform.localScale = sizeOfCards;
-            _card.AddComponent<CardHandInteractions>().Setup(_card);
+            _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
             shownCards.Add(_card);
         }
         
