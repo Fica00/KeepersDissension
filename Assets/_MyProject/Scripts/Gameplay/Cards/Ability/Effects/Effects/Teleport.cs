@@ -20,6 +20,27 @@ public class Teleport : AbilityEffect
                 if (_placeId==-1)
                 {
                     _range++;
+                    if(_range>10)
+                    {
+                        CardAction _damageSelf = new CardAction()
+                        {
+                            StartingPlaceId = _keeper.GetTablePlace().Id,
+                            FirstCardId = _keeper.Details.Id,
+                            FinishingPlaceId = _keeper.GetTablePlace().Id,
+                            SecondCardId = 0,
+                            Type = CardActionType.Attack,
+                            Cost = 0,
+                            IsMy = true,
+                            CanTransferLoot = false,
+                            Damage = 1,
+                            CanCounter = false
+                        };
+                        GameplayManager.Instance.ExecuteCardAction(_damageSelf);
+                        GameplayManager.Instance.GameState = _state;
+                        RemoveAction();
+                        OnActivated?.Invoke();
+                        return;
+                    }
                     GetPlace();
                 }
                 else

@@ -2,54 +2,109 @@ using System.Linq;
 
 public class Snipe : AbilityEffect
 {
-    private GameplayPlayer player;
-    private Keeper keeper;
+    private bool isActive;
     private int startingRange;
     private float startingDamage;
-    
+    private Keeper keeper;
+
     public override void ActivateForOwner()
     {
-        MoveToActivationField();
-        player = GameplayManager.Instance.MyPlayer;
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        MoveToActivationField();
         Activate();
-        RemoveAction();
-        OnActivated?.Invoke();
+        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
     public override void ActivateForOther()
     {
-        player = GameplayManager.Instance.OpponentPlayer;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
+        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
     private void Activate()
     {
-        player.OnEndedTurn += Deactivate;
-        startingDamage = keeper.Stats.Damage;
+        if (isActive)
+        {
+            return;
+        }
+
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
+        isActive = true;
         startingRange = keeper.Stats.Range;
-        keeper.Stats.Damage = 1;
+        startingDamage = keeper.Stats.Damage;
         keeper.Stats.Range = 3;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        keeper.Stats.Damage = 1;
+        ForceKeeperAttack();
+    }
+
+    private void ForceKeeperAttack()
+    {
+        GameplayState _state = GameplayManager.Instance.GameState;
+        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+
+        TablePlaceHandler _keeperTablePlace = keeper.GetTablePlace();
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id, 3, PlaceLookFor.Both, keeper.MovementType, false, LookForCardOwner
+        .Both, Attack, false);
+
+        void Attack(int _placeId)
+        {
+            if (_placeId == -1)
+            {
+                UIManager.Instance.ShowOkDialog("There are no available spaces");
+                Finish();
+                return;
+            }
+
+            TablePlaceHandler _place = GameplayManager.Instance.TableHandler.GetPlace(_placeId);
+            if (!_place.IsOccupied)
+            {
+                Finish();
+                return;
+            }
+
+            CardAction _attackAction = new CardAction
+            {
+                StartingPlaceId = _keeperTablePlace.Id,
+                FirstCardId = keeper.Details.Id,
+                FinishingPlaceId = _placeId,
+                SecondCardId = _place.GetCard().Details.Id,
+                Type = CardActionType.Attack,
+                Cost = 0,
+                IsMy = true,
+                CanTransferLoot = true,
+                Damage = (int)keeper.Stats.Damage,
+                CanCounter = true,
+                GiveLoot = false
+            };
+
+            GameplayManager.Instance.ExecuteCardAction(_attackAction);
+            Finish();
+        }
+
+        void Finish()
+        {
+            Deactivate();
+            GameplayManager.Instance.GameState = _state;
+            RemoveAction();
+            OnActivated?.Invoke();
+        }
     }
 
     private void Deactivate()
     {
-        player.OnEndedTurn -= Deactivate;
-        keeper.Stats.Damage = startingDamage;
+        if (!isActive)
+        {
+            return;
+        }
+
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
+        isActive = false;
         keeper.Stats.Range = startingRange;
-        keeper = null;
+        keeper.Stats.Damage = startingDamage;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 
     public override void CancelEffect()
     {
-        if (keeper == null)
-        {
-            return;
-        }
-        
-        Deactivate();
+        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

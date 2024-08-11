@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 public class Regeneration : AbilityEffect
@@ -13,6 +14,7 @@ public class Regeneration : AbilityEffect
         {
             MoveToActivationField();
             RemoveAction();
+            Activate();
             OnActivated?.Invoke();
             return;
         }
@@ -31,6 +33,7 @@ public class Regeneration : AbilityEffect
     {
         if (isActive)
         {
+            Activate();
             return;
         }
         isActive = true;

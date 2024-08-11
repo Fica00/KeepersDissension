@@ -82,14 +82,7 @@ public class TableActionsHandler : MonoBehaviour
         CardMovementType _movementType = _card.MovementType;
         int _range = _card.Speed != 0 ? _card.Speed : 1;
         List<TablePlaceHandler> _movablePlaces;
-        if (_range==1)
-        {
-            _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
-        }
-        else
-        {
-            _movablePlaces = tableHandler.GetPlacesAroundNoCorners(_placeId, _movementType, _range);
-        }
+        _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
         // List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,GetRange(_card),true);
         if (_card.Stats.Range!=1)
         {
@@ -102,6 +95,7 @@ public class TableActionsHandler : MonoBehaviour
                 AddAttackAction(_attackablePlaces, _card);
                 break;
             case CardActionType.Move:
+                int _movingRange = _range;
                 if (SlowDown.IsActive)
                 {
                     SlowDown _slowDown = FindObjectOfType<SlowDown>();
@@ -111,10 +105,11 @@ public class TableActionsHandler : MonoBehaviour
                         ClearPossibleActions();
                         return;
                     }
+                    _movingRange = 1;
                 }
                 AddSwitchActions(_movablePlaces, _card,_range);
                 AddRamAbility(_movablePlaces, _card);
-                AddMovementActions(_movablePlaces, _card,_range);
+                AddMovementActions(_movablePlaces, _card, _movingRange);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(_type), _type, null);

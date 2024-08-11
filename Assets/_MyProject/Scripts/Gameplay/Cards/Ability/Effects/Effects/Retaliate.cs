@@ -70,6 +70,10 @@ public class Retaliate : AbilityEffect
         {
             return;
         }
+        if (_attackingCard == keeper)
+        {
+            return;
+        }
 
         CardAction _returnDamage = new CardAction
         {

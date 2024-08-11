@@ -50,10 +50,8 @@ public class Dash : AbilityEffect
     {
         if (applied)
         {
-            Debug.Log(222);
             return;
         }
-            Debug.Log(333);
         applied = true;
         keeper.Speed+=2;
     }

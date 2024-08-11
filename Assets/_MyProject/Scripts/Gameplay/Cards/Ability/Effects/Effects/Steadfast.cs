@@ -43,7 +43,18 @@ public class Steadfast : AbilityEffect
     private void Activate()
     {
         GameplayManager.OnCardMoved += CheckMovedCard;
+        GameplayManager.OnSwitchedPlace += CheckSwitchedCard;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+    }
+
+    private void CheckSwitchedCard(CardBase _firstCard, CardBase _secondCard)
+    {
+        if(_firstCard != keeper && _secondCard != keeper)
+        {
+            return;
+        }
+
+        Deactivate();
     }
 
     private void CheckMovedCard(CardBase _movedCard, int _startPlace, int _endPLace)
@@ -52,8 +63,14 @@ public class Steadfast : AbilityEffect
         {
             return;
         }
-        
+
+        Deactivate();
+    }
+
+    private void Deactivate()
+    {
         GameplayManager.OnCardMoved -= CheckMovedCard;
+        GameplayManager.OnSwitchedPlace -= CheckSwitchedCard;
         IsActive = false;
         IsActiveForOpponent = false;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
@@ -66,6 +83,7 @@ public class Steadfast : AbilityEffect
             return;
         }
         GameplayManager.OnCardMoved -= CheckMovedCard;
+        GameplayManager.OnSwitchedPlace -= CheckSwitchedCard;
         IsActive = false;
         IsActiveForOpponent = false;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
