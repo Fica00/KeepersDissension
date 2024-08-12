@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameplayActions;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -315,18 +316,26 @@ public class TableActionsHandler : MonoBehaviour
                     }
                 }
 
+
+                Vector2 _cordsInFront = tableHandler.GetFrontIndex(_warriorCard.GetTablePlace().Id, _placeAround.Id);
+                Vector2 _direction = tableHandler.GetDirection(_warriorCard.GetTablePlace().Id, _placeAround.Id);
+
                 if (_hasLeapfrog && _skip)
                 {
-                    AddCardInFront();
+                    AddCardInFront(_warriorCard, _cordsInFront,_actionCost, _direction, _addIfOccupied: true);
                     continue;
                 }
 
                 if (_hasLeapfrog && _placeAround.ContainsWall)
                 {
-                    AddCardInFront(true);
+                    AddCardInFront(_warriorCard, _cordsInFront, _actionCost, _direction, _dontAddIfItIsAWall:true);
                 }
-                
+
             }
+
+            //private void AddCardInFront(Card _warriorCard, TablePlaceHandler _placeAround, Vector2 _cordsInFront,
+            //int _actionCost, bool _dontAddIfItIsAWall = false, bool _addIfOccupied = false)
+
 
             //added this part to handle moving over the wall
             TablePlaceHandler _wallInPathPlace = tableHandler.GetPlaceWithWallInPath(_startingPlace, _placeAround);
@@ -368,29 +377,35 @@ public class TableActionsHandler : MonoBehaviour
             
             _placeAround.SetColor(Color.blue);
             
-            void AddCardInFront(bool _dontAddIfItIsAWall=false)
-            {
-                var _cordsInFront = tableHandler.GetFrontIndex(_warriorCard.GetTablePlace().Id, _placeAround.Id);
-                TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
-                if (_placeInFront!=default && !_placeInFront.ContainsWarrior() && !_placeInFront.IsAbility)
-                {
-                    if (_dontAddIfItIsAWall&& _placeInFront.ContainsWall)
-                    {
-                        return;
-                    }
-                    possibleActions.Add( new CardAction()
-                    {
-                        FirstCardId = _warriorCard.Details.Id,
-                        StartingPlaceId = _warriorCard.GetTablePlace().Id,
-                        FinishingPlaceId=_placeInFront.Id,
-                        Type = CardActionType.Move,
-                        Cost = _actionCost,
-                    });
-                    _placeInFront.SetColor(Color.blue);
-                }
-                
-            }
+            
         }
+    }
+
+    private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, Vector2 _direction, bool _dontAddIfItIsAWall = false, bool _addIfOccupied = false)
+    {
+        TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
+        if (_placeInFront==null)
+        {
+            return;
+        }
+       
+        if (_placeInFront != default && !_placeInFront.ContainsWarrior() && !_placeInFront.IsAbility)
+        {
+            if (_dontAddIfItIsAWall && _placeInFront.ContainsWall)
+            {
+                return;
+            }
+            possibleActions.Add(new CardAction()
+            {
+                FirstCardId = _warriorCard.Details.Id,
+                StartingPlaceId = _warriorCard.GetTablePlace().Id,
+                FinishingPlaceId = _placeInFront.Id,
+                Type = CardActionType.Move,
+                Cost = _actionCost,
+            });
+            _placeInFront.SetColor(Color.blue);
+        }
+
     }
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType 

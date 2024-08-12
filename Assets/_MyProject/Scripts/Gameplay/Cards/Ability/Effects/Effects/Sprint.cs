@@ -76,7 +76,7 @@ public class Sprint : AbilityEffect
             }
 
             card = _clickedPlace.GetCardNoWall();
-            card.Speed = 3;
+            card.Speed += 3;
             GameplayManager.Instance.GameState = state;
             GameplayManager.OnCardMoved += RemoveEffect;
             GameplayManager.OnCardAttacked += RemoveEffect;
@@ -90,16 +90,29 @@ public class Sprint : AbilityEffect
 
     private void RemoveEffect(CardBase _arg1, CardBase _arg2, int _arg3)
     {
+        if(_arg1 != card && _arg2 != card)
+        {
+            return;
+        }
+
         RemoveEffect();
     }
 
     private void RemoveEffect(CardBase _obj)
     {
+        if (card != _obj)
+        {
+            return;
+        }
         RemoveEffect();
     }
 
     private void RemoveEffect(CardBase _arg1, int _arg2, int _arg3)
     {
+        if (card != _arg1)
+        {
+            return;
+        }
         RemoveEffect();
     }
 
@@ -109,7 +122,6 @@ public class Sprint : AbilityEffect
         GameplayManager.OnCardAttacked -= RemoveEffect;
         GameplayManager.OnPlacedCard -= RemoveEffect;
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= RemoveEffect;
-        card.Speed = 0;
         IsActive = false;
     }
 
@@ -121,5 +133,6 @@ public class Sprint : AbilityEffect
         }
         
         RemoveEffect();
+        card.Speed -= 3;
     }
 }

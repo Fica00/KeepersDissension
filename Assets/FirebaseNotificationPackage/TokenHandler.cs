@@ -22,6 +22,7 @@ public class TokenHandler : MonoBehaviour
         {
             Destroy(this);
         }
+        
     }
 
     public void Init(FirebaseAuth _auth, DatabaseReference _databaseReference)

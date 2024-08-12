@@ -1401,6 +1401,11 @@ public class GameplayManagerPVP : GameplayManager
         void CheckForResponseAction()
         {
             int _idOfDefendingCard = _defendingCard.Details.Id;
+            if(_defendingCard.My == _attackingCard.My)
+            {
+                return;
+            }
+
             if (!_defendingCard.IsWarrior())
             {
                 if (_defendingCard is Wall _defendingWall)
@@ -1866,9 +1871,11 @@ public class GameplayManagerPVP : GameplayManager
     
     private void TellOpponentThatIUpdatedWhiteStrangeMatter(bool _tellRoom=true)
     {
+        Debug.Log(333);
         OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
         if (_tellRoom)
         {
+        Debug.Log(444);
             roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
         }
     }
@@ -2377,17 +2384,17 @@ public class GameplayManagerPVP : GameplayManager
 
                 if (_amountOfCardsOnPlace>1)
                 {
-                    bool _isLeapfrog = false;
+                    bool _isScaler = false;
                     foreach (var _ability in _cardOnPlace.SpecialAbilities)
                     {
-                        if (_ability is ScalerLeapfrog)
+                        if (_ability is ScalerScale)
                         {
-                            _isLeapfrog = true;
+                            _isScaler = true;
                             break;
                         }
                     }
 
-                    if (_isLeapfrog)
+                    if (_isScaler)
                     {
                         continue;
                     }

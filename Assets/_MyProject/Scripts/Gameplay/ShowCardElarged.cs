@@ -74,12 +74,10 @@ public class ShowCardElarged : MonoBehaviour
         shownCard = _card;
         if (_card is Card)
         {
-            Debug.Log(2);
             ShowCard(_card as Card);
         }
         else
         {
-            Debug.Log(3);
             ShowAbility(_card as AbilityCard);
         }
         

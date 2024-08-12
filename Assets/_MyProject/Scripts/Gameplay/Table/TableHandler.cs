@@ -199,7 +199,7 @@ public class TableHandler : MonoBehaviour
         return _distance;
     }
 
-    private Vector2 GetIndexOfPlace(TablePlaceHandler _place)
+    public Vector2 GetIndexOfPlace(TablePlaceHandler _place)
     {
         for (int _i = 0; _i < tableSize.x; _i++)
         {

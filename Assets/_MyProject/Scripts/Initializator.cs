@@ -93,8 +93,6 @@ public class Initializator : MonoBehaviour
 
     private void LoadAppropriateScene()
     {
-        SceneManager.LoadMainMenu();
-        return;
         if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.CurrentRoomId))
         {
             SceneManager.LoadMainMenu();
