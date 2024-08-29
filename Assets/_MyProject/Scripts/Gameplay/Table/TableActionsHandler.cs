@@ -810,7 +810,7 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
-        if (Tar.IsActive)
+        if (Tar.IsActiveForOpponent)
         {
             if (_newAction.Type == CardActionType.Move || _newAction.Type == CardActionType.SwitchPlace)
             {

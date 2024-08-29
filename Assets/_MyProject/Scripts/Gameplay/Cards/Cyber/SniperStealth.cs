@@ -57,6 +57,12 @@ public class SniperStealth : CardSpecialAbility
 
             TablePlaceHandler _stealthPlace = GameplayManager.Instance.TableHandler.GetPlace(0);
 
+            if (_stealthPlace.ContainsVoid)
+            {
+                UIManager.Instance.ShowOkDialog("Cant place on void");
+                return;
+            }
+
             if (_stealthPlace.IsOccupied)
             {
                 UIManager.Instance.ShowOkDialog("Stealth tile is already occupied");
@@ -96,9 +102,12 @@ public class SniperStealth : CardSpecialAbility
             foreach (var _place in GameplayManager.Instance.TableHandler.GetPlacesAround(_originalPlace,
                          CardMovementType.FourDirections, 1, true))
             {
+                if (_place.ContainsVoid)
+                {
+                    continue;
+                }
                 if (_place.ContainsMarker)
                 {
-                    Debug.Log("Added");
                     _changeSprites.Add(_place);
                     continue;
                 }

@@ -113,6 +113,12 @@ public class BomberMinefield : CardSpecialAbility
             }
             
             TablePlaceHandler _tablePlace = GameplayManager.Instance.TableHandler.GetPlace(_placeId);
+            if (_tablePlace.ContainsVoid)
+            {
+                UIManager.Instance.ShowOkDialog("Please select unoccupied space");
+                OnActivated?.Invoke();
+                return;
+            }
             if (_tablePlace.IsOccupied && !_tablePlace.ContainsMarker)
             {
                 UIManager.Instance.ShowOkDialog("Please select unoccupied space");
@@ -170,6 +176,10 @@ public class BomberMinefield : CardSpecialAbility
                          CardMovementType.EightDirections, 1, false))
             {
                 Card _marker;
+                if (_place.ContainsVoid)
+                {
+                    continue;
+                }
                 if (_place.ContainsMarker)
                 {
                     _marker = _place.GetMarker();

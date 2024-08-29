@@ -23,6 +23,8 @@ public class AbilityShopDisplay : MonoBehaviour, IPointerDownHandler, IPointerCl
             Empty();
             return;
         }
+
+        gameObject.name = _card.name;
         Ability = _card;
         foreground.enabled = true;
         foreground.sprite = _card.Details.Foreground;

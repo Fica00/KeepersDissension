@@ -76,8 +76,10 @@ public class ChooseCardPanel : MonoBehaviour
 
     private void ClearShownCards()
     {
+        Debug.Log("1111");
         foreach (var _shownCard in shownCards)
         {
+            Debug.Log(_shownCard.name,_shownCard.gameObject);
             _shownCard.Display.UnHide();
             CardHandInteractions _cardHandler = _shownCard.GetComponent<CardHandInteractions>();
             if (_cardHandler!=null)

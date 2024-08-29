@@ -755,12 +755,10 @@ public class GameplayManagerPVP : GameplayManager
         if (IsMyTurn)
         {
             Finished = false;
-            Debug.Log("Starting my turn");
             GameState = GameplayState.Playing;
             MyPlayer.NewTurn();
             if (lastAction != null)
             {
-                Debug.Log("Last action: "+JsonConvert.SerializeObject(lastAction));
                 MyPlayer.Actions = lastAction.ActionsLeft;
                 lastAction = null;
             }
@@ -771,18 +769,15 @@ public class GameplayManagerPVP : GameplayManager
                 IsMyTurn = false;
             }
             yield return new WaitUntil(() => Finished);
-            Debug.Log("Ended my turn");
             MyPlayer.EndedTurn();
         }
         else
         {
             OpponentFinished = false;
-            Debug.Log("Starting opponents turn");
             GameState = GameplayState.Waiting;
             OpponentPlayer.NewTurn();
             if (lastAction != null)
             {
-                Debug.Log("Last action: "+JsonConvert.SerializeObject(lastAction));
                 OpponentPlayer.Actions = lastAction.ActionsLeft;
                 lastAction = null;
             }
@@ -793,7 +788,6 @@ public class GameplayManagerPVP : GameplayManager
                 IsMyTurn = true;
             }
             yield return new WaitUntil(() => OpponentFinished);
-            Debug.Log("Ended opponents turn");
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
@@ -1518,6 +1512,7 @@ public class GameplayManagerPVP : GameplayManager
             }
             else
             {
+                _defendingCard.AllowCardEffectOnDeath = _action.AllowCardEffectOnDeath;
                 _defendingPlayer.DestroyCard(_defendingCard);
             }
             
@@ -1871,11 +1866,9 @@ public class GameplayManagerPVP : GameplayManager
     
     private void TellOpponentThatIUpdatedWhiteStrangeMatter(bool _tellRoom=true)
     {
-        Debug.Log(333);
         OpponentUpdateWhiteMatter _data = new OpponentUpdateWhiteMatter { Amount = MyPlayer.StrangeMatter };
         if (_tellRoom)
         {
-        Debug.Log(444);
             roomHandler.AddAction(ActionType.OpponentUpdatedHisStrangeMatter, JsonConvert.SerializeObject(_data));
         }
     }

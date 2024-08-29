@@ -130,7 +130,6 @@ namespace FirebaseMultiplayer.Room
                     continue;
                 }
 
-                Debug.Log(123);
                 OnPlayerJoined?.Invoke(_player);
             }
         }

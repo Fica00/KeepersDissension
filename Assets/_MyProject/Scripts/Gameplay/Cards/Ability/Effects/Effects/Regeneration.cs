@@ -7,9 +7,18 @@ public class Regeneration : AbilityEffect
     private GameplayPlayer player;
     private Keeper keeper;
     private bool isActive;
+    private int counter=-1;
     
     public override void ActivateForOwner()
     {
+        if (counter==-1)
+        {
+            counter = 1;
+        }
+        else
+        {
+            counter++;
+        }
         if (isActive)
         {
             MoveToActivationField();
@@ -31,16 +40,24 @@ public class Regeneration : AbilityEffect
 
     public override void ActivateForOther()
     {
+        if (counter==-1)
+        {
+            counter = 1;
+        }
+        else
+        {
+            counter++;
+        }
         if (isActive)
         {
             Activate();
             return;
         }
+        player = GameplayManager.Instance.OpponentPlayer;
+        player.OnStartedTurn += ActivateAndUnsubscribe;
         isActive = true;
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
         Activate();
-        player = GameplayManager.Instance.OpponentPlayer;
-        player.OnStartedTurn += ActivateAndUnsubscribe;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
@@ -49,15 +66,17 @@ public class Regeneration : AbilityEffect
         player.OnStartedTurn -= ActivateAndUnsubscribe;
         if (isActive)
         {
-            Activate();
+            Activate(counter);
         }
+
+        counter = 0;
         isActive = false;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 
-    private void Activate()
+    private void Activate(int _amount=-1)
     {
-        keeper.Heal(amountToHeal);
+        keeper.Heal(_amount == -1 ? amountToHeal : _amount);
     }
 
     public override void CancelEffect()

@@ -120,7 +120,8 @@ public class Reduction : AbilityEffect
                 IsMy = true,
                 CanTransferLoot = false,
                 Damage = 10,
-                CanCounter = false
+                CanCounter = false,
+                AllowCardEffectOnDeath = false
             };
             GameplayManager.Instance.ExecuteCardAction(_attackAction);
             _callBack?.Invoke();
@@ -136,7 +137,6 @@ public class Reduction : AbilityEffect
 
     public void OpponentFinishedAction()
     {
-        Debug.Log("000");
         opponentFinished = true;
         UIManager.Instance.ShowOkDialog("Opponent selected warrior");
         CheckForEnd();

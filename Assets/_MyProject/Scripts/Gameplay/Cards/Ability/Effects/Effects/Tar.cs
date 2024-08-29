@@ -1,20 +1,18 @@
-using System.Linq;
-
 public class Tar : AbilityEffect
 {
     private int counter;
-    public static bool IsActive;
-    private bool isActiveForOpponent;
+    public static bool IsActiveForMe;
+    public static bool IsActiveForOpponent;
 
     private void OnEnable()
     {
-        isActiveForOpponent = false;
-        IsActive = false;
+        IsActiveForOpponent = false;
+        IsActiveForMe = false;
     }
 
     public override void ActivateForOwner()
     {
-        if (IsActive)
+        if (IsActiveForMe)
         {
             RemoveAction();
             MoveToActivationField();
@@ -22,7 +20,7 @@ public class Tar : AbilityEffect
             return;
         }
 
-        IsActive = true;
+        IsActiveForMe = true;
         counter = 1;
         GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableActiveDisplay;
         MoveToActivationField();
@@ -38,19 +36,19 @@ public class Tar : AbilityEffect
             counter--;
         }
 
-        IsActive = false;
-        isActiveForOpponent = false;
+        IsActiveForMe = false;
+        IsActiveForOpponent = false;
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 
     public override void ActivateForOther()
     {
-        if (isActiveForOpponent)
+        if (IsActiveForOpponent)
         {
             return;
         }
 
-        isActiveForOpponent = true;
+        IsActiveForOpponent = true;
         GameplayManager.Instance.MyPlayer.OnEndedTurn += ChangeEffect;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
@@ -64,15 +62,15 @@ public class Tar : AbilityEffect
     private void RemoveEffect()
     {
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= RemoveEffect;        
-        IsActive = false;
-        isActiveForOpponent = false;
+        IsActiveForMe = false;
+        IsActiveForOpponent = false;
     }
 
     public override void CancelEffect()
     {
         RemoveEffect();
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        IsActive = false;
-        isActiveForOpponent = false;
+        IsActiveForMe = false;
+        IsActiveForOpponent = false;
     }
 }

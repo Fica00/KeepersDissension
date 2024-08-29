@@ -15,23 +15,15 @@ public class Veto : AbilityEffect
 
     private void OptionSelected(int _optionId)
     {
-        Debug.Log("selected option: "+_optionId);
         List<AbilityCard> _availableCards = new List<AbilityCard>();
         
         if (_optionId==1)
         {
-            Debug.Log(GameplayManager.Instance.OpponentPlayer.OwnedAbilities.Count);
             _availableCards = GameplayManager.Instance.OpponentPlayer.OwnedAbilities.ToList();
-            Debug.Log(_availableCards.Count);
         }
         else
         {
             _availableCards = GameplayManager.Instance.OpponentPlayer.GetAbilities().ToList();
-        }
-
-        foreach (var _available in _availableCards)
-        {
-            Debug.Log(_available.name,_available.gameObject);
         }
 
         if (_availableCards.Count==0)
@@ -44,7 +36,6 @@ public class Veto : AbilityEffect
             }
             UIManager.Instance.ShowOkDialog("Opponent doesnt have ability cards on field, choose from hand");
             OptionSelected(1);
-            
             return;
         }
         

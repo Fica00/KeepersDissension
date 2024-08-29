@@ -1,11 +1,12 @@
 using System.Linq;
+using UnityEngine;
 
 public class WoundedRunner : AbilityEffect
 {
     private Keeper keeper;
     private GameplayPlayer player;
     private bool isActive;
-    
+    private bool applied;
     public override void ActivateForOwner()
     {
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
@@ -23,31 +24,9 @@ public class WoundedRunner : AbilityEffect
         GameplayManager.OnCardMoved += AddSpeed;
         GameplayManager.OnPlacedCard += AddSpeed;
         GameplayManager.OnSwitchedPlace += AddSpeed;
+        keeper.Stats.UpdatedHealth += RemoveSpeed;
+        Debug.Log("Subscribed");
         AddSpeed();
-    }
-
-    private void AddSpeed()
-    {
-        if (keeper.Stats.Health==1)
-        {
-            keeper.Speed = 3;
-            AbilityCard.ActiveDisplay.SetActive(true);
-        }
-        else
-        {
-            AbilityCard.ActiveDisplay.SetActive(false);
-        }
-    }
-
-    private void Update()
-    {
-        if (isActive)
-        {
-            if (keeper.Stats.Health!=1)
-            {
-                CancelEffect();
-            }
-        }
     }
 
     private void OnDisable()
@@ -62,6 +41,7 @@ public class WoundedRunner : AbilityEffect
             return;
         }
 
+        Debug.Log("canceled effect");
         isActive = false;
         keeper.Speed = 0;
         player.OnEndedTurn -= AddSpeed;
@@ -69,27 +49,87 @@ public class WoundedRunner : AbilityEffect
         GameplayManager.OnCardMoved -= AddSpeed;
         GameplayManager.OnPlacedCard -= AddSpeed;
         GameplayManager.OnSwitchedPlace -= AddSpeed;
+        keeper.Stats.UpdatedHealth -= RemoveSpeed;
         keeper = null;
         AbilityCard.ActiveDisplay.SetActive(false);
     }
 
     private void AddSpeed(CardBase _arg1, CardBase _arg2)
     {
+        if (_arg1==keeper || _arg2==keeper)
+        {
+            applied = false;
+        }
         AddSpeed();
     }
 
     private void AddSpeed(CardBase _arg1, CardBase _arg2, int _arg3)
     {
+        if (_arg1==keeper || _arg2==keeper)
+        {
+            applied = false;
+        }
         AddSpeed();
     }
 
     private void AddSpeed(CardBase _arg1, int _arg2, int _arg3)
     {
+        if (_arg1==keeper)
+        {
+            applied = false;
+        }
         AddSpeed();
     }
 
-    private void AddSpeed(CardBase _obj)
+    private void AddSpeed(CardBase _arg1)
     {
+        if (_arg1==keeper)
+        {
+            applied = false;
+        }
         AddSpeed();
+    }
+    
+    private void AddSpeed()
+    {
+        Debug.Log(111);
+        if (!isActive)
+        {
+        Debug.Log(222);
+            return;
+        }
+        if (applied)
+        {
+        Debug.Log(3333);
+            return;
+        }
+        
+        Debug.Log(444);
+        if (keeper.Stats.Health==1)
+        {
+            applied = true;
+            keeper.Speed += 3;
+            AbilityCard.ActiveDisplay.SetActive(true);
+        }
+        else
+        {
+            AbilityCard.ActiveDisplay.SetActive(false);
+        }
+    }
+
+    private void RemoveSpeed()
+    {
+        if (!isActive)
+        {
+            return;
+        }
+
+        if (!applied)
+        {
+            return;
+        }
+        
+        keeper.Speed -= 3;
+        applied = false;
     }
 }

@@ -13,7 +13,6 @@ public class Minefield : AbilityEffect
         player = GameplayManager.Instance.MyPlayer;
         keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         Activate();
-        RemoveAction();
     }
 
     public override void ActivateForOther()
@@ -38,6 +37,10 @@ public class Minefield : AbilityEffect
     {
         BomberMinefield _bomberMinefield = keeper.EffectsHolder.GetComponent<BomberMinefield>();
         _bomberMinefield.OnActivated -= Finish;
+        if (keeper.My)
+        {
+            RemoveAction();
+        }
         OnActivated?.Invoke();
     }
 

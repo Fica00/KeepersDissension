@@ -28,13 +28,13 @@ public class Persevere : AbilityEffect
 
     private void CheckKeeper()
     {
-        if (isApplied&&effectedKeeper.Stats.Health>3)
+        if (isApplied&&effectedKeeper.Stats.Health>2)
         {
             isApplied = false;
             effectedKeeper.Stats.Damage -= attackChange;
             AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         }
-        else if (!isApplied&& effectedKeeper.Stats.Health<=3)
+        else if (!isApplied&& effectedKeeper.Stats.Health<=2)
         {
             isApplied = true;
             effectedKeeper.Stats.Damage += attackChange;

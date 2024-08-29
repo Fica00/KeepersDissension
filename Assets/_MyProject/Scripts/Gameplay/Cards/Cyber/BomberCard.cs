@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class BomberCard : CardSpecialAbility
@@ -32,6 +30,11 @@ public class BomberCard : CardSpecialAbility
         }
 
         if (!_cardBase.My)
+        {
+            return;
+        }
+
+        if (!_cardBase.AllowCardEffectOnDeath)
         {
             return;
         }

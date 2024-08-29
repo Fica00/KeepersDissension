@@ -48,14 +48,32 @@ public class SnowWall : WallBase
                 DamageAttacker(attackerPlace);
             }
         }
-        
-        if (Immunity.IsActiveForMe && _attacker.My)
+
+        Debug.Log("Checking effect");
+        if (_attacker.My)
         {
-            return;
+            Debug.Log(1111);
+            if (Immunity.IsActiveForMe)
+            {
+                Debug.Log(22222);
+                return;
+            }
+            if (Tar.IsActiveForOpponent)
+            {
+                Debug.Log(33333);
+                return;   
+            }
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.My)
+        else
         {
-            return;
+                Debug.Log(444444);
+            if (Immunity.IsActiveForOpponent)
+            {
+                Debug.Log(555555);
+                return;
+            }   
+            
+            
         }
 
         if (attackerPlace==TablePlaceHandler.Id)
@@ -63,11 +81,6 @@ public class SnowWall : WallBase
             return;
         }
 
-        if (Tar.IsActive && _attacker is Guardian)
-        {
-            return;
-        }
-        
         GameplayManager.Instance.ChangeMovementForCard(attackerPlace, false);
         GameplayManager.Instance.MyPlayer.OnStartedTurn += Unsubscribe;
     }

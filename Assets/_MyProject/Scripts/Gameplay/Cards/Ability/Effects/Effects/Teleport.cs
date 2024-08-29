@@ -1,4 +1,5 @@
 using System.Linq;
+using UnityEngine;
 
 public class Teleport : AbilityEffect
 {
@@ -20,14 +21,17 @@ public class Teleport : AbilityEffect
                 if (_placeId==-1)
                 {
                     _range++;
+                    Debug.Log(_range);
                     if(_range>10)
                     {
+                        Debug.Log("1111111");
+                        Debug.Log(_keeper,_keeper.GetTablePlace().gameObject);
                         CardAction _damageSelf = new CardAction()
                         {
                             StartingPlaceId = _keeper.GetTablePlace().Id,
                             FirstCardId = _keeper.Details.Id,
                             FinishingPlaceId = _keeper.GetTablePlace().Id,
-                            SecondCardId = 0,
+                            SecondCardId = _keeper.Details.Id,
                             Type = CardActionType.Attack,
                             Cost = 0,
                             IsMy = true,

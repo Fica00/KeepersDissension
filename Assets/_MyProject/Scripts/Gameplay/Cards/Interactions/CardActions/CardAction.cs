@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class CardAction
@@ -15,4 +16,5 @@ public class CardAction
     public bool CanCounter = true;
     public bool GiveLoot = false;
     public bool CanBeBlocked = true;
+    [FormerlySerializedAs("AllowExplosion")] public bool AllowCardEffectOnDeath = true;
 }

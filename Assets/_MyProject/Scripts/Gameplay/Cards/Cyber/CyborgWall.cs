@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class CyborgWall : WallBase
 {
     private void OnEnable()
@@ -32,17 +34,22 @@ public class CyborgWall : WallBase
         }
 
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
+        Debug.Log(1111);
         if (Collapse.IsActiveForMe)
         {
+        Debug.Log(2222);
             if (!_attacker.My)
             {
+        Debug.Log(3333);
                 DamageAttacker(AttackerPlace);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
+        Debug.Log(44444);
             if (_attacker.My)
             {
+        Debug.Log(5555);
                 DamageAttacker(AttackerPlace);
             }
         }

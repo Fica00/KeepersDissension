@@ -18,6 +18,7 @@ public class CardBase : MonoBehaviour
     public CardMovementType MovementType;
     [HideInInspector] public bool HasDied;
     [HideInInspector] public bool CanBeUsed = true;
+    public bool AllowCardEffectOnDeath;
     private bool canMove=true;
 
     protected Transform Parent;

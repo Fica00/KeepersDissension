@@ -28,8 +28,6 @@ public class NotificationSender : MonoBehaviour
         }
         TokenHandler.Instance.GetTokenForUser(_userId, _token =>
         {
-            Debug.Log(_userId);
-            Debug.Log("got token: " + _token);
             if (_token == null)
             {
                 return;
