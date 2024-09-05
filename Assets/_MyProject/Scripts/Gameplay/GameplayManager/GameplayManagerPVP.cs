@@ -2763,9 +2763,13 @@ public class GameplayManagerPVP : GameplayManager
 
     private void PlaceAbilityOnTable(int _cardId, bool _isMy, int _placeId)
     {
-        AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability =>
-            _ability.Details.Id == _cardId && _ability.My == _isMy);
+        Debug.Log("Card id: "+_cardId);
+        Debug.Log("Place id: "+_placeId);
+        AbilityCard _ability = Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _cardId);
+        Debug.Log("Ability: "+_ability);
         TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
+        Debug.Log("Place: "+_tablePlace);
+        Debug.Log("----------------");
         _ability.PositionOnTable(_tablePlace);
     }
 

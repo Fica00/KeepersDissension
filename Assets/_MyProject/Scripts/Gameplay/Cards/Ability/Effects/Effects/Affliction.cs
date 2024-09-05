@@ -10,7 +10,6 @@ public class Affliction : AbilityEffect
         RemoveAction();
         int _damage = Convert.ToInt32(_opponentsGuardian.Stats.Health / 2);
         _damage = Math.Clamp(_damage, 1, int.MaxValue);
-        GUIUtility.systemCopyBuffer = _damage.ToString();
         CardAction _damageAction = new CardAction
         {
             StartingPlaceId = _opponentsGuardian.GetTablePlace().Id,

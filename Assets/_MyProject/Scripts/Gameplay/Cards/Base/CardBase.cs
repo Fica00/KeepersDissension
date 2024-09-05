@@ -61,6 +61,12 @@ public class CardBase : MonoBehaviour
     public void PositionInHand(bool _rotateHorizontaly=false)
     {
         CardPlace = CardPlace.Hand;
+        RotateCard(_rotateHorizontaly);
+        OnPositionedInHand?.Invoke(this);
+    }
+
+    public void RotateCard(bool _rotateHorizontaly=false)
+    {
         if (_rotateHorizontaly)
         {
             // transform.DORotate(new Vector3(0, 0, 90), 0.5f);
@@ -71,8 +77,6 @@ public class CardBase : MonoBehaviour
             // transform.DORotate(new Vector3(0, 0, 0), 0.5f);
             transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
         }
-
-        OnPositionedInHand?.Invoke(this);
     }
     
     public void PositionOnTable(TablePlaceHandler _tablePosition)
