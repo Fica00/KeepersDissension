@@ -162,4 +162,24 @@ public class FirebaseManager : MonoBehaviour
             }
         });
     }
+    
+    public void DeleteUserDataAndAccount(Action<bool> _callBack)
+    {
+        database.Child(USERS_KEY).Child(Authentication.UserId).RemoveValueAsync().ContinueWithOnMainThread(_task =>
+        {
+            if (_task.IsCompleted)
+            {
+                DeleteUserAccount(_callBack);
+            }
+            else
+            {
+                _callBack?.Invoke(false);
+            }
+        });
+    }
+
+    private void DeleteUserAccount(Action<bool> _callBack)
+    {
+        Authentication.FirebaseUser.DeleteAsync().ContinueWithOnMainThread(_task => { _callBack?.Invoke(_task.IsCompleted); });
+    }
 }

@@ -26,7 +26,11 @@ public class SimpleOpenAndClose : MonoBehaviour
     {
         object1.transform.localScale = Vector3.zero;
         object2.transform.localScale = Vector3.one;
-        object2.GetComponent<ElipsisActionsController>().Setup();
+        var _actions = object2.GetComponent<ElipsisActionsController>();
+        if (_actions)
+        {
+            _actions.Setup();
+        }
     }
 
     public void CloseObject()
