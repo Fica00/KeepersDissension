@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +31,10 @@ public class StrangeMatterTracker : MonoBehaviour
 
     private void OnDisable()
     {
+        if (myPlayer==null)
+        {
+            return;
+        }
         myPlayer.UpdatedStrangeMatter -= ShowMyStrangeMatter;
         opponentPlayer.UpdatedStrangeMatter -= ShowOpponentStrangeMatter;
         GameplayManager.Instance.WhiteStrangeMatter.UpdatedAmountInEconomy -= ShowAmountInEconomy;

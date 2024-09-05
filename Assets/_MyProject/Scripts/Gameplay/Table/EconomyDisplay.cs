@@ -15,6 +15,10 @@ public class EconomyDisplay : MonoBehaviour
 
     private void OnDisable()
     {
+        if (player==null)
+        {
+            return;
+        }
         player.UpdatedStrangeMatter -= ShowWhiteStrangeMatter;
     }
 

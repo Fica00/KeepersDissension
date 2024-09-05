@@ -45,6 +45,10 @@ public class HealthTracker : MonoBehaviour
 
     private void OnDisable()
     {
+        if (myGuardian==null)
+        {
+            return;
+        }
         myGuardian.Stats.UpdatedHealth -= ShowMyGuardianHealth;
         opponentGuardian.Stats.UpdatedHealth += ShowOpponentGuardianHealth;
         myKeeper.Stats.UpdatedHealth -= ShowMyKeeperHealth;
