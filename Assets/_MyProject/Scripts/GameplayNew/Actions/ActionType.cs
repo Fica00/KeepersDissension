@@ -58,5 +58,7 @@ namespace GameplayActions
         OpponentRespondedForBombQuestion = 50,
         OpponentPlacedVetoedCard=51,
         UseDelivery=52,
+        SetTaxCard=53,
+        ActivatedTaxCard=54
     }
 }

@@ -599,16 +599,35 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
-
-        if (_triggeredActions.Count == 1)
+        
+        List<CardAction> _uniqueActions = new List<CardAction>();
+        foreach (var _triggeredAction in _triggeredActions)
         {
-            ExecuteAction(_triggeredActions[0]);
+            bool _skip = false;
+            foreach (var _uniq in _uniqueActions)
+            {
+                if (_triggeredAction.CompareTo(_uniq))
+                {
+                    _skip = true;
+                }
+            }
+
+            if (_skip)
+            {
+                continue;
+            }
+
+            _uniqueActions.Add(_triggeredAction);
+        }
+
+        if (_uniqueActions.Count == 1)
+        {
+            ExecuteAction(_uniqueActions[0]);
         }
         else
         {
-            ResolveMultipleActions.Instance.Show(_triggeredActions.ToList(), ExecuteAction);
+            ResolveMultipleActions.Instance.Show(_uniqueActions.ToList(), ExecuteAction);
         }
-
     }
 
     private void ExecuteAction(CardAction _action)

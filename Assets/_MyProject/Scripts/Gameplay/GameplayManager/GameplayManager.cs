@@ -787,4 +787,14 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void SetTaxCard(int _id)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ActivatedTaxedCard()
+    {
+        throw new Exception();
+    }
 }

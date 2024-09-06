@@ -81,12 +81,10 @@ public class ChooseCardPanel : MonoBehaviour
     {
         foreach (CardBase _shownCard in shownCards)
         {
-            Debug.Log($"{_shownCard.gameObject.name} -> {_shownCard.CardPlace}");
             _shownCard.Display.UnHide();
             CardHandInteractions _cardHandler = _shownCard.GetComponent<CardHandInteractions>();
             if (_cardHandler != null)
             {
-                Debug.Log(1111);
                 Destroy(_cardHandler);
             }
 
@@ -97,7 +95,6 @@ public class ChooseCardPanel : MonoBehaviour
                 continue;
             }
 
-            Debug.Log(3333);
             _shownCard.ReturnFromHand();
         }
 

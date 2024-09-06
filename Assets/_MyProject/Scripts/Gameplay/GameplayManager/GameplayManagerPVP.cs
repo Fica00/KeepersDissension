@@ -133,12 +133,13 @@ public class GameplayManagerPVP : GameplayManager
                 if (_action.IsMine)
                 {
                     var _card = GetCard(_placeCard.CardId, true);
-                    PlaceCard(_card,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt,false);
+                    PlaceCard(_card, _placeCard.PositionId, _placeCard.DontCheckIfPlayerHasIt, false);
                 }
                 else
                 {
-                    OpponentPlacedCard(_placeCard.CardId,_placeCard.PositionId,_placeCard.DontCheckIfPlayerHasIt);
+                    OpponentPlacedCard(_placeCard.CardId, _placeCard.PositionId, _placeCard.DontCheckIfPlayerHasIt);
                 }
+
                 break;
             case ActionType.Resign:
                 StopGame(!_action.IsMine);
@@ -153,35 +154,38 @@ public class GameplayManagerPVP : GameplayManager
                 AddAbilityCardToPlayer _addAbilityToPlayer = JsonConvert.DeserializeObject<AddAbilityCardToPlayer>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    AddAbilityToPlayer(true,_addAbilityToPlayer.AbilityId,false);
+                    AddAbilityToPlayer(true, _addAbilityToPlayer.AbilityId, false);
                 }
                 else
                 {
                     MasterAddedAbilityToPlayer(_addAbilityToPlayer.IsMyPlayer, _addAbilityToPlayer.AbilityId);
                 }
+
                 break;
             case ActionType.AddAbilityToShop:
                 AddAbilityToShop _addAbilityToShop = JsonConvert.DeserializeObject<AddAbilityToShop>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    AddAbilityToShop(_addAbilityToShop.AbilityId,false);
+                    AddAbilityToShop(_addAbilityToShop.AbilityId, false);
                 }
                 else
                 {
                     MasterAddedAbilityToShop(_addAbilityToShop.AbilityId);
                 }
+
                 break;
             case ActionType.ExecuteCardAction:
                 ExecuteCardAction _executeCardAction = JsonConvert.DeserializeObject<ExecuteCardAction>(_action.JsonData);
 
                 if (_action.IsMine)
                 {
-                    ExecuteCardAction(JsonConvert.DeserializeObject<CardAction>(_executeCardAction.JsonData),false);
+                    ExecuteCardAction(JsonConvert.DeserializeObject<CardAction>(_executeCardAction.JsonData), false);
                 }
                 else
                 {
                     OpponentExecutedAction(_executeCardAction.JsonData);
                 }
+
                 break;
             case ActionType.OpponentTookLoot:
                 if (_action.IsMine)
@@ -192,6 +196,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentLootedMe();
                 }
+
                 break;
             case ActionType.GiveLoot:
                 GiveLoot _giveLoot = JsonConvert.DeserializeObject<GiveLoot>(_action.JsonData);
@@ -203,6 +208,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentGiveYouLoot(_giveLoot.Amount);
                 }
+
                 break;
             case ActionType.OpponentFinishedAttackResponse:
                 if (_action.IsMine)
@@ -213,6 +219,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentFinishedAttackResponse();
                 }
+
                 break;
             case ActionType.OpponentEndedTurn:
                 if (_action.IsMine)
@@ -223,6 +230,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentFinishedHisMove();
                 }
+
                 break;
             case ActionType.OpponentUpdatedHisStrangeMatter:
                 OpponentUpdateWhiteMatter _opponentUpdatedMatter = JsonConvert.DeserializeObject<OpponentUpdateWhiteMatter>(_action.JsonData);
@@ -234,6 +242,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentUpdatedWhiteStrangeMatter(_opponentUpdatedMatter.Amount);
                 }
+
                 break;
             case ActionType.OpponentUpdatedStrangeMatterInReserve:
                 OpponentUpdatedWhiteMatterInReserve _opponentUpdatedMatterInReserve =
@@ -246,6 +255,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     UpdateWhiteStrangeMatterInReserve(_opponentUpdatedMatterInReserve.Amount);
                 }
+
                 break;
             case ActionType.ForceUpdateOpponentAction:
                 ForceUpdateOpponentAction _forceUpdateOpponentAction = JsonConvert.DeserializeObject<ForceUpdateOpponentAction>(_action.JsonData);
@@ -257,30 +267,34 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentForcedActionsUpdate(_forceUpdateOpponentAction.Amount);
                 }
+
                 break;
             case ActionType.OpponentBoughtMinion:
                 OpponentBoughtMinion _opponentBoughtMinion = JsonConvert.DeserializeObject<OpponentBoughtMinion>(_action.JsonData);
-                
+
                 if (_action.IsMine)
                 {
-                    BuyMinion(GetCard(_opponentBoughtMinion.CardId ,false), _opponentBoughtMinion.Cost, null, _opponentBoughtMinion.PlaceMinion, false);
+                    BuyMinion(GetCard(_opponentBoughtMinion.CardId, false), _opponentBoughtMinion.Cost, null, _opponentBoughtMinion.PlaceMinion,
+                        false);
                 }
                 else
                 {
                     OpponentBoughtMinion(_opponentBoughtMinion.CardId, _opponentBoughtMinion.Cost, _opponentBoughtMinion.PositionId,
                         _opponentBoughtMinion.PlaceMinion);
                 }
+
                 break;
             case ActionType.OpponentBuiltWall:
                 OpponentBuiltWall _opponentBuiltWall = JsonConvert.DeserializeObject<OpponentBuiltWall>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    BuildWall(GetCard(_opponentBuiltWall.CardId ,false), _opponentBuiltWall.Cost, false);
+                    BuildWall(GetCard(_opponentBuiltWall.CardId, false), _opponentBuiltWall.Cost, false);
                 }
                 else
                 {
                     OpponentBuiltWall(_opponentBuiltWall.CardId, _opponentBuiltWall.Cost, _opponentBuiltWall.PositionId);
                 }
+
                 break;
             case ActionType.OpponentUnchainedGuardian:
                 if (_action.IsMine)
@@ -291,6 +305,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentUnchainedGuardian();
                 }
+
                 break;
             case ActionType.OpponentsBlockaderPassive:
                 OpponentsBlockaderPassive _blockaderPassive = JsonConvert.DeserializeObject<OpponentsBlockaderPassive>(_action.JsonData);
@@ -300,8 +315,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentsBlockaderPassive(_blockaderPassive.Status);  
+                    OpponentsBlockaderPassive(_blockaderPassive.Status);
                 }
+
                 break;
             case ActionType.TellOpponentSomething:
                 TellOpponentSomething _tellOpponentSomething = JsonConvert.DeserializeObject<TellOpponentSomething>(_action.JsonData);
@@ -313,6 +329,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentSaidSomething(_tellOpponentSomething.Message);
                 }
+
                 break;
             case ActionType.ChangeOwner:
                 ChangeOwner _changeOwner = JsonConvert.DeserializeObject<ChangeOwner>(_action.JsonData);
@@ -324,6 +341,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentRequestedChangeOfCardOwner(_changeOwner.PlaceId);
                 }
+
                 break;
             case ActionType.MyCardDiedInOpponentPossession:
                 MyCardDiedInOpponentsPossession _cardDiedInMyPossession =
@@ -334,8 +352,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                     OpponentSaidThatTheMyCardInHisPositionDied(_cardDiedInMyPossession.CardId);
+                    OpponentSaidThatTheMyCardInHisPositionDied(_cardDiedInMyPossession.CardId);
                 }
+
                 break;
             case ActionType.OpponentChangedMovement:
                 OpponentChangedMovementForCard _changedMovement = JsonConvert.DeserializeObject<OpponentChangedMovementForCard>(_action.JsonData);
@@ -347,6 +366,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentChangedMovementForCard(_changedMovement.PlaceId, _changedMovement.Status);
                 }
+
                 break;
             case ActionType.OpponentChangedCanFlyToDodge:
                 OpponentChangedCanFlyToDodge _flyToDodge = JsonConvert.DeserializeObject<OpponentChangedCanFlyToDodge>(_action.JsonData);
@@ -356,8 +376,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status,_flyToDodge.IsEffectedCardMy);
+                    OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status, _flyToDodge.IsEffectedCardMy);
                 }
+
                 break;
             case ActionType.OpponentWantsToTryAndDestroyMarkers:
                 OpponentWantsToTryAndDestroyMarkers _opponentWantsToTryAndDestroyMarkers =
@@ -371,6 +392,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentWantsToTryAndDestroyMarkers(_opponentWantsToTryAndDestroyMarkers.JsonData);
                 }
+
                 break;
             case ActionType.OpponentMarkedBomb:
                 OpponentMarkedBomb _opponentMarkedBomb = JsonConvert.DeserializeObject<OpponentMarkedBomb>(_action.JsonData);
@@ -382,6 +404,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentMarkedBomb(_opponentMarkedBomb.PlaceId);
                 }
+
                 break;
             case ActionType.OpponentFinishedReductionAction:
                 if (_action.IsMine)
@@ -392,6 +415,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentFinishedReductionAction();
                 }
+
                 break;
             case ActionType.OpponentSaidThatBombExploded:
                 OpponentSaidThatBombExploded _opponentSaidThatBombExploded =
@@ -404,6 +428,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentSaidThatBombExploded(_opponentSaidThatBombExploded.PlaceId, _opponentSaidThatBombExploded.IncludeCenter);
                 }
+
                 break;
             case ActionType.OpponentUsedSnowUltimate:
                 OpponentUsedSnowUltimate _opponentUsedSnowUltimate = JsonConvert.DeserializeObject<OpponentUsedSnowUltimate>(_action.JsonData);
@@ -415,6 +440,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentUsedSnowUltimate(_opponentUsedSnowUltimate.Status);
                 }
+
                 break;
             case ActionType.OpponentActivatedAbility:
                 OpponentActivatedAbility _opponentActivatedAbility = JsonConvert.DeserializeObject<OpponentActivatedAbility>(_action.JsonData);
@@ -426,6 +452,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentActivatedAbility(_opponentActivatedAbility.CardId, _opponentActivatedAbility.Place);
                 }
+
                 break;
             case ActionType.OpponentBoughtAbilityFromShop:
                 OpponentBoughtAbilityFromShop _opponentBoughtAbilityFromShop =
@@ -438,6 +465,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentBoughtAbilityFromShop(_opponentBoughtAbilityFromShop.AbilityId);
                 }
+
                 break;
             case ActionType.OpponentBoughtAbilityFromHand:
                 OpponentBoughtAbilityFromHand _opponentBoughtAbilityFromHand =
@@ -450,6 +478,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentBoughtAbilityFromHand(_opponentBoughtAbilityFromHand.AbilityId);
                 }
+
                 break;
             case ActionType.OpponentChangedBomberExplode:
                 OpponentChangedBomberExplode _opponentChangedBomberExplode =
@@ -460,8 +489,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentChangedBomberExplode(_opponentChangedBomberExplode.State);  
+                    OpponentChangedBomberExplode(_opponentChangedBomberExplode.State);
                 }
+
                 break;
             case ActionType.OpponentChangedOrgesDamage:
                 OpponentChangedOrgesDamage _opponentChangedOrgesDamage = JsonConvert.DeserializeObject<OpponentChangedOrgesDamage>(_action.JsonData);
@@ -471,8 +501,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentChangedOrgesDamage(_opponentChangedOrgesDamage.Amount);  
+                    OpponentChangedOrgesDamage(_opponentChangedOrgesDamage.Amount);
                 }
+
                 break;
             case ActionType.OpponentReturnedAbilityToPlace:
                 OpponentReturnedAbilityToPlace _opponentReturnedAbilityToPlace =
@@ -485,6 +516,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentReturnedAbilityToPlace(_opponentReturnedAbilityToPlace.AbilityId, _opponentReturnedAbilityToPlace.PlaceId);
                 }
+
                 break;
             case ActionType.OpponentReturnAbilityToHand:
                 OpponentReturnAbilityToHand _opponentReturnAbilityToHand =
@@ -497,6 +529,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentReturnAbilityToHand(_opponentReturnAbilityToHand.AbilityId);
                 }
+
                 break;
             case ActionType.OpponentBoughtStrangeMatter:
                 if (_action.IsMine)
@@ -507,8 +540,9 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentBoughtStrangeMatter();
                 }
+
                 break;
-            case  ActionType.OpponentAskedIfThereIsBombInMarkers:
+            case ActionType.OpponentAskedIfThereIsBombInMarkers:
                 OpponentAskedIfThereIsBombInMarkers _opponentAskedIfThereIsBombInMarkers =
                     JsonConvert.DeserializeObject<OpponentAskedIfThereIsBombInMarkers>(_action.JsonData);
                 if (_action.IsMine)
@@ -520,6 +554,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentAskedIfThereIsBombInMarkers(_opponentAskedIfThereIsBombInMarkers.Data);
                 }
+
                 break;
             case ActionType.OpponentSaidToRemoveStrangeMatter:
                 OpponentSaidToRemoveStrangeMatter _opponentSaidToRemoveStrangeMatter =
@@ -532,19 +567,22 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentSaidToRemoveStrangeMatter(_opponentSaidToRemoveStrangeMatter.Amount);
                 }
+
                 break;
             case ActionType.OpponentToldYouToVetoCardOnField:
-            OpponentToldYouToVetoCardOnField _opponentToldYouToVetoCardOnField =
-                JsonConvert.DeserializeObject<OpponentToldYouToVetoCardOnField>(_action.JsonData);
+                OpponentToldYouToVetoCardOnField _opponentToldYouToVetoCardOnField =
+                    JsonConvert.DeserializeObject<OpponentToldYouToVetoCardOnField>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    AbilityCard _abilityCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _opponentToldYouToVetoCardOnField.CardId);
+                    AbilityCard _abilityCard = FindObjectsOfType<AbilityCard>().ToList()
+                        .Find(_card => _card.Details.Id == _opponentToldYouToVetoCardOnField.CardId);
                     VetoCard(_abilityCard, false);
                 }
                 else
                 {
                     OpponentToldYouToVetoCardOnField(_opponentToldYouToVetoCardOnField.CardId);
                 }
+
                 break;
             case ActionType.OpponentWantsMeToActivateFirstAbilityCasters:
                 if (_action.IsMine)
@@ -555,6 +593,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentWantsMeToActivateFirstAbilityCasters();
                 }
+
                 break;
             case ActionType.TellOpponentThatIPlacedFirstCardForCasters:
                 if (_action.IsMine)
@@ -565,6 +604,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     TellOpponentThatIPlacedFirstCardForCasters();
                 }
+
                 break;
             case ActionType.OpponentSaidFinishCasters:
                 if (_action.IsMine)
@@ -573,8 +613,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                   OpponentSaidFinishCasters(); 
+                    OpponentSaidFinishCasters();
                 }
+
                 break;
             case ActionType.OpponentUpdatedHealth:
                 OpponentUpdatedHealth _opponentUpdatedHealth = JsonConvert.DeserializeObject<OpponentUpdatedHealth>(_action.JsonData);
@@ -584,52 +625,63 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentUpdatedHealth(_opponentUpdatedHealth.CardId,_opponentUpdatedHealth.Status,_opponentUpdatedHealth.Health);
+                    OpponentUpdatedHealth(_opponentUpdatedHealth.CardId, _opponentUpdatedHealth.Status, _opponentUpdatedHealth.Health);
                 }
+
                 break;
             case ActionType.OpponentWantsToDestroyBombWithoutActivatingIt:
-            OpponentWantsToDestroyBombWithoutActivatingIt _opponentWantsToDestroyBombWithoutActivatingIt =
-                JsonConvert.DeserializeObject<OpponentWantsToDestroyBombWithoutActivatingIt>(_action.JsonData);
+                OpponentWantsToDestroyBombWithoutActivatingIt _opponentWantsToDestroyBombWithoutActivatingIt =
+                    JsonConvert.DeserializeObject<OpponentWantsToDestroyBombWithoutActivatingIt>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    DestroyBombWithoutActivatingIt(_opponentWantsToDestroyBombWithoutActivatingIt.CardId, _opponentWantsToDestroyBombWithoutActivatingIt.IsMy, false);
+                    DestroyBombWithoutActivatingIt(_opponentWantsToDestroyBombWithoutActivatingIt.CardId,
+                        _opponentWantsToDestroyBombWithoutActivatingIt.IsMy, false);
                 }
                 else
                 {
-                    OpponentWantsToDestroyBombWithoutActivatingIt(_opponentWantsToDestroyBombWithoutActivatingIt.CardId, _opponentWantsToDestroyBombWithoutActivatingIt.IsMy);
+                    OpponentWantsToDestroyBombWithoutActivatingIt(_opponentWantsToDestroyBombWithoutActivatingIt.CardId,
+                        _opponentWantsToDestroyBombWithoutActivatingIt.IsMy);
                 }
+
                 break;
             case ActionType.OpponentSaidToUseStealth:
                 OpponentSaidToUseStealth _opponentSaidToUseStealth = JsonConvert.DeserializeObject<OpponentSaidToUseStealth>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    TellOpponentToUseStealth(_opponentSaidToUseStealth.CardId,_opponentSaidToUseStealth.StealthFromPlace,_opponentSaidToUseStealth.PlaceMinionsFrom, false);
+                    TellOpponentToUseStealth(_opponentSaidToUseStealth.CardId, _opponentSaidToUseStealth.StealthFromPlace,
+                        _opponentSaidToUseStealth.PlaceMinionsFrom, false);
                 }
                 else
                 {
-                    OpponentSaidToUseStealth(_opponentSaidToUseStealth.CardId,_opponentSaidToUseStealth.StealthFromPlace,_opponentSaidToUseStealth.PlaceMinionsFrom);
+                    OpponentSaidToUseStealth(_opponentSaidToUseStealth.CardId, _opponentSaidToUseStealth.StealthFromPlace,
+                        _opponentSaidToUseStealth.PlaceMinionsFrom);
                 }
+
                 break;
             case ActionType.OpponentSaidToChangeSprite:
                 OpponentSaidToChangeSprite _opponentSaidToChangeSprite = JsonConvert.DeserializeObject<OpponentSaidToChangeSprite>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    ChangeSprite(_opponentSaidToChangeSprite.CardPlace,_opponentSaidToChangeSprite.CardId,_opponentSaidToChangeSprite.SpriteId,_opponentSaidToChangeSprite.ShowPlaceAnimation, false);
+                    ChangeSprite(_opponentSaidToChangeSprite.CardPlace, _opponentSaidToChangeSprite.CardId, _opponentSaidToChangeSprite.SpriteId,
+                        _opponentSaidToChangeSprite.ShowPlaceAnimation, false);
                 }
                 else
                 {
-                    OpponentSaidToChangeSprite(_opponentSaidToChangeSprite.CardPlace,_opponentSaidToChangeSprite.CardId,_opponentSaidToChangeSprite.SpriteId,_opponentSaidToChangeSprite.ShowPlaceAnimation);
+                    OpponentSaidToChangeSprite(_opponentSaidToChangeSprite.CardPlace, _opponentSaidToChangeSprite.CardId,
+                        _opponentSaidToChangeSprite.SpriteId, _opponentSaidToChangeSprite.ShowPlaceAnimation);
                 }
+
                 break;
             case ActionType.OpponentGotResponseAction:
                 if (_action.IsMine)
                 {
-                    RequestResponseAction(IdOfCardWithResponseAction,false);
+                    RequestResponseAction(IdOfCardWithResponseAction, false);
                 }
                 else
                 {
                     OpponentGotResponseAction();
                 }
+
                 break;
             case ActionType.OpponentSaidToPlayAudio:
                 OpponentSaidToPlayAudio _opponentSaidToPlayAudio = JsonConvert.DeserializeObject<OpponentSaidToPlayAudio>(_action.JsonData);
@@ -639,8 +691,9 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    OpponentSaidToPlayAudio(_opponentSaidToPlayAudio.Key,_opponentSaidToPlayAudio.CardId);
+                    OpponentSaidToPlayAudio(_opponentSaidToPlayAudio.Key, _opponentSaidToPlayAudio.CardId);
                 }
+
                 break;
             case ActionType.OpponentUsedHisUltimate:
                 if (_action.IsMine)
@@ -651,6 +704,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentUsedHisUltimate();
                 }
+
                 break;
             case ActionType.OpponentRespondedForBombQuestion:
                 OpponentRespondedForBombQuestion _opponentRespondedForBombQuestion =
@@ -663,6 +717,7 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentRespondedForBombQuestion(_opponentRespondedForBombQuestion.BombPlaces);
                 }
+
                 break;
             case ActionType.OpponentPlacedVetoedCard:
                 OpponentPlacedVetoedCard _opponentPlacedVetoedCard = JsonConvert.DeserializeObject<OpponentPlacedVetoedCard>(_action.JsonData);
@@ -674,9 +729,35 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     OpponentPlacedVetoedCard(_opponentPlacedVetoedCard.CardId);
                 }
+
+                break;
+            case ActionType.SetTaxCard:
+                TaxSelectedCard _taxCard = JsonConvert.DeserializeObject<TaxSelectedCard>(_action.JsonData);
+                if (!_action.IsMine)
+                {
+                    FindObjectOfType<Tax>().SetTaxedCard(_taxCard.CardId);
+                }
+
+                break;
+            case ActionType.ActivatedTaxCard:
+                MyPlayer.StrangeMatter++;
+                break;
+            case ActionType.UseDelivery:
+                UseDelivery _deliveryData = JsonConvert.DeserializeObject<UseDelivery>(_action.JsonData);
+                var _place = TableHandler.GetPlace(_deliveryData.PlaceId);
+                var _deliveryCard = _place.GetCards().Find(_card => (_card as Card).Details.Id == _deliveryData.CardId);
+                (_deliveryCard as Card).CanFlyToDodgeAttack = false;
+                if (_action.IsMine)
+                {
+                    Debug.Log("OOOOOOOOOOOO");
+                }
+                else
+                {
+                    Debug.Log("RRRRRRR");
+                }
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("Type: " + _action.Data.Type);
         }
 
         Card GetCard(int _id, bool _isMy)
@@ -1115,6 +1196,7 @@ public class GameplayManagerPVP : GameplayManager
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
         CardBase _movingCard = null;
+        Debug.Log(JsonConvert.SerializeObject(_action));
         foreach (var _possibleCard in _startingDestination.GetCards())
         {
             Card _card = _possibleCard as Card;
@@ -1204,14 +1286,17 @@ public class GameplayManagerPVP : GameplayManager
 
     private void ExecuteAttack(CardAction _action)
     {
+        Debug.Log("aaaaaaaa");
         if (Truce.IsActive&& _action.CanBeBlocked)
         {
+        Debug.Log("bbbbbbbb");
             GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
             _player.Actions--;
             UIManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
             return;
         }
         
+        Debug.Log("ccccccc");
         TablePlaceHandler _attackingPosition = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _defendingPosition = TableHandler.GetPlace(_action.FinishingPlaceId);
 
@@ -1219,14 +1304,17 @@ public class GameplayManagerPVP : GameplayManager
         List<CardBase> _defendingCards = _defendingPosition.GetCards();
         Card _attackingCard;
         Card _defendingCard;
+        Debug.Log("ddddddd");
         
         try
         {
+        Debug.Log("eeeeeee");
             _attackingCard = _attackingCards.Find(_card=> ((Card)_card).Details.Id== _action.FirstCardId) as Card;
             _defendingCard = _defendingCards.Find(_card=> ((Card)_card).Details.Id== _action.SecondCardId) as Card;
         }
         catch
         {
+        Debug.Log("ffffffff");
             return;
         }
         
@@ -1234,15 +1322,18 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard==null || _defendingCard == null)
         {
+        Debug.Log("gggggggg");
             return;
         }
 
         if (_action.Type == CardActionType.Attack&& _action.CanCounter)
         {
+        Debug.Log("dddddd");
             WallBase.AttackerPlace = _action.StartingPlaceId;
         }
         else
         {
+        Debug.Log("hhhhhhhhh");
             WallBase.AttackerPlace = -1;
         }
 
@@ -1253,10 +1344,12 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard == _defendingCard)
         {
+        Debug.Log("iiiiiiiiii");
             ResolveEndOfAttack();
             return;
         }
 
+        Debug.Log("kkkkkkkkk");
         _attackingCard.transform.DOMove(_defendingCard.transform.position, 0.5f)
             .OnComplete(() =>
             {
@@ -1374,11 +1467,14 @@ public class GameplayManagerPVP : GameplayManager
                 if (!_defendingCard.My)
                 {
                     TellOpponentToUseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
+        Debug.Log("mmmmmmmmmmm");
+                    // OpponentGotResponseAction();
                     return;
                 }
 
                 //get first available place and fly to it, starts from 8 to skip ability spots
                 UseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
+        Debug.Log("rrrrrrrrr");
                 return;
             }
 
@@ -1394,29 +1490,37 @@ public class GameplayManagerPVP : GameplayManager
 
         void CheckForResponseAction()
         {
+            Debug.Log(111111);
             int _idOfDefendingCard = _defendingCard.Details.Id;
-            if(_defendingCard.My == _attackingCard.My)
+            if (_defendingCard.My == _attackingCard.My)
             {
+                Debug.Log(222222);
                 return;
             }
 
+            Debug.Log(333333);
             if (!_defendingCard.IsWarrior())
             {
+                Debug.Log(444444);
                 if (_defendingCard is Wall _defendingWall)
                 {
+                    Debug.Log(555555);
                     TablePlaceHandler _defendingTablePlace = _defendingWall.GetTablePlace();
                     Card _cardOnWall = _defendingTablePlace.GetCardNoWall();
                     if (_cardOnWall == null)
                     {
+                        Debug.Log(66666);
                         return;
                     }
 
-                    if (_cardOnWall.My==_attackingCard.My)
+                    if (_cardOnWall.My == _attackingCard.My)
                     {
+                        Debug.Log(777777);
                         return;
                     }
+
                     _idOfDefendingCard = _cardOnWall.Details.Id;
-                    
+
                     if (_cardOnWall.My)
                     {
                         ForceResponseAction(_idOfDefendingCard);
@@ -1426,41 +1530,50 @@ public class GameplayManagerPVP : GameplayManager
                         OpponentGotResponseAction();
                     }
 
+                    Debug.Log(88888);
                     return;
                 }
 
+                Debug.Log(999999);
                 return;
             }
 
             if (!_action.CanCounter)
             {
+                Debug.Log(111111111111111);
                 return;
             }
 
             if (GameState is not (GameplayState.Playing or GameplayState.Waiting))
             {
+                Debug.Log(222222222222222);
                 return;
             }
 
             if (!(_defendingCard.Stats.Health > 0) || _attackingCard.My == _defendingCard.My)
             {
+                Debug.Log(3333333333333);
                 return;
             }
 
             if ((Ambush.IsActiveForMe && !_defendingCard.My) || (Ambush.IsActiveForOpponent && _defendingCard.My))
             {
+                Debug.Log(4444444444444);
                 UIManager.Instance.ShowOkDialog("Ignore next response action activated!");
                 Ambush.IsActiveForMe = false;
                 Ambush.IsActiveForOpponent = false;
                 return;
             }
 
+            Debug.Log(555555555555);
             if (_defendingCard.My)
             {
+                Debug.Log(6666666666666);
                 ForceResponseAction(_idOfDefendingCard);
             }
             else
             {
+                Debug.Log(7777777777777);
                 OpponentGotResponseAction();
             }
         }
@@ -1884,6 +1997,9 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ForceUpdatePlayerActions(bool _tellRoom = true)
     {
+        Debug.Log("xxxxxxxxxxxxxx");
+        Debug.Log(MyPlayer);
+        Debug.Log(roomHandler);
         ForceUpdateOpponentAction _data = new ForceUpdateOpponentAction { Amount = MyPlayer.Actions };
         roomHandler.AddAction(ActionType.ForceUpdateOpponentAction, JsonConvert.SerializeObject(_data));
     }
@@ -2234,6 +2350,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ForceResponseAction(int _cardId)
     {
+        Debug.Log("-------------- Idk");
         IdOfCardWithResponseAction = _cardId;
         MyPlayer.Actions = 1;
         GameState = GameplayState.AttackResponse;
@@ -2763,13 +2880,8 @@ public class GameplayManagerPVP : GameplayManager
 
     private void PlaceAbilityOnTable(int _cardId, bool _isMy, int _placeId)
     {
-        Debug.Log("Card id: "+_cardId);
-        Debug.Log("Place id: "+_placeId);
         AbilityCard _ability = Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _cardId);
-        Debug.Log("Ability: "+_ability);
         TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
-        Debug.Log("Place: "+_tablePlace);
-        Debug.Log("----------------");
         _ability.PositionOnTable(_tablePlace);
     }
 
@@ -3217,6 +3329,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentGotResponseAction()
     {
+        Debug.Log("---------------- Omg");
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
         GameState = GameplayState.WaitingForAttackResponse;
@@ -3498,5 +3611,17 @@ public class GameplayManagerPVP : GameplayManager
         };
         ExecuteCardAction(_actionMove);
         return true;
+    }
+
+    public override void SetTaxCard(int _id)
+    {
+        Debug.Log("--- Setting tax: "+_id);
+        TaxSelectedCard _taxDetails = new TaxSelectedCard { CardId =  _id};
+        FirebaseManager.Instance.RoomHandler.AddAction(ActionType.SetTaxCard, JsonConvert.SerializeObject(_taxDetails));
+    }
+
+    public override void ActivatedTaxedCard()
+    {
+        FirebaseManager.Instance.RoomHandler.AddAction(ActionType.ActivatedTaxCard, string.Empty);
     }
 }

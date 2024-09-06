@@ -17,4 +17,24 @@ public class CardAction
     public bool GiveLoot = false;
     public bool CanBeBlocked = true;
     [FormerlySerializedAs("AllowExplosion")] public bool AllowCardEffectOnDeath = true;
+    
+    public bool CompareTo(CardAction _other)
+    {
+        if (_other == null)
+            return false;
+
+        return StartingPlaceId == _other.StartingPlaceId &&
+               FirstCardId == _other.FirstCardId &&
+               FinishingPlaceId == _other.FinishingPlaceId &&
+               SecondCardId == _other.SecondCardId &&
+               Type == _other.Type &&
+               Cost == _other.Cost &&
+               IsMy == _other.IsMy &&
+               CanTransferLoot == _other.CanTransferLoot &&
+               Damage == _other.Damage &&
+               CanCounter == _other.CanCounter &&
+               GiveLoot == _other.GiveLoot &&
+               CanBeBlocked == _other.CanBeBlocked &&
+               AllowCardEffectOnDeath == _other.AllowCardEffectOnDeath;
+    }
 }
