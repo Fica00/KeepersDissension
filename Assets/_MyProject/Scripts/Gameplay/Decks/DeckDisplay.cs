@@ -27,6 +27,10 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
 
     private void OnDisable()
     {
+        if (player==null)
+        {
+            return;
+        }
         player.UpdatedDeck -= ShowFirstCard;
         GameplayManager.FinishedSetup -= ShowFirstCard;
     }
@@ -42,6 +46,10 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
 
     private void ShowFirstCard()
     {
+        if (player==null)
+        {
+            return;
+        }
         Card _card = player.PeakNextCard(type);
         display.sprite = _card==null ? player.FactionSO.CardBackground : _card.Details.Foreground;
     }

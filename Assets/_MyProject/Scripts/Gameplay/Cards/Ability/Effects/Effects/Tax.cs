@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class Tax : AbilityEffect
 {
-    private CardBase selectedCard;
+    public static bool IsActiveForMe;
+    public static CardBase SelectedCard;
     
     public override void ActivateForOwner()
     {
+        IsActiveForMe = true;
         List<CardBase> _cards = new();
         GameplayState _state = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
@@ -40,44 +41,39 @@ public class Tax : AbilityEffect
 
         void SetAsTax(CardBase _selectedCard)
         {
-            Debug.Log(_selectedCard,_selectedCard.gameObject);
-            selectedCard = _selectedCard;
+            SelectedCard = _selectedCard;
             RemoveAction();
             OnActivated?.Invoke();
-            GameplayManager.OnActivatedAbility += CheckAbility;
             GameplayManager.Instance.GameState = _state;
+            GameplayManager.Instance.SetTaxCard((_selectedCard as AbilityCard).Details.Id);
         }
         
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
+    public void SetTaxedCard(int _cardId)
+    {
+        SelectedCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _cardId);
+    }
+
     public override void ActivateForOther()
     {
+        IsActiveForMe = false;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
-    private void CheckAbility(CardBase _playedAbility)
+    private void OnDisable()
     {
-        if (_playedAbility==selectedCard)
-        {
-            if (GameplayManager.Instance.OpponentPlayer.StrangeMatter<=0)
-            {
-                return;
-            }
-            GameplayManager.Instance.MyPlayer.StrangeMatter++;
-            GameplayManager.Instance.TellOpponentToRemoveStrangeMatter(1);
-        }
+        CancelEffect();
     }
 
     public override void CancelEffect()
     {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        if (selectedCard==null)
+        if (SelectedCard== null)
         {
             return;
         }
-
-        selectedCard = null;
-        GameplayManager.OnActivatedAbility -= CheckAbility;
+        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SelectedCard = null;
     }
 }

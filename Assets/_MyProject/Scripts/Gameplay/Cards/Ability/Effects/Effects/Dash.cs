@@ -41,7 +41,6 @@ public class Dash : AbilityEffect
             return;
         }
 
-        Debug.Log(111);
         applied = false;
         AddSpeed();
     }

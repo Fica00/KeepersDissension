@@ -52,6 +52,7 @@ public class AbilityCard : CardBase
         {
             return;
         }
+        
         TryActivateCard();
     }
 
@@ -86,6 +87,20 @@ public class AbilityCard : CardBase
         UIManager.Instance.ShowYesNoDialog("Are you sure that you want to activate this ability?",YesActivate);
         void YesActivate()
         {
+            if (Tax.SelectedCard!=null)
+            {
+                if (Tax.SelectedCard==this && !Tax.IsActiveForMe)
+                {
+                    if (GameplayManager.Instance.MyPlayer.StrangeMatter<=0)
+                    {
+                        UIManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
+                        return;
+                    }
+
+                    GameplayManager.Instance.MyPlayer.StrangeMatter--;
+                    GameplayManager.Instance.ActivatedTaxedCard();
+                }
+            }
             GameplayManager.Instance.ActivateAbility(Details.Id);
         }
     }

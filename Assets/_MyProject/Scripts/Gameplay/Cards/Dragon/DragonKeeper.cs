@@ -48,7 +48,12 @@ public class DragonKeeper : CardSpecialAbility
                 return;
             }
 
-            ChooseCardPanel.Instance.ShowCards(_availableCards.Cast<CardBase>().ToList(),SaveMinion,true);
+            List<CardBase> _cards = new List<CardBase>();
+            foreach (var _availableCard in _availableCards)
+            {
+                _cards.Add(_availableCard);
+            }
+            ChooseCardPanel.Instance.ShowCards(_cards,SaveMinion,true);
             
             void SaveMinion(CardBase _card)
             {

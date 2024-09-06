@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class Veto : AbilityEffect
 {
@@ -41,8 +40,13 @@ public class Veto : AbilityEffect
         
         GameplayState _state = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        List<CardBase> _cards = new List<CardBase>();
+        foreach (var _availableCard in _availableCards)
+        {
+            _cards.Add(_availableCard);
+        }
         
-        ChooseCardPanel.Instance.ShowCards(_availableCards.Cast<CardBase>().ToList(),VetoCard,_hideCards:_optionId==0);
+        ChooseCardPanel.Instance.ShowCards(_cards,VetoCard,_hideCards:_optionId==0);
         
         void VetoCard(CardBase _card)
         {

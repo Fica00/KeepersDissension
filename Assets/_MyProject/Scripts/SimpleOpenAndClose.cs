@@ -24,12 +24,13 @@ public class SimpleOpenAndClose : MonoBehaviour
 
     private void OpenObject()
     {
-        if (GameplayManager.Instance.IsSettingUpTable)
-        {
-            return;
-        }
         object1.transform.localScale = Vector3.zero;
         object2.transform.localScale = Vector3.one;
+        var _actions = object2.GetComponent<ElipsisActionsController>();
+        if (_actions)
+        {
+            _actions.Setup();
+        }
     }
 
     public void CloseObject()

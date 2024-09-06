@@ -107,11 +107,20 @@ namespace FirebaseMultiplayer.Room
             {
                 return;
             }
+            
+            if (roomData==null)
+            {
+                return;
+            }
 
             RoomData _newData = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
             if (_newData == null)
             {
-                Debug.Log(12333);
+                return;
+            }
+
+            if (_newData.RoomPlayers == null)
+            {
                 return;
             }
 

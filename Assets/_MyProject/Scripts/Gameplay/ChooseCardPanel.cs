@@ -15,6 +15,7 @@ public class ChooseCardPanel : MonoBehaviour
     private Vector3 sizeOfCards = new Vector3(2, 2, 1);
     private List<CardBase> shownCards = new ();
     private Action<CardBase> callBack;
+    private Dictionary<CardBase, TablePlaceHandler> cardsDict = new();
 
     private void Awake()
     {
@@ -24,6 +25,7 @@ public class ChooseCardPanel : MonoBehaviour
     public void ShowCards(List<CardBase> _cardBase, Action<CardBase> _callBack,bool _enableCancel = false, bool 
     _hideCards=false)
     {
+        cardsDict = new();
         cancelButton.gameObject.SetActive(false);
         callBack = _callBack;
         if (_cardBase==null || _cardBase.Count == 0)
@@ -34,8 +36,9 @@ public class ChooseCardPanel : MonoBehaviour
         
         foreach (var _card in _cardBase)
         {
+            cardsDict.Add(_card, _card.GetTablePlace());
             _card.transform.SetParent(cardsHolder);
-            _card.PositionInHand();
+            _card.RotateCard();
             _card.transform.localScale = sizeOfCards;
             _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
             shownCards.Add(_card);
@@ -76,25 +79,25 @@ public class ChooseCardPanel : MonoBehaviour
 
     private void ClearShownCards()
     {
-        Debug.Log("1111");
-        foreach (var _shownCard in shownCards)
+        foreach (CardBase _shownCard in shownCards)
         {
-            Debug.Log(_shownCard.name,_shownCard.gameObject);
             _shownCard.Display.UnHide();
             CardHandInteractions _cardHandler = _shownCard.GetComponent<CardHandInteractions>();
-            if (_cardHandler!=null)
+            if (_cardHandler != null)
             {
                 Destroy(_cardHandler);
             }
-            
+
             if (!(_shownCard.CardPlace == CardPlace.Hand || _shownCard.CardPlace == CardPlace.Graveyard))
             {
+                var _place = cardsDict[_shownCard];
+                GameplayManager.Instance.PlaceAbilityOnTable((_shownCard as AbilityCard).Details.Id,_place.Id,false);
                 continue;
             }
 
             _shownCard.ReturnFromHand();
         }
-        
+
         shownCards.Clear();
     }
 }

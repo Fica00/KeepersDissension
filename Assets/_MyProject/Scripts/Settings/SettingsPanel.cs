@@ -12,6 +12,7 @@ public class SettingsPanel : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Button logoutButton;
     [SerializeField] private Button showProfile;
+    [SerializeField] private Button deleteAccount;
     [SerializeField] private PlayerSettings playerSettings;
 
     private void OnEnable()
@@ -19,6 +20,7 @@ public class SettingsPanel : MonoBehaviour
         closeButton.onClick.AddListener(Close);
         logoutButton.onClick.AddListener(Logout);
         showProfile.onClick.AddListener(ShowProfile);
+        deleteAccount.onClick.AddListener(DeleteAccount);
         
         logoutButton.gameObject.SetActive(!SceneManager.IsGameplayScene);
     }
@@ -28,6 +30,7 @@ public class SettingsPanel : MonoBehaviour
         closeButton.onClick.RemoveListener(Close);
         logoutButton.onClick.RemoveListener(Logout);
         showProfile.onClick.RemoveListener(ShowProfile);
+        deleteAccount.onClick.RemoveListener(DeleteAccount);
     }
 
     private void ShowProfile()
@@ -45,6 +48,29 @@ public class SettingsPanel : MonoBehaviour
     {
         OnOpened?.Invoke();
         gameObject.SetActive(true);
+    }
+
+    private void DeleteAccount()
+    {
+        FirebaseManager.Instance.DeleteUserDataAndAccount(HandleAccountDeleted);
+    }
+
+    private void HandleAccountDeleted(bool _result)
+    {
+        if (!_result)
+        {
+            UIManager.Instance.ShowOkDialog("Something went wrong please try again later");
+            return;
+        }
+        
+        UIManager.Instance.ShowOkDialog("Account successfully deleted", CloseGameAfterAccountDeletion);
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
+
+    private void CloseGameAfterAccountDeletion()
+    {
+        Application.Quit();
     }
 
     private void Logout()

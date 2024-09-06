@@ -9806,6 +9806,7 @@ MonoBehaviour:
     CanCounter: 1
     GiveLoot: 0
     CanBeBlocked: 1
+    AllowCardEffectOnDeath: 1
   GameState: 0
   healthTracker: {fileID: 1497496152}
   LootChanges: 0000000000000000
@@ -30983,6 +30984,7 @@ GameObject:
   - component: {fileID: 2043192627}
   - component: {fileID: 2043192629}
   - component: {fileID: 2043192628}
+  - component: {fileID: 2043192630}
   m_Layer: 5
   m_Name: Actions
   m_TagString: Untagged
@@ -31053,6 +31055,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2043192626}
   m_CullTransparentMesh: 1
+--- !u!114 &2043192630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043192626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b950de1fd8ce749af005f09c09b5ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  endTurn: {fileID: 1076157141}
 --- !u!1 &2054172651
 GameObject:
   m_ObjectHideFlags: 0
@@ -35820,7 +35835,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9234311
+      value: -9340882
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}

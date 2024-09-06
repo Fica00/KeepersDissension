@@ -71,19 +71,19 @@ public class FirebaseManager : MonoBehaviour
 
             string _result = _task.Result.GetRawJsonValue();
             DataManager.Instance.SetPlayerData(_result);
-            if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.DeviceId))
-            {
-                DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
-            }
-            else if (DataManager.Instance.PlayerData.DeviceId != SystemInfo.deviceUniqueIdentifier)
-            {
-                UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
-                Authentication.SignOut();
-                PlayerPrefs.DeleteAll();
-                PlayerPrefs.Save();
-                _callBack?.Invoke(false);
-                return;
-            }
+            // if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.DeviceId))
+            // {
+            //     DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
+            // }
+            // else if (DataManager.Instance.PlayerData.DeviceId != SystemInfo.deviceUniqueIdentifier)
+            // {
+            //     UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
+            //     Authentication.SignOut();
+            //     PlayerPrefs.DeleteAll();
+            //     PlayerPrefs.Save();
+            //     _callBack?.Invoke(false);
+            //     return;
+            // }
 
             CollectGameData(_callBack);
         });
@@ -161,5 +161,25 @@ public class FirebaseManager : MonoBehaviour
                 _callBack?.Invoke(null);
             }
         });
+    }
+    
+    public void DeleteUserDataAndAccount(Action<bool> _callBack)
+    {
+        database.Child(USERS_KEY).Child(Authentication.UserId).RemoveValueAsync().ContinueWithOnMainThread(_task =>
+        {
+            if (_task.IsCompleted)
+            {
+                DeleteUserAccount(_callBack);
+            }
+            else
+            {
+                _callBack?.Invoke(false);
+            }
+        });
+    }
+
+    private void DeleteUserAccount(Action<bool> _callBack)
+    {
+        Authentication.FirebaseUser.DeleteAsync().ContinueWithOnMainThread(_task => { _callBack?.Invoke(_task.IsCompleted); });
     }
 }
