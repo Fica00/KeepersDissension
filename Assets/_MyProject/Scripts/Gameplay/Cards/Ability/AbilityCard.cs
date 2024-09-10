@@ -99,6 +99,7 @@ public class AbilityCard : CardBase
 
                     GameplayManager.Instance.MyPlayer.StrangeMatter--;
                     GameplayManager.Instance.ActivatedTaxedCard();
+                    GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
                 }
             }
             GameplayManager.Instance.ActivateAbility(Details.Id);

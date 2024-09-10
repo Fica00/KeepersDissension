@@ -59,6 +59,7 @@ namespace GameplayActions
         OpponentPlacedVetoedCard=51,
         UseDelivery=52,
         SetTaxCard=53,
-        ActivatedTaxCard=54
+        ActivatedTaxCard=54,
+        ForceSetOpponentStrangeMatter=55
     }
 }

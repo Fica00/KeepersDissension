@@ -756,6 +756,12 @@ public class GameplayManagerPVP : GameplayManager
                     Debug.Log("RRRRRRR");
                 }
                 break;
+                case ActionType.ForceSetOpponentStrangeMatter:
+                ForceSetOpponentStrangeMatter _forceSetOpponentStrange =
+                    JsonConvert.DeserializeObject<ForceSetOpponentStrangeMatter>(_action.JsonData);
+                OpponentPlayer.StrangeMatter = _forceSetOpponentStrange.Amount;
+                Debug.Log("Setting opponents strange matter: "+OpponentPlayer.StrangeMatter);
+                break;
             default:
                 throw new ArgumentOutOfRangeException("Type: " + _action.Data.Type);
         }
@@ -1196,7 +1202,6 @@ public class GameplayManagerPVP : GameplayManager
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
         CardBase _movingCard = null;
-        Debug.Log(JsonConvert.SerializeObject(_action));
         foreach (var _possibleCard in _startingDestination.GetCards())
         {
             Card _card = _possibleCard as Card;
@@ -1217,6 +1222,11 @@ public class GameplayManagerPVP : GameplayManager
         }
         
         GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
+
+        if (_action.ResetSpeed)
+        {
+            (_movingCard as Card).Speed = 0;
+        }
 
         if (_destination.ContainsMarker)
         {
@@ -1286,17 +1296,14 @@ public class GameplayManagerPVP : GameplayManager
 
     private void ExecuteAttack(CardAction _action)
     {
-        Debug.Log("aaaaaaaa");
         if (Truce.IsActive&& _action.CanBeBlocked)
         {
-        Debug.Log("bbbbbbbb");
             GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
             _player.Actions--;
             UIManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
             return;
         }
         
-        Debug.Log("ccccccc");
         TablePlaceHandler _attackingPosition = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _defendingPosition = TableHandler.GetPlace(_action.FinishingPlaceId);
 
@@ -1304,17 +1311,14 @@ public class GameplayManagerPVP : GameplayManager
         List<CardBase> _defendingCards = _defendingPosition.GetCards();
         Card _attackingCard;
         Card _defendingCard;
-        Debug.Log("ddddddd");
         
         try
         {
-        Debug.Log("eeeeeee");
             _attackingCard = _attackingCards.Find(_card=> ((Card)_card).Details.Id== _action.FirstCardId) as Card;
             _defendingCard = _defendingCards.Find(_card=> ((Card)_card).Details.Id== _action.SecondCardId) as Card;
         }
         catch
         {
-        Debug.Log("ffffffff");
             return;
         }
         
@@ -1322,18 +1326,15 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard==null || _defendingCard == null)
         {
-        Debug.Log("gggggggg");
             return;
         }
 
         if (_action.Type == CardActionType.Attack&& _action.CanCounter)
         {
-        Debug.Log("dddddd");
             WallBase.AttackerPlace = _action.StartingPlaceId;
         }
         else
         {
-        Debug.Log("hhhhhhhhh");
             WallBase.AttackerPlace = -1;
         }
 
@@ -1344,12 +1345,10 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard == _defendingCard)
         {
-        Debug.Log("iiiiiiiiii");
             ResolveEndOfAttack();
             return;
         }
 
-        Debug.Log("kkkkkkkkk");
         _attackingCard.transform.DOMove(_defendingCard.transform.position, 0.5f)
             .OnComplete(() =>
             {
@@ -1467,14 +1466,12 @@ public class GameplayManagerPVP : GameplayManager
                 if (!_defendingCard.My)
                 {
                     TellOpponentToUseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
-        Debug.Log("mmmmmmmmmmm");
                     // OpponentGotResponseAction();
                     return;
                 }
 
                 //get first available place and fly to it, starts from 8 to skip ability spots
                 UseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
-        Debug.Log("rrrrrrrrr");
                 return;
             }
 
@@ -1490,32 +1487,25 @@ public class GameplayManagerPVP : GameplayManager
 
         void CheckForResponseAction()
         {
-            Debug.Log(111111);
             int _idOfDefendingCard = _defendingCard.Details.Id;
             if (_defendingCard.My == _attackingCard.My)
             {
-                Debug.Log(222222);
                 return;
             }
 
-            Debug.Log(333333);
             if (!_defendingCard.IsWarrior())
             {
-                Debug.Log(444444);
                 if (_defendingCard is Wall _defendingWall)
                 {
-                    Debug.Log(555555);
                     TablePlaceHandler _defendingTablePlace = _defendingWall.GetTablePlace();
                     Card _cardOnWall = _defendingTablePlace.GetCardNoWall();
                     if (_cardOnWall == null)
                     {
-                        Debug.Log(66666);
                         return;
                     }
 
                     if (_cardOnWall.My == _attackingCard.My)
                     {
-                        Debug.Log(777777);
                         return;
                     }
 
@@ -1530,50 +1520,41 @@ public class GameplayManagerPVP : GameplayManager
                         OpponentGotResponseAction();
                     }
 
-                    Debug.Log(88888);
                     return;
                 }
 
-                Debug.Log(999999);
                 return;
             }
 
             if (!_action.CanCounter)
             {
-                Debug.Log(111111111111111);
                 return;
             }
 
             if (GameState is not (GameplayState.Playing or GameplayState.Waiting))
             {
-                Debug.Log(222222222222222);
                 return;
             }
 
             if (!(_defendingCard.Stats.Health > 0) || _attackingCard.My == _defendingCard.My)
             {
-                Debug.Log(3333333333333);
                 return;
             }
 
             if ((Ambush.IsActiveForMe && !_defendingCard.My) || (Ambush.IsActiveForOpponent && _defendingCard.My))
             {
-                Debug.Log(4444444444444);
                 UIManager.Instance.ShowOkDialog("Ignore next response action activated!");
                 Ambush.IsActiveForMe = false;
                 Ambush.IsActiveForOpponent = false;
                 return;
             }
 
-            Debug.Log(555555555555);
             if (_defendingCard.My)
             {
-                Debug.Log(6666666666666);
                 ForceResponseAction(_idOfDefendingCard);
             }
             else
             {
-                Debug.Log(7777777777777);
                 OpponentGotResponseAction();
             }
         }
@@ -1997,9 +1978,6 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ForceUpdatePlayerActions(bool _tellRoom = true)
     {
-        Debug.Log("xxxxxxxxxxxxxx");
-        Debug.Log(MyPlayer);
-        Debug.Log(roomHandler);
         ForceUpdateOpponentAction _data = new ForceUpdateOpponentAction { Amount = MyPlayer.Actions };
         roomHandler.AddAction(ActionType.ForceUpdateOpponentAction, JsonConvert.SerializeObject(_data));
     }
@@ -2710,7 +2688,6 @@ public class GameplayManagerPVP : GameplayManager
         if (_placeInFrontOfPushedCard.GetCard() == null)
         {
             CardBase _pushedCardBase = _pushedCardPlace.GetCard();
-            
             CardAction _moveCardInFront = new CardAction
             {
                 FirstCardId = ((Card)_pushedCardBase).Details.Id,
@@ -2722,6 +2699,7 @@ public class GameplayManagerPVP : GameplayManager
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false,
+                ResetSpeed = true
             };
 
             ExecuteCardAction(_moveCardInFront);
@@ -2797,6 +2775,7 @@ public class GameplayManagerPVP : GameplayManager
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false,
+                ResetSpeed = true
             };
 
             ExecuteCardAction(_moveCardInFront);
@@ -3329,7 +3308,6 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentGotResponseAction()
     {
-        Debug.Log("---------------- Omg");
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
         GameState = GameplayState.WaitingForAttackResponse;
@@ -3623,5 +3601,11 @@ public class GameplayManagerPVP : GameplayManager
     public override void ActivatedTaxedCard()
     {
         FirebaseManager.Instance.RoomHandler.AddAction(ActionType.ActivatedTaxCard, string.Empty);
+    }
+
+    public override void TellOpponentToUpdateMyStrangeMatter()
+    {
+        ForceSetOpponentStrangeMatter _data = new ForceSetOpponentStrangeMatter { Amount = MyPlayer.StrangeMatter };
+        roomHandler.AddAction(ActionType.ForceSetOpponentStrangeMatter,JsonConvert.SerializeObject(_data));
     }
 }

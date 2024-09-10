@@ -53,6 +53,7 @@ public class FirebaseManager : MonoBehaviour
 
     public void CollectData(Action<bool> _callBack)
     {
+        Debug.Log(Authentication.UserId);
         CollectPlayerData(_callBack);
     }
 

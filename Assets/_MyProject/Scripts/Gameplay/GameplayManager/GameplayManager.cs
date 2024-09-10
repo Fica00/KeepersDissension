@@ -797,4 +797,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void TellOpponentToUpdateMyStrangeMatter()
+    {
+        throw new Exception();
+    }
 }

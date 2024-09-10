@@ -716,6 +716,11 @@ public class TableActionsHandler : MonoBehaviour
                         continue;
                     }
 
+                    if (_placeInRange.GetCard().My)
+                    {
+                        continue;
+                    }
+
                     UIManager.Instance.ShowOkDialog("This card can't move due Hinder effect");
                     return;
                 }
