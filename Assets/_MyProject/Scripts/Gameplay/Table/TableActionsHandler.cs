@@ -305,7 +305,6 @@ public class TableActionsHandler : MonoBehaviour
 
         _processedPlaces.Add(_currentPlace);
 
-        // Get all places within the card's immediate surrounding
         List<TablePlaceHandler> _neighborPlaces = tableHandler.GetPlacesAround(_currentPlace.Id, _warriorCard.MovementType, 1);
 
         foreach (var _placeAround in _neighborPlaces)
@@ -325,7 +324,6 @@ public class TableActionsHandler : MonoBehaviour
                 }
             }
 
-            // Check if this move is possible based on remaining speed
             int _movementCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
             if (_remainingSpeed >= _movementCost && !_skip)
             {
@@ -336,8 +334,30 @@ public class TableActionsHandler : MonoBehaviour
 
                 _placeAround.SetColor(Color.blue);
 
-                // Recurse to process further movement from this place
                 ProcessMovement(_placeAround, _warriorCard, _remainingSpeed - _movementCost, _processedPlaces);
+            }
+
+            if (_skip)
+            {
+                AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+            }
+        }
+    }
+    
+    private void AddLeapfrogMovement(TablePlaceHandler _currentPlace, TablePlaceHandler _placeAround, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
+    {
+        foreach (var _special in _warriorCard.SpecialAbilities)
+        {
+            if (_special is ScalerLeapfrog)
+            {
+                Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
+                AddCardInFront(_warriorCard, _cordsInFront, 1, tableHandler.GetDirection(_currentPlace.Id, _placeAround.Id), _dontAddIfItIsAWall: true, _addIfOccupied: false);
+                //
+                // TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
+                // if (_placeInFront != null && !_placeInFront.IsOccupied)
+                // {
+                //     ProcessMovement(_placeInFront, _warriorCard, _remainingSpeed - 1, _processedPlaces);
+                // }
             }
         }
     }

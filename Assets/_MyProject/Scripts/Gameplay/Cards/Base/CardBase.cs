@@ -40,6 +40,7 @@ public class CardBase : MonoBehaviour
     }
 
     public List<CardSpecialAbility> SpecialAbilities => EffectsHolder.GetComponents<CardSpecialAbility>().ToList();
+    public List<AbilityEffect> SpecialEffects => EffectsHolder.GetComponents<AbilityEffect>().ToList();
     [HideInInspector] public List<EffectBase> Effects = new();
     public bool My=>IsMy;
 

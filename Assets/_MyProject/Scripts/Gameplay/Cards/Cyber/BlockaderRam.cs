@@ -48,7 +48,13 @@ public class BlockaderRam : CardSpecialAbility
                 var _card = GameplayManager.Instance.TableHandler.GetPlace(_placeIdOfSecondCard).GetCard();
                 var _direction = GameplayManager.Instance.TableHandler.GetFrontIndex(_placeIdOfFirstCard, _placeIdOfSecondCard);
                 var _place = GameplayManager.Instance.TableHandler.GetPlace(_direction);
-                _portal.CheckCard(_card, _placeIdOfSecondCard, _place.Id);
+                _portal.CheckCard(_card, _placeIdOfSecondCard, _place.Id, _didPush =>
+                {
+                    if (_didPush)
+                    {
+                        StartCoroutine(MoveSelfRoutine());
+                    }
+                });
                 GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
                 return;
             }
