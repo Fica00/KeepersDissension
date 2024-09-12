@@ -32,6 +32,10 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
 
     public void OnPointerClick(PointerEventData _eventData)
     {
+        if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
+        {
+            return;
+        }
         OnCardClicked?.Invoke(cardBase);
     }
 

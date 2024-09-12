@@ -1,4 +1,5 @@
 using System.Linq;
+using UnityEngine;
 
 public class Snipe : AbilityEffect
 {
@@ -56,6 +57,13 @@ public class Snipe : AbilityEffect
 
             TablePlaceHandler _place = GameplayManager.Instance.TableHandler.GetPlace(_placeId);
             if (!_place.IsOccupied)
+            {
+                Finish();
+                return;
+            }
+
+            Card _card = _place.GetCard();
+            if (_card is Wall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(keeper.GetTablePlace(),_place)>1)
             {
                 Finish();
                 return;

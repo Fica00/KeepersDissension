@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Linq;
 using FirebaseMultiplayer.Room;
 using GameplayActions;
+using Unity.VisualScripting;
 
 public class GameplayManagerPVP : GameplayManager
 {
@@ -372,11 +373,11 @@ public class GameplayManagerPVP : GameplayManager
                 OpponentChangedCanFlyToDodge _flyToDodge = JsonConvert.DeserializeObject<OpponentChangedCanFlyToDodge>(_action.JsonData);
                 if (_action.IsMine)
                 {
-                    ChangeCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status, _flyToDodge.IsEffectedCardMy, false);
+                    HandleChangeCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status, _flyToDodge.IsEffectedCardMy);
                 }
                 else
                 {
-                    OpponentChangedCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status, _flyToDodge.IsEffectedCardMy);
+                    HandleChangeCanFlyToDodge(_flyToDodge.CardId, _flyToDodge.Status, !_flyToDodge.IsEffectedCardMy);
                 }
 
                 break;
@@ -742,25 +743,25 @@ public class GameplayManagerPVP : GameplayManager
             case ActionType.ActivatedTaxCard:
                 MyPlayer.StrangeMatter++;
                 break;
-            case ActionType.UseDelivery:
-                UseDelivery _deliveryData = JsonConvert.DeserializeObject<UseDelivery>(_action.JsonData);
-                var _place = TableHandler.GetPlace(_deliveryData.PlaceId);
-                var _deliveryCard = _place.GetCards().Find(_card => (_card as Card).Details.Id == _deliveryData.CardId);
-                (_deliveryCard as Card).CanFlyToDodgeAttack = false;
+            case ActionType.ForceSetOpponentStrangeMatter:
                 if (_action.IsMine)
                 {
-                    Debug.Log("OOOOOOOOOOOO");
+                    return;
                 }
-                else
-                {
-                    Debug.Log("RRRRRRR");
-                }
-                break;
-                case ActionType.ForceSetOpponentStrangeMatter:
                 ForceSetOpponentStrangeMatter _forceSetOpponentStrange =
                     JsonConvert.DeserializeObject<ForceSetOpponentStrangeMatter>(_action.JsonData);
                 OpponentPlayer.StrangeMatter = _forceSetOpponentStrange.Amount;
-                Debug.Log("Setting opponents strange matter: "+OpponentPlayer.StrangeMatter);
+                Debug.Log("Setting opponents strange matter: " + OpponentPlayer.StrangeMatter);
+                break;
+            case ActionType.TellOpponentToGetResponseAction:
+                if (_action.IsMine)
+                {
+                    return;
+                }
+
+                TellOpponentToGetResponseAction _tellOpponentToGetResponse =
+                    JsonConvert.DeserializeObject<TellOpponentToGetResponseAction>(_action.JsonData);
+                ForceResponseAction(_tellOpponentToGetResponse.CardId);
                 break;
             default:
                 throw new ArgumentOutOfRangeException("Type: " + _action.Data.Type);
@@ -1463,14 +1464,26 @@ public class GameplayManagerPVP : GameplayManager
             {
                 _defendingCard.CanFlyToDodgeAttack = false;
                 _attackingPlayer.Actions -= _action.Cost;
-                if (!_defendingCard.My)
+                if (_attackingCard.My != _defendingCard.My)
                 {
-                    TellOpponentToUseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
-                    // OpponentGotResponseAction();
-                    return;
+                    if (_defendingCard.My && !_attackingCard.My)
+                    {
+                        ForceResponseAction(_defendingCard.Details.Id);
+                    }
+                    else if(!_defendingCard.My && _attackingCard.My)
+                    {
+                        OpponentGotResponseAction();
+                        return;
+                    }
                 }
-
-                //get first available place and fly to it, starts from 8 to skip ability spots
+                else
+                {
+                    if (!_defendingCard.My)
+                    {
+                        return;
+                    }
+                }
+                
                 UseDelivery(_defendingCard.Details.Id,_defendingCard.GetTablePlace().Id);
                 return;
             }
@@ -1724,10 +1737,10 @@ public class GameplayManagerPVP : GameplayManager
         }
     }
 
-    private void TellOpponentToUseDelivery(int _cardId, int _startingPlace)
+    private void TellOpponentToGetResponseAction(int _cardId)
     {
-        UseDelivery _delivery = new UseDelivery { CardId = _cardId, PlaceId = _startingPlace };
-        roomHandler.AddAction(ActionType.UseDelivery, JsonConvert.SerializeObject(_delivery));
+        TellOpponentToGetResponseAction _data = new TellOpponentToGetResponseAction { CardId = _cardId };
+        roomHandler.AddAction(ActionType.TellOpponentToGetResponseAction, JsonConvert.SerializeObject(_data));
     }
 
     private void ExecuteMoveAbility(CardAction _action)
@@ -2125,11 +2138,7 @@ public class GameplayManagerPVP : GameplayManager
         bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack, bool _ignoreMarkers = true, bool _ignoreWalls = false)
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
-        StartCoroutine(SelectPlaceForSpecialAbilityRoutine());
-
-        IEnumerator SelectPlaceForSpecialAbilityRoutine()
-        {
-            List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition, _movementType, _range, _includeSelf);
+        List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition, _movementType, _range, _includeSelf);
             foreach (var _availablePlace in _availablePlaces.ToList())
             {
                 bool _isOccupied = _availablePlace.IsOccupied;
@@ -2183,49 +2192,53 @@ public class GameplayManagerPVP : GameplayManager
                 }
             }
 
-            foreach (var _availablePlace in _availablePlaces.ToList())
+            StartCoroutine(SelectPlace(_availablePlaces, _ignoreWalls, _callBack));
+    }
+
+    private IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack)
+    {
+        foreach (var _availablePlace in _availablePlaces.ToList())
+        {
+            if (_availablePlace.ContainsWall && _ignoreWalls)
             {
-                if (_availablePlace.ContainsWall && _ignoreWalls)
-                {
-                    _availablePlaces.Remove(_availablePlace);
-                }
+                _availablePlaces.Remove(_availablePlace);
+            }
+        }
+
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            _availablePlace.SetColor(Color.green);
+        }
+
+        if (_availablePlaces.Count == 0)
+        {
+            _callBack?.Invoke(-1);
+            yield break;
+        }
+
+        CardTableInteractions.OnPlaceClicked += SelectPlace;
+        bool _hasSelectedPlace = false;
+        int _selectedPlaceId = 0;
+
+        yield return new WaitUntil(() => _hasSelectedPlace);
+
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            _availablePlace.SetColor(Color.white);
+        }
+
+        _callBack?.Invoke(_selectedPlaceId);
+
+        void SelectPlace(TablePlaceHandler _place)
+        {
+            if (!_availablePlaces.Contains(_place))
+            {
+                return;
             }
 
-            foreach (var _availablePlace in _availablePlaces)
-            {
-                _availablePlace.SetColor(Color.green);
-            }
-
-            if (_availablePlaces.Count == 0)
-            {
-                _callBack?.Invoke(-1);
-                yield break;
-            }
-
-            CardTableInteractions.OnPlaceClicked += SelectPlace;
-            bool _hasSelectedPlace = false;
-            int _selectedPlaceId = 0;
-
-            yield return new WaitUntil(() => _hasSelectedPlace);
-
-            foreach (var _availablePlace in _availablePlaces)
-            {
-                _availablePlace.SetColor(Color.white);
-            }
-
-            _callBack?.Invoke(_selectedPlaceId);
-
-            void SelectPlace(TablePlaceHandler _place)
-            {
-                if (!_availablePlaces.Contains(_place))
-                {
-                    return;
-                }
-
-                CardTableInteractions.OnPlaceClicked -= SelectPlace;
-                _selectedPlaceId = _place.Id;
-                _hasSelectedPlace = true;
-            }
+            CardTableInteractions.OnPlaceClicked -= SelectPlace;
+            _selectedPlaceId = _place.Id;
+            _hasSelectedPlace = true;
         }
     }
 
@@ -2311,7 +2324,6 @@ public class GameplayManagerPVP : GameplayManager
     {
         HandleChangeCanFlyToDodge(_cardId,_status,_isCardMy);
         OpponentChangedCanFlyToDodge _data = new OpponentChangedCanFlyToDodge { CardId = _cardId, Status = _status, IsEffectedCardMy = _isCardMy};
-
         if (_tellRoom)
         {
             roomHandler.AddAction(ActionType.OpponentChangedCanFlyToDodge, JsonConvert.SerializeObject(_data));
@@ -2328,7 +2340,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ForceResponseAction(int _cardId)
     {
-        Debug.Log("-------------- Idk");
+        Debug.Log("Interesting");
         IdOfCardWithResponseAction = _cardId;
         MyPlayer.Actions = 1;
         GameState = GameplayState.AttackResponse;
@@ -3300,12 +3312,7 @@ public class GameplayManagerPVP : GameplayManager
         _placeId = ConvertOpponentsPosition(_placeId);
         HandleChangeMovementForCard(_placeId,_status);
     }
-
-    private void OpponentChangedCanFlyToDodge(int _cardId, bool _status, bool _isCardMy)
-    {
-        HandleChangeCanFlyToDodge(_cardId,_status, _isCardMy);
-    }
-
+    
     private void OpponentGotResponseAction()
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
@@ -3550,45 +3557,85 @@ public class GameplayManagerPVP : GameplayManager
     
     private void UseDelivery(int _defendingCardId, int _startingPlace)
     {
-        List<int> _placesNearLifeForce = new List<int>(){10,12,18,17,19,9,13,19,16,23,24,25,26,27};
-        foreach (var _placeNear in _placesNearLifeForce)
+        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>(){12,10,19,18,17});
+        if (_emptyPlaces.Count==0)
         {
-            if (CheckPlace(_placeNear,_defendingCardId,_startingPlace))
+            _emptyPlaces = GetEmptyPlaces(new List<int>(){13,20,27,26,25,24,23,16,9});
+            if (_emptyPlaces.Count==0)
             {
-                return;
+                _emptyPlaces = GetEmptyPlaces(new List<int>(){14,21,28,27,26,25,24,23,22,15,8});
+                if (_emptyPlaces.Count==0)
+                {
+                    for (int _i = 8; _i < 57; _i++)
+                    {
+                        if (PlaceAnywhere(_i,_defendingCardId,_startingPlace))
+                        {
+                            return;
+                        }
+                    }
+                }
             }
-        }
-        for (int _i = 8; _i < 57; _i++)
-        {
-            if (CheckPlace(_i,_defendingCardId,_startingPlace))
-            {
-                return;
-            }
-        }
-    }
-    
-    private bool CheckPlace(int _index, int _defendingCardId, int _startingPlace)
-    {
-        TablePlaceHandler _place = TableHandler.GetPlace(_index);
-        if (_place.IsOccupied)
-        {
-            return false;
         }
 
-        CardAction _actionMove = new CardAction
+        if (_emptyPlaces.Count==1)
         {
-            FirstCardId = _defendingCardId,
-            StartingPlaceId = _startingPlace,
-            FinishingPlaceId = _index,
-            Type = CardActionType.Move,
-            Cost = 0,
-            IsMy = true,
-            CanTransferLoot = false,
-            Damage = -1,
-            CanCounter = false
-        };
-        ExecuteCardAction(_actionMove);
-        return true;
+            DoPlace(_emptyPlaces[0].Id, _defendingCardId, _startingPlace);
+        }
+        else
+        {
+            StartCoroutine(SelectPlace(_emptyPlaces, true, DoPlaceOnTable));
+        }
+        
+
+        List<TablePlaceHandler> GetEmptyPlaces(List<int> _places)
+        {
+            List<TablePlaceHandler> _emptyPlaces = new List<TablePlaceHandler>();
+            foreach (var _placeId in _places)
+            {
+                TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+                if (_place.IsOccupied)
+                {
+                    continue;
+                }
+                _emptyPlaces.Add(_place);
+            }
+
+            return _emptyPlaces;
+        }
+        
+        bool PlaceAnywhere(int _index, int _defendingCardId, int _startingPlace)
+            {
+                TablePlaceHandler _place = TableHandler.GetPlace(_index);
+                if (_place.IsOccupied)
+                {
+                    return false;
+                }
+
+                DoPlace(_index,_defendingCardId,_startingPlace);
+                return true;
+            }
+        
+        void DoPlaceOnTable(int _placeId)
+        { 
+            DoPlace(_placeId,_defendingCardId,_startingPlace);
+        }
+
+        void DoPlace(int _index, int _defendingCardId, int _startingPlace)
+        {
+            CardAction _actionMove = new CardAction
+            {
+                FirstCardId = _defendingCardId,
+                StartingPlaceId = _startingPlace,
+                FinishingPlaceId = _index,
+                Type = CardActionType.Move,
+                Cost = 0,
+                IsMy = true,
+                CanTransferLoot = false,
+                Damage = -1,
+                CanCounter = false
+            };
+            ExecuteCardAction(_actionMove);
+        }
     }
 
     public override void SetTaxCard(int _id)

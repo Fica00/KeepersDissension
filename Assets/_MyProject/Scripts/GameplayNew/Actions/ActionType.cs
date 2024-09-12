@@ -57,9 +57,9 @@ namespace GameplayActions
         OpponentUsedHisUltimate=49,
         OpponentRespondedForBombQuestion = 50,
         OpponentPlacedVetoedCard=51,
-        UseDelivery=52,
-        SetTaxCard=53,
-        ActivatedTaxCard=54,
-        ForceSetOpponentStrangeMatter=55
+        SetTaxCard=52,
+        ActivatedTaxCard=53,
+        ForceSetOpponentStrangeMatter=54,
+        TellOpponentToGetResponseAction=55
     }
 }
