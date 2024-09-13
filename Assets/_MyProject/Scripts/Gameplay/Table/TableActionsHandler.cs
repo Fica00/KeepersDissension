@@ -351,20 +351,13 @@ public class TableActionsHandler : MonoBehaviour
             if (_special is ScalerLeapfrog)
             {
                 Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
-                AddCardInFront(_warriorCard, _cordsInFront, 1, tableHandler.GetDirection(_currentPlace.Id, _placeAround.Id), _dontAddIfItIsAWall: true, _addIfOccupied: false);
-                //
-                // TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
-                // if (_placeInFront != null && !_placeInFront.IsOccupied)
-                // {
-                //     ProcessMovement(_placeInFront, _warriorCard, _remainingSpeed - 1, _processedPlaces);
-                // }
+                AddCardInFront(_warriorCard, _cordsInFront, 1, _dontAddIfItIsAWall: true);
             }
         }
     }
 
 
-    private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, Vector2 _direction, bool _dontAddIfItIsAWall = false,
-        bool _addIfOccupied = false)
+    private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, bool _dontAddIfItIsAWall = false)
     {
         TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
         if (_placeInFront == null)
@@ -387,9 +380,9 @@ public class TableActionsHandler : MonoBehaviour
                 Type = CardActionType.Move,
                 Cost = _actionCost,
             });
-            _placeInFront.SetColor(Color.blue);
+            _placeInFront.SetColor(Color.magenta);
+            Debug.Log(_placeInFront.name, _placeInFront.gameObject);
         }
-
     }
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType _movementType,

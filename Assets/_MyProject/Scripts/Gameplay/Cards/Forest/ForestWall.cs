@@ -86,5 +86,6 @@ public class ForestWall : WallBase
         }
         Card _card = _cardObject as Card;
         _card.Heal(1);
+        GameplayManager.Instance.UpdateHealth(_card.Details.Id,_card.My,(int)_card.Stats.Health);
     }
 }

@@ -1320,6 +1320,7 @@ public class GameplayManagerPVP : GameplayManager
         }
         catch
         {
+            Debug.Log("----- Failed to find");
             return;
         }
         
@@ -1327,6 +1328,7 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard==null || _defendingCard == null)
         {
+            Debug.Log("----- 22222");
             return;
         }
 
