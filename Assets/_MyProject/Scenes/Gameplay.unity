@@ -9806,6 +9806,7 @@ MonoBehaviour:
     CanCounter: 1
     GiveLoot: 0
     CanBeBlocked: 1
+    ResetSpeed: 0
     AllowCardEffectOnDeath: 1
   GameState: 0
   healthTracker: {fileID: 1497496152}
@@ -35835,7 +35836,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9340882
+      value: -9363789
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
