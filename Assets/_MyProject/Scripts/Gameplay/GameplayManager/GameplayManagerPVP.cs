@@ -7,7 +7,6 @@ using UnityEngine;
 using System.Linq;
 using FirebaseMultiplayer.Room;
 using GameplayActions;
-using Unity.VisualScripting;
 
 public class GameplayManagerPVP : GameplayManager
 {
@@ -1468,13 +1467,17 @@ public class GameplayManagerPVP : GameplayManager
                 _attackingPlayer.Actions -= _action.Cost;
                 if (_attackingCard.My != _defendingCard.My)
                 {
-                    if (_defendingCard.My && !_attackingCard.My)
+                    // if (_defendingCard.My && !_attackingCard.My)
+                    // {
+                    //     ForceResponseAction(_defendingCard.Details.Id);
+                    // }
+                    // else if(!_defendingCard.My && _attackingCard.My)
+                    // {
+                    //     OpponentGotResponseAction();
+                    //     return;
+                    // }
+                    if(!_defendingCard.My && _attackingCard.My)
                     {
-                        ForceResponseAction(_defendingCard.Details.Id);
-                    }
-                    else if(!_defendingCard.My && _attackingCard.My)
-                    {
-                        OpponentGotResponseAction();
                         return;
                     }
                 }
@@ -2316,9 +2319,12 @@ public class GameplayManagerPVP : GameplayManager
         CardBase _cardAtPlace = TableHandler.GetPlace(_placeId).GetCardNoWall();
         if (_cardAtPlace==null)
         {
+            Debug.Log(1111);
             return;
         }
         
+        Debug.Log(_cardAtPlace.gameObject.name,_cardAtPlace.gameObject);
+        Debug.Log(_status);
         _cardAtPlace.CanMove = _status;
     }
     
@@ -3559,20 +3565,24 @@ public class GameplayManagerPVP : GameplayManager
     
     private void UseDelivery(int _defendingCardId, int _startingPlace)
     {
-        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>(){12,10,19,18,17});
+        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>(){8,9,10,11,12,13,14});
         if (_emptyPlaces.Count==0)
         {
-            _emptyPlaces = GetEmptyPlaces(new List<int>(){13,20,27,26,25,24,23,16,9});
+            _emptyPlaces = GetEmptyPlaces(new List<int>(){12,10,19,18,17});
             if (_emptyPlaces.Count==0)
             {
-                _emptyPlaces = GetEmptyPlaces(new List<int>(){14,21,28,27,26,25,24,23,22,15,8});
+                _emptyPlaces = GetEmptyPlaces(new List<int>(){13,20,27,26,25,24,23,16,9});
                 if (_emptyPlaces.Count==0)
                 {
-                    for (int _i = 8; _i < 57; _i++)
+                    _emptyPlaces = GetEmptyPlaces(new List<int>(){14,21,28,27,26,25,24,23,22,15,8});
+                    if (_emptyPlaces.Count==0)
                     {
-                        if (PlaceAnywhere(_i,_defendingCardId,_startingPlace))
+                        for (int _i = 8; _i < 57; _i++)
                         {
-                            return;
+                            if (PlaceAnywhere(_i,_defendingCardId,_startingPlace))
+                            {
+                                return;
+                            }
                         }
                     }
                 }

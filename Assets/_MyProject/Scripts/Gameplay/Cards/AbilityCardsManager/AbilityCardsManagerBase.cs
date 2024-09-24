@@ -25,7 +25,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
         abilities = CardsManager.Instance.GetAbilityCards();
         if (FirebaseManager.Instance.RoomHandler.IsTestingRoom)
         {
-            amountOfStartingAbilities = 5;
+            amountOfStartingAbilities = 0;
             amountOfCardsInShop = abilities.Count;
         }
 

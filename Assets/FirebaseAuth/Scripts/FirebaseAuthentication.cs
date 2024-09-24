@@ -95,11 +95,14 @@ namespace FirebaseAuthHandler
             if (!_canSignIn)
             {
                 _callBack?.Invoke(_signInResult);
+                Debug.Log(33333);
                 return;
             }
 
+            Debug.Log(4444);
             auth.SignInWithEmailAndPasswordAsync(_email, _password).ContinueWithOnMainThread(_task =>
             {
+            Debug.Log(5555);
                 SignInResult _result = new();
                 if (_task.IsCanceled)
                 {
@@ -111,6 +114,7 @@ namespace FirebaseAuthHandler
                 }
                 else
                 {
+            Debug.Log(66666);
                     _result.IsSuccessful = true;
                     firebaseUser = _task.Result.User;
                     isEmailVerificationSent = false;

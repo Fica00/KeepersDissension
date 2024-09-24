@@ -10,8 +10,6 @@ public class Tax : AbilityEffect
     {
         IsActiveForMe = true;
         List<CardBase> _cards = new();
-        GameplayState _state = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
         List<AbilityCard> _availableCards = GameplayManager.Instance.OpponentPlayer.OwnedAbilities;
         foreach (var _availableCard in _availableCards.ToList())
         {
@@ -28,7 +26,6 @@ public class Tax : AbilityEffect
             RemoveAction();
             OnActivated?.Invoke();
             UIManager.Instance.ShowOkDialog("Opponent doesn't own a CC ability card");
-            GameplayManager.Instance.GameState = _state;
             return;
         }
         
@@ -44,7 +41,6 @@ public class Tax : AbilityEffect
             SelectedCard = _selectedCard;
             RemoveAction();
             OnActivated?.Invoke();
-            GameplayManager.Instance.GameState = _state;
             GameplayManager.Instance.SetTaxCard((_selectedCard as AbilityCard).Details.Id);
         }
         

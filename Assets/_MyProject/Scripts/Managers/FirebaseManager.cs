@@ -34,13 +34,17 @@ public class FirebaseManager : MonoBehaviour
 
     public void Init(Action _callBack)
     {
+        Debug.Log(3333);
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(_result =>
         {
+        Debug.Log(4444);
             if (_result.Result == DependencyStatus.Available)
             {
+        Debug.Log(55555);
                 Authentication.Init(FirebaseAuth.DefaultInstance);
                 database = FirebaseDatabase.DefaultInstance.RootReference;
                 RoomHandler.Init(database, $"{GAME_DATA_KEY}/{ROOMS_KEY}");
+                SubscribeToDeviceIdChanges(OnDeviceIdChanged);
 
                 _callBack?.Invoke();
             }
@@ -72,22 +76,41 @@ public class FirebaseManager : MonoBehaviour
 
             string _result = _task.Result.GetRawJsonValue();
             DataManager.Instance.SetPlayerData(_result);
-            // if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.DeviceId))
-            // {
-            //     DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
-            // }
-            // else if (DataManager.Instance.PlayerData.DeviceId != SystemInfo.deviceUniqueIdentifier)
-            // {
-            //     UIManager.Instance.ShowOkDialog("Please logout from other device and try again!");
-            //     Authentication.SignOut();
-            //     PlayerPrefs.DeleteAll();
-            //     PlayerPrefs.Save();
-            //     _callBack?.Invoke(false);
-            //     return;
-            // }
+            if (string.IsNullOrEmpty(DataManager.Instance.PlayerData.DeviceId))
+            {
+                DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
+            }
+            else if (DataManager.Instance.PlayerData.DeviceId != SystemInfo.deviceUniqueIdentifier)
+            {
+                UIManager.Instance.ShowYesNoDialog("Looks like you are already signed in on another device. Do you want to logout from other devices and continue?",
+                    () =>
+                    {
+                        YesLogOut(_callBack);
+                    }, () =>
+                    {
+                        NoDontLogout(_callBack);
+                    });
+                
+                return;
+            }
 
             CollectGameData(_callBack);
         });
+    }
+
+
+    private void YesLogOut(Action<bool> _callBack)
+    {
+        DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
+        CollectGameData(_callBack);
+    }
+    
+    private void NoDontLogout(Action<bool> _callBack)
+    {
+        Authentication.SignOut();
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+        _callBack?.Invoke(false);
     }
 
     private void CollectGameData(Action<bool> _callBack)
@@ -182,5 +205,52 @@ public class FirebaseManager : MonoBehaviour
     private void DeleteUserAccount(Action<bool> _callBack)
     {
         Authentication.FirebaseUser.DeleteAsync().ContinueWithOnMainThread(_task => { _callBack?.Invoke(_task.IsCompleted); });
+    }
+    
+    private void SubscribeToDeviceIdChanges(Action<string> _onDeviceIdChanged)
+    {
+        if (!Authentication.IsSignedIn)
+        {
+            return;
+        }
+        string _userId = Authentication.UserId; // Assuming this is already set
+        Debug.Log(_userId);
+        DatabaseReference _deviceIdRef = FirebaseDatabase.DefaultInstance
+            .GetReference($"users/{_userId}/DeviceId");
+
+        _deviceIdRef.ValueChanged += (_, _args) =>
+        {
+            if (_args.DatabaseError != null)
+            {
+                Debug.LogError($"Database error: {_args.DatabaseError.Message}");
+                return;
+            }
+
+            if (_args.Snapshot.Exists && _args.Snapshot.Value != null)
+            {
+                string _newDeviceId = _args.Snapshot.Value.ToString();
+                _onDeviceIdChanged?.Invoke(_newDeviceId);
+            }
+            else
+            {
+                _onDeviceIdChanged?.Invoke(string.Empty);
+            }
+        };
+    }
+    
+    private void OnDeviceIdChanged(string _newDeviceId)
+    {
+        Debug.Log($"Device ID updated: {_newDeviceId}");
+        if (SystemInfo.deviceUniqueIdentifier == _newDeviceId)
+        {
+            return;
+        }
+        
+        UIManager.Instance.ShowOkDialog("Please log in to continue", () =>
+        {
+            Authentication.SignOut();
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+        });
     }
 }

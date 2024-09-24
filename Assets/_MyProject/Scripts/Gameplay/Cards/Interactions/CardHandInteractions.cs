@@ -34,8 +34,11 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
     {
         if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
         {
+            Debug.Log(1111);
             return;
         }
+        
+        Debug.Log(2222);
         OnCardClicked?.Invoke(cardBase);
     }
 
@@ -53,6 +56,7 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
     
     private void OnLongPress()
     {
+        Debug.Log(3333);
         OnCardPressed?.Invoke(cardBase);
     }
 }

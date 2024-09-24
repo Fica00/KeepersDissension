@@ -1,6 +1,7 @@
 using System;
 using Firebase.Auth;
 using Firebase.Database;
+using Newtonsoft.Json;
 using UnityEngine;
 using SignInResult = FirebaseAuthHandler.SignInResult;
 
@@ -37,7 +38,9 @@ public class Initializator : MonoBehaviour
 
     private void Authenticate()
     {
+        Debug.Log(1111);
         AuthenticationCredentials _credentials = DataManager.GetAuthCredentials();
+        Debug.Log(JsonConvert.SerializeObject(_credentials));
         if (_credentials == null)
         {
             AuthenticationUI.Instance.ShowLogin();
@@ -51,6 +54,7 @@ public class Initializator : MonoBehaviour
                 return;
             }
 
+            Debug.Log(2222);
             FirebaseManager.Instance.Authentication.SignInEmail(_credentials.Email, _credentials.Password, FinishSignIn);
         }
     }
