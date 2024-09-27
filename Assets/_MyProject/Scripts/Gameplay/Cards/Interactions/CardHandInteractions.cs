@@ -34,11 +34,9 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
     {
         if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
         {
-            Debug.Log(1111);
             return;
         }
         
-        Debug.Log(2222);
         OnCardClicked?.Invoke(cardBase);
     }
 

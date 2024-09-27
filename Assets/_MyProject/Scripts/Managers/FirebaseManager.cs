@@ -34,13 +34,10 @@ public class FirebaseManager : MonoBehaviour
 
     public void Init(Action _callBack)
     {
-        Debug.Log(3333);
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(_result =>
         {
-        Debug.Log(4444);
             if (_result.Result == DependencyStatus.Available)
             {
-        Debug.Log(55555);
                 Authentication.Init(FirebaseAuth.DefaultInstance);
                 database = FirebaseDatabase.DefaultInstance.RootReference;
                 RoomHandler.Init(database, $"{GAME_DATA_KEY}/{ROOMS_KEY}");
@@ -57,7 +54,6 @@ public class FirebaseManager : MonoBehaviour
 
     public void CollectData(Action<bool> _callBack)
     {
-        Debug.Log(Authentication.UserId);
         CollectPlayerData(_callBack);
     }
 
@@ -214,7 +210,6 @@ public class FirebaseManager : MonoBehaviour
             return;
         }
         string _userId = Authentication.UserId; // Assuming this is already set
-        Debug.Log(_userId);
         DatabaseReference _deviceIdRef = FirebaseDatabase.DefaultInstance
             .GetReference($"users/{_userId}/DeviceId");
 
@@ -240,7 +235,6 @@ public class FirebaseManager : MonoBehaviour
     
     private void OnDeviceIdChanged(string _newDeviceId)
     {
-        Debug.Log($"Device ID updated: {_newDeviceId}");
         if (SystemInfo.deviceUniqueIdentifier == _newDeviceId)
         {
             return;

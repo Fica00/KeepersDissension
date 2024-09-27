@@ -1,4 +1,46 @@
 public class ScalerLeapfrog : CardSpecialAbility
 {
     //nothing to do here
+
+    private void OnEnable()
+    {
+        CardBase.OnGotDestroyed += CheckForResponseAction;
+    }
+
+    private void OnDisable()
+    {
+        CardBase.OnGotDestroyed -= CheckForResponseAction;
+    }
+
+    private void CheckForResponseAction(CardBase _card)
+    {
+        if (!CardBase.My)
+        {
+            return;
+        }
+
+        if (_card == null)
+        {
+            return;
+        }
+
+        var _tablePlace = _card.GetTablePlace();
+
+        if (_tablePlace == null)
+        {
+            return;
+        }
+
+        if (_tablePlace.Id != TablePlaceHandler.Id)
+        {
+            return;
+        }
+
+        if (GameplayManager.Instance.GameState != GameplayState.Waiting)
+        {
+            return;
+        }
+
+        GameplayManager.Instance.RequestResponseAction(((Card)CardBase).Details.Id);
+    }
 }

@@ -35,6 +35,7 @@ public class BomberMinefield : CardSpecialAbility
             {
                 continue;
             }
+            
             _markerPlaces.Add(_tablePlace.Id);
         }
         
@@ -206,7 +207,6 @@ public class BomberMinefield : CardSpecialAbility
 
                 if (_place.Id == _placeId)
                 {
-                    Debug.Log("Added",gameObject);
                     _bombMarker = _marker;
                     BombMarkers.Add(_marker);
                 }
@@ -228,23 +228,9 @@ public class BomberMinefield : CardSpecialAbility
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            foreach (var (_bomMarker,_restMarkers) in markers)
-            {
-                Debug.Log(_bomMarker.name,_bomMarker.gameObject);
-                foreach (var _marker in _restMarkers)
-                {
-                    Debug.Log(_marker.name,_marker.gameObject);
-                }
-            }
-        }
-    }
-
     private void CheckDestroyedCard(CardBase _card)
     {
+        DestroyRestOfCards(_card);
         if (_card is Card _destCard)
         {
             foreach (var _markers in markers.Values.ToList())
@@ -262,7 +248,6 @@ public class BomberMinefield : CardSpecialAbility
         }
 
         BombMarkers.Remove(_card);
-        
         GameplayManager.Instance.BombExploded(_card.GetTablePlace().Id);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using FirebaseAuthHandler;
 using Newtonsoft.Json;
 using TMPro;
@@ -16,7 +17,44 @@ public class RegisterUI : MonoBehaviour, IPanel
     
     public void Setup()
     {
+        string _email = GetEmail();
+        string _password = GetPassword();
+        email.text = _email;
+        password.text = _password;
+        confirmPassword.text = _password;
+        name.text = GetPassword();
+        Register();
+        return;
         holder.SetActive(true);
+    }
+
+    string GetEmail()
+    {
+        string _randomEmail = CreateRandom();
+        string _email = String.Empty;
+        for (int i = 0; i < 8; i++)
+        {
+            _email += _randomEmail[i];
+        }
+
+        return _email + "@keepers.com";
+    }
+
+    string GetPassword()
+    {
+        string _randomPass = CreateRandom();
+        string _passowrd = string.Empty;
+        for (int i = 0; i < 8; i++)
+        {
+            _passowrd += _randomPass[i];
+        }
+
+        return _passowrd;
+    }
+
+    string CreateRandom()
+    {
+        return Guid.NewGuid().ToString();
     }
 
     private void OnEnable()

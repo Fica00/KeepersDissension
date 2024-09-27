@@ -1072,8 +1072,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000075233}
-  m_SizeDelta: {x: 0, y: 4747.973}
+  m_AnchoredPosition: {x: 0, y: 3.3155553}
+  m_SizeDelta: {x: 0, y: 5906.163}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &301883625
 MonoBehaviour:
@@ -3408,7 +3408,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 469.297, y: -21.6365}
+  m_AnchoredPosition: {x: 500.18008, y: -21.6365}
   m_SizeDelta: {x: 100, y: 43.273}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &716429047
@@ -12224,8 +12224,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 469.297, y: -2395.623}
-  m_SizeDelta: {x: 857.161, y: 4704.7}
+  m_AnchoredPosition: {x: 500.18008, y: -2974.718}
+  m_SizeDelta: {x: 857.161, y: 5862.89}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1669402650
 MonoBehaviour:
@@ -12705,8 +12705,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 428.5805, y: -2352.35}
-  m_SizeDelta: {x: 857.161, y: 4704.7}
+  m_AnchoredPosition: {x: 428.5805, y: -2931.445}
+  m_SizeDelta: {x: 857.161, y: 5862.89}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1810251195
 MonoBehaviour:
@@ -12742,127 +12742,144 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'App Developer:
+  m_text: '
+
+
+    App Developer:
 
     MagmaDev
+
 
 
     Illustration Artists:
 
-    Milos Zecevic
-
-    Jonah
-    Greene
-
-    Jose Lopez
-
-
-    Graphic Design:
-
-    Joseph Fox
-
-    Sam Turner
-
-    Tim
-    Turner II
-
-    MagmaDev
-
-
-    Menu Music:
-
-    Corbin Wescott
-
-    App Music:
-
-    Tim
-    Turner II
-
-    Tapian Turner
-
-    Game concept and design:
-
-    Tim Turner II
-
-    Voice
-    Actors:
-
-    Sam Turner
-
-    Wesley McCullough
-
-    Levi Sisko
-
-    Titus Turner
-
-    Tony
-    Payne
-
-    Simon J. Peters
-
-    Douglas Cloven
-
-    Adam Parsons
-
-    Katie Turner
-
-    Lili
-    Turner
-
-    Sally Turner
-
-    Tapian Gibson
-
-    Ken Bartels
-
-    Suzi Bartels
-
-    Stefan
-    Hinkley
-
-    Brad Reynoso
-
-    Josh H.
-
-    MC Clendon
-
-    Special Thanks:
-
-    Sam
-    Turner
-
-    Liliana Turner
-
-    Joseph Fox
-
-    Adam Parsons
-
-    Milos Zecevic
-
-    Bryan
-    Riester
-
-    EndyMinionGames
-
-    Mustache Power
-
-    Gnork Games
-
-    Titus
-    Turner
+    Milos
+    Zecevic
 
     Jonah Greene
 
     Jose Lopez
 
-    Ruth Ashton
+
+
+    Graphic Design:
+
+    Joseph
+    Fox
+
+    Sam Turner
+
+    Tim Turner II
+
+    MagmaDev
+
+
+
+    Menu Music:
+
+    Corbin
+    Wescott
+
+
+
+    App Music:
+
+    Tim Turner II
+
+    Tapian Turner
+
+
+
+    Game concept
+    and design:
+
+    Tim Turner II
+
+
+
+    Voice Actors:
+
+    Sam Turner
+
+    Wesley
+    McCullough
+
+    Levi Sisko
+
+    Titus Turner
+
+    Tony Payne
+
+    Simon J. Peters
+
+    Douglas
+    Cloven
+
+    Adam Parsons
+
+    Katie Turner
+
+    Lili Turner
+
+    Sally Turner
+
+    Tapian
+    Gibson
+
+    Ken Bartels
+
+    Suzi Bartels
+
+    Stefan Hinkley
+
+    Brad Reynoso
+
+    Josh
+    H.
+
+    MC Clendon
+
+
+
+    Special Thanks:
+
+    Sam Turner
+
+    Liliana Turner
+
+    Joseph
+    Fox
+
+    Adam Parsons
+
+    Milos Zecevic
+
+    Bryan Riester
+
+    EndyMinionGames
+
+    Mustache
+    Power
+
+    Gnork Games
+
+    Titus Turner
+
+    Jonah Greene
+
+    Jose Lopez
+
+    Ruth
+    Ashton
 
     Steve Ellis
 
-    Kerry
-    Kuenzi
+    Kerry Kuenzi
 
-    Levi Sisko'
+    Levi Sisko
+
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9e15b711f3f78f74bbfafd12b0df4f10, type: 2}
   m_sharedMaterial: {fileID: 8843519754723688482, guid: 9e15b711f3f78f74bbfafd12b0df4f10,

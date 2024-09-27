@@ -1343,6 +1343,12 @@ public class GameplayManagerPVP : GameplayManager
         GameplayPlayer _attackingPlayer = _attackingCard.My ? MyPlayer : OpponentPlayer;
         GameplayPlayer _defendingPlayer = _defendingCard.My ? MyPlayer : OpponentPlayer;
         
+        if (_defendingCard is Wall && TableHandler.DistanceBetweenPlaces(_attackingCard.GetTablePlace(),_defendingCard.GetTablePlace())>1)
+        {
+            _attackingPlayer.Actions -= _action.Cost;
+            return;
+        }
+        
         AudioManager.Instance.PlaySoundEffect("Attack");
 
         if (_attackingCard == _defendingCard)
@@ -1952,6 +1958,7 @@ public class GameplayManagerPVP : GameplayManager
                 roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
             }
             GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions,false);
+            AudioManager.Instance.PlaySoundEffect("EndTurn");
             return;
         }
 
@@ -1969,7 +1976,7 @@ public class GameplayManagerPVP : GameplayManager
         IsMyTurn = false;
 
         NotificationSender.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
-
+        AudioManager.Instance.PlaySoundEffect("EndTurn");
         if (_tellRoom)
         {
             roomHandler.AddAction(ActionType.OpponentEndedTurn,string.Empty);
@@ -2454,6 +2461,7 @@ public class GameplayManagerPVP : GameplayManager
     public override void BombExploded(int _placeId, bool _includeCenter=true, bool _tellRoom = true)
     {
         StartCoroutine(BombExplodedRoutine());
+        
         IEnumerator BombExplodedRoutine()
         {
             yield return new WaitForSeconds(0.3f);
