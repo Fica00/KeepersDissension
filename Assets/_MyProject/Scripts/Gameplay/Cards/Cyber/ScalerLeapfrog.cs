@@ -24,6 +24,11 @@ public class ScalerLeapfrog : CardSpecialAbility
             return;
         }
 
+        if (TablePlaceHandler==null)
+        {
+            return;
+        }
+
         var _tablePlace = _card.GetTablePlace();
 
         if (_tablePlace == null)

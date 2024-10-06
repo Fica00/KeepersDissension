@@ -13,6 +13,8 @@ public class GameplayManagerPVP : GameplayManager
     private Action<List<int>> opponentCheckForMarkerCallback;
     private RoomHandler roomHandler;
     [SerializeField] private GameObject inputBlocker;
+    private bool didIKillLastBomber;
+
 
     protected override void Awake()
     {
@@ -1319,7 +1321,6 @@ public class GameplayManagerPVP : GameplayManager
         }
         catch
         {
-            Debug.Log("----- Failed to find");
             return;
         }
         
@@ -1327,8 +1328,15 @@ public class GameplayManagerPVP : GameplayManager
 
         if (_attackingCard==null || _defendingCard == null)
         {
-            Debug.Log("----- 22222");
             return;
+        }
+
+        foreach (var _ability in _defendingCard.SpecialAbilities)
+        {
+            if (_ability is BomberCard)
+            {
+                didIKillLastBomber = _action.IsMy;
+            }
         }
 
         if (_action.Type == CardActionType.Attack&& _action.CanCounter)
@@ -1473,15 +1481,6 @@ public class GameplayManagerPVP : GameplayManager
                 _attackingPlayer.Actions -= _action.Cost;
                 if (_attackingCard.My != _defendingCard.My)
                 {
-                    // if (_defendingCard.My && !_attackingCard.My)
-                    // {
-                    //     ForceResponseAction(_defendingCard.Details.Id);
-                    // }
-                    // else if(!_defendingCard.My && _attackingCard.My)
-                    // {
-                    //     OpponentGotResponseAction();
-                    //     return;
-                    // }
                     if(!_defendingCard.My && _attackingCard.My)
                     {
                         return;
@@ -1633,43 +1632,86 @@ public class GameplayManagerPVP : GameplayManager
                 _defendingCard.AllowCardEffectOnDeath = _action.AllowCardEffectOnDeath;
                 _defendingPlayer.DestroyCard(_defendingCard);
             }
-            
-            if (_attackingPlayer.IsMy)
+
+            if (!_action.DiedByBomb)
             {
-                int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
-                if (_defendingCard is Minion)
+                if (_attackingPlayer.IsMy)
                 {
-                    GetMatter(2+_additionalMatter, true);
-                }
+                    int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
+                    if (_defendingCard is Minion)
+                    {
+                        GetMatter(2+_additionalMatter, true);
+                    }
 
-                if (_defendingCard is Guardian)
-                {
-                    GetMatter(10+_additionalMatter, true);
-                }
+                    if (_defendingCard is Guardian)
+                    {
+                        GetMatter(10+_additionalMatter, true);
+                    }
 
-                if (_defendingCard is Keeper)
+                    if (_defendingCard is Keeper)
+                    {
+                        GetMatter(5+_additionalMatter, true);
+                    }
+                }
+                else
                 {
-                    GetMatter(5+_additionalMatter, true);
+                    int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
+                    if (_defendingCard is Minion)
+                    {
+                        GetMatter(2+_additionalMatter, false);
+                    }
+
+                    if (_defendingCard is Guardian)
+                    {
+                        GetMatter(10+_additionalMatter, false);
+                    }
+
+                    if (_defendingCard is Keeper)
+                    {
+                        GetMatter(5+_additionalMatter, false);
+                    }
                 }
             }
             else
             {
-                int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
-                if (_defendingCard is Minion)
+                if (didIKillLastBomber)
                 {
-                    GetMatter(2+_additionalMatter, false);
-                }
+                    int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
+                    if (_defendingCard is Minion)
+                    {
+                        GetMatter(2+_additionalMatter, true);
+                    }
 
-                if (_defendingCard is Guardian)
-                {
-                    GetMatter(10+_additionalMatter, false);
-                }
+                    if (_defendingCard is Guardian)
+                    {
+                        GetMatter(10+_additionalMatter, true);
+                    }
 
-                if (_defendingCard is Keeper)
+                    if (_defendingCard is Keeper)
+                    {
+                        GetMatter(5+_additionalMatter, true);
+                    }
+                }
+                else
                 {
-                    GetMatter(5+_additionalMatter, false);
+                    int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
+                    if (_defendingCard is Minion)
+                    {
+                        GetMatter(2+_additionalMatter, false);
+                    }
+
+                    if (_defendingCard is Guardian)
+                    {
+                        GetMatter(10+_additionalMatter, false);
+                    }
+
+                    if (_defendingCard is Keeper)
+                    {
+                        GetMatter(5+_additionalMatter, false);
+                    }
                 }
             }
+            
 
             if (_defendingCard is LifeForce)
             {
@@ -2530,7 +2572,8 @@ public class GameplayManagerPVP : GameplayManager
                     CanTransferLoot = false,
                     IsMy = false,
                     Damage = 3,
-                    CanCounter = false
+                    CanCounter = false,
+                    DiedByBomb = true
                 };
 
                 ExecuteCardAction(_action, false);

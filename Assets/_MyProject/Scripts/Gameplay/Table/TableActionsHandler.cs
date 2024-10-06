@@ -300,7 +300,6 @@ public class TableActionsHandler : MonoBehaviour
         int _actionCost = 1;
         if (_remainingSpeed <= 0 || _processedPlaces.Contains(_currentPlace))
         {
-            Debug.Log("111111");
             return;
         }
 
@@ -313,17 +312,14 @@ public class TableActionsHandler : MonoBehaviour
             bool _skip = false;
             if (_placeAround.IsOccupied)
             {
-                Debug.Log("Is occupied");
                 _skip = true;
 
                 if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
                 {
-                    Debug.Log("But I can go on walls");
                     _skip = false;
                 }
                 else if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
                 {
-                    Debug.Log("but it is a marker");
                     _skip = false;
                 }
             }
@@ -343,12 +339,10 @@ public class TableActionsHandler : MonoBehaviour
 
             if (_skip)
             {
-                Debug.Log("Adding leapfrog");
                 AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
             }
             else if(_placeAround.ContainsWall)
             {
-                Debug.Log("Adding leapfrog 2");
                 foreach (var _ability in _warriorCard.SpecialAbilities)
                 {
                     if (_ability is ScalerLeapfrog)

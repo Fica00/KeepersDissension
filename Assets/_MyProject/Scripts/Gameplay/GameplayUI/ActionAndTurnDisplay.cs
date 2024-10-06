@@ -62,7 +62,6 @@ public class ActionAndTurnDisplay : MonoBehaviour
     {
         if (_number==0)
         {
-            Debug.Log("Setting to 0");
             return;
         }
         
