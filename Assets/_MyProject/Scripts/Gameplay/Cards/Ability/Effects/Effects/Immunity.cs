@@ -2,7 +2,7 @@ public class Immunity : AbilityEffect
 {
    public static bool IsActiveForMe;
    public static bool IsActiveForOpponent;
-   private void OnEnable()
+   private void Awake()
    {
       IsActiveForMe = false;
       IsActiveForOpponent = false;

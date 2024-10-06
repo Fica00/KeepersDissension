@@ -7,7 +7,7 @@ public class Invincible : AbilityEffect
 
     private int counter;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
         IsActiveForOpponent = false;

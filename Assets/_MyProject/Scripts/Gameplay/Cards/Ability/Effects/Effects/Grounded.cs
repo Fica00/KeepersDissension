@@ -7,7 +7,7 @@ public class Grounded : AbilityEffect
    private CardBase defendingCard;
    private bool skipFirst;
 
-   private void OnEnable()
+   private void Awake()
    {
       isActiveForMe = false;
       isActiveForOpponent = false;

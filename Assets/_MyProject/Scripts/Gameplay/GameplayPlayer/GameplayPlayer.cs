@@ -90,7 +90,6 @@ public class GameplayPlayer : MonoBehaviour
         {
             if (_cardInDeck == null)
             {
-                Debug.Log("Somehow lost this card???");
                 continue;
             }
 
@@ -271,7 +270,6 @@ public class GameplayPlayer : MonoBehaviour
         {
             return;
         }
-        Debug.Log("----- Adding owned ability");
 
         GameplayManager.Instance.PlaceAbilityOnTable(_ability.Details.Id);
 

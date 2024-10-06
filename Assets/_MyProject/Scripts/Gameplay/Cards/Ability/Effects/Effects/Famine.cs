@@ -4,7 +4,7 @@ public class Famine : AbilityEffect
     private int counter;
     private GameplayPlayer gameplayPlayer;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }

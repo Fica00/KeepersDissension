@@ -6,7 +6,7 @@ public class Steadfast : AbilityEffect
     public static bool IsActiveForOpponent;
     private Keeper keeper;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
         IsActiveForOpponent = false;

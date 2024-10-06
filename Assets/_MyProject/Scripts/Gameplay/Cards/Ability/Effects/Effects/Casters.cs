@@ -10,14 +10,13 @@ public class Casters : AbilityEffect
     private List<CardBase> availableEffects = new ();
     public static bool IsActive;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }
 
     public override void ActivateForOwner()
     {
-        Debug.Log("----- Activating casters");
         IsActive = true;
         gameplayState = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
@@ -25,7 +24,6 @@ public class Casters : AbilityEffect
         
         if (availableEffects.Count==0)
         {
-            Debug.Log("----- I don't have available effects for casters");
             UIManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for player to play a card");
             TellOpponentToPlayACard();
             return;
@@ -33,13 +31,11 @@ public class Casters : AbilityEffect
 
         if (GameplayManager.Instance.MyPlayer.Actions==0)
         {
-            Debug.Log("----- I don't have available actions for casters");
             UIManager.Instance.ShowOkDialog("You don't have enough actions, waiting for player to play a card");
             TellOpponentToPlayACard();
             return;
         }
         
-        Debug.Log("----- Showing available effects: "+availableEffects.Count);
         ChooseCardImagePanel.Instance.Show(availableEffects, _card =>
         {
             ActivateCard(_card, TellOpponentToPlayACard);
@@ -57,7 +53,6 @@ public class Casters : AbilityEffect
 
     private void TellOpponentToPlayACard()
     {
-        Debug.Log("----- Casters tell opponent to activate a card");
         GameplayUI.Instance.ActionAndTurnDisplay.ShowAction(1,false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn?.Invoke();
         GameplayManager.Instance.TellOpponentToPlaceFirstCardCasters();

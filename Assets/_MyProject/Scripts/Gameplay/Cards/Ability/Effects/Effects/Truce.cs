@@ -4,7 +4,7 @@ public class Truce : AbilityEffect
     public static bool IsActive = false;
     private static int duration = 0;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }

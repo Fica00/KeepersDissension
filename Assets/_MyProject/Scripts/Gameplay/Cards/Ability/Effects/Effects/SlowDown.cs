@@ -8,7 +8,7 @@ public class SlowDown : AbilityEffect
     private GameplayPlayer activatingPlayer;
     private int counter;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }

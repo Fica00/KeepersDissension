@@ -4,7 +4,7 @@ public class Tar : AbilityEffect
     public static bool IsActiveForOpponent;
     private GameplayPlayer player;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActiveForOpponent = false;
         IsActiveForMe = false;
