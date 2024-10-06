@@ -36,7 +36,7 @@ public class RegisterUI : MonoBehaviour, IPanel
         {
             _email += _randomEmail[i];
         }
-
+        
         return _email + "@keepers.com";
     }
 

@@ -1,5 +1,3 @@
-using System;
-
 public class Penalty : AbilityEffect
 {
    public static bool IsActive;

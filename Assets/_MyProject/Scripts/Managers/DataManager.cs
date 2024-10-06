@@ -100,7 +100,8 @@ public class DataManager : MonoBehaviour
     {
         if (PlayerPrefs.HasKey(AUTH_CREDENTIALS))
         {
-            return JsonConvert.DeserializeObject<AuthenticationCredentials>(PlayerPrefs.GetString(AUTH_CREDENTIALS));
+            AuthenticationCredentials _credentials = JsonConvert.DeserializeObject<AuthenticationCredentials>(PlayerPrefs.GetString(AUTH_CREDENTIALS));
+            return _credentials;
         }
 
         return null;

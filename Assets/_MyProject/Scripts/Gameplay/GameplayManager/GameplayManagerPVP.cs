@@ -3660,7 +3660,6 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void SetTaxCard(int _id)
     {
-        Debug.Log("--- Setting tax: "+_id);
         TaxSelectedCard _taxDetails = new TaxSelectedCard { CardId =  _id};
         FirebaseManager.Instance.RoomHandler.AddAction(ActionType.SetTaxCard, JsonConvert.SerializeObject(_taxDetails));
     }

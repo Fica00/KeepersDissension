@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Portal : AbilityEffect
@@ -49,11 +50,9 @@ public class Portal : AbilityEffect
     public void CheckCard(CardBase _cardThatMoved, int _startingPosition, int _finishingPosition, Action<bool> _didPushCallBack=null)
     {
         StartCoroutine(CheckRoutine());
-        Debug.Log("aaaaaaaaaaaa");
 
         IEnumerator CheckRoutine()
         {
-        Debug.Log("bbbbbbbb");
             yield return new WaitForSeconds(1);
             Card _enteredPortal = null;
             Card _exitPortal = null;
@@ -69,7 +68,6 @@ public class Portal : AbilityEffect
 
             if (_enteredPortal == null)
             {
-        Debug.Log("cccccc");
                 yield break;
             }
 
@@ -78,16 +76,16 @@ public class Portal : AbilityEffect
             if (_exitIndex != -1 && _cardThatMoved.name.ToLower().Contains("blockader") &&
                 GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
             {
+                Debug.Log("handling blockader");
                 HandleBlockader(_exitIndex, _exitPortal.GetTablePlace().Id,(_cardThatMoved as Card), _cardThatMoved
                 .GetTablePlace().Id, _exitIndex,(_cardThatMoved as Card).Details.Id, GameplayManager.Instance
                 .TableHandler.GetPlace(_exitIndex).GetCard().Details.Id);
-        Debug.Log("dddddddd");
                 yield break;
             }
 
             if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
             {
-        Debug.Log("eeeeeeee");
+                Debug.Log("damaging self");
                 CardAction _damageSelf = new CardAction
                 {
                     StartingPlaceId = _cardThatMoved.GetTablePlace().Id,
@@ -106,7 +104,7 @@ public class Portal : AbilityEffect
             }
             else
             {
-        Debug.Log("fffffffffff");
+                Debug.Log("Moving");
                 CardAction _moveAction = new CardAction
                 {
                     StartingPlaceId = _cardThatMoved.GetTablePlace().Id,
@@ -129,7 +127,6 @@ public class Portal : AbilityEffect
         void HandleBlockader(int _exitIndex, int _exitPortalIndex, Card _card, int _placeIdOfFirstCard,
             int _placeIdOfSecondCard, int _firstCardId, int _secondCardId)
         {
-        Debug.Log("gggggggg");
             Card _cardInFrontOfSecondCard =
                 GameplayManager.Instance.TableHandler.CheckForCardInFront(_exitIndex, _exitPortalIndex);
 
@@ -140,12 +137,10 @@ public class Portal : AbilityEffect
                     GameplayManager.Instance.PushCardForward(_exitPortalIndex, _placeIdOfSecondCard, 100);
                 if (_pushedCardPlaceId != -1)
                 {
-        Debug.Log("eeeee");
                     StartCoroutine(MoveSelfRoutine());
                 }
                 else
                 {
-        Debug.Log("ffffff");
                     CardAction _moveBack = new CardAction
                     {
                         StartingPlaceId = _placeIdOfFirstCard,
@@ -167,7 +162,6 @@ public class Portal : AbilityEffect
             }
             else
             {
-        Debug.Log("kkkkkk");
                 CardAction _damageAction = new CardAction
                 {
                     StartingPlaceId = _placeIdOfFirstCard,
@@ -189,7 +183,6 @@ public class Portal : AbilityEffect
 
             IEnumerator MoveSelfRoutine()
             {
-        Debug.Log("mmmmmmmmmmmm");
                 yield return new WaitForSeconds(0.5f);
                 CardAction _moveSelf = new CardAction()
                 {
