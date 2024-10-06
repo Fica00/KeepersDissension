@@ -263,7 +263,6 @@ public class GameplayPlayer : MonoBehaviour
     public void AddOwnedAbility(int _abilityId)
     {
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _abilityId);
-
         ownedAbilities.Add(_ability);
         cardsInHandHandler.HideCards();
         UpdatedOwnedAbilities?.Invoke(_ability);
@@ -272,6 +271,7 @@ public class GameplayPlayer : MonoBehaviour
         {
             return;
         }
+        Debug.Log("----- Adding owned ability");
 
         GameplayManager.Instance.PlaceAbilityOnTable(_ability.Details.Id);
 
