@@ -30,7 +30,7 @@ public class ScoutVision : CardSpecialAbility
         UseVision();
     }
 
-    private void UseVision(CardBase _arg1, int _arg2, int _arg3)
+    private void UseVision(CardBase _arg1, int _arg2, int _arg3, bool _)
     {
         UseVision();
     }

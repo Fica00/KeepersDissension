@@ -66,7 +66,7 @@ public class SlowDown : AbilityEffect
         IsActive = false;
     }
 
-    private void AddCard(CardBase _cardThatMoved, int _arg2, int _arg3)
+    private void AddCard(CardBase _cardThatMoved, int _arg2, int _arg3, bool _)
     {
         cardsThatMovedThisTurn.Add(_cardThatMoved as Card);
     }

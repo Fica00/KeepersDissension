@@ -53,17 +53,19 @@ public class ActionAndTurnDisplay : MonoBehaviour
         ShowAction(opponentPlayer.Actions,false);
     }
 
-    public void ForceChange(int _actionAmount, bool _my)
+    public void ForceChange(int _actionAmount, bool _my, bool _isResponseAction)
     {
-        ShowAction(_actionAmount,_my);
+        ShowAction(_actionAmount,_my,_isResponseAction);
     }
 
-    public void ShowAction(int _number, bool _my)
+    public void ShowAction(int _number, bool _my,bool _isResponseAction=false)
     {
         if (_number==0)
         {
+            Debug.Log("Setting to 0");
             return;
         }
+        
         string _text;
         Color _color;
         if (_my)
@@ -77,9 +79,15 @@ public class ActionAndTurnDisplay : MonoBehaviour
             _color = opponentColor;
         }
 
+        if (_isResponseAction)
+        {
+            Debug.Log("Setting color");
+            _color = Color.magenta;
+        }
+
         actionsDisplay.color = _color;
-        actionAmountDisplay.text = _number.ToString();
         turnDisplay.text = _text;
+        actionAmountDisplay.text = _number.ToString();
         
         if (actionDisplays.Length-1<_number-1)
         {

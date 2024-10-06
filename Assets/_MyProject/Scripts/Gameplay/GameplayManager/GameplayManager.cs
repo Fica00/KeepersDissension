@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-    public static Action<CardBase, int, int> OnCardMoved;
+    public static Action<CardBase, int, int, bool> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
     public static Action<CardBase, CardBase> OnGonnaSwitchPlace;

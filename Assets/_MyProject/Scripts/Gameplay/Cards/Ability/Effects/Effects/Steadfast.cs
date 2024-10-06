@@ -57,7 +57,7 @@ public class Steadfast : AbilityEffect
         Deactivate();
     }
 
-    private void CheckMovedCard(CardBase _movedCard, int _startPlace, int _endPLace)
+    private void CheckMovedCard(CardBase _movedCard, int _startPlace, int _endPLace, bool _)
     {
         if (_movedCard != keeper)
         {

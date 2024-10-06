@@ -76,9 +76,9 @@ public class GameplayUI : MonoBehaviour
         botBackground.sprite = GameplayManager.Instance.MyPlayer.FactionSO.Board;
     }
 
-    public void ForceActionUpdate(int _amountOfAction, bool _my)
+    public void ForceActionUpdate(int _amountOfAction, bool _my, bool _isResponseAction)
     {
-        actionAndTurnDisplay.ForceChange(_amountOfAction,_my);
+        actionAndTurnDisplay.ForceChange(_amountOfAction,_my,_isResponseAction);
     }
     
     public void SetupActionAndTurnDisplay()

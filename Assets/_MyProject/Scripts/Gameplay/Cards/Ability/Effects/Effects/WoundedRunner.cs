@@ -72,7 +72,7 @@ public class WoundedRunner : AbilityEffect
         AddSpeed();
     }
 
-    private void AddSpeed(CardBase _arg1, int _arg2, int _arg3)
+    private void AddSpeed(CardBase _arg1, int _arg2, int _arg3, bool _)
     {
         Debug.Log("Card moved: "+_arg1);
         if (_arg1==keeper)

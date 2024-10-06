@@ -107,7 +107,7 @@ public class Sprint : AbilityEffect
         RemoveEffect();
     }
 
-    private void RemoveEffect(CardBase _arg1, int _arg2, int _arg3)
+    private void RemoveEffect(CardBase _arg1, int _arg2, int _arg3, bool _)
     {
         if (card != _arg1)
         {

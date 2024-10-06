@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Portal : AbilityEffect
@@ -42,7 +41,7 @@ public class Portal : AbilityEffect
         }
     }
 
-    private void CheckCard(CardBase _arg1, int _arg2, int _arg3)
+    private void CheckCard(CardBase _arg1, int _arg2, int _arg3, bool _s)
     {
         CheckCard(_arg1, _arg2, _arg3,null);
     }
@@ -117,7 +116,8 @@ public class Portal : AbilityEffect
                     CanTransferLoot = false,
                     Damage = 0,
                     CanCounter = false,
-                    GiveLoot = false
+                    GiveLoot = false,
+                    DidTeleport = true
                 };
                 GameplayManager.Instance.ExecuteCardAction(_moveAction);
                 _didPushCallBack?.Invoke(true);

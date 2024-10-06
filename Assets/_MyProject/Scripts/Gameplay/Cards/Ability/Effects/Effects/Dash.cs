@@ -30,7 +30,7 @@ public class Dash : AbilityEffect
         AddSpeed();
     }
 
-    private void AddSpeed(CardBase _card, int _starting, int _ending)
+    private void AddSpeed(CardBase _card, int _starting, int _ending, bool _)
     {
         if (_card is not Keeper _keeper)
         {

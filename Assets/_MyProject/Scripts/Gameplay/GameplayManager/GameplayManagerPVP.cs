@@ -1241,7 +1241,7 @@ public class GameplayManagerPVP : GameplayManager
         }
 
         _movingCard.MoveToPosition(_destination);
-        OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId);
+        OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId, _action.DidTeleport);
         if (_action.Cost!=0)
         {
             _player.Actions -= _action.Cost;
@@ -1957,7 +1957,8 @@ public class GameplayManagerPVP : GameplayManager
             {
                 roomHandler.AddAction(ActionType.OpponentFinishedAttackResponse,string.Empty);
             }
-            GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions,false);
+            GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions == 0? 1:OpponentPlayer.Actions,false,false);
+            Debug.Log("Finished response action");
             AudioManager.Instance.PlaySoundEffect("EndTurn");
             return;
         }
@@ -2359,7 +2360,7 @@ public class GameplayManagerPVP : GameplayManager
         IdOfCardWithResponseAction = _cardId;
         MyPlayer.Actions = 1;
         GameState = GameplayState.AttackResponse;
-        GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true);
+        GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true,true);
         UIManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
 
@@ -3272,7 +3273,7 @@ public class GameplayManagerPVP : GameplayManager
             {
                 UIManager.Instance.ShowOkDialog(
                     $"Opponent finished response action, you still have {MyPlayer.Actions} actions left");
-                GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions,true);
+                GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions,true,false);
             }
         }
     }
@@ -3334,7 +3335,7 @@ public class GameplayManagerPVP : GameplayManager
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
         GameState = GameplayState.WaitingForAttackResponse;
-        GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false);
+        GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false,true);
         UIManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
 

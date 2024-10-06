@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Penalty : AbilityEffect
 {
    public static bool IsActive;
@@ -39,7 +41,7 @@ public class Penalty : AbilityEffect
       GameplayManager.Instance.MyPlayer.OnStartedTurn += RemoveEffect;
    }
 
-   private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo)
+   private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo, bool _didTeleport)
    {
       if (_cardBase is not Keeper _keeper)
       {
@@ -47,6 +49,11 @@ public class Penalty : AbilityEffect
       }
 
       if (_keeper.My)
+      {
+         return;
+      }
+      
+      if (_didTeleport)
       {
          return;
       }
@@ -58,6 +65,10 @@ public class Penalty : AbilityEffect
       {
          return;
       }
+      
+      Debug.Log(_startingPlace.name,_startingPlace.gameObject);
+      Debug.Log(_endingPlace.name,_endingPlace.gameObject);
+      Debug.Log("---- Damaging: "+_distance);
 
       CardAction _attackAction = new CardAction
       {
