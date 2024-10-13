@@ -64,10 +64,9 @@ public class ActionAndTurnDisplay : MonoBehaviour
         {
             return;
         }
-
+        
         if (!_isResponseAction && (GameplayManager.Instance.GameState == GameplayState.WaitingForAttackResponse || GameplayManager.Instance.GameState == GameplayState.AttackResponse))
         {
-            Debug.Log("Response action is selected but this is not a response action correction");
             return;
         }
         

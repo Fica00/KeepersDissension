@@ -360,7 +360,6 @@ public class TableActionsHandler : MonoBehaviour
         {
             if (_special is ScalerLeapfrog)
             {
-                Debug.Log("Adding leapfrog");
                 Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
                 AddCardInFront(_warriorCard, _cordsInFront, 1, _dontAddIfItIsAWall: true);
             }
@@ -392,7 +391,6 @@ public class TableActionsHandler : MonoBehaviour
                 Cost = _actionCost,
             });
             _placeInFront.SetColor(Color.magenta);
-            Debug.Log(_placeInFront.name, _placeInFront.gameObject);
         }
     }
 

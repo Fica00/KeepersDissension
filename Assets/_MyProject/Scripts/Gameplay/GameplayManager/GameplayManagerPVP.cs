@@ -13,7 +13,7 @@ public class GameplayManagerPVP : GameplayManager
     private Action<List<int>> opponentCheckForMarkerCallback;
     private RoomHandler roomHandler;
     [SerializeField] private GameObject inputBlocker;
-    private bool didIKillLastBomber;
+    private bool wasLastBomberMine;
 
 
     protected override void Awake()
@@ -1335,7 +1335,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             if (_ability is BomberCard)
             {
-                didIKillLastBomber = _action.IsMy;
+                wasLastBomberMine = _defendingCard.My;
             }
         }
 
@@ -1674,7 +1674,7 @@ public class GameplayManagerPVP : GameplayManager
             }
             else
             {
-                if (didIKillLastBomber)
+                if (wasLastBomberMine)
                 {
                     int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChanges[0] : LootChanges[1];
                     if (_defendingCard is Minion)

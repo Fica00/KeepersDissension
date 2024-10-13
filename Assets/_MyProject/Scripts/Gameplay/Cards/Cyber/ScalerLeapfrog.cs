@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class ScalerLeapfrog : CardSpecialAbility
 {
     //nothing to do here
@@ -43,6 +45,12 @@ public class ScalerLeapfrog : CardSpecialAbility
 
         if (GameplayManager.Instance.GameState != GameplayState.Waiting)
         {
+            return;
+        }
+
+        if (_card==Card)
+        {
+            Debug.Log("Destroyed this card");
             return;
         }
 
