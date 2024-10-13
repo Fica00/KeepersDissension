@@ -31,14 +31,24 @@ public class Penalty : AbilityEffect
       {
          return;
       }
+
+      IsActive = true;
       AbilityCard.ActiveDisplay.gameObject.SetActive(true);
       GameplayManager.Instance.OpponentPlayer.OnStartedTurn += RemoveEffect;
    }
 
    private void Activate()
    {
+      IsActive = true;
       GameplayManager.OnCardMoved += CheckMove;
+      GameplayManager.OnSwitchedPlace += CheckCards;
       GameplayManager.Instance.MyPlayer.OnStartedTurn += RemoveEffect;
+   }
+
+   private void CheckCards(CardBase _card1, CardBase _card2)
+   {
+      CheckMove(_card1 as Card,_card2.GetTablePlace().Id,_card1.GetTablePlace().Id,false);
+      CheckMove(_card2 as Card,_card1.GetTablePlace().Id,_card2.GetTablePlace().Id,false);
    }
 
    private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo, bool _didTeleport)
@@ -65,10 +75,6 @@ public class Penalty : AbilityEffect
       {
          return;
       }
-      
-      Debug.Log(_startingPlace.name,_startingPlace.gameObject);
-      Debug.Log(_endingPlace.name,_endingPlace.gameObject);
-      Debug.Log("---- Damaging: "+_distance);
 
       CardAction _attackAction = new CardAction
       {

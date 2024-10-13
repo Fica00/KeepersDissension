@@ -64,6 +64,12 @@ public class ActionAndTurnDisplay : MonoBehaviour
         {
             return;
         }
+
+        if (!_isResponseAction && (GameplayManager.Instance.GameState == GameplayState.WaitingForAttackResponse || GameplayManager.Instance.GameState == GameplayState.AttackResponse))
+        {
+            Debug.Log("Response action is selected but this is not a response action correction");
+            return;
+        }
         
         string _text;
         Color _color;
@@ -80,10 +86,10 @@ public class ActionAndTurnDisplay : MonoBehaviour
 
         if (_isResponseAction)
         {
-            Debug.Log("Setting color");
             _color = Color.magenta;
+            _text = _my ? "Your response" : "Opponents response";
         }
-
+        
         actionsDisplay.color = _color;
         turnDisplay.text = _text;
         actionAmountDisplay.text = _number.ToString();

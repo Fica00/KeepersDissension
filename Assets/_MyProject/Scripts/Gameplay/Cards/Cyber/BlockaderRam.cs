@@ -4,11 +4,11 @@ using UnityEngine;
 public class BlockaderRam : CardSpecialAbility
 {
     private int chanceForPush = 100;
-    
+
     public void TryAndPush(int _placeIdOfFirstCard, int _placeIdOfSecondCard, int _firstCardId, int _secondCardId)
     {
         Card _cardInFrontOfSecondCard = GameplayManager.Instance.TableHandler.CheckForCardInFront(_placeIdOfFirstCard, _placeIdOfSecondCard);
-        if (_cardInFrontOfSecondCard==null)
+        if (_cardInFrontOfSecondCard == null)
         {
             //push second card
             if (Card is not Keeper)
@@ -30,10 +30,9 @@ public class BlockaderRam : CardSpecialAbility
                     GameplayManager.Instance.PlayAudioOnBoth("OutOfMyWay", Card);
                 }
             }
-            
-            int _pushedCardPlaceId = GameplayManager.Instance.PushCardForward(_placeIdOfFirstCard, _placeIdOfSecondCard, 
-                chanceForPush);
-            if (_pushedCardPlaceId!=-1)
+
+            int _pushedCardPlaceId = GameplayManager.Instance.PushCardForward(_placeIdOfFirstCard, _placeIdOfSecondCard, chanceForPush);
+            if (_pushedCardPlaceId != -1)
             {
                 StartCoroutine(MoveSelfRoutine());
             }
@@ -48,7 +47,7 @@ public class BlockaderRam : CardSpecialAbility
                 var _card = GameplayManager.Instance.TableHandler.GetPlace(_placeIdOfSecondCard).GetCard();
                 var _direction = GameplayManager.Instance.TableHandler.GetFrontIndex(_placeIdOfFirstCard, _placeIdOfSecondCard);
                 var _place = GameplayManager.Instance.TableHandler.GetPlace(_direction);
-                _portal.CheckCard(_card, _placeIdOfSecondCard, _place.Id, _didPush =>
+                _portal.CheckCard(_card, _placeIdOfSecondCard, _place.Id,true, _didPush =>
                 {
                     if (_didPush)
                     {
@@ -58,6 +57,7 @@ public class BlockaderRam : CardSpecialAbility
                 GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
                 return;
             }
+
             //damage second card
             CardAction _damageAction = new CardAction
             {
@@ -73,11 +73,11 @@ public class BlockaderRam : CardSpecialAbility
                 CanCounter = false,
                 GiveLoot = false
             };
-            
+
             GameplayManager.Instance.ExecuteCardAction(_damageAction);
         }
-        
-        
+
+
         IEnumerator MoveSelfRoutine()
         {
             yield return new WaitForSeconds(0.5f);

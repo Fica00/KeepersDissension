@@ -2398,7 +2398,6 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void ForceResponseAction(int _cardId)
     {
-        Debug.Log("Interesting");
         IdOfCardWithResponseAction = _cardId;
         MyPlayer.Actions = 1;
         GameState = GameplayState.AttackResponse;
