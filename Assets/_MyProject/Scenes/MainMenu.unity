@@ -6795,11 +6795,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Version 1.0.30
-
-
-
-'
+  m_text: Version 1.0.31
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9e15b711f3f78f74bbfafd12b0df4f10, type: 2}
   m_sharedMaterial: {fileID: 8843519754723688482, guid: 9e15b711f3f78f74bbfafd12b0df4f10,
@@ -12744,33 +12740,33 @@ MonoBehaviour:
       m_Calls: []
   m_text: '
 
-    
+
 
     App Developer:
 
     MagmaDev
 
-    
 
-    
 
-    Illustration
-    Artists:
 
-    Milos Zecevic
+
+    Illustration Artists:
+
+    Milos
+    Zecevic
 
     Jonah Greene
 
     Jose Lopez
 
-    
 
-    
 
-    Graphic
-    Design:
 
-    Joseph Fox
+
+    Graphic Design:
+
+    Joseph
+    Fox
 
     Sam Turner
 
@@ -12778,93 +12774,92 @@ MonoBehaviour:
 
     MagmaDev
 
-    
 
-    
 
-    Menu
-    Music:
 
-    Corbin Wescott
 
-    
+    Menu Music:
 
-    
+    Corbin
+    Wescott
+
+
+
+
 
     App Music:
 
     Tim Turner II
 
-    Tapian
-    Turner
+    Tapian Turner
 
-    
 
-    
 
-    Game concept and design:
+
+
+    Game
+    concept and design:
 
     Tim Turner II
 
-    
 
-    
 
-    Voice
-    Actors:
+
+
+    Voice Actors:
 
     Sam Turner
 
-    Tim Turner II
+    Tim
+    Turner II
 
     Wesley McCullough
 
-    Levi
-    Sisko
+    Levi Sisko
 
     Titus Turner
 
-    Tony Payne
+    Tony
+    Payne
 
     Simon J. Peters
 
-    Douglas
-    Cloven
+    Douglas Cloven
 
     Adam Parsons
 
     Katie Turner
 
-    Lili Turner
+    Lili
+    Turner
 
     Sally Turner
 
-    Tapian
-    Gibson
+    Tapian Gibson
 
     Ken Bartels
 
     Suzi Bartels
 
-    Stefan Hinkley
+    Stefan
+    Hinkley
 
     Brad Reynoso
 
-    Josh
-    H.
+    Josh H.
 
     MC Clendon
 
-    
 
-    
+
+
 
     Special Thanks:
 
-    Sam Turner
-
-    Liliana
+    Sam
     Turner
+
+    Liliana Turner
 
     Joseph Fox
 
@@ -12872,31 +12867,32 @@ MonoBehaviour:
 
     Milos Zecevic
 
-    Bryan Riester
+    Bryan
+    Riester
 
     EndyMinionGames
 
-    Mustache
-    Power
+    Mustache Power
 
     Gnork Games
 
-    Titus Turner
+    Titus
+    Turner
 
     Jonah Greene
 
     Jose Lopez
 
-    Ruth
-    Ashton
+    Ruth Ashton
 
     Steve Ellis
 
-    Kerry Kuenzi
+    Kerry
+    Kuenzi
 
     Levi Sisko
 
-    
+
 
 '
   m_isRightToLeft: 0
