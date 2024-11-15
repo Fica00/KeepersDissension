@@ -2,17 +2,17 @@ public class Subdued : AbilityEffect
 {
     public static bool IsActive;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
-        RemoveAction();
-        OnActivated?.Invoke();
     }
 
     public override void ActivateForOwner()
     {
         MoveToActivationField();
         IsActive = true;
+        RemoveAction();
+        OnActivated?.Invoke();
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 

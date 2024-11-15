@@ -3,9 +3,8 @@ using System;
 namespace GameplayActions
 {
     [Serializable]
-    public class UseDelivery
+    public class TellOpponentToGetResponseAction
     {
         public int CardId;
-        public int PlaceId;
     }
 }

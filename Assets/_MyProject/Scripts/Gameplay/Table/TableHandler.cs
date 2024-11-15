@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 public class TableHandler : MonoBehaviour
@@ -60,7 +59,7 @@ public class TableHandler : MonoBehaviour
     }
 
     public List<TablePlaceHandler> GetPlacesAround(int _id, CardMovementType _movementType, int _range = 1,
-        bool _includeCenter = false)
+        bool _includeCenter = false, bool _log=false)
     {
         List<TablePlaceHandler> _surroundingPlaces = new List<TablePlaceHandler>();
         TablePlaceHandler _centerPlace = GetPlace(_id);
@@ -113,7 +112,7 @@ public class TableHandler : MonoBehaviour
                 }
             }
         }
-
+        
         return _surroundingPlaces;
     }
 
@@ -297,10 +296,8 @@ public class TableHandler : MonoBehaviour
 
     public Vector2 GetFrontIndex(int _startId, int _endId)
     {
-        Vector2 _startIndex = GetIndexOfPlace(GetPlace(_startId));
         Vector2 _endIndex = GetIndexOfPlace(GetPlace(_endId));
-
-        Vector2 _direction = (_endIndex - _startIndex).normalized;
+        Vector2 _direction = GetDirection(_startId, _endId);
 
         Vector2 _inFrontIndex = _endIndex + _direction;
 
@@ -312,7 +309,13 @@ public class TableHandler : MonoBehaviour
         Vector2 _startIndex = GetIndexOfPlace(GetPlace(_startId));
         Vector2 _endIndex = GetIndexOfPlace(GetPlace(_endId));
 
-        return (_endIndex - _startIndex).normalized;
+        int deltaX = (int)(_endIndex.x - _startIndex.x);
+        int deltaY = (int)(_endIndex.y - _startIndex.y);
+
+        int dirX = Math.Sign(deltaX);
+        int dirY = Math.Sign(deltaY);
+
+        return new Vector2(dirX, dirY);
     }
 
     public bool AreDiagonal(TablePlaceHandler _placeOne, TablePlaceHandler _placeTwo)

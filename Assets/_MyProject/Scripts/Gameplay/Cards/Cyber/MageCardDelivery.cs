@@ -93,12 +93,13 @@ public class MageCardDelivery : CardSpecialAbility
                     GameplayManager.Instance.PlayAudioOnBoth("YouWillRemainProtected", Card);
                 }
             }
-            
-            Player.Actions--;
+
             cardEffectedByDeliver = _card.Details.Id;
             isEffectedCardMy = _card.My;
             GameplayManager.Instance.TellOpponentSomething("Opponent used his Delivery ability");
             GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,true,isEffectedCardMy);
+            Player.Actions--;
+           
         }
     }
 }

@@ -7,7 +7,7 @@ public class Grounded : AbilityEffect
    private CardBase defendingCard;
    private bool skipFirst;
 
-   private void OnEnable()
+   private void Awake()
    {
       isActiveForMe = false;
       isActiveForOpponent = false;
@@ -91,13 +91,17 @@ public class Grounded : AbilityEffect
          return;
       }
 
-      if (!defendingCard.CanMove || ((Card)defendingCard).CanFlyToDodgeAttack)
-      {
-         GameplayManager.OnCardAttacked -= CheckAttackedCard;
-         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-         return;
-      }
-
+      Debug.Log(defendingCard.name,defendingCard.gameObject);
+      Debug.Log(defendingCard.GetTablePlace().Id,defendingCard.gameObject);
+      
+      // if (!defendingCard.CanMove || ((Card)defendingCard).CanFlyToDodgeAttack)
+      // {
+      //    GameplayManager.OnCardAttacked -= CheckAttackedCard;
+      //    AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+      //    GameplayManager.Instance.ChangeMovementForCard(defendingCard.GetTablePlace().Id,true);
+      //    return;
+      // }
+      
       GameplayManager.Instance.ChangeMovementForCard(defendingCard.GetTablePlace().Id,true);
       GameplayManager.OnCardAttacked -= CheckAttackedCard;
       AbilityCard.ActiveDisplay.gameObject.SetActive(false);

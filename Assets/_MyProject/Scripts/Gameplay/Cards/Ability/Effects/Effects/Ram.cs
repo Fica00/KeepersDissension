@@ -21,6 +21,7 @@ public class Ram : AbilityEffect
     private void Activate()
     {
         keeper.EffectsHolder.AddComponent<BlockaderRam>();
+        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
     public override void CancelEffect()
@@ -37,5 +38,6 @@ public class Ram : AbilityEffect
         }
         
         Destroy(_blockader);
+        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

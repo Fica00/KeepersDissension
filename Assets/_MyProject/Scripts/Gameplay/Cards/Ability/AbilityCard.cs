@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class AbilityCard : CardBase
@@ -99,10 +100,18 @@ public class AbilityCard : CardBase
 
                     GameplayManager.Instance.MyPlayer.StrangeMatter--;
                     GameplayManager.Instance.ActivatedTaxedCard();
+                    GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
+                    StartCoroutine(TellOpponentToUpdateMyStrangeMatter());
                 }
             }
             GameplayManager.Instance.ActivateAbility(Details.Id);
         }
+    }
+
+    private IEnumerator TellOpponentToUpdateMyStrangeMatter()
+    {
+        yield return new WaitForSeconds(2);
+        GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
     }
 
     public override void SetParent(Transform _parent)

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class CyborgWall : WallBase
 {
     private void OnEnable()
@@ -38,14 +36,14 @@ public class CyborgWall : WallBase
         {
             if (!_attacker.My)
             {
-                DamageAttacker(AttackerPlace);
+                DamageAttacker(AttackerPlace,2);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
             if (_attacker.My)
             {
-                DamageAttacker(AttackerPlace);
+                DamageAttacker(AttackerPlace,2);
             }
         }
         

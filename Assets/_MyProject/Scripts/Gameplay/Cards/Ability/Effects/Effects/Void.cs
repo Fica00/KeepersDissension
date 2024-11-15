@@ -52,7 +52,7 @@ public class Void : AbilityEffect
         }
     }
 
-    private void CheckMovedCard(CardBase _movedCard, int _startingPlace, int _finishingPlace)
+    private void CheckMovedCard(CardBase _movedCard, int _startingPlace, int _finishingPlace, bool _)
     {
         if (_finishingPlace!=effectedPlace)
         {

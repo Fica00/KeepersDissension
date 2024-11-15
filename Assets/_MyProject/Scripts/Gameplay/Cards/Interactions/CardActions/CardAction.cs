@@ -16,6 +16,10 @@ public class CardAction
     public bool CanCounter = true;
     public bool GiveLoot = false;
     public bool CanBeBlocked = true;
+    public bool ResetSpeed;
+    public bool DidTeleport;
+    public bool DiedByBomb;
+    
     [FormerlySerializedAs("AllowExplosion")] public bool AllowCardEffectOnDeath = true;
     
     public bool CompareTo(CardAction _other)

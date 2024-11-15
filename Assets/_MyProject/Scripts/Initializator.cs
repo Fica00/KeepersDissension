@@ -1,6 +1,7 @@
 using System;
 using Firebase.Auth;
 using Firebase.Database;
+using Newtonsoft.Json;
 using UnityEngine;
 using SignInResult = FirebaseAuthHandler.SignInResult;
 

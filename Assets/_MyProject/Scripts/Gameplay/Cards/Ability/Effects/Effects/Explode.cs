@@ -2,7 +2,7 @@ public class Explode : AbilityEffect
 {
     public static bool IsActive;
     
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }

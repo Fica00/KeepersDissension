@@ -8459,8 +8459,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -99.999985, y: 330.2412}
+  m_AnchoredPosition: {x: 0, y: 0.00076293945}
+  m_SizeDelta: {x: -100, y: 488.65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1079210228
 MonoBehaviour:
@@ -9806,6 +9806,9 @@ MonoBehaviour:
     CanCounter: 1
     GiveLoot: 0
     CanBeBlocked: 1
+    ResetSpeed: 0
+    DidTeleport: 0
+    DiedByBomb: 0
     AllowCardEffectOnDeath: 1
   GameState: 0
   healthTracker: {fileID: 1497496152}
@@ -17222,8 +17225,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25.775024, y: 0}
-  m_SizeDelta: {x: -48.526, y: 0}
+  m_AnchoredPosition: {x: 25.775, y: 0}
+  m_SizeDelta: {x: -48.526, y: 71.323}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1591591194
 MonoBehaviour:
@@ -23288,8 +23291,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00011891696, y: 0}
-  m_SizeDelta: {x: -853.7078, y: 134.13}
+  m_AnchoredPosition: {x: 0.00013122587, y: 0}
+  m_SizeDelta: {x: -915.474, y: 465.18}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1758898893
 MonoBehaviour:
@@ -23322,7 +23325,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 33
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 4
   m_Spacing: 25
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -30595,6 +30598,8 @@ MonoBehaviour:
     type: 3}
   displaysHolder: {fileID: 1758898892}
   holder: {fileID: 316879800}
+  close: {fileID: 674888753}
+  horizontalLayoutGroup: {fileID: 1758898894}
 --- !u!1 &1969520826
 GameObject:
   m_ObjectHideFlags: 0
@@ -35835,7 +35840,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9340882
+      value: -9551763
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
@@ -38742,7 +38747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

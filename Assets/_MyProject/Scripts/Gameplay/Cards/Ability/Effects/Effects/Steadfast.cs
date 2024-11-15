@@ -6,7 +6,7 @@ public class Steadfast : AbilityEffect
     public static bool IsActiveForOpponent;
     private Keeper keeper;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
         IsActiveForOpponent = false;
@@ -57,7 +57,7 @@ public class Steadfast : AbilityEffect
         Deactivate();
     }
 
-    private void CheckMovedCard(CardBase _movedCard, int _startPlace, int _endPLace)
+    private void CheckMovedCard(CardBase _movedCard, int _startPlace, int _endPLace, bool _)
     {
         if (_movedCard != keeper)
         {

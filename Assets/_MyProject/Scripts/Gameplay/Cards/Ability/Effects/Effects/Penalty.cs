@@ -1,10 +1,10 @@
-using System;
+using UnityEngine;
 
 public class Penalty : AbilityEffect
 {
    public static bool IsActive;
 
-   private void OnEnable()
+   private void Awake()
    {
       IsActive = false;
    }
@@ -31,17 +31,27 @@ public class Penalty : AbilityEffect
       {
          return;
       }
+
+      IsActive = true;
       AbilityCard.ActiveDisplay.gameObject.SetActive(true);
       GameplayManager.Instance.OpponentPlayer.OnStartedTurn += RemoveEffect;
    }
 
    private void Activate()
    {
+      IsActive = true;
       GameplayManager.OnCardMoved += CheckMove;
+      GameplayManager.OnSwitchedPlace += CheckCards;
       GameplayManager.Instance.MyPlayer.OnStartedTurn += RemoveEffect;
    }
 
-   private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo)
+   private void CheckCards(CardBase _card1, CardBase _card2)
+   {
+      CheckMove(_card1 as Card,_card2.GetTablePlace().Id,_card1.GetTablePlace().Id,false);
+      CheckMove(_card2 as Card,_card1.GetTablePlace().Id,_card2.GetTablePlace().Id,false);
+   }
+
+   private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo, bool _didTeleport)
    {
       if (_cardBase is not Keeper _keeper)
       {
@@ -49,6 +59,11 @@ public class Penalty : AbilityEffect
       }
 
       if (_keeper.My)
+      {
+         return;
+      }
+      
+      if (_didTeleport)
       {
          return;
       }

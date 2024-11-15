@@ -83,12 +83,12 @@ public class TableActionsHandler : MonoBehaviour
         List<TablePlaceHandler> _movablePlaces;
         _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
         // List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,GetRange(_card),true);
-        if (_card.Stats.Range != 1)
+        if (_card.Stats.Range != 1 && _type == CardActionType.Attack)
         {
             _range = _card.Stats.Range;
         }
 
-        List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _range, true);
+        List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _range, true, true);
         switch (_type)
         {
             case CardActionType.Attack:
@@ -305,7 +305,6 @@ public class TableActionsHandler : MonoBehaviour
 
         _processedPlaces.Add(_currentPlace);
 
-        // Get all places within the card's immediate surrounding
         List<TablePlaceHandler> _neighborPlaces = tableHandler.GetPlacesAround(_currentPlace.Id, _warriorCard.MovementType, 1);
 
         foreach (var _placeAround in _neighborPlaces)
@@ -325,7 +324,6 @@ public class TableActionsHandler : MonoBehaviour
                 }
             }
 
-            // Check if this move is possible based on remaining speed
             int _movementCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
             if (_remainingSpeed >= _movementCost && !_skip)
             {
@@ -336,15 +334,41 @@ public class TableActionsHandler : MonoBehaviour
 
                 _placeAround.SetColor(Color.blue);
 
-                // Recurse to process further movement from this place
                 ProcessMovement(_placeAround, _warriorCard, _remainingSpeed - _movementCost, _processedPlaces);
+            }
+
+            if (_skip)
+            {
+                AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+            }
+            else if (_placeAround.ContainsWall)
+            {
+                foreach (var _ability in _warriorCard.SpecialAbilities)
+                {
+                    if (_ability is ScalerLeapfrog)
+                    {
+                        AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+                    }
+                }
+            }
+        }
+    }
+
+    private void AddLeapfrogMovement(TablePlaceHandler _currentPlace, TablePlaceHandler _placeAround, Card _warriorCard, int _remainingSpeed,
+        HashSet<TablePlaceHandler> _processedPlaces)
+    {
+        foreach (var _special in _warriorCard.SpecialAbilities)
+        {
+            if (_special is ScalerLeapfrog)
+            {
+                Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
+                AddCardInFront(_warriorCard, _cordsInFront, 1, _dontAddIfItIsAWall: true);
             }
         }
     }
 
 
-    private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, Vector2 _direction, bool _dontAddIfItIsAWall = false,
-        bool _addIfOccupied = false)
+    private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, bool _dontAddIfItIsAWall = false)
     {
         TablePlaceHandler _placeInFront = tableHandler.GetPlace(_cordsInFront);
         if (_placeInFront == null)
@@ -367,9 +391,8 @@ public class TableActionsHandler : MonoBehaviour
                 Type = CardActionType.Move,
                 Cost = _actionCost,
             });
-            _placeInFront.SetColor(Color.blue);
+            _placeInFront.SetColor(Color.magenta);
         }
-
     }
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType _movementType,
@@ -553,9 +576,9 @@ public class TableActionsHandler : MonoBehaviour
                 _distance--;
             }
 
-            if (_attackingCard.Speed != 0)
+            if (_attackingCard.Stats.Range != 0)
             {
-                if (_attackingCard.Speed <
+                if (_attackingCard.Stats.Range <
                     CalculatePathCost(_attackingCardPlace, _attackablePlace, _attackingCard.MovementType, 1, CardActionType.Attack))
                 {
                     continue;
@@ -599,7 +622,7 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
-        
+
         List<CardAction> _uniqueActions = new List<CardAction>();
         foreach (var _triggeredAction in _triggeredActions)
         {
@@ -704,6 +727,124 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
+        // New logic to handle portals and occupied destinations
+        if (_action.Type == CardActionType.Move)
+        {
+            TablePlaceHandler _currentPlace = tableHandler.GetPlace(_action.StartingPlaceId);
+            TablePlaceHandler _destinationPlace = tableHandler.GetPlace(_action.FinishingPlaceId);
+
+            if (_destinationPlace.ContainsPortal)
+            {
+                TablePlaceHandler _exitPlace = _destinationPlace.GetComponentInChildren<PortalCard>()
+                    .GetExitPlace(_action.StartingPlaceId, _action.FinishingPlaceId);
+                
+                if (_exitPlace != null && _exitPlace.IsOccupied)
+                {
+                    Card _cardAtExitPlace = _exitPlace.GetCard();
+                    if (_cardAtExitPlace != null)
+                    {
+                        Vector2 direction = tableHandler.GetDirection(_currentPlace.Id, _action.FinishingPlaceId);
+                        Vector2 coordsInFront = tableHandler.GetIndexOfPlace(_exitPlace) + direction;
+                        TablePlaceHandler placeInFront = tableHandler.GetPlace(coordsInFront);
+                        if (placeInFront != null && !placeInFront.IsOccupied)
+                        {
+                            CardAction _pushAction = new CardAction
+                            {
+                                StartingPlaceId = _exitPlace.Id,
+                                FirstCardId = _cardAtExitPlace.Details.Id,
+                                FinishingPlaceId = placeInFront.Id,
+                                Type = CardActionType.Move,
+                                Cost = 0,
+                                IsMy = true,
+                                CanTransferLoot = false,
+                                Damage = 0,
+                                CanCounter = false,
+                                GiveLoot = false
+                            };
+                            GameplayManager.Instance.ExecuteCardAction(_pushAction);
+                            // Now move the moving card into the exit place
+                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.Details.Id == _action.FirstCardId);
+
+                            CardAction _moveAction = new CardAction
+                            {
+                                StartingPlaceId = _movingCard.GetTablePlace().Id,
+                                FirstCardId = _movingCard.Details.Id,
+                                FinishingPlaceId = _exitPlace.Id,
+                                Type = CardActionType.Move,
+                                Cost = 0,
+                                IsMy = true,
+                                CanTransferLoot = false,
+                                Damage = 0,
+                                CanCounter = false,
+                                GiveLoot = false,
+                                DidTeleport = true
+                            };
+                            GameplayManager.Instance.ExecuteCardAction(_moveAction);
+
+                            return; // Action handled, so exit the function
+                        }
+                        else
+                        {
+                            int _cardsPlace = _cardAtExitPlace.GetTablePlace().Id;
+                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.Details.Id == _action.FirstCardId);
+
+                            CardAction _damageOtherCard = new CardAction
+                            {
+                                StartingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
+                                FirstCardId = _cardAtExitPlace.Details.Id,
+                                FinishingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
+                                SecondCardId = _cardAtExitPlace.Details.Id,
+                                Type = CardActionType.Attack,
+                                Cost = 0,
+                                IsMy = true,
+                                CanTransferLoot = false,
+                                Damage = 1,
+                                CanCounter = false,
+                                GiveLoot = false
+                            };
+                            GameplayManager.Instance.ExecuteCardAction(_damageOtherCard);
+
+                            if (_cardAtExitPlace == null || _cardAtExitPlace.Stats.Health <= 0)
+                            {
+                                CardAction _moveAction = new CardAction
+                                {
+                                    StartingPlaceId = _currentPlace.Id,
+                                    FirstCardId = _movingCard.Details.Id,
+                                    FinishingPlaceId = _cardsPlace,
+                                    Type = CardActionType.Move,
+                                    Cost = 0,
+                                    IsMy = true,
+                                    CanTransferLoot = false,
+                                    Damage = 0,
+                                    CanCounter = false,
+                                    GiveLoot = false,
+                                    DidTeleport = true
+                                };
+                                GameplayManager.Instance.ExecuteCardAction(_moveAction);
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                if (_exitPlace==null)
+                {
+                    return;
+                }
+
+                if (_exitPlace.IsActivationField)
+                {
+                    return;
+                }                
+                
+                if (_exitPlace.IsAbility)
+                {
+                    return;
+                }
+
+            }
+        }
+
         if (_action.Type is CardActionType.Move or CardActionType.SwitchPlace or CardActionType.RamAbility)
         {
             if (Hinder.IsActive)
@@ -716,7 +857,12 @@ public class TableActionsHandler : MonoBehaviour
                         continue;
                     }
 
-                    UIManager.Instance.ShowOkDialog("This card can't move due Hinder effect");
+                    if (_placeInRange.GetCard().My)
+                    {
+                        continue;
+                    }
+
+                    UIManager.Instance.ShowOkDialog("This card can't move due to Hinder effect.");
                     return;
                 }
             }
@@ -744,7 +890,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (!_cardOne.CanMove || !_cardTwo.CanMove)
             {
-                UIManager.Instance.ShowOkDialog("Cant swap, card cant move");
+                UIManager.Instance.ShowOkDialog("Cannot swap, one of the cards cannot move.");
                 return;
             }
         }
@@ -754,7 +900,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (!_cardOne.CanMove)
             {
-                UIManager.Instance.ShowOkDialog("Cant move this card");
+                UIManager.Instance.ShowOkDialog("Cannot move this card.");
                 return;
             }
         }
@@ -784,7 +930,7 @@ public class TableActionsHandler : MonoBehaviour
 
         if ((_card1 != null && !_card1.CanBeUsed) || _card2 != null && !_card2.CanBeUsed)
         {
-            UIManager.Instance.ShowOkDialog("One of the cards cant be used!");
+            UIManager.Instance.ShowOkDialog("One of the cards cannot be used!");
             CardActionsDisplay.Instance.Close();
             ClearPossibleActions();
             return;
@@ -798,7 +944,7 @@ public class TableActionsHandler : MonoBehaviour
                 {
                     if (_card1 is Guardian)
                     {
-                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability");
+                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
                         return;
                     }
                 }
@@ -807,7 +953,7 @@ public class TableActionsHandler : MonoBehaviour
                 {
                     if (_card2 is Guardian)
                     {
-                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability");
+                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
                         return;
                     }
                 }
@@ -818,4 +964,5 @@ public class TableActionsHandler : MonoBehaviour
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();
     }
+
 }

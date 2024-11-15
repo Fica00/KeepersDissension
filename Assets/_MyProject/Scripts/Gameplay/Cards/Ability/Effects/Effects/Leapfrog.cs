@@ -1,4 +1,5 @@
 using System.Linq;
+using UnityEngine;
 
 public class Leapfrog : AbilityEffect
 {
@@ -20,6 +21,7 @@ public class Leapfrog : AbilityEffect
 
     private void Activate()
     {
+        Debug.Log(keeper.name,keeper.gameObject);
         keeper.EffectsHolder.AddComponent<ScalerLeapfrog>();
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
@@ -31,6 +33,7 @@ public class Leapfrog : AbilityEffect
             return;
         }
 
+        Debug.Log("Canceling effect");
         ScalerLeapfrog _leapfrog = keeper.EffectsHolder.GetComponent<ScalerLeapfrog>();
         if (_leapfrog==null)
         {

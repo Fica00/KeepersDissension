@@ -61,6 +61,13 @@ public class Snipe : AbilityEffect
                 return;
             }
 
+            Card _card = _place.GetCard();
+            if (_card is Wall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(keeper.GetTablePlace(),_place)>1)
+            {
+                Finish();
+                return;
+            }
+
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _keeperTablePlace.Id,

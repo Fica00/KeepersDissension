@@ -8,7 +8,7 @@ public class Minionized : AbilityEffect
     private float startingHealth;
     private bool hasDied;
     
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }

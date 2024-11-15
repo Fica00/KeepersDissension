@@ -3,7 +3,7 @@ public class Hunter : AbilityEffect
     public static bool IsActive;
     public static bool IsActiveForOpponent;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
         IsActiveForOpponent = false;

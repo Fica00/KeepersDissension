@@ -10,7 +10,7 @@ public class Casters : AbilityEffect
     private List<CardBase> availableEffects = new ();
     public static bool IsActive;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActive = false;
     }
@@ -86,6 +86,7 @@ public class Casters : AbilityEffect
 
     private void TellOpponentThatIPlacedSecondCard()
     {
+        Debug.Log("----- I placed seconds card");
         GameplayManager.Instance.MyPlayer.OnEndedTurn?.Invoke();
         GameplayManager.Instance.FinishCasters();
         Finish();

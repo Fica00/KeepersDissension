@@ -6250,6 +6250,9 @@ MonoBehaviour:
   - Key: DragonGuardianUnchained
     AudioClip: {fileID: 8300000, guid: 96599585f8434824e862d5c25bcbf2e8, type: 3}
     Volume: 1
+  - Key: EndTurn
+    AudioClip: {fileID: 8300000, guid: 7336bfdd53b987f4b87cebe3d6b0a0d2, type: 3}
+    Volume: 1
   mainMenuClip: {fileID: 8300000, guid: 8983fd990fbd8ae4e8e13b60dd1a4c9a, type: 3}
   gameplayClip: {fileID: 8300000, guid: 1d3eb35d78cd4d048bf53d4f22535e8c, type: 3}
   audioSource: {fileID: 1949659731}

@@ -87,7 +87,7 @@ public class Guardian: Card
         AddSpeed();
     }
 
-    private void AddSpeed(CardBase _arg1, int _arg2, int _arg3)
+    private void AddSpeed(CardBase _arg1, int _arg2, int _arg3, bool _)
     {
         AddSpeed();
     }

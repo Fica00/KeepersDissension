@@ -23,7 +23,7 @@ public class Hyperdrive : AbilityEffect
             return;
         }
         
-        ChooseCardPanel.Instance.ShowCards(_availableEffects, _card =>
+        ChooseCardImagePanel.Instance.Show(_availableEffects, _card =>
         {
             ActivateCard(_card);
         });
@@ -49,7 +49,7 @@ public class Hyperdrive : AbilityEffect
                 yield break;
             }
         
-            ChooseCardPanel.Instance.ShowCards(_availableEffects, _card =>
+            ChooseCardImagePanel.Instance.Show(_availableEffects, _card =>
             {
                 ActivateCard(_card,true);
             });
@@ -92,11 +92,6 @@ public class Hyperdrive : AbilityEffect
                 continue;
             }
 
-            if (_ownedAbility.GetTablePlace() != null)
-            {
-                continue;
-            }
-            
             _availableEffects.Add(_ownedAbility);
         }
         return _availableEffects;

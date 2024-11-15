@@ -7,6 +7,7 @@ public class Revive : AbilityEffect
 {
     private GameplayState state;
     private bool forceEnd;
+    
     public override void ActivateForOwner()
     {
         MoveToActivationField();
@@ -55,7 +56,7 @@ public class Revive : AbilityEffect
                     break;
                 }
                 
-                ChooseCardPanel.Instance.ShowCards(_validCards,PlaceMinion,true);
+                ChooseCardImagePanel.Instance.Show(_validCards,PlaceMinion,true,true);
                 yield return new WaitUntil(() => _continue);
             }
             GameplayManager.Instance.GameState = state;

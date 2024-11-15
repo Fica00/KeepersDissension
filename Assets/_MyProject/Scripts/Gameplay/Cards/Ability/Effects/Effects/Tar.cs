@@ -1,10 +1,10 @@
 public class Tar : AbilityEffect
 {
-    private int counter;
     public static bool IsActiveForMe;
     public static bool IsActiveForOpponent;
+    private GameplayPlayer player;
 
-    private void OnEnable()
+    private void Awake()
     {
         IsActiveForOpponent = false;
         IsActiveForMe = false;
@@ -20,25 +20,13 @@ public class Tar : AbilityEffect
             return;
         }
 
+        player = GameplayManager.Instance.OpponentPlayer;
         IsActiveForMe = true;
-        counter = 1;
-        GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableActiveDisplay;
+        player.OnEndedTurn += ChangeEffect;
         MoveToActivationField();
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
         RemoveAction();
         OnActivated?.Invoke();
-    }
-
-    private void DisableActiveDisplay()
-    {
-        if (counter>0)
-        {
-            counter--;
-        }
-
-        IsActiveForMe = false;
-        IsActiveForOpponent = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 
     public override void ActivateForOther()
@@ -48,29 +36,33 @@ public class Tar : AbilityEffect
             return;
         }
 
+        player = GameplayManager.Instance.MyPlayer;
         IsActiveForOpponent = true;
-        GameplayManager.Instance.MyPlayer.OnEndedTurn += ChangeEffect;
+        player.OnEndedTurn += ChangeEffect;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
     private void ChangeEffect()
     {
-        GameplayManager.Instance.MyPlayer.OnEndedTurn -= ChangeEffect;
-        GameplayManager.Instance.MyPlayer.OnEndedTurn += RemoveEffect;
+        player.OnEndedTurn -= ChangeEffect;
+        player.OnEndedTurn += RemoveEffect;
     }
 
     private void RemoveEffect()
     {
-        GameplayManager.Instance.MyPlayer.OnEndedTurn -= RemoveEffect;        
+        player.OnEndedTurn -= RemoveEffect;        
         IsActiveForMe = false;
         IsActiveForOpponent = false;
+        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 
     public override void CancelEffect()
     {
+        if (!(IsActiveForMe&& IsActiveForOpponent))
+        {
+            return;
+        }
+        
         RemoveEffect();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        IsActiveForMe = false;
-        IsActiveForOpponent = false;
     }
 }

@@ -184,6 +184,7 @@ namespace FirebaseAuthHandler
 
         private void CheckEmailVerification()
         {
+            return;
             firebaseUser.ReloadAsync().ContinueWithOnMainThread(_task =>
             {
                 if (_task.IsCompleted && !_task.IsFaulted)
