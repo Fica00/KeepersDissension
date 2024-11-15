@@ -737,7 +737,7 @@ public class TableActionsHandler : MonoBehaviour
             {
                 TablePlaceHandler _exitPlace = _destinationPlace.GetComponentInChildren<PortalCard>()
                     .GetExitPlace(_action.StartingPlaceId, _action.FinishingPlaceId);
-
+                
                 if (_exitPlace != null && _exitPlace.IsOccupied)
                 {
                     Card _cardAtExitPlace = _exitPlace.GetCard();
@@ -762,7 +762,6 @@ public class TableActionsHandler : MonoBehaviour
                                 GiveLoot = false
                             };
                             GameplayManager.Instance.ExecuteCardAction(_pushAction);
-                            
                             // Now move the moving card into the exit place
                             Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.Details.Id == _action.FirstCardId);
 
@@ -827,6 +826,22 @@ public class TableActionsHandler : MonoBehaviour
                         }
                     }
                 }
+
+                if (_exitPlace==null)
+                {
+                    return;
+                }
+
+                if (_exitPlace.IsActivationField)
+                {
+                    return;
+                }                
+                
+                if (_exitPlace.IsAbility)
+                {
+                    return;
+                }
+
             }
         }
 
