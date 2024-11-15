@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 public class TableHandler : MonoBehaviour
@@ -60,7 +59,7 @@ public class TableHandler : MonoBehaviour
     }
 
     public List<TablePlaceHandler> GetPlacesAround(int _id, CardMovementType _movementType, int _range = 1,
-        bool _includeCenter = false)
+        bool _includeCenter = false, bool _log=false)
     {
         List<TablePlaceHandler> _surroundingPlaces = new List<TablePlaceHandler>();
         TablePlaceHandler _centerPlace = GetPlace(_id);
@@ -113,7 +112,7 @@ public class TableHandler : MonoBehaviour
                 }
             }
         }
-
+        
         return _surroundingPlaces;
     }
 

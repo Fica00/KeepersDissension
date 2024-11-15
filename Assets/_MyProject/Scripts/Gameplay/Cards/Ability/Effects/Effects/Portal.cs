@@ -102,6 +102,7 @@ public class Portal : AbilityEffect
                     }
                 }
             }
+            
             GameplayManager.Instance.MyPlayer.Actions--;
 
             int _exitIndex = GameplayManager.Instance.TableHandler.GetTeleportExitIndex(_startingPosition, _enteredPortal.GetTablePlace().Id,

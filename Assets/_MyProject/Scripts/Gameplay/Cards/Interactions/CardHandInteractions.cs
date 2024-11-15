@@ -34,6 +34,7 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
     {
         if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
         {
+            Debug.Log("Using special ability...");
             return;
         }
         

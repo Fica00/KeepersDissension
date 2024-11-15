@@ -98,8 +98,6 @@ public class ScoutVision : CardSpecialAbility
                     GameplayManager.Instance.MarkMarkerAsBomb(_markerPlace);
                     _markerPositions.Remove(_markerPlace);
                 }
-                
-                GameplayManager.Instance.TryDestroyMarkers(_markerPositions);
             }
         }
     }
