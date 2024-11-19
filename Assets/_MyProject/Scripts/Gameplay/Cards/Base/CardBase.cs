@@ -155,6 +155,11 @@ public class CardBase : MonoBehaviour
         //warriors are minions,keepers and guardians
         throw new Exception("Is warrior must be implemented");
     }
+    
+    public virtual bool IsLifeForce()
+    {
+        throw new Exception("IsLifeForce must be implemented");
+    }
 
     public virtual bool IsAttackable()
     {

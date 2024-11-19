@@ -570,6 +570,17 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
             }
+            
+            if (_attackedCard.IsLifeForce())
+            {
+                if (_distance != 1)
+                {
+                    if (_attackingCard.Stats.Range < _distance)
+                    {
+                        continue;
+                    }
+                }
+            }
 
             if (_attackingCardPlace.ContainsWall)
             {

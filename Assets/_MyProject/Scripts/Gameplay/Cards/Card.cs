@@ -60,6 +60,12 @@ public class Card : CardBase
         CardType _type = Details.Type;
         return  IsWarrior() || _type is CardType.Wall or CardType.LifeForce or CardType.Marker;
     }
+    
+    public override bool IsLifeForce()
+    {
+        CardType _type = Details.Type;
+        return _type is CardType.LifeForce;
+    }
 
     public override void Heal(int _amount)
     {

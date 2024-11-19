@@ -125,6 +125,11 @@ public class AbilityCard : CardBase
     {
         return false;
     }
+    
+    public override bool IsLifeForce()
+    {
+        return false;
+    }
 
     public void Activate()
     {
