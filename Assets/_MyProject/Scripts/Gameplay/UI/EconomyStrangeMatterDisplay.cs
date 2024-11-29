@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
 {
     private bool enablePurchase;
+    
     public void Setup(bool _enablePurchase=true)
     {
         enablePurchase = _enablePurchase;

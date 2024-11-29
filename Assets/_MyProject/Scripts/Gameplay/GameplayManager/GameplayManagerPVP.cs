@@ -785,22 +785,6 @@ public class GameplayManagerPVP : GameplayManager
         StopGame(true);
     }
 
-    protected override void SetupPlayers()
-    {
-        List<GameplayPlayerData> _playerData = new();
-        
-        foreach (var _player in roomHandler.RoomData.RoomPlayers)
-        {
-            _playerData.Add(new GameplayPlayerData
-            {
-                PlayerId = _player.Id,
-                WhiteMatter = 0
-            });
-        }
-
-        roomHandler.SetStartingPlayerData(_playerData);
-    }
-
     protected override void SetupTable()
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);

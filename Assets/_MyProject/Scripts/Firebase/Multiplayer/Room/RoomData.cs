@@ -14,6 +14,5 @@ namespace FirebaseMultiplayer.Room
         public string Owner;
         public List<RoomPlayer> RoomPlayers;
         public Dictionary<string,ActionData> Actions = new();
-        public GameplayData GameplayData = new ();
     }
 }

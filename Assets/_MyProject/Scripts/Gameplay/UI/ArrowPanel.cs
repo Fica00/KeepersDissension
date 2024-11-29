@@ -7,8 +7,10 @@ public class ArrowPanel : MonoBehaviour
 {
     public static Action OnShow;
     public static Action OnHide;
+    
     public Action OnOpened;
     public Action OnClosed;
+    
     [SerializeField] private Button showButton;
     [SerializeField] private Transform holder;
     [SerializeField] private Button closeButton;

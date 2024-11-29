@@ -248,16 +248,6 @@ namespace FirebaseMultiplayer.Room
             throw new Exception("Can't find opponent");
         }
 
-        public void SetStartingPlayerData(List<GameplayPlayerData> _data)
-        {
-            roomData.GameplayData.PlayersData = _data;
-            if (IsOwner)
-            {
-                database.Child(RoomPath).Child(nameof(roomData.GameplayData)).Child(nameof(roomData.GameplayData.PlayersData))
-                    .SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
-            }
-        }
-
         public void AddAction(ActionType _type, string _jsonData)
         {
             if (GameplayManager.Instance.IsExecutingOldActions)

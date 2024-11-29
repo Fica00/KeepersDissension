@@ -75,7 +75,6 @@ public class GameplayManager : MonoBehaviour
 
     private void Start()
     {
-        SetupPlayers();
         SetupTable();
         MyPlayer.UpdatedActions += TryEndTurn;
         DataManager.Instance.PlayerData.PlayMusic = DataManager.Instance.PlayerData.PlayMusic; 
@@ -90,11 +89,6 @@ public class GameplayManager : MonoBehaviour
         }
 
         EndTurn();
-    }
-
-    protected virtual void SetupPlayers()
-    {
-        
     }
 
     protected virtual void SetupTable()
