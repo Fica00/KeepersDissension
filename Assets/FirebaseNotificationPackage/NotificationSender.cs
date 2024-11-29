@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class NotificationSender : MonoBehaviour
@@ -26,7 +25,7 @@ public class NotificationSender : MonoBehaviour
         {
             return;
         }
-        TokenHandler.Instance.GetTokenForUser(_userId, _token =>
+        FirebaseNotificationHandler.Instance.GetTokenForUser(_userId, _token =>
         {
             if (_token == null)
             {

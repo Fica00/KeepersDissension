@@ -18,7 +18,7 @@ public class Hyperdrive : AbilityEffect
             GameplayManager.Instance.GameState = gameplayState;
             RemoveAction();
             OnActivated?.Invoke();
-            UIManager.Instance.ShowOkDialog("You don't have any available abilities");
+            DialogsManager.Instance.ShowOkDialog("You don't have any available abilities");
             MoveToActivationField();
             return;
         }
@@ -44,7 +44,7 @@ public class Hyperdrive : AbilityEffect
                 GameplayManager.Instance.GameState = gameplayState;
                 RemoveAction();
                 OnActivated?.Invoke();
-                UIManager.Instance.ShowOkDialog("You don't have anymore available abilities");
+                DialogsManager.Instance.ShowOkDialog("You don't have anymore available abilities");
                 MoveToActivationField();
                 yield break;
             }

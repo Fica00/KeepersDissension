@@ -10,7 +10,7 @@ public class SnowKeeper : CardSpecialAbility
         }
         if (Player.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -19,7 +19,7 @@ public class SnowKeeper : CardSpecialAbility
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
+        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
         
         void Use()
         {

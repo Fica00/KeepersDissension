@@ -203,7 +203,7 @@ namespace FirebaseAuthHandler
                         });
                     }
                     
-                    UIManager.Instance.ShowOkDialog("Please check your email for verification link", CheckEmailVerification);
+                    DialogsManager.Instance.ShowOkDialog("Please check your email for verification link", CheckEmailVerification);
                 }
                 else
                 {

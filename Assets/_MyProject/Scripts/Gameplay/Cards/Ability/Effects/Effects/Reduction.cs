@@ -81,7 +81,7 @@ public class Reduction : AbilityEffect
         if (_availablePlaces.Count==0)
         {
             _callBack?.Invoke();
-            UIManager.Instance.ShowOkDialog("You dont have warrior to sacrifice");
+            DialogsManager.Instance.ShowOkDialog("You dont have warrior to sacrifice");
             RemoveAction();
             return;
         }
@@ -91,7 +91,7 @@ public class Reduction : AbilityEffect
             _availablePlace.SetColor(Color.green);
         }
 
-        UIManager.Instance.ShowOkDialog("Please select warrior to be sacrificed");
+        DialogsManager.Instance.ShowOkDialog("Please select warrior to be sacrificed");
         TablePlaceHandler.OnPlaceClicked += CheckClickedPlace;
 
 
@@ -138,7 +138,7 @@ public class Reduction : AbilityEffect
     public void OpponentFinishedAction()
     {
         opponentFinished = true;
-        UIManager.Instance.ShowOkDialog("Opponent selected warrior");
+        DialogsManager.Instance.ShowOkDialog("Opponent selected warrior");
         CheckForEnd();
     }
 
@@ -147,7 +147,7 @@ public class Reduction : AbilityEffect
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         if (!opponentFinished)
         {
-            UIManager.Instance.ShowOkDialog("Waiting for opponent to select a warrior");
+            DialogsManager.Instance.ShowOkDialog("Waiting for opponent to select a warrior");
             return;
         }
 

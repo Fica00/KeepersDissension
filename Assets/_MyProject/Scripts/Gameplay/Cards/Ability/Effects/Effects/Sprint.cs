@@ -45,7 +45,7 @@ public class Sprint : AbilityEffect
 
         if (_availablePlaces.Count == 0)
         {
-            UIManager.Instance.ShowOkDialog("You dont have minion on which this ability can be applied to");
+            DialogsManager.Instance.ShowOkDialog("You dont have minion on which this ability can be applied to");
             GameplayManager.Instance.GameState = state;
             RemoveAction();
             OnActivated?.Invoke();
@@ -57,7 +57,7 @@ public class Sprint : AbilityEffect
             _availablePlace.SetColor(Color.green);
         }
 
-        UIManager.Instance.ShowOkDialog("Select which Warrior will get +3 speed for one action");
+        DialogsManager.Instance.ShowOkDialog("Select which Warrior will get +3 speed for one action");
         TablePlaceHandler.OnPlaceClicked += CheckClickedPlace;
         IsActive = true;
 

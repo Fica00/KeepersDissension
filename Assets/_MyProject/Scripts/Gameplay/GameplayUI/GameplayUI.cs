@@ -46,7 +46,7 @@ public class GameplayUI : MonoBehaviour
     
     private void Resign()
     {
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to resign?",YesResign);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to resign?",YesResign);
     }
 
     private void YesResign()

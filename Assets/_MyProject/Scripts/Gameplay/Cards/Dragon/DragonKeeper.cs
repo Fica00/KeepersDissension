@@ -14,7 +14,7 @@ public class DragonKeeper : CardSpecialAbility
 
         if (Player.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -23,7 +23,7 @@ public class DragonKeeper : CardSpecialAbility
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
+        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
 
         void Use()
         {
@@ -43,7 +43,7 @@ public class DragonKeeper : CardSpecialAbility
 
             if (_availableCards.Count==0)
             {
-                UIManager.Instance.ShowOkDialog("You don't have any minion that you cloud revive");
+                DialogsManager.Instance.ShowOkDialog("You don't have any minion that you cloud revive");
                 GameplayManager.Instance.MyPlayer.Actions--;
                 return;
             }
@@ -69,7 +69,7 @@ public class DragonKeeper : CardSpecialAbility
                 GameplayManager.Instance.BuyMinion(effectedCard, 0,_placeMinion: false);
                 PlaceMinion();
                 effectedCard.CanBeUsed = false;
-                UIManager.Instance.ShowOkDialog("This minion will be available next turn");
+                DialogsManager.Instance.ShowOkDialog("This minion will be available next turn");
             }
         }
     }

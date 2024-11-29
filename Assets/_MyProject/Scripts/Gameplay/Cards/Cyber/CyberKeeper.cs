@@ -14,7 +14,7 @@ public class CyberKeeper : CardSpecialAbility
         
         if (Player.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -23,7 +23,7 @@ public class CyberKeeper : CardSpecialAbility
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
+        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
 
         void Use()
         {
@@ -52,26 +52,26 @@ public class CyberKeeper : CardSpecialAbility
                 CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_id).GetCard();
                 if (!(_cardAtSpot != null))
                 {
-                    UIManager.Instance.ShowOkDialog("Select warrior");
+                    DialogsManager.Instance.ShowOkDialog("Select warrior");
                     return;
                 }
 
                 Card _card = ((Card)_cardAtSpot);
                 if (!_card.IsWarrior())
                 {
-                    UIManager.Instance.ShowOkDialog("Select warrior");
+                    DialogsManager.Instance.ShowOkDialog("Select warrior");
                     return;
                 }
 
                 if (_card.My)
                 {
-                    UIManager.Instance.ShowOkDialog("Select opponents card");
+                    DialogsManager.Instance.ShowOkDialog("Select opponents card");
                     return;
                 }
 
                 if (GameplayManager.Instance.MyPlayer.Actions <= 0)
                 {
-                    UIManager.Instance.ShowOkDialog("You don't have anymore actions");
+                    DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
                     return;
                 }
 

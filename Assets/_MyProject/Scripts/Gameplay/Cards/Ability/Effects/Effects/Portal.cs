@@ -13,7 +13,7 @@ public class Portal : AbilityEffect
         GameplayState _gameState = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
 
-        UIManager.Instance.ShowOkDialog("Select place for the portal");
+        DialogsManager.Instance.ShowOkDialog("Select place for the portal");
         GameplayManager.Instance.SelectPlaceForSpecialAbility(10, 10, PlaceLookFor.Empty, CardMovementType.EightDirections, false,
             LookForCardOwner.Both, OnPlaceSelected);
 
@@ -32,7 +32,7 @@ public class Portal : AbilityEffect
             }
             else
             {
-                UIManager.Instance.ShowOkDialog("Select second place for the portal");
+                DialogsManager.Instance.ShowOkDialog("Select second place for the portal");
                 GameplayManager.Instance.SelectPlaceForSpecialAbility(10, 10, PlaceLookFor.Empty, CardMovementType.EightDirections, false,
                     LookForCardOwner.Both, OnPlaceSelected);
                 portalId++;

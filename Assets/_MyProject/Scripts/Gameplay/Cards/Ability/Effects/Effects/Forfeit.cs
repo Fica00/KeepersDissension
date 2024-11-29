@@ -22,7 +22,7 @@ public class Forfeit : AbilityEffect
         
         if (_availablePlaces.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You dont have minion to sacrifice");
+            DialogsManager.Instance.ShowOkDialog("You dont have minion to sacrifice");
             GameplayManager.Instance.GameState = GameplayState.Playing;
             RemoveAction();
             OnActivated?.Invoke();
@@ -34,7 +34,7 @@ public class Forfeit : AbilityEffect
             _availablePlace.SetColor(Color.green);
         }
 
-        UIManager.Instance.ShowOkDialog("Please select minion to be sacrificed");
+        DialogsManager.Instance.ShowOkDialog("Please select minion to be sacrificed");
         TablePlaceHandler.OnPlaceClicked += CheckClickedPlace;
 
 

@@ -52,7 +52,7 @@ public class BomberMinefield : CardSpecialAbility
     {
         if (Player.Actions<=0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -63,11 +63,11 @@ public class BomberMinefield : CardSpecialAbility
 
         if (BombMarkers.Count >= 3)
         {
-            UIManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
+            DialogsManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to use minefield ability?", () =>
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use minefield ability?", () =>
         {
             YesUseMinefield();
         }, () =>
@@ -80,7 +80,7 @@ public class BomberMinefield : CardSpecialAbility
     {
         if (Player.Actions<=0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -91,7 +91,7 @@ public class BomberMinefield : CardSpecialAbility
 
         if (BombMarkers.Count >= 3)
         {
-            UIManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
+            DialogsManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
             return;
         }
 
@@ -108,7 +108,7 @@ public class BomberMinefield : CardSpecialAbility
             GameplayManager.Instance.CloseAllPanels();
             if (_placeId == -1)
             {
-                UIManager.Instance.ShowOkDialog("There is no empty space for bomb");
+                DialogsManager.Instance.ShowOkDialog("There is no empty space for bomb");
                 OnActivated?.Invoke();
                 return;
             }
@@ -116,13 +116,13 @@ public class BomberMinefield : CardSpecialAbility
             TablePlaceHandler _tablePlace = GameplayManager.Instance.TableHandler.GetPlace(_placeId);
             if (_tablePlace.ContainsVoid)
             {
-                UIManager.Instance.ShowOkDialog("Please select unoccupied space");
+                DialogsManager.Instance.ShowOkDialog("Please select unoccupied space");
                 OnActivated?.Invoke();
                 return;
             }
             if (_tablePlace.IsOccupied && !_tablePlace.ContainsMarker)
             {
-                UIManager.Instance.ShowOkDialog("Please select unoccupied space");
+                DialogsManager.Instance.ShowOkDialog("Please select unoccupied space");
                 OnActivated?.Invoke();
                 return;
             }
@@ -131,7 +131,7 @@ public class BomberMinefield : CardSpecialAbility
             {
                 if (_marker.GetTablePlace().Id==_placeId)
                 {
-                    UIManager.Instance.ShowOkDialog("This place already contains bomb");
+                    DialogsManager.Instance.ShowOkDialog("This place already contains bomb");
                     OnActivated?.Invoke();
                     return;
                 }
@@ -139,7 +139,7 @@ public class BomberMinefield : CardSpecialAbility
             
             if (Player.Actions<=0 && !Casters.IsActive && _checkActions)
             {
-                UIManager.Instance.ShowOkDialog("You don't have anymore actions");
+                DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
                 OnActivated?.Invoke();
                 return;
             }

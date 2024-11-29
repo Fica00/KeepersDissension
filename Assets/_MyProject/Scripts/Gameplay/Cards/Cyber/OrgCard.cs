@@ -14,7 +14,7 @@ public class OrgCard : CardSpecialAbility
     {
         if (Player.Actions<=0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -23,7 +23,7 @@ public class OrgCard : CardSpecialAbility
             return;
         }
         
-        UIManager.Instance.ShowYesNoDialog("Use orges Groundpound  attack?",YesUseGroundpoundAttack);
+        DialogsManager.Instance.ShowYesNoDialog("Use orges Groundpound  attack?",YesUseGroundpoundAttack);
     }
 
     private void YesUseGroundpoundAttack()

@@ -28,7 +28,7 @@ public class MageCardStun : CardSpecialAbility
     {
         if (Player.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -37,7 +37,7 @@ public class MageCardStun : CardSpecialAbility
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to use stun ability?", YesUseStunAbility);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use stun ability?", YesUseStunAbility);
     }
 
     private void YesUseStunAbility()
@@ -51,27 +51,27 @@ public class MageCardStun : CardSpecialAbility
             GameplayManager.Instance.GameState = GameplayState.Playing;
             if (_id == -1)
             {
-                UIManager.Instance.ShowOkDialog("No enemy cards found");
+                DialogsManager.Instance.ShowOkDialog("No enemy cards found");
                 return;
             }
 
             CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_id).GetCardNoWall();
             if (_cardAtSpot == null)
             {
-                UIManager.Instance.ShowOkDialog("Select card");
+                DialogsManager.Instance.ShowOkDialog("Select card");
                 return;
             }
 
             Card _card = ((Card)_cardAtSpot);
             if (!_card.IsWarrior())
             {
-                UIManager.Instance.ShowOkDialog("Select warrior");
+                DialogsManager.Instance.ShowOkDialog("Select warrior");
                 return;
             }
 
             if (!_card.CanMove)
             {
-                UIManager.Instance.ShowOkDialog("This card can't move");
+                DialogsManager.Instance.ShowOkDialog("This card can't move");
                 return;
             }
             

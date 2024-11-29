@@ -87,7 +87,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
 
         if (_player.StrangeMatter<_price && !GameplayCheats.HasUnlimitedGold)
         {
-            UIManager.Instance.ShowOkDialog($"You dont have enough strange matter, this action requires {_price}");
+            DialogsManager.Instance.ShowOkDialog($"You dont have enough strange matter, this action requires {_price}");
             return;
         }
         
@@ -96,7 +96,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog($"Do you want to buy this ability for {_price} strange matter?", () =>
+        DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy this ability for {_price} strange matter?", () =>
         {
             if (_abilityCard != null)
             {

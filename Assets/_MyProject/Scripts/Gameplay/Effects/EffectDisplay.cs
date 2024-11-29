@@ -28,7 +28,7 @@ public class EffectDisplay : MonoBehaviour
 
     private void Show()
     {
-        UIManager.Instance.ShowOkDialog(text);
+        DialogsManager.Instance.ShowOkDialog(text);
     }
 
     private Sprite GetSprite(EffectType _type)

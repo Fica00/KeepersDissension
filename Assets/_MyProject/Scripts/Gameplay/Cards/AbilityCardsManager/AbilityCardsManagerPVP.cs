@@ -45,7 +45,7 @@ public class AbilityCardsManagerPVP : AbilityCardsManagerBase
         
         if (Famine.IsActive)
         {
-            UIManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
+            DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
             return;
         }
 
@@ -58,17 +58,17 @@ public class AbilityCardsManagerPVP : AbilityCardsManagerBase
 
         if (_player.AmountOfAbilitiesPlayerCanBuy<=0)
         {
-            UIManager.Instance.ShowOkDialog("You can't buy any more abilities");
+            DialogsManager.Instance.ShowOkDialog("You can't buy any more abilities");
             return;
         }
 
         if (_player.StrangeMatter<_price&& !GameplayCheats.HasUnlimitedGold)
         {
-            UIManager.Instance.ShowOkDialog($"You need {_price} strange matter to buy ability card");
+            DialogsManager.Instance.ShowOkDialog($"You need {_price} strange matter to buy ability card");
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog(
+        DialogsManager.Instance.ShowYesNoDialog(
             $"Are you sure that you want to buy ability for {_price} strange matter?", ()=>
         {
             _player.RemoveStrangeMatter(_price);

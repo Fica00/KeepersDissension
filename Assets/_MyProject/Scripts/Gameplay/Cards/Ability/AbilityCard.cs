@@ -75,17 +75,17 @@ public class AbilityCard : CardBase
 
         if (GameplayManager.Instance.MyPlayer.Actions<=0)
         {
-            UIManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
+            DialogsManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
             return;
         }
 
         if (Subdued.IsActive)
         {
-            UIManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
+            DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to activate this ability?",YesActivate);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to activate this ability?",YesActivate);
         void YesActivate()
         {
             if (Tax.SelectedCard!=null)
@@ -94,7 +94,7 @@ public class AbilityCard : CardBase
                 {
                     if (GameplayManager.Instance.MyPlayer.StrangeMatter<=0)
                     {
-                        UIManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
+                        DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
                         return;
                     }
 

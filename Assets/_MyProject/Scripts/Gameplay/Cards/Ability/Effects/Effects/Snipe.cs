@@ -49,7 +49,7 @@ public class Snipe : AbilityEffect
         {
             if (_placeId == -1)
             {
-                UIManager.Instance.ShowOkDialog("There are no available spaces");
+                DialogsManager.Instance.ShowOkDialog("There are no available spaces");
                 Finish();
                 return;
             }

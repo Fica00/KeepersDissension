@@ -23,7 +23,7 @@ public class SniperStealth : CardSpecialAbility
 
         if (Player.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -32,7 +32,7 @@ public class SniperStealth : CardSpecialAbility
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to use stealth ability?", YesUseStealth);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use stealth ability?", YesUseStealth);
     }
 
     private void YesUseStealth()
@@ -51,7 +51,7 @@ public class SniperStealth : CardSpecialAbility
         {
             if (_placeId == -1)
             {
-                UIManager.Instance.ShowOkDialog("There is no empty space");
+                DialogsManager.Instance.ShowOkDialog("There is no empty space");
                 return;
             }
 
@@ -59,19 +59,19 @@ public class SniperStealth : CardSpecialAbility
 
             if (_stealthPlace.ContainsVoid)
             {
-                UIManager.Instance.ShowOkDialog("Cant place on void");
+                DialogsManager.Instance.ShowOkDialog("Cant place on void");
                 return;
             }
 
             if (_stealthPlace.IsOccupied)
             {
-                UIManager.Instance.ShowOkDialog("Stealth tile is already occupied");
+                DialogsManager.Instance.ShowOkDialog("Stealth tile is already occupied");
                 return;
             }
 
             if (GameplayManager.Instance.MyPlayer.Actions <= 0)
             {
-                UIManager.Instance.ShowOkDialog("You don't have anymore actions");
+                DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
                 return;
             }
 
@@ -153,13 +153,13 @@ public class SniperStealth : CardSpecialAbility
         }
         if (_stealthPlace.IsOccupied)
         {
-            UIManager.Instance.ShowOkDialog("Stealth tile is already occupied");
+            DialogsManager.Instance.ShowOkDialog("Stealth tile is already occupied");
             return;
         }
 
         if (GameplayManager.Instance.MyPlayer.Actions <= 0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have anymore actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
             return;
         }
 

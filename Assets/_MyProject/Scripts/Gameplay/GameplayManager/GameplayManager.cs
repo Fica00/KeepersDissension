@@ -210,24 +210,24 @@ public class GameplayManager : MonoBehaviour
 
         if (!FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My).IsChained)
         {
-            UIManager.Instance.ShowOkDialog("Guardian is already unchained");
+            DialogsManager.Instance.ShowOkDialog("Guardian is already unchained");
             return;
         }
 
         int _price = UnchainingGuardianPrice - StrangeMatterCostChange;
         if (Famine.IsActive)
         {
-            UIManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
+            DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
             return;
         }
 
         if (MyPlayer.StrangeMatter < _price && !GameplayCheats.HasUnlimitedGold)
         {
-            UIManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
+            DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
             return;
         }
 
-        UIManager.Instance.ShowYesNoDialog($"Spend {_price} to unchain guardian??", () => { YesUnchain(_price); });
+        DialogsManager.Instance.ShowYesNoDialog($"Spend {_price} to unchain guardian??", () => { YesUnchain(_price); });
     }
 
     private void YesUnchain(int _price)
@@ -374,7 +374,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
+    public virtual int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100, bool _tryToMoveSelf = false)
     {
         throw new NotImplementedException();
     }

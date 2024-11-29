@@ -79,7 +79,7 @@ public class CardActionsDisplay : MonoBehaviour
         
         if (!selectedCard.My)
         {
-            UIManager.Instance.ShowOkDialog("Selected card is not yours");
+            DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
             return;
         }
         
@@ -99,7 +99,7 @@ public class CardActionsDisplay : MonoBehaviour
         
         if (!selectedCard.My)
         {
-            UIManager.Instance.ShowOkDialog("Selected card is not yours");
+            DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
             return;
         }
         
@@ -152,7 +152,7 @@ public class CardActionsDisplay : MonoBehaviour
             if (_id != _placeId)
             {
                 _placeId = _id;
-                UIManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
             }
         }
         
@@ -166,7 +166,7 @@ public class CardActionsDisplay : MonoBehaviour
 
         if (!selectedCard.CanBeUsed)
         {
-            UIManager.Instance.ShowOkDialog("This card can't be used!");
+            DialogsManager.Instance.ShowOkDialog("This card can't be used!");
             selectedCard = null;
             return;
         }
@@ -240,7 +240,7 @@ public class CardActionsDisplay : MonoBehaviour
             {
                 if (!selectedCard.My)
                 {
-                    UIManager.Instance.ShowOkDialog("Selected card is not yours");
+                    DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
                     return;
                 }
                 

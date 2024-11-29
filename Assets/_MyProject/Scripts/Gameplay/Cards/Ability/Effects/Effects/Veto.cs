@@ -29,11 +29,11 @@ public class Veto : AbilityEffect
         {
             if (_optionId==1)
             {
-                UIManager.Instance.ShowOkDialog("Opponent doesnt have ability in his hand, choose from field");
+                DialogsManager.Instance.ShowOkDialog("Opponent doesnt have ability in his hand, choose from field");
                 OptionSelected(0);
                 return;
             }
-            UIManager.Instance.ShowOkDialog("Opponent doesnt have ability cards on field, choose from hand");
+            DialogsManager.Instance.ShowOkDialog("Opponent doesnt have ability cards on field, choose from hand");
             OptionSelected(1);
             return;
         }

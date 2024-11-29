@@ -101,7 +101,7 @@ public class ActivationFieldHandler : MonoBehaviour
         
         if (Subdued.IsActive && GameplayCheats.CheckForCD)
         {
-            UIManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
+            DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return;
         }
 
@@ -144,7 +144,7 @@ public class ActivationFieldHandler : MonoBehaviour
         }
         else
         {
-            UIManager.Instance.ShowOkDialog($"This card needs {_effect.Cooldown} on top of it but there is only " +
+            DialogsManager.Instance.ShowOkDialog($"This card needs {_effect.Cooldown} on top of it but there is only " +
                                             $"{_amountOfCardsOnTop}");
         }
     }

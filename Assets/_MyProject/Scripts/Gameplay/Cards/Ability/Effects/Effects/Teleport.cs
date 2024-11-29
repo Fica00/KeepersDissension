@@ -58,7 +58,7 @@ public class Teleport : AbilityEffect
         {
             if (_placeId==-1)
             {
-                UIManager.Instance.ShowOkDialog("There are no empty spaces around Life Force");
+                DialogsManager.Instance.ShowOkDialog("There are no empty spaces around Life Force");
                 GameplayManager.Instance.GameState = _state;
                 RemoveAction();
                 OnActivated?.Invoke();

@@ -6,11 +6,11 @@ public class GameplayUIPVP : GameplayUI
     {
         if (_didIWin)
         {
-            UIManager.Instance.ShowOkDialog("You won!",LeaveRoom);
+            DialogsManager.Instance.ShowOkDialog("You won!",LeaveRoom);
         }
         else
         {
-            UIManager.Instance.ShowOkDialog("You lost!",LeaveRoom);
+            DialogsManager.Instance.ShowOkDialog("You lost!",LeaveRoom);
         }
     }
     

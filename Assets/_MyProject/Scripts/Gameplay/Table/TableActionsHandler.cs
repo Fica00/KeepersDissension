@@ -48,7 +48,7 @@ public class TableActionsHandler : MonoBehaviour
             Card _cardAtStealth = _tablePlace.GetCardNoWall();
             if (_cardAtStealth)
             {
-                UIManager.Instance.ShowYesNoDialog("To interact with card in stealth, you have to leave stealth, continue??", YesLeaveStealth,
+                DialogsManager.Instance.ShowYesNoDialog("To interact with card in stealth, you have to leave stealth, continue??", YesLeaveStealth,
                     ClearPossibleActions);
             }
 
@@ -101,7 +101,7 @@ public class TableActionsHandler : MonoBehaviour
                     SlowDown _slowDown = FindObjectOfType<SlowDown>();
                     if (!_slowDown.CanMoveCard(_card))
                     {
-                        UIManager.Instance.ShowOkDialog("Movement is blocked by SlowDown ability");
+                        DialogsManager.Instance.ShowOkDialog("Movement is blocked by SlowDown ability");
                         ClearPossibleActions();
                         return;
                     }
@@ -698,7 +698,7 @@ public class TableActionsHandler : MonoBehaviour
                     }
                 }
 
-                UIManager.Instance.ShowYesNoDialog(_question, () => { YesExecute(_action); });
+                DialogsManager.Instance.ShowYesNoDialog(_question, () => { YesExecute(_action); });
                 return;
             }
         }
@@ -873,7 +873,7 @@ public class TableActionsHandler : MonoBehaviour
                         continue;
                     }
 
-                    UIManager.Instance.ShowOkDialog("This card can't move due to Hinder effect.");
+                    DialogsManager.Instance.ShowOkDialog("This card can't move due to Hinder effect.");
                     return;
                 }
             }
@@ -901,7 +901,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (!_cardOne.CanMove || !_cardTwo.CanMove)
             {
-                UIManager.Instance.ShowOkDialog("Cannot swap, one of the cards cannot move.");
+                DialogsManager.Instance.ShowOkDialog("Cannot swap, one of the cards cannot move.");
                 return;
             }
         }
@@ -911,7 +911,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (!_cardOne.CanMove)
             {
-                UIManager.Instance.ShowOkDialog("Cannot move this card.");
+                DialogsManager.Instance.ShowOkDialog("Cannot move this card.");
                 return;
             }
         }
@@ -941,7 +941,7 @@ public class TableActionsHandler : MonoBehaviour
 
         if ((_card1 != null && !_card1.CanBeUsed) || _card2 != null && !_card2.CanBeUsed)
         {
-            UIManager.Instance.ShowOkDialog("One of the cards cannot be used!");
+            DialogsManager.Instance.ShowOkDialog("One of the cards cannot be used!");
             CardActionsDisplay.Instance.Close();
             ClearPossibleActions();
             return;
@@ -955,7 +955,7 @@ public class TableActionsHandler : MonoBehaviour
                 {
                     if (_card1 is Guardian)
                     {
-                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
+                        DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
                         return;
                     }
                 }
@@ -964,7 +964,7 @@ public class TableActionsHandler : MonoBehaviour
                 {
                     if (_card2 is Guardian)
                     {
-                        UIManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
+                        DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
                         return;
                     }
                 }

@@ -25,7 +25,7 @@ public class Mirage : AbilityEffect
         
         if (_availablePlaces.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You dont have minion to switch with");
+            DialogsManager.Instance.ShowOkDialog("You dont have minion to switch with");
             GameplayManager.Instance.GameState = GameplayState.Playing;
             RemoveAction();
             OnActivated?.Invoke();
@@ -37,7 +37,7 @@ public class Mirage : AbilityEffect
             _availablePlace.SetColor(Color.green);
         }
 
-        UIManager.Instance.ShowOkDialog("Please select minion to switch keepers position with");
+        DialogsManager.Instance.ShowOkDialog("Please select minion to switch keepers position with");
         TablePlaceHandler.OnPlaceClicked += CheckClickedPlace;
         
         void CheckClickedPlace(TablePlaceHandler _clickedPlace)

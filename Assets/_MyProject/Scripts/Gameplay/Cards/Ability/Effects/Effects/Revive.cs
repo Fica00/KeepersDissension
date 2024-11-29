@@ -29,7 +29,7 @@ public class Revive : AbilityEffect
         
         if (_validCards.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have any dead minion");
+            DialogsManager.Instance.ShowOkDialog("You don't have any dead minion");
             RemoveAction();
             OnActivated?.Invoke();
             return;
@@ -52,7 +52,7 @@ public class Revive : AbilityEffect
                 _continue = false;
                 if (_validCards.Count==0)
                 {
-                    UIManager.Instance.ShowOkDialog("You revived all dead minions");
+                    DialogsManager.Instance.ShowOkDialog("You revived all dead minions");
                     break;
                 }
                 

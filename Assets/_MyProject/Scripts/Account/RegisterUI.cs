@@ -1,9 +1,8 @@
 using System;
-using FirebaseAuthHandler;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class RegisterUI : MonoBehaviour, IPanel
 {
@@ -13,62 +12,28 @@ public class RegisterUI : MonoBehaviour, IPanel
     [SerializeField] private TMP_InputField password;
     [SerializeField] private TMP_InputField confirmPassword;
     [SerializeField] private Button register;
-    [SerializeField] private Button signIp;
+    [SerializeField] private Button signUp;
+    [SerializeField] private Button anonymous;
     
-    public void Setup()
-    {
-        string _email = GetEmail();
-        string _password = GetPassword();
-        email.text = _email;
-        password.text = _password;
-        confirmPassword.text = _password;
-        name.text = GetPassword();
-        Register();
-        return;
-        holder.SetActive(true);
-    }
-
-    string GetEmail()
-    {
-        string _randomEmail = CreateRandom();
-        string _email = String.Empty;
-        for (int i = 0; i < 8; i++)
-        {
-            _email += _randomEmail[i];
-        }
-        
-        return _email + "@keepers.com";
-    }
-
-    string GetPassword()
-    {
-        string _randomPass = CreateRandom();
-        string _passowrd = string.Empty;
-        for (int i = 0; i < 8; i++)
-        {
-            _passowrd += _randomPass[i];
-        }
-
-        return _passowrd;
-    }
-
-    string CreateRandom()
-    {
-        return Guid.NewGuid().ToString();
-    }
-
     private void OnEnable()
     {
+        signUp.onClick.AddListener(SignUp);
         register.onClick.AddListener(Register);
-        signIp.onClick.AddListener(SignUp);
+        anonymous.onClick.AddListener(Anonymous);
     }
 
     private void OnDisable()
     {
+        signUp.onClick.RemoveListener(SignUp);
         register.onClick.RemoveListener(Register);
-        signIp.onClick.RemoveListener(SignUp);
+        anonymous.onClick.RemoveListener(Anonymous);
     }
-
+    
+    private void SignUp()
+    {
+        AuthenticationHandler.Instance.ShowLogin();
+    }
+    
     private void Register()
     {
         string _email = email.text;
@@ -83,56 +48,72 @@ public class RegisterUI : MonoBehaviour, IPanel
 
         if (_password!=_confirmPassword)
         {
-            UIManager.Instance.ShowOkDialog("Passwords don't match");
+            DialogsManager.Instance.ShowOkDialog("Passwords don't match");
             return;
         }
 
-        if (CredentialsValidator.ValidateName(_name))
+        if (!CredentialsValidator.ValidateName(_name))
         {
-            ManageInteractables(false);
-            FirebaseManager.Instance.Authentication.SignUpEmail(_email,_password, HandleRegister);
-        }
-    }
-
-    private void HandleRegister(SignInResult _result)
-    {
-        if (!_result.IsSuccessful)
-        {        
-            ManageInteractables(true);
-            UIManager.Instance.ShowOkDialog("Email already in use");
             return;
         }
 
-        DataManager.SaveAuthenticationCredentials(email.text,password.text);
-        DataManager.Instance.CreateNewPlayer();
-        DataManager.Instance.PlayerData.Name = name.text;
-        FirebaseManager.Instance.UpdatePlayerData(JsonConvert.SerializeObject(DataManager.Instance.PlayerData),HandleFinishedUpdatingPlayerData);
+        AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = _email, Password = _password };
+        AuthenticationHandler.Instance.TryToRegister(_credentials, _name);
+        HandleInteractables(false);
     }
 
-    private void HandleFinishedUpdatingPlayerData(bool _result)
+    private void Anonymous()
     {
-        if (!_result)
+        HandleInteractables(false);
+        AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = GetEmail(), Password = GetPassword() };
+        string _playerName = "Player" + Random.Range(1000, 10000);
+        AuthenticationHandler.Instance.TryToRegister(_credentials, _playerName);
+        return;
+
+        string GetEmail()
         {
-            UIManager.Instance.ShowOkDialog("Something went wrong while setting starting data");
-            return;
+            string _randomEmail = CreateRandom();
+            string _email = string.Empty;
+            for (int _i = 0; _i < 8; _i++)
+            {
+                _email += _randomEmail[_i];
+            }
+        
+            return _email + "@keepers.com";
         }
 
-        Initializator.Instance.CollectData();
-    }
+        string GetPassword()
+        {
+            string _randomPass = CreateRandom();
+            string _password = string.Empty;
+            for (int _i = 0; _i < 8; _i++)
+            {
+                _password += _randomPass[_i];
+            }
 
-    private void SignUp()
+            return _password;
+        }
+
+        string CreateRandom()
+        {
+            return Guid.NewGuid().ToString();
+        }
+    }
+    
+    public void Setup()
     {
-        AuthenticationUI.Instance.ShowLogin();
+        holder.SetActive(true);
+        HandleInteractables(true);
     }
-
-    private void ManageInteractables(bool _status)
+    
+    private void HandleInteractables(bool _status)
     {
         name.interactable = _status;
         email.interactable = _status;
         password.interactable = _status;
         confirmPassword.interactable = _status;
         register.interactable = _status;
-        signIp.interactable = _status;
+        signUp.interactable = _status;
     }
 
     public void Close()

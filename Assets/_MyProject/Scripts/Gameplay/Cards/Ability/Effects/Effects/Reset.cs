@@ -23,7 +23,7 @@ public class Reset : AbilityEffect
         
         if (_cards.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have any card on cooldown");
+            DialogsManager.Instance.ShowOkDialog("You don't have any card on cooldown");
             RemoveAction();
             OnActivated?.Invoke();
             return;

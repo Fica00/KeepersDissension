@@ -25,7 +25,7 @@ public class Tax : AbilityEffect
         {
             RemoveAction();
             OnActivated?.Invoke();
-            UIManager.Instance.ShowOkDialog("Opponent doesn't own a CC ability card");
+            DialogsManager.Instance.ShowOkDialog("Opponent doesn't own a CC ability card");
             return;
         }
         

@@ -781,7 +781,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        UIManager.Instance.ShowOkDialog("Opponent resigned");
+        DialogsManager.Instance.ShowOkDialog("Opponent resigned");
         StopGame(true);
     }
 
@@ -960,7 +960,7 @@ public class GameplayManagerPVP : GameplayManager
     private IEnumerator PlaceRestOfStartingCards()
     {
         yield return PlaceKeeper();
-        UIManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+        DialogsManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
         yield return RequestCardToBePlaced(14, CardType.Minion);
         yield return RequestCardToBePlaced(13, CardType.Minion);
         yield return RequestCardToBePlaced(12, CardType.Minion);
@@ -971,7 +971,7 @@ public class GameplayManagerPVP : GameplayManager
 
         IEnumerator PlaceKeeper()
         {
-            UIManager.Instance.ShowOkDialog("Select which side of your Lifeforce that you, the Keeper, will start.");
+            DialogsManager.Instance.ShowOkDialog("Select which side of your Lifeforce that you, the Keeper, will start.");
             List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler>
             {
                 TableHandler.GetPlace(10),
@@ -1302,7 +1302,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
             _player.Actions--;
-            UIManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
+            DialogsManager.Instance.ShowOkDialog("Attacks are blocked by Truce");
             return;
         }
         
@@ -1421,23 +1421,23 @@ public class GameplayManagerPVP : GameplayManager
                 {
                     if (Invincible.IsActive && _defendingCard.My&& _action.CanBeBlocked)
                     {
-                        UIManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
+                        DialogsManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
                         _damage = 0;
                     }
                     else if (Invincible.IsActiveForOpponent && !_defendingCard.My&& _action.CanBeBlocked)
                     {
-                        UIManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
+                        DialogsManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
                         _damage = 0;
                     }
                     else if (Steadfast.IsActive && _defendingCard.My && _attackingCard is Minion && !_attackingCard.My&& _action.CanBeBlocked)
                     {
-                        UIManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
+                        DialogsManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
                         _damage = 0;
                     }
                     else if (Steadfast.IsActiveForOpponent && !_defendingCard.My && _attackingCard is Minion && 
                     _attackingCard.My && _action.CanBeBlocked)
                     {
-                        UIManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
+                        DialogsManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
                         _damage = 0;
                     }
 
@@ -1566,7 +1566,7 @@ public class GameplayManagerPVP : GameplayManager
 
             if ((Ambush.IsActiveForMe && !_defendingCard.My) || (Ambush.IsActiveForOpponent && _defendingCard.My))
             {
-                UIManager.Instance.ShowOkDialog("Ignore next response action activated!");
+                DialogsManager.Instance.ShowOkDialog("Ignore next response action activated!");
                 Ambush.IsActiveForMe = false;
                 Ambush.IsActiveForOpponent = false;
                 return;
@@ -2402,7 +2402,7 @@ public class GameplayManagerPVP : GameplayManager
         MyPlayer.Actions = 1;
         GameState = GameplayState.AttackResponse;
         GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true,true);
-        UIManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
+        DialogsManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
 
     public override void TryDestroyMarkers(List<int> _places, bool _tellRoom = true)
@@ -2643,7 +2643,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             if (_placeId==-1)
             {
-                UIManager.Instance.ShowOkDialog("There are no empty spaces in ability row");
+                DialogsManager.Instance.ShowOkDialog("There are no empty spaces in ability row");
                 return;
             }
             HandleActivateAbility(_cardId,true,_placeId);
@@ -2722,8 +2722,8 @@ public class GameplayManagerPVP : GameplayManager
         _player.AmountOfAbilitiesPlayerCanBuy--;
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
     }
-    
-    public override int PushCardForward(int _startingPlace, int _endingPlace,int _chanceForPush=100)
+
+    public override int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100, bool _tryToMoveSelf = false)
     {
         Card _pushedCard = TableHandler.GetPlace(_endingPlace).GetCard();
 
@@ -2747,13 +2747,13 @@ public class GameplayManagerPVP : GameplayManager
         TablePlaceHandler _placeInFrontOfPushedCard = TableHandler.GetPlace(_indexInFrontOfPushedCard);
         if (_placeInFrontOfPushedCard==null)
         {
-            StartCoroutine(DamagePushedCard());
+            StartCoroutine(DamagePushedCard(true));
             return -1;
         }
 
         if (_placeInFrontOfPushedCard.IsAbility)
         {
-            StartCoroutine(DamagePushedCard());
+            StartCoroutine(DamagePushedCard(true));
             return -1;
         }
         if (_placeInFrontOfPushedCard.GetCard() == null)
@@ -2777,10 +2777,10 @@ public class GameplayManagerPVP : GameplayManager
             return _pushedCardPlace.Id;
         }
 
-        StartCoroutine(DamagePushedCard());
+        StartCoroutine(DamagePushedCard(true));
         return -1;
 
-        IEnumerator DamagePushedCard()
+        IEnumerator DamagePushedCard(bool _shouldMoveSelf)
         {
             yield return new WaitForSeconds(0.5f);
             CardAction _damage = new CardAction()
@@ -2798,6 +2798,43 @@ public class GameplayManagerPVP : GameplayManager
             };
             
             ExecuteCardAction(_damage);
+            if (_shouldMoveSelf && _tryToMoveSelf)
+            {
+                var _attackedCard = TableHandler.GetPlace(_endingPlace).GetCard();
+                if (_attackedCard != null)
+                {
+                    if (_attackedCard.Stats.Health!=0)
+                    {
+                        yield break;
+                    }
+                }
+                
+                var _myCardTable = TableHandler.GetPlace(_startingPlace).GetCard();
+                if (_myCardTable == null)
+                {
+                    yield break;
+                }
+
+                if (_myCardTable.Stats.Health == 0)
+                {
+                    yield break;
+                }
+                
+                CardAction _moveSelf = new CardAction()
+                {
+                    FirstCardId = _myCardTable.Details.Id,
+                    StartingPlaceId = _myCardTable.GetTablePlace().Id,
+                    FinishingPlaceId = _endingPlace,
+                    Type = CardActionType.Move,
+                    Cost = 0,
+                    IsMy = true,
+                    CanTransferLoot = false,
+                    Damage = -1,
+                    CanCounter = false,
+                };
+
+                ExecuteCardAction(_moveSelf);
+            }
         }
     }
 
@@ -3313,7 +3350,7 @@ public class GameplayManagerPVP : GameplayManager
             }
             else
             {
-                UIManager.Instance.ShowOkDialog(
+                DialogsManager.Instance.ShowOkDialog(
                     $"Opponent finished response action, you still have {MyPlayer.Actions} actions left");
                 GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions,true,false);
             }
@@ -3378,7 +3415,7 @@ public class GameplayManagerPVP : GameplayManager
         OpponentPlayer.Actions = 1;
         GameState = GameplayState.WaitingForAttackResponse;
         GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false,true);
-        UIManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
+        DialogsManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
 
     private void OpponentWantsToTryAndDestroyMarkers(string _placesString)
@@ -3416,14 +3453,14 @@ public class GameplayManagerPVP : GameplayManager
     private void OpponentBoughtAbilityFromShop(int _abilityId)
     {
         HandleBuyAbilityFromShop(_abilityId,false);
-        UIManager.Instance.ShowOkDialog("Opponent Bought from shared hand");
+        DialogsManager.Instance.ShowOkDialog("Opponent Bought from shared hand");
         CloseAllPanels();
     }
 
     private void OpponentBoughtAbilityFromHand(int _abilityId)
     {
         HandleBuyAbilityFromHand(_abilityId,false);
-        UIManager.Instance.ShowOkDialog("Opponent bought ability from his hand");
+        DialogsManager.Instance.ShowOkDialog("Opponent bought ability from his hand");
     }
 
     private void OpponentChangedBomberExplode(bool _state)
@@ -3438,7 +3475,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void OpponentSaidSomething(string _text)
     {
-        UIManager.Instance.ShowOkDialog(_text);
+        DialogsManager.Instance.ShowOkDialog(_text);
     }
 
     private void OpponentReturnedAbilityToPlace(int _abilityId, int _placeId)
@@ -3452,7 +3489,7 @@ public class GameplayManagerPVP : GameplayManager
             .Find(_ability => _ability.Details.Id == _abilityId);
         _ability.transform.SetParent(null);
         _ability.PositionInHand();
-        UIManager.Instance.ShowOkDialog("Opponent took card from activation field");
+        DialogsManager.Instance.ShowOkDialog("Opponent took card from activation field");
     }
 
     private void OpponentBoughtStrangeMatter()

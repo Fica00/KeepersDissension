@@ -27,7 +27,7 @@ public class MageCardDelivery : CardSpecialAbility
     {
         if (Player.Actions<=0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
             return;
         }
 
@@ -36,7 +36,7 @@ public class MageCardDelivery : CardSpecialAbility
             return;
         }
         
-        UIManager.Instance.ShowYesNoDialog("Are you sure that you want to use deliver ability?", YesUseDeliverAbility);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use deliver ability?", YesUseDeliverAbility);
     }
 
     private void YesUseDeliverAbility()
@@ -56,21 +56,21 @@ public class MageCardDelivery : CardSpecialAbility
             GameplayManager.Instance.GameState = GameplayState.Playing;
             if (_id==-1)
             {
-                UIManager.Instance.ShowOkDialog("No cards found");
+                DialogsManager.Instance.ShowOkDialog("No cards found");
                 return;
             }
             
             CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_id).GetCard();
             if (!(_cardAtSpot != null))
             {
-                UIManager.Instance.ShowOkDialog("Select warrior");
+                DialogsManager.Instance.ShowOkDialog("Select warrior");
                 return;
             }
 
             Card _card = ((Card)_cardAtSpot);
             if (!_card.IsWarrior())
             {
-                UIManager.Instance.ShowOkDialog("Select warrior");
+                DialogsManager.Instance.ShowOkDialog("Select warrior");
                 return;
             }
 

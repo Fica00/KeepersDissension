@@ -24,14 +24,14 @@ public class Casters : AbilityEffect
         
         if (availableEffects.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for player to play a card");
+            DialogsManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for player to play a card");
             TellOpponentToPlayACard();
             return;
         }
 
         if (GameplayManager.Instance.MyPlayer.Actions==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have enough actions, waiting for player to play a card");
+            DialogsManager.Instance.ShowOkDialog("You don't have enough actions, waiting for player to play a card");
             TellOpponentToPlayACard();
             return;
         }
@@ -65,7 +65,7 @@ public class Casters : AbilityEffect
         availableEffects = GetAvailableEffects();
         if (availableEffects.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for opponent to place card");
+            DialogsManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for opponent to place card");
             TellOpponentThatIPlacedCard();
             return;
         }
@@ -120,7 +120,7 @@ public class Casters : AbilityEffect
         
         if (availableEffects.Count==0)
         {
-            UIManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for player to play a card");
+            DialogsManager.Instance.ShowOkDialog("You don't have any available abilities, waiting for player to play a card");
             TellOpponentThatIPlacedSecondCard();
             return;
         }

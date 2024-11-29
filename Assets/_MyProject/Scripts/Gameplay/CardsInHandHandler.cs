@@ -141,7 +141,7 @@ public class CardsInHandHandler : MonoBehaviour
       
       if (Famine.IsActive)
       {
-         UIManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
+         DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
          return;
       }
 
@@ -155,11 +155,11 @@ public class CardsInHandHandler : MonoBehaviour
          int _buyPrice = 10 - GameplayManager.Instance.StrangeMatterCostChange;
          if (player.StrangeMatter < _buyPrice&& !GameplayCheats.HasUnlimitedGold)
          {
-            UIManager.Instance.ShowOkDialog($"You need {_buyPrice} strange matter to buy minion");
+            DialogsManager.Instance.ShowOkDialog($"You need {_buyPrice} strange matter to buy minion");
             return;
          }
 
-         UIManager.Instance.ShowYesNoDialog($"Do you want to buy minion for {_buyPrice} strange matter?",
+         DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy minion for {_buyPrice} strange matter?",
             () =>
             {
                GameplayManager.Instance.BuyMinion(_card, _buyPrice);
@@ -204,17 +204,17 @@ public class CardsInHandHandler : MonoBehaviour
       
       if (Famine.IsActive)
       {
-         UIManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
+         DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
          return;
       }
 
       if (player.StrangeMatter < _buildPrice && !GameplayCheats.HasUnlimitedGold)
       {
-         UIManager.Instance.ShowOkDialog($"You need {_buildPrice} strange matter to build wall");
+         DialogsManager.Instance.ShowOkDialog($"You need {_buildPrice} strange matter to build wall");
          return;
       }
 
-      UIManager.Instance.ShowYesNoDialog($"Do you want to build wall for {_buildPrice} strange matter?",
+      DialogsManager.Instance.ShowYesNoDialog($"Do you want to build wall for {_buildPrice} strange matter?",
          () =>
          {
             GameplayManager.Instance.BuildWall(_card, _buildPrice);

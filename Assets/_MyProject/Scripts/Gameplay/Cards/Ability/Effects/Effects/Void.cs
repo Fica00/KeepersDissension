@@ -15,7 +15,7 @@ public class Void : AbilityEffect
         {
             if (_placeId==-1)
             {
-                UIManager.Instance.ShowOkDialog("Looks like there is no empty space");
+                DialogsManager.Instance.ShowOkDialog("Looks like there is no empty space");
                 RemoveAction();
                 OnActivated?.Invoke();
                 return;
@@ -25,7 +25,7 @@ public class Void : AbilityEffect
 
             if (_player.Actions<=0)
             {
-                UIManager.Instance.ShowOkDialog("You don't have anymore actions");
+                DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
                 RemoveAction();
                 OnActivated?.Invoke();
                 return;
@@ -36,7 +36,7 @@ public class Void : AbilityEffect
             Card _marker = _player.GetCard(CardType.Marker);
             if (_marker==null)
             {
-                UIManager.Instance.ShowOkDialog("You don't have available marker");
+                DialogsManager.Instance.ShowOkDialog("You don't have available marker");
                 RemoveAction();
                 OnActivated?.Invoke();
                 return;

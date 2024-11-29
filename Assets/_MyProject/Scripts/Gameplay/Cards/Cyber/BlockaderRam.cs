@@ -31,7 +31,7 @@ public class BlockaderRam : CardSpecialAbility
                 }
             }
 
-            int _pushedCardPlaceId = GameplayManager.Instance.PushCardForward(_placeIdOfFirstCard, _placeIdOfSecondCard, chanceForPush);
+            int _pushedCardPlaceId = GameplayManager.Instance.PushCardForward(_placeIdOfFirstCard, _placeIdOfSecondCard, chanceForPush,true);
             if (_pushedCardPlaceId != -1)
             {
                 StartCoroutine(MoveSelfRoutine());
@@ -75,6 +75,7 @@ public class BlockaderRam : CardSpecialAbility
             };
 
             GameplayManager.Instance.ExecuteCardAction(_damageAction);
+            StartCoroutine(MoveSelfRoutine());
         }
 
 

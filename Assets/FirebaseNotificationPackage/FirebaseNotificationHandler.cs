@@ -1,19 +1,21 @@
 using System;
-using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Extensions;
 using Firebase.Messaging;
 using UnityEngine;
 
 public class FirebaseNotificationHandler : MonoBehaviour
 {
     public static FirebaseNotificationHandler Instance;
-
-    private FirebaseAuth auth;
+    
+    private DatabaseReference databaseReference;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -21,35 +23,16 @@ public class FirebaseNotificationHandler : MonoBehaviour
         }
     }
 
-    public void Init(FirebaseAuth _auth)
+    private void OnEnable()
     {
-        auth = _auth;
-        // if (DataManager.Instance.PlayerData.GameplayNotifications)
-        // {
-        
-        FirebaseMessaging.TokenReceived += OnTokenReceived;
         FirebaseMessaging.MessageReceived += OnMessageReceived;
-        // }
-
-        if (auth.CurrentUser != null)
-        {
-            TokenHandler.Instance.FetchAndUpdateUserTokens();
-        }
-
-        auth.StateChanged += OnAuthStateChanged;
+        FirebaseMessaging.TokenReceived += OnTokenReceived;
     }
 
-    private void OnAuthStateChanged(object _sender, EventArgs _eventArgs)
+    private void OnDisable()
     {
-        if (auth.CurrentUser != null)
-        {
-            TokenHandler.Instance.FetchAndUpdateUserTokens();
-        }
-    }
-
-    private void OnTokenReceived(object _sender, TokenReceivedEventArgs _token)
-    {
-        TokenHandler.Instance.UpdateToken(auth.CurrentUser.UserId, _token.Token);
+        FirebaseMessaging.MessageReceived -= OnMessageReceived;
+        FirebaseMessaging.TokenReceived -= OnTokenReceived;
     }
 
     private void OnMessageReceived(object _sender, MessageReceivedEventArgs _e)
@@ -57,26 +40,65 @@ public class FirebaseNotificationHandler : MonoBehaviour
         Debug.Log("Received a new message from FCM!");
     }
 
-    private void OnDestroy()
+    private void OnTokenReceived(object _sender, TokenReceivedEventArgs _e)
     {
-        FirebaseMessaging.TokenReceived -= OnTokenReceived;
-        FirebaseMessaging.MessageReceived -= OnMessageReceived;
+        SaveTokenToDatabase(_e.Token, null);
+    }
 
-        if (auth != null)
+    public void Init(DatabaseReference _databaseReference, Action _callBack)
+    {
+        databaseReference = _databaseReference;
+        FirebaseMessaging.GetTokenAsync().ContinueWithOnMainThread(_task =>
         {
-            auth.StateChanged -= OnAuthStateChanged;
-        }
+            if (_task.IsCompleted && !_task.IsFaulted && !_task.IsCanceled)
+            {
+                string _fcmToken = _task.Result;
+                SaveTokenToDatabase(_fcmToken,_callBack);
+            }
+            else
+            {
+                _callBack?.Invoke();
+            }
+        });
     }
     
-    // public void ToggleNotifications(bool _isEnabled)
-    // {
-    //     // if (_isEnabled)
-    //     // {
-    //     //     SubscribeToNotifications();
-    //     // }
-    //     // else
-    //     // {
-    //     //     UnsubscribeFromNotifications();
-    //     // }
-    // }
+    private void SaveTokenToDatabase(string _token, Action _callBack)
+    {
+        if (databaseReference == null)
+        {
+            _callBack?.Invoke();
+            return;
+        }
+
+        Debug.Log("------ Saving token");
+        DatabaseReference _tokenRef = databaseReference.Child("notifications").Child(FirebaseManager.Instance.Authentication.UserId).Child("fcmToken");
+
+        _tokenRef.SetValueAsync(_token).ContinueWithOnMainThread(_task =>
+        {
+            _callBack?.Invoke();
+        });
+    }
+    
+    public void GetTokenForUser(string _userId, Action<string> _callback)
+    {
+        DatabaseReference _tokenRef = databaseReference.Child("notifications").Child(_userId).Child("fcmToken");
+
+        _tokenRef.GetValueAsync().ContinueWithOnMainThread(_task =>
+        {
+            if (_task.IsFaulted)
+            {
+                Debug.LogError("Error retrieving token: " + _task.Exception);
+                _callback?.Invoke(null);
+            }
+            else if (_task.Result.Exists)
+            {
+                string _token = _task.Result.Value.ToString();
+                _callback?.Invoke(_token);
+            }
+            else
+            {
+                _callback?.Invoke(null);
+            }
+        });
+    }
 }

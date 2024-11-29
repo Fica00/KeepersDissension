@@ -15,7 +15,7 @@ public class Shockwave : AbilityEffect
         {
             RemoveAction();
             OnActivated?.Invoke();
-            UIManager.Instance.ShowOkDialog("You don't have any red ability card");
+            DialogsManager.Instance.ShowOkDialog("You don't have any red ability card");
             return;
         }
 

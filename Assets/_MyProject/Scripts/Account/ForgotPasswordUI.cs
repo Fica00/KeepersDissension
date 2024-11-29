@@ -29,30 +29,18 @@ public class ForgotPasswordUI : MonoBehaviour, IPanel
     private void Reset()
     {
         string _email = email.text;
-        if (CredentialsValidator.VerifyEmail(_email))
+        if (!CredentialsValidator.VerifyEmail(_email))
         {
-            ManageInteractables(false);
-            FirebaseManager.Instance.SendPasswordResetEmail(_email,HandlePasswordSentResult);
+            return;
         }
-    }
-
-    private void HandlePasswordSentResult(bool _result)
-    {
-        ManageInteractables(true);
-        if (_result)
-        {
-            UIManager.Instance.ShowOkDialog("Email with instructions to reset your password has been sent");
-            Login();
-        }
-        else
-        {
-            UIManager.Instance.ShowOkDialog("Something went wrong, please check email or try again later");
-        }
+        
+        ManageInteractables(false);
+        AuthenticationHandler.Instance.SendPasswordReset(_email);
     }
 
     private void Login()
     {
-        AuthenticationUI.Instance.ShowLogin();
+        AuthenticationHandler.Instance.ShowLogin();
     }
 
     private void ManageInteractables(bool _status)

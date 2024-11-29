@@ -1,4 +1,3 @@
-using FirebaseAuthHandler;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,58 +13,46 @@ public class LoginUI : MonoBehaviour, IPanel
     
     public void Setup()
     {
-        SignUn();
-        return;
         holder.SetActive(true);
         HandleInteractables(true);
     }
 
     private void OnEnable()
     {
-        login.onClick.AddListener(Login);
         signUp.onClick.AddListener(SignUn);
         forgotPassword.onClick.AddListener(ForgotPassword);
+        login.onClick.AddListener(Login);
     }
 
     private void OnDisable()
     {
-        login.onClick.RemoveListener(Login);
         signUp.onClick.RemoveListener(SignUn);
         forgotPassword.onClick.RemoveListener(ForgotPassword);
+        login.onClick.RemoveListener(Login);
+    }
+    
+    private void SignUn()
+    {
+        AuthenticationHandler.Instance.ShowRegister();
+    }
+
+    private void ForgotPassword()
+    {
+        AuthenticationHandler.Instance.ShowForgotPassword();
     }
 
     private void Login()
     {
         string _email = email.text;
         string _password = password.text;
-        if (CredentialsValidator.ValidateCredentials(_email,_password))
+        if (!CredentialsValidator.ValidateCredentials(_email, _password))
         {
-            HandleInteractables(false);
-            FirebaseManager.Instance.Authentication.SignInEmail(_email,_password,HandleLoginResult);
-        }
-    }
-
-    private void HandleLoginResult(SignInResult _result)
-    {
-        if (!_result.IsSuccessful)
-        {
-            HandleInteractables(true);
-            UIManager.Instance.ShowOkDialog(_result.Message);
             return;
         }
         
-        DataManager.SaveAuthenticationCredentials(email.text,password.text);
-        Initializator.Instance.CollectData();
-    }
-
-    private void SignUn()
-    {
-        AuthenticationUI.Instance.ShowRegister();
-    }
-
-    private void ForgotPassword()
-    {
-        AuthenticationUI.Instance.ShowForgotPassword();
+        HandleInteractables(false);
+        AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = _email, Password = _password };
+        AuthenticationHandler.Instance.TryLogin(_credentials);
     }
 
     private void HandleInteractables(bool _status)
