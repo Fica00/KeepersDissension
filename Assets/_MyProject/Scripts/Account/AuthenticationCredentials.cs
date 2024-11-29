@@ -5,4 +5,5 @@ public class AuthenticationCredentials
 {
     public string Email;
     public string Password;
+    public bool IsAnonymous;
 }

@@ -65,7 +65,7 @@ public class RegisterUI : MonoBehaviour, IPanel
     private void Anonymous()
     {
         HandleInteractables(false);
-        AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = GetEmail(), Password = GetPassword() };
+        AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = GetEmail(), Password = GetPassword() , IsAnonymous = true};
         string _playerName = "Player" + Random.Range(1000, 10000);
         AuthenticationHandler.Instance.TryToRegister(_credentials, _playerName);
         return;

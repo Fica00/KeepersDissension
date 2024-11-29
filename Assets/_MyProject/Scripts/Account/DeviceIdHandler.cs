@@ -56,13 +56,13 @@ public class DeviceIdHandler : MonoBehaviour
         {
             return;
         }
-        
-        DialogsManager.Instance.ShowOkDialog("Please log in to continue", () =>
+
+        if (string.IsNullOrEmpty(_newDeviceId))
         {
-            FirebaseManager.Instance.Authentication.SignOut();
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.Save();
-            SceneManager.LoadDataCollector();
-        });
+            return;
+        }
+        
+        FirebaseManager.Instance.SignOut(SceneManager.LoadDataCollector);
+        DialogsManager.Instance.ShowOkDialog("Please log in to continue");
     }
 }

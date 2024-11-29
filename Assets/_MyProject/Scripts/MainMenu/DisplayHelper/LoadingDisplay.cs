@@ -9,8 +9,6 @@ namespace DisplayHelpers
     {
         [SerializeField] private Text loadingText;
         [SerializeField] private Image loadingBar;
-        
-        
         [SerializeField] private string startingText;
         [SerializeField] private string addition;
         [SerializeField] private bool loop;
@@ -19,11 +17,10 @@ namespace DisplayHelpers
 
         private void Awake()
         {
-            SetUp();//Temp for testing
+            SetUp();
         }
 
-
-        public void SetUp()
+        private void SetUp()
         {
             loadingText.text = startingText;
             loadingBar.fillAmount = 0;
@@ -33,20 +30,23 @@ namespace DisplayHelpers
 
         private IEnumerator Animate()
         {
-            var holder = startingText;
-            loadingText.text = holder;
-            var index = 0;
+            var _holder = startingText;
+            loadingText.text = _holder;
+            var _index = 0;
             yield return new WaitForSecondsRealtime(timeToAddCharacter);
-            while (holder!=startingText+addition)
+            while (_holder!=startingText+addition)
             {
            
-                holder += addition[index];
-                loadingText.text = holder;
-                index++;
+                _holder += addition[_index];
+                loadingText.text = _holder;
+                _index++;
                 yield return new WaitForSecondsRealtime(timeToAddCharacter);
             }
 
-            if (loop) StartCoroutine(nameof(Animate));
+            if (loop)
+            {
+                StartCoroutine(nameof(Animate));
+            }
         }
     }
 }

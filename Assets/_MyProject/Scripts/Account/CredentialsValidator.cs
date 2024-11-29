@@ -40,7 +40,7 @@ public static class CredentialsValidator
         return true;
     }
     
-    public static bool VerifyPassword(string _password)
+    private static bool VerifyPassword(string _password)
     {
         if (string.IsNullOrEmpty(_password))
         {

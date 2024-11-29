@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Newtonsoft.Json;
 using UnityEngine;
 using FirebaseAuthHandler;
@@ -11,9 +12,12 @@ public class AuthenticationHandler : MonoBehaviour
    [SerializeField] private LoginUI login;
    [SerializeField] private RegisterUI register;
    [SerializeField] private ForgotPasswordUI forgotPassword;
+   [SerializeField] private EmailVerificationUI emailVerificationUI;
    
    private Action authCallBack;
+   private Action emailVerifyCallback;
    private AuthenticationCredentials credentials;
+   
 
    private void Awake()
    {
@@ -83,6 +87,7 @@ public class AuthenticationHandler : MonoBehaviour
          return;
       }
 
+      FirebaseManager.Instance.SendEmailVerification();
       DataManager.Instance.CreateNewPlayer();
       DataManager.Instance.PlayerData.Name = _name;
       string _playerData = JsonConvert.SerializeObject(DataManager.Instance.PlayerData);
@@ -138,11 +143,45 @@ public class AuthenticationHandler : MonoBehaviour
       SwitchPanel(forgotPassword);
    }
 
+   public void VerifyAccount(Action _callBack)
+   {
+      emailVerifyCallback = _callBack;
+      StartCoroutine(VerifyAccountRoutine());
+   }
+
+   public void RecheckAccountVerification()
+   {
+      StartCoroutine(VerifyAccountRoutine());
+   }
+
+   private IEnumerator VerifyAccountRoutine()
+   {
+      var _user = FirebaseManager.Instance.Authentication.FirebaseUser;
+
+      var _reloadTask = _user.ReloadAsync();
+      yield return new WaitUntil(() => _reloadTask.IsCompleted);
+
+      if (_user.IsEmailVerified || credentials.IsAnonymous)
+      {
+         Debug.Log("Email is verified!");
+         emailVerifyCallback?.Invoke();
+         yield break;
+      }
+
+      ShowVerifyEmail();
+   }
+   
+   private void ShowVerifyEmail()
+   {
+      SwitchPanel(emailVerificationUI);
+   }
+
    private void SwitchPanel(IPanel _panel)
    {
       login.Close();
       register.Close();
       forgotPassword.Close();
+      emailVerificationUI.Close();
       
       _panel.Setup();
    }

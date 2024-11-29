@@ -90,9 +90,12 @@ public class ChooseCardPanel : MonoBehaviour
 
             if (!(_shownCard.CardPlace == CardPlace.Hand || _shownCard.CardPlace == CardPlace.Graveyard))
             {
-                var _place = cardsDict[_shownCard];
-                GameplayManager.Instance.PlaceAbilityOnTable((_shownCard as AbilityCard).Details.Id,_place.Id,false);
-                continue;
+                if (_shownCard is AbilityCard _card)
+                {
+                    var _place = cardsDict[_card];
+                    GameplayManager.Instance.PlaceAbilityOnTable(_card.Details.Id,_place.Id,false);
+                    continue;
+                }
             }
 
             _shownCard.ReturnFromHand();

@@ -1941,6 +1941,7 @@ public class GameplayManagerPVP : GameplayManager
                     yield break;
                 }
                 ChooseCardPanel.Instance.ShowCards(_cards, PlaceMinion);
+                // ChooseCardImagePanel.Instance.Show(_cards, PlaceMinion);
             }
 
             void PlaceMinion(CardBase _minion)

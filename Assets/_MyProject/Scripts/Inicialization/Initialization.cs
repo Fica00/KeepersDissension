@@ -1,3 +1,4 @@
+using System.Collections;
 using Firebase.Database;
 using UnityEngine;
 
@@ -46,9 +47,8 @@ public class Initialization : MonoBehaviour
             Authenticate();
             return;
         }
-        
-        //todo check for verification
-        SetupNotifications();
+
+        AuthenticationHandler.Instance.VerifyAccount(SetupNotifications);
     }
 
     private void SetupNotifications()

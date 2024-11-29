@@ -151,7 +151,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    public void FinishSettingUpMatch()
+    private void FinishSettingUpMatch()
     {
         searchingForOpponentPanel.Activate();
         FirebaseManager.Instance.RoomHandler.SubscribeToRoom();

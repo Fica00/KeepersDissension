@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,12 +44,14 @@ public class SettingsPanel : MonoBehaviour
 
     public void Setup()
     {
+        ManageInteractables(true);
         OnOpened?.Invoke();
         gameObject.SetActive(true);
     }
 
     private void DeleteAccount()
     {
+        ManageInteractables(false);
         FirebaseManager.Instance.DeleteUserDataAndAccount(HandleAccountDeleted);
     }
 
@@ -58,34 +59,26 @@ public class SettingsPanel : MonoBehaviour
     {
         if (!_result)
         {
+            ManageInteractables(true);
             DialogsManager.Instance.ShowOkDialog("Something went wrong please try again later");
             return;
         }
         
-        DialogsManager.Instance.ShowOkDialog("Account successfully deleted", CloseGameAfterAccountDeletion);
+        DialogsManager.Instance.ShowOkDialog("Account successfully deleted", Application.Quit);
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
     }
 
-    private void CloseGameAfterAccountDeletion()
-    {
-        Application.Quit();
-    }
-
     private void Logout()
     {
-        StartCoroutine(LogoutRoutine());
-        IEnumerator LogoutRoutine()
-        {
-            logoutButton.interactable = false;
-            closeButton.interactable = false;
-            DataManager.Instance.PlayerData.DeviceId = string.Empty;
-            yield return new WaitForSeconds(2);
-            FirebaseManager.Instance.Authentication.SignOut();
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.Save();
-            yield return new WaitForSeconds(2);
-            SceneManager.LoadDataCollector();
-        }
+        ManageInteractables(false);
+        FirebaseManager.Instance.SignOut(SceneManager.LoadDataCollector);
+    }
+
+    private void ManageInteractables(bool _status)
+    {
+        logoutButton.interactable = _status;
+        closeButton.interactable = _status;
+        deleteAccount.interactable = _status;
     }
 }

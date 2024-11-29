@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class GameplayNotificationsHandler : MonoBehaviour
 {
     [SerializeField] private Toggle toggle;
+    
     private void OnEnable()
     {
         toggle.onValueChanged.AddListener(UpdateGameplayNotifications);
@@ -15,9 +16,8 @@ public class GameplayNotificationsHandler : MonoBehaviour
         toggle.onValueChanged.RemoveListener(UpdateGameplayNotifications);
     }
     
-    private void UpdateGameplayNotifications(bool _arg0)
+    private void UpdateGameplayNotifications(bool _isOn)
     {
-        DataManager.Instance.PlayerData.GameplayNotifications = _arg0;
+        DataManager.Instance.PlayerData.GameplayNotifications = _isOn;
     }
-
 }

@@ -9,7 +9,7 @@ public class PreviewFactionCardDisplay : MonoBehaviour
     [SerializeField] private Button flipButton;
     [SerializeField] private Button zoomButton;
 
-    private bool isFliped;
+    private bool isFlipped;
     private Card showingCard;
     
     private void OnEnable()
@@ -26,8 +26,8 @@ public class PreviewFactionCardDisplay : MonoBehaviour
 
     private void Flip()
     {
-        display.sprite = isFliped ? showingCard.Details.Background : showingCard.Details.Foreground;
-        isFliped = !isFliped;
+        display.sprite = isFlipped ? showingCard.Details.Background : showingCard.Details.Foreground;
+        isFlipped = !isFlipped;
     }
 
     private void Zoom()

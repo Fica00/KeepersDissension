@@ -88,7 +88,6 @@ public class RulesHandler : MonoBehaviour
         showPrevious.gameObject.SetActive(_showButtons);
     }
 
-
     private void ShowNext()
     {
         if (searchResults.Count == 0)

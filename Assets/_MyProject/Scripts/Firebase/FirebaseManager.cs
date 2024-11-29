@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using FirebaseAuthHandler;
 using Firebase;
@@ -96,16 +97,31 @@ public class FirebaseManager : MonoBehaviour
 
     private void YesLogOut(Action<bool> _callBack)
     {
-        DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
-        CollectGameData(_callBack);
+        SignOut(() =>
+        {
+            _callBack?.Invoke(false);
+        });
     }
     
     private void NoDontLogout(Action<bool> _callBack)
     {
-        Authentication.SignOut();
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-        _callBack?.Invoke(false);
+        DataManager.Instance.PlayerData.DeviceId = SystemInfo.deviceUniqueIdentifier;
+        CollectGameData(_callBack);
+    }
+
+    public void SignOut(Action _callBack = null)
+    {
+        StartCoroutine(SignOutRoutine());
+        
+        IEnumerator SignOutRoutine()
+        {
+            DataManager.Instance.PlayerData.DeviceId = string.Empty;
+            yield return new WaitForSeconds(2);
+            Authentication.SignOut();
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+            _callBack?.Invoke();
+        }
     }
 
     private void CollectGameData(Action<bool> _callBack)
@@ -174,5 +190,25 @@ public class FirebaseManager : MonoBehaviour
     private void DeleteUserAccount(Action<bool> _callBack)
     {
         Authentication.FirebaseUser.DeleteAsync().ContinueWithOnMainThread(_task => { _callBack?.Invoke(_task.IsCompleted); });
+    }
+
+    public void SendEmailVerification()
+    {
+        var _user = Authentication.FirebaseUser;
+        _user.SendEmailVerificationAsync().ContinueWith(_task => 
+        {
+            if (_task.IsCanceled)
+            {
+                Debug.Log("SendEmailVerificationAsync was canceled.");
+                return;
+            }
+            if (_task.IsFaulted)
+            {
+                Debug.Log("SendEmailVerificationAsync encountered an error: " + _task.Exception);
+                return;
+            }
+
+            Debug.Log("Verification email sent successfully.");
+        });
     }
 }

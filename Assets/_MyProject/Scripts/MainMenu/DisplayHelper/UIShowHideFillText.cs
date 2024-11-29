@@ -18,6 +18,7 @@ namespace DisplayHelper
                 _image.DOFillAmount(1f, duration);
             }
         }
+        
         public override void Hide()
         {
             Image _image = gameObject.GetComponent<Image>();
