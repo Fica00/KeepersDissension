@@ -242,10 +242,6 @@ public class TableActionsHandler : MonoBehaviour
                         possibleActions.Remove(_possibleAction);
                     }
                 }
-                else if (_possibleAction.Type == CardActionType.Attack)
-                {
-                    continue;
-                }
             }
         }
     }
@@ -499,20 +495,21 @@ public class TableActionsHandler : MonoBehaviour
             {
                 TablePlaceHandler _placeOfExitPortal = FindObjectsOfType<PortalCard>().ToList().Find(_portal =>
                     _portal.GetTablePlace().Id != _attackablePlace.Id).GetTablePlace();
-                int _newRange = tableHandler.DistanceBetweenPlaces(_attackingCardPlace, _attackablePlace);
+                int _distanceBetween = tableHandler.DistanceBetweenPlaces(_attackingCardPlace, _attackablePlace);
+                int _newRange = _attackingCard.Stats.Range - (_distanceBetween-1);
                 List<TablePlaceHandler> _placesAroundPortal = tableHandler.GetPlacesAround(_placeOfExitPortal.Id, _card.MovementType, _newRange);
 
                 foreach (var _placeAroundPortal in _placesAroundPortal)
                 {
                     int _newDistance = tableHandler.DistanceBetweenPlaces(_placeOfExitPortal, _placeAroundPortal);
                     TablePlaceHandler _newPlaceWithWall = tableHandler.GetPlaceWithWallInPath(_placeOfExitPortal, _placeAroundPortal);
-                    if (tableHandler.GetDirection(_attackingCardPlace.Id, _attackablePlace.Id) !=
+                    if (tableHandler.GetDirection(_attackablePlace.Id, _attackingCardPlace.Id) ==
                         tableHandler.GetDirection(_placeOfExitPortal.Id, _placeAroundPortal.Id))
                     {
                         continue;
                     }
 
-                    CheckAttackingPlace(_attackingCard, _placeAroundPortal, _newDistance, _attackingCardPlace, _newPlaceWithWall);
+                    CheckAttackingPlace(_attackingCard, _placeAroundPortal, _newDistance, _placeOfExitPortal, _newPlaceWithWall);
                 }
 
                 continue;
@@ -605,6 +602,7 @@ public class TableActionsHandler : MonoBehaviour
                 continue;
             }
 
+            
             possibleActions.Add(new CardAction()
             {
                 FirstCardId = _attackingCard.Details.Id,
@@ -975,5 +973,4 @@ public class TableActionsHandler : MonoBehaviour
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();
     }
-
 }

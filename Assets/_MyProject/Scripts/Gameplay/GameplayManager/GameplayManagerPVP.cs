@@ -2003,7 +2003,7 @@ public class GameplayManagerPVP : GameplayManager
         Finished = true;
         IsMyTurn = false;
 
-        NotificationSender.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
+        FirebaseNotificationHandler.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
         AudioManager.Instance.PlaySoundEffect("EndTurn");
         if (_tellRoom)
         {

@@ -55,7 +55,6 @@ public class CardHandInteractions : MonoBehaviour, IPointerClickHandler, IPointe
     
     private void OnLongPress()
     {
-        Debug.Log(3333);
         OnCardPressed?.Invoke(cardBase);
     }
 }
