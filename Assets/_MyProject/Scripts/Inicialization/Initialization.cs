@@ -1,4 +1,3 @@
-using System.Collections;
 using Firebase.Database;
 using UnityEngine;
 
