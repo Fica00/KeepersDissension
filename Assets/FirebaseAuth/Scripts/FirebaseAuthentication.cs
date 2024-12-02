@@ -58,17 +58,6 @@ namespace FirebaseAuthHandler
             });
         }
 
-        private void HandleGoogleSignIn(GoogleSignInResult _result, Action<SignInResult> _callBack)
-        {
-            if (!_result.IsSuccessful)
-            {
-                _callBack?.Invoke(new SignInResult { IsSuccessful = false, Message = _result.Message });
-                return;
-            }
-
-            LoginWithCredentials(_result.Credential, _callBack);
-        }
-
         private void LoginWithCredentials(Credential _credential, Action<SignInResult> _callBack)
         {
             auth.SignInWithCredentialAsync(_credential).ContinueWithOnMainThread(_task =>
