@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.MagmaDev.Keepers</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDvD5RofQLUqbuBWQt4_ltMjCG-21lZr5E</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,15 +17,15 @@
 	<key>STORAGE_BUCKET</key>
 	<string>keepersdissension.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:667989231623:ios:f7de2e56d25b6bfdaf02a2</string>
 	<key>DATABASE_URL</key>
