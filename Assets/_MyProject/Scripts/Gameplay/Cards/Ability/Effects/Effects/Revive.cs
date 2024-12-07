@@ -19,7 +19,7 @@ public class Revive : AbilityEffect
         
         foreach (var _validCard in _validCards.ToList())
         {
-            if (_validCard.HasDied)
+            if ((_validCard as Card).HasDied)
             {
                 continue;
             }

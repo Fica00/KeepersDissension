@@ -4,7 +4,7 @@ public class CriticalHit : AbilityEffect
 {
     private bool isActive;
     private int startingRange;
-    private float startingDamage;
+    private int startingDamage;
     private Keeper keeper;
     
     public override void ActivateForOwner()
@@ -29,10 +29,10 @@ public class CriticalHit : AbilityEffect
 
         GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
         isActive = true;
-        startingRange = keeper.Stats.Range;
-        startingDamage = keeper.Stats.Damage;
-        keeper.Stats.Range = 1;
-        keeper.Stats.Damage = 3;
+        startingRange = keeper.Range;
+        startingDamage = keeper.Damage;
+        keeper.SetRange(1);
+        keeper.SetDamage(3);
         ForceKeeperAttack();
     }
 
@@ -71,7 +71,7 @@ public class CriticalHit : AbilityEffect
                 Cost = 0,
                 IsMy = true,
                 CanTransferLoot = true,
-                Damage = (int)keeper.Stats.Damage,
+                Damage = keeper.Damage,
                 CanCounter = true,
                 GiveLoot = false
             };
@@ -103,8 +103,8 @@ public class CriticalHit : AbilityEffect
         
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
         isActive = false;
-        keeper.Stats.Range = startingRange;
-        keeper.Stats.Damage = startingDamage;
+        keeper.SetRange(startingRange);
+        keeper.SetDamage(startingDamage);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 

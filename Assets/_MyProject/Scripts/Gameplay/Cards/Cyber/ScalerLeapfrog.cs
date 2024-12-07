@@ -16,7 +16,7 @@ public class ScalerLeapfrog : CardSpecialAbility
 
     private void CheckForResponseAction(CardBase _card)
     {
-        if (!CardBase.My)
+        if (!CardBase.GetIsMy())
         {
             return;
         }

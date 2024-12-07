@@ -24,7 +24,7 @@ public class WoundedRunner : AbilityEffect
         GameplayManager.OnCardMoved += AddSpeed;
         GameplayManager.OnPlacedCard += AddSpeed;
         GameplayManager.OnSwitchedPlace += AddSpeed;
-        keeper.Stats.UpdatedHealth += RemoveSpeed;
+        keeper.UpdatedHealth += RemoveSpeed;
         Debug.Log("Subscribed");
         AddSpeed();
     }
@@ -43,13 +43,13 @@ public class WoundedRunner : AbilityEffect
 
         Debug.Log("canceled effect");
         isActive = false;
-        keeper.Speed = 0;
+        keeper.SetSpeed(0);
         player.OnEndedTurn -= AddSpeed;
         GameplayManager.OnCardAttacked -= AddSpeed;
         GameplayManager.OnCardMoved -= AddSpeed;
         GameplayManager.OnPlacedCard -= AddSpeed;
         GameplayManager.OnSwitchedPlace -= AddSpeed;
-        keeper.Stats.UpdatedHealth -= RemoveSpeed;
+        keeper.UpdatedHealth -= RemoveSpeed;
         keeper = null;
         AbilityCard.ActiveDisplay.SetActive(false);
     }
@@ -102,10 +102,10 @@ public class WoundedRunner : AbilityEffect
             return;
         }
         
-        if (keeper.Stats.Health==1)
+        if (keeper.Health==1)
         {
             applied = true;
-            keeper.Speed += 3;
+            keeper.ChangeSpeed(3);
             AbilityCard.ActiveDisplay.SetActive(true);
         }
         else
@@ -126,7 +126,7 @@ public class WoundedRunner : AbilityEffect
             return;
         }
         
-        keeper.Speed -= 3;
+        keeper.ChangeSpeed(-3);
         applied = false;
     }
 }

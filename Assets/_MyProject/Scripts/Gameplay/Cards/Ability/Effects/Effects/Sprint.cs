@@ -75,7 +75,7 @@ public class Sprint : AbilityEffect
             }
 
             card = _clickedPlace.GetCardNoWall();
-            card.Speed += 3;
+            card.ChangeSpeed(3);
             GameplayManager.Instance.GameState = state;
             GameplayManager.OnCardMoved += RemoveEffect;
             GameplayManager.OnCardAttacked += RemoveEffect;
@@ -132,6 +132,6 @@ public class Sprint : AbilityEffect
         }
         
         RemoveEffect();
-        card.Speed -= 3;
+        card.ChangeSpeed(-3);
     }
 }

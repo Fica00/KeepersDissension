@@ -77,7 +77,6 @@ public class GameplayManager : MonoBehaviour
     {
         SetupTable();
         MyPlayer.UpdatedActions += TryEndTurn;
-        DataManager.Instance.PlayerData.PlayMusic = DataManager.Instance.PlayerData.PlayMusic; 
         StartCoroutine(GameplayRoutine());
     }
 
@@ -105,26 +104,12 @@ public class GameplayManager : MonoBehaviour
         Finished = false;
         OpponentFinished = false;
 
-        if (FirebaseManager.Instance.RoomHandler.ExecuteOldActionsFirst)
-        {
-            Debug.Log("Starting executing old actions");
-            yield return ExecuteOldActions();
-            yield return new WaitForSeconds(2);
-            IsMyTurn = lastAction.IsMine;
-            Debug.Log("Finished executing old actions, is last action mine? "+lastAction.IsMine);
-            BlockaderCard.IgnoreSending = true;
-            healthTracker.Setup();
-            LastPreparation();
-            FinishedSetup?.Invoke();
-        }
-        else
-        {
-            yield return NewMatchRoutine();
-            IsMyTurn = doIPlayFirst;
-            healthTracker.Setup();
-            LastPreparation();
-        }
-        
+        yield return NewMatchRoutine();
+        IsMyTurn = doIPlayFirst;
+        healthTracker.Setup();
+        ShowGuardianChains();
+        MyPlayer.UpdatedStrangeMatter += TellOpponentThatIUpdatedWhiteStrangeMatter;
+        WhiteStrangeMatter.UpdatedAmountInEconomy += TellOpponentToUpdateWhiteStrangeMatterReserves;
         
         while (!HasGameEnded)
         {
@@ -133,6 +118,24 @@ public class GameplayManager : MonoBehaviour
             yield return WaitUntilTheEndOfTurn(); //second players turn
             yield return new WaitForSeconds(1); //sync up
             _round++;
+        }
+    }
+
+    protected virtual void TellOpponentThatIUpdatedWhiteStrangeMatter()
+    {
+        throw new Exception();
+    }
+
+    protected virtual void TellOpponentToUpdateWhiteStrangeMatterReserves()
+    {
+        throw new Exception();
+    }
+    
+    private void ShowGuardianChains()
+    {
+        foreach (var _guardian in FindObjectsOfType<Guardian>())
+        {
+            _guardian.ShowChain();
         }
     }
 
@@ -158,16 +161,6 @@ public class GameplayManager : MonoBehaviour
         {
             GameState = GameplayState.Waiting;
         }
-    }
-
-    protected virtual IEnumerator ExecuteOldActions()
-    {
-        throw new Exception();
-    }
-
-    protected virtual void LastPreparation()
-    {
-        throw new Exception();
     }
 
     protected virtual bool DecideWhoPlaysFirst()
@@ -567,7 +560,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _blockader && _blockader.name.ToLower().Contains("blockader"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -599,7 +592,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _mage && _mage.name.ToLower().Contains("mage"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -629,7 +622,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _orge && _orge.name.ToLower().Contains("org"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -663,7 +656,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _scout && _scout.name.ToLower().Contains("scout"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -697,7 +690,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _sniper && _sniper.name.ToLower().Contains("sniper"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -733,7 +726,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _scaler && _scaler.name.ToLower().Contains("scaler"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }

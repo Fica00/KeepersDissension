@@ -22,33 +22,33 @@ public class Persevere : AbilityEffect
 
     private void Activate()
     {
-        effectedKeeper.Stats.UpdatedHealth += CheckKeeper;
+        effectedKeeper.UpdatedHealth += CheckKeeper;
         CheckKeeper();
     }
 
     private void CheckKeeper()
     {
-        if (isApplied&&effectedKeeper.Stats.Health>2)
+        if (isApplied&&effectedKeeper.Health>2)
         {
             isApplied = false;
-            effectedKeeper.Stats.Damage -= attackChange;
+            effectedKeeper.ChangeDamage(-attackChange) ;
             AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         }
-        else if (!isApplied&& effectedKeeper.Stats.Health<=2)
+        else if (!isApplied&& effectedKeeper.Health<=2)
         {
             isApplied = true;
-            effectedKeeper.Stats.Damage += attackChange;
+            effectedKeeper.ChangeDamage(attackChange);
             AbilityCard.ActiveDisplay.gameObject.SetActive(true);
         }
     }
 
     public override void CancelEffect()
     {
-        effectedKeeper.Stats.UpdatedHealth -= CheckKeeper;
+        effectedKeeper.UpdatedHealth -= CheckKeeper;
         if (isApplied)
         {
             isApplied = false;
-            effectedKeeper.Stats.Damage -= attackChange;
+            effectedKeeper.ChangeDamage(-attackChange) ;
             AbilityCard.ActiveDisplay.gameObject.SetActive(false);
         }
     }

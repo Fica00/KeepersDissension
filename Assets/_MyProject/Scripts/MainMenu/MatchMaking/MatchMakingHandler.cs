@@ -107,7 +107,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandleJoinRoom(JoinRoom _response)
+    private void HandleJoinRoom(NewJoinRoom _response)
     {
         if (_response.Success)
         {
@@ -115,7 +115,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
         else
         {
-            RoomData _roomData = new RoomData
+            NewRoomData _roomData = new NewRoomData
             {
                 Name = _response.Name,
                 Id = Guid.NewGuid().ToString(),
@@ -139,7 +139,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandeCreateRoom(CreateRoom _response)
+    private void HandeCreateRoom(NewCreateRoom _response)
     {
         if (_response.Success)
         {
@@ -154,7 +154,6 @@ public class MatchMakingHandler : MonoBehaviour
     private void FinishSettingUpMatch()
     {
         searchingForOpponentPanel.Activate();
-        FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
         if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count == 2)
         {
             StartGameplay();
@@ -162,7 +161,7 @@ public class MatchMakingHandler : MonoBehaviour
         else
         {
             friendlyMatchCreateCallBack?.Invoke();
-            RoomHandler.OnPlayerJoined += PlayerJoined;
+            NewRoomHandler.OnPlayerJoined += PlayerJoined;
         }
     }
 

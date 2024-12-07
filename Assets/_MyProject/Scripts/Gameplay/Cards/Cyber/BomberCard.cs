@@ -29,7 +29,7 @@ public class BomberCard : CardSpecialAbility
             return;
         }
 
-        if (!_cardBase.My)
+        if (!_cardBase.GetIsMy())
         {
             return;
         }

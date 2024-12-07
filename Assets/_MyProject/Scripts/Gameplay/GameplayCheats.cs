@@ -76,7 +76,6 @@ public class GameplayCheats : MonoBehaviour
         }
 
         _guardian.Heal(10);
-        GameplayManager.Instance.UpdateHealth(_guardian.Details.Id,_guardian.My,(int)_guardian.Stats.Health);
     }
 
     private void HealKeeper()
@@ -88,7 +87,6 @@ public class GameplayCheats : MonoBehaviour
         }
 
         _keeper.Heal(10);
-        GameplayManager.Instance.UpdateHealth(_keeper.Details.Id,_keeper.My,(int)_keeper.Stats.Health);
     }
 
     private void Show()

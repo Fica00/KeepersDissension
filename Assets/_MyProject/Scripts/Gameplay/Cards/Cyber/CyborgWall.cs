@@ -22,7 +22,7 @@ public class CyborgWall : WallBase
             return;
         }
 
-        if (CardBase.My)
+        if (CardBase.GetIsMy())
         {
             GameplayManager.Instance.PlayAudioOnBoth("CyborgWall",CardBase);
         }
@@ -34,24 +34,24 @@ public class CyborgWall : WallBase
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
         if (Collapse.IsActiveForMe)
         {
-            if (!_attacker.My)
+            if (!_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace,2);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
-            if (_attacker.My)
+            if (_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace,2);
             }
         }
         
-        if (Immunity.IsActiveForMe && _attacker.My)
+        if (Immunity.IsActiveForMe && _attacker.GetIsMy())
         {
             return;
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.My)
+        if (Immunity.IsActiveForOpponent && !_attacker.GetIsMy())
         {
             return;
         }

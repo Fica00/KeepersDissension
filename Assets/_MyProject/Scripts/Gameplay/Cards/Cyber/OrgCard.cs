@@ -7,7 +7,7 @@ public class OrgCard : CardSpecialAbility
 {
     private void Start()
     {
-        Card.Stats.Damage = 2;
+        Card.SetDamage(2);
     }
 
     public override void UseAbility()
@@ -128,7 +128,7 @@ public class OrgCard : CardSpecialAbility
                 CanTransferLoot = false,
                 IsMy = true,
                 CanCounter = true,
-                Damage = (int)Card.Stats.Damage
+                Damage = Card.Damage
             };
             
 
@@ -180,7 +180,7 @@ public class OrgCard : CardSpecialAbility
                 Cost = 0,
                 IsMy = true,
                 CanTransferLoot = false,
-                Damage = (int)Card.Stats.Damage,
+                Damage = Card.Damage,
                 CanCounter = false,
                 GiveLoot = false
             };

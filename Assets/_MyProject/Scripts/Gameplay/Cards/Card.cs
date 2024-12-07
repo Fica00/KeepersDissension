@@ -3,41 +3,45 @@ using UnityEngine;
 
 public class Card : CardBase
 {
-    public Action UpdatedCanFlyToDodge;
-    
+    public Action UpdatedHealth;
+
     public CardDetails Details;
-    [HideInInspector] public CardStats Stats;
-    public bool CanMoveOnWall;
-    private bool canFlyToDodgeAttack;
-    [HideInInspector]public int Speed;
-    public bool IsVoid;
+    private CardData cardData;
 
-    public bool CanFlyToDodgeAttack
-    {
-        get => canFlyToDodgeAttack;
-        set
-        {
-            canFlyToDodgeAttack = value;
-            UpdatedCanFlyToDodge?.Invoke();
-        }
-    }
+    public int Health => cardData.Stats.Health;
+    public int Range => cardData.Stats.Range;
+    public int Damage => cardData.Stats.Damage;
+    public bool IsVoid => cardData.IsVoid;
+    public bool CanMoveOnWall => cardData.CanMoveOnWall;
+    public int Speed => cardData.Stats.Speed;
+    public bool CanFlyToDodgeAttack => cardData.CanFlyToDodgeAttack;
+    public bool CanMove => cardData.CanMove;
+    public bool CanBeUsed => cardData.CanBeUsed;
+    public bool My => cardData.Owner == FirebaseManager.Instance.PlayerId;
+    public CardMovementType MovementType => cardData.MovementType;
+    public bool HasDied => cardData.HasDied;
+
+    public string UniqueId => cardData.CardUniqueId;
     
-    public override void Setup(bool _isMy)
-    {
-        IsMy = _isMy;
 
-        Stats = new CardStats()
+    public void Setup(string _owner)
+    {
+        cardData = new CardData
         {
-            Damage = Details.Stats.Damage,
-            Health = Details.Stats.Health,
-            Range = Details.Stats.Range,
+            Owner = _owner,
+            CardUniqueId = Guid.NewGuid().ToString(),
+            CardId = Details.Id,
+            IsVoid = false,
+            CanFlyToDodgeAttack = false,
+            CanMoveOnWall = false,
+            Stats = new CardStats { Damage = Details.Stats.Damage, Health = Details.Stats.Health, Range = Details.Stats.Range, }
         };
-        
+
         Display.Setup(this);
         Setup();
     }
 
-    public override void SetParent(Transform _parent)
+    public void SetParent(Transform _parent)
     {
         Parent = _parent;
         transform.SetParent(_parent);
@@ -67,19 +71,32 @@ public class Card : CardBase
         return _type is CardType.LifeForce;
     }
 
-    public override void Heal(int _amount)
+    public void Heal(int _amount)
     {
-        Stats.Health += _amount;
-        if (Stats.Health>Details.Stats.Health)
+        cardData.Stats.Health += _amount;
+        if (cardData.Stats.Health>Details.Stats.Health)
         {
-            Stats.Health = Details.Stats.Health;
+            cardData.Stats.Health = Details.Stats.Health;
         }
     }
 
-    public override void Heal()
+    public void Heal()
     {
-        float _amount = Details.Stats.Health - Stats.Health;
+        float _amount = Details.Stats.Health - cardData.Stats.Health;
         Heal((int)_amount);
+        UpdatedHealth?.Invoke();
+    }
+    
+    public void SetHealth(int _amount)
+    {
+        cardData.Stats.Health = _amount;
+        UpdatedHealth?.Invoke();
+    }
+
+    public void ChangeHealth(int _amount)
+    {
+        cardData.Stats.Health += _amount;
+        UpdatedHealth?.Invoke();
     }
 
     public void Hide()
@@ -91,4 +108,91 @@ public class Card : CardBase
     {
         Display.gameObject.SetActive(true);
     }
+
+    public void ChangeDamage(int _amount)
+    {
+        cardData.Stats.Damage += _amount;
+    }
+
+    public void SetDamage(int _amount)
+    {
+        cardData.Stats.Damage = _amount;
+    }
+
+    public void ChangeRange(int _amount)
+    {
+        cardData.Stats.Range += _amount;
+    }
+    
+    public void SetRange(int _amount)
+    {
+        cardData.Stats.Range = _amount;
+    }
+
+    public void ChangeSpeed(int _amount)
+    {
+        cardData.Stats.Speed += _amount;
+    }
+
+    public void SetSpeed(int _amount)
+    {
+        cardData.Stats.Speed = _amount;
+    }
+
+    public void SetMaxHealth(int _amount)
+    {
+        cardData.Stats.MaxHealth = _amount;
+    }
+
+    public void SetCanMoveOnWall(bool _status)
+    {
+        cardData.CanMoveOnWall = _status;
+    }
+
+    public void SetCanFlyToDodgeAttack(bool _status)
+    {
+        cardData.CanFlyToDodgeAttack = _status;
+    }
+
+    public void SetIsVoid(bool _status)
+    {
+        cardData.IsVoid = _status;
+    }
+
+    public void SetCanMove(bool _status)
+    {
+        cardData.CanMove = _status;
+    }
+
+    public void SetCanBeUsed(bool _status)
+    {
+        cardData.CanBeUsed = _status;
+    }
+    
+    public void ChangeOwner()
+    {
+        cardData.Owner = GetIsMy() ? FirebaseManager.Instance.OpponentId : FirebaseManager.Instance.PlayerId;
+        SetRotation();
+    }
+
+    public void ChangeMovementType(CardMovementType _movementType)
+    {
+        cardData.MovementType = _movementType;
+    }
+
+    public void SetHasDied(bool _status)
+    {
+        cardData.HasDied = _status;
+    }
+    
+    public void CopyStats(Card _card)
+    {
+        
+    }
+    
+    public override bool GetIsMy()
+    {
+        return My;
+    }
+    
 }

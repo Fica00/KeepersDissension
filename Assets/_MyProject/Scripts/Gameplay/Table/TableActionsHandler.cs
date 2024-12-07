@@ -83,9 +83,9 @@ public class TableActionsHandler : MonoBehaviour
         List<TablePlaceHandler> _movablePlaces;
         _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
         // List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,GetRange(_card),true);
-        if (_card.Stats.Range != 1 && _type == CardActionType.Attack)
+        if (_card.Range != 1 && _type == CardActionType.Attack)
         {
-            _range = _card.Stats.Range;
+            _range = _card.Range;
         }
 
         List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _range, true, true);
@@ -438,7 +438,7 @@ public class TableActionsHandler : MonoBehaviour
 
             foreach (var _cardAtPlace in _cardsAtPlace)
             {
-                if (!_cardAtPlace.My)
+                if (!_cardAtPlace.GetIsMy())
                 {
                     continue;
                 }
@@ -496,8 +496,8 @@ public class TableActionsHandler : MonoBehaviour
                 TablePlaceHandler _placeOfExitPortal = FindObjectsOfType<PortalCard>().ToList().Find(_portal =>
                     _portal.GetTablePlace().Id != _attackablePlace.Id).GetTablePlace();
                 int _distanceBetween = tableHandler.DistanceBetweenPlaces(_attackingCardPlace, _attackablePlace);
-                int _newRange = _attackingCard.Stats.Range - (_distanceBetween-1);
-                List<TablePlaceHandler> _placesAroundPortal = tableHandler.GetPlacesAround(_placeOfExitPortal.Id, _card.MovementType, _newRange);
+                int _newRange = _attackingCard.Range - (_distanceBetween-1);
+                List<TablePlaceHandler> _placesAroundPortal = tableHandler.GetPlacesAround(_placeOfExitPortal.Id, _attackingCard.MovementType, _newRange);
 
                 foreach (var _placeAroundPortal in _placesAroundPortal)
                 {
@@ -555,14 +555,14 @@ public class TableActionsHandler : MonoBehaviour
             {
                 if (_distance != 1)
                 {
-                    if (_attackingCard.Stats.Range < _distance)
+                    if (_attackingCard.Range < _distance)
                     {
                         continue;
                     }
 
                 }
 
-                if (_placeWithWall.GetCards().Count > 1 && _attackedCard is Minion && _attackingCard.Stats.Range <= 1)
+                if (_placeWithWall.GetCards().Count > 1 && _attackedCard is Minion && _attackingCard.Range <= 1)
                 {
                     continue;
                 }
@@ -572,7 +572,7 @@ public class TableActionsHandler : MonoBehaviour
             {
                 if (_distance != 1)
                 {
-                    if (_attackingCard.Stats.Range < _distance)
+                    if (_attackingCard.Range < _distance)
                     {
                         continue;
                     }
@@ -584,15 +584,15 @@ public class TableActionsHandler : MonoBehaviour
                 _distance--;
             }
 
-            if (_attackingCard.Stats.Range != 0)
+            if (_attackingCard.Range != 0)
             {
-                if (_attackingCard.Stats.Range <
+                if (_attackingCard.Range <
                     CalculatePathCost(_attackingCardPlace, _attackablePlace, _attackingCard.MovementType, 1, CardActionType.Attack))
                 {
                     continue;
                 }
             }
-            else if (_attackingCard.Stats.Range < _distance)
+            else if (_attackingCard.Range < _distance)
             {
                 continue;
             }
@@ -675,7 +675,7 @@ public class TableActionsHandler : MonoBehaviour
                 _defendingCard = tableHandler.GetPlace(_action.FinishingPlaceId).GetCards().Cast<Card>().ToList()
                     .Find(_card => _card.Details.Id == _action.SecondCardId);
                 string _question = string.Empty;
-                if (_attackingCard.My && _defendingCard.My)
+                if (_attackingCard.GetIsMy() && _defendingCard.GetIsMy())
                 {
                     _question += $"Attacking your own {((Card)_defendingCard).Details.Type}, continue?";
                 }
@@ -813,7 +813,7 @@ public class TableActionsHandler : MonoBehaviour
                             };
                             GameplayManager.Instance.ExecuteCardAction(_damageOtherCard);
 
-                            if (_cardAtExitPlace == null || _cardAtExitPlace.Stats.Health <= 0)
+                            if (_cardAtExitPlace == null || _cardAtExitPlace.Health <= 0)
                             {
                                 CardAction _moveAction = new CardAction
                                 {
@@ -893,9 +893,9 @@ public class TableActionsHandler : MonoBehaviour
 
         if (_newAction.Type == CardActionType.SwitchPlace)
         {
-            CardBase _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<CardBase>();
+            Card _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
 
-            CardBase _cardTwo = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<CardBase>();
+            Card _cardTwo = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<Card>();
 
             if (!_cardOne.CanMove || !_cardTwo.CanMove)
             {
@@ -905,7 +905,7 @@ public class TableActionsHandler : MonoBehaviour
         }
         else if (_newAction.Type == CardActionType.Move)
         {
-            CardBase _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<CardBase>();
+            Card _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
 
             if (!_cardOne.CanMove)
             {
@@ -930,12 +930,12 @@ public class TableActionsHandler : MonoBehaviour
 
         if (_card != null)
         {
-            _card.Speed = 0;
+            _card.SetSpeed(0);
         }
 
-        CardBase _card1 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<CardBase>();
+        Card _card1 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
 
-        CardBase _card2 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<CardBase>();
+        Card _card2 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<Card>();
 
         if ((_card1 != null && !_card1.CanBeUsed) || _card2 != null && !_card2.CanBeUsed)
         {

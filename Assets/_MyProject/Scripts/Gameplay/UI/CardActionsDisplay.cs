@@ -28,7 +28,6 @@ public class CardActionsDisplay : MonoBehaviour
     private TablePlaceHandler selectedPlace;
     private bool isFlipped;
     private List<GameObject> shownAbilityTriggers= new();
-    private List<GameObject> shownEffects = new ();
     
     private void Awake()
     {
@@ -185,7 +184,6 @@ public class CardActionsDisplay : MonoBehaviour
         if (!selectedCard.My)
         {
             ClearAbilities();
-            ClearEffects();
             useMoveAction.gameObject.SetActive(false);
             useAttackAction.gameObject.SetActive(false);
             return;
@@ -194,7 +192,6 @@ public class CardActionsDisplay : MonoBehaviour
         useMoveAction.gameObject.SetActive(true);
         useAttackAction.gameObject.SetActive(true);
         ShowAbilities();
-        ShowEffects();
         UseMoveAction();
     }
 
@@ -265,36 +262,4 @@ public class CardActionsDisplay : MonoBehaviour
         
         shownAbilityTriggers.Clear();
     }
-
-    private void ShowEffects()
-    {
-        ClearEffects();
-        
-        List<EffectBase> _cardEffects = selectedCard.Effects;
-        
-        if (_cardEffects == null || _cardEffects.Count==0)
-        {
-            return;
-        }
-
-        foreach (var _cardEffect in _cardEffects)
-        {
-            EffectDisplay _effectDisplay = Instantiate(effectPrefab, effectsHolder);
-            _effectDisplay.Setup(_cardEffect);
-            shownEffects.Add(_effectDisplay.gameObject);
-        }
-    }
-
-
-    private void ClearEffects()
-    {
-        foreach (var _shownEffects in shownEffects)
-        {
-            Destroy(_shownEffects);
-        }
-        
-        shownEffects.Clear();
-    }
-
-    
 }

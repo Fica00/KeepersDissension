@@ -4,7 +4,7 @@ public class Snipe : AbilityEffect
 {
     private bool isActive;
     private int startingRange;
-    private float startingDamage;
+    private int startingDamage;
     private Keeper keeper;
 
     public override void ActivateForOwner()
@@ -29,10 +29,10 @@ public class Snipe : AbilityEffect
 
         GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
         isActive = true;
-        startingRange = keeper.Stats.Range;
-        startingDamage = keeper.Stats.Damage;
-        keeper.Stats.Range = 3;
-        keeper.Stats.Damage = 1;
+        startingRange = keeper.Range;
+        startingDamage = keeper.Damage;
+        keeper.SetRange(3);
+        keeper.SetDamage(1);
         ForceKeeperAttack();
     }
 
@@ -78,7 +78,7 @@ public class Snipe : AbilityEffect
                 Cost = 0,
                 IsMy = true,
                 CanTransferLoot = true,
-                Damage = (int)keeper.Stats.Damage,
+                Damage = keeper.Damage,
                 CanCounter = true,
                 GiveLoot = false
             };
@@ -105,8 +105,8 @@ public class Snipe : AbilityEffect
 
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
         isActive = false;
-        keeper.Stats.Range = startingRange;
-        keeper.Stats.Damage = startingDamage;
+        keeper.SetRange(startingRange);
+        keeper.SetDamage(startingDamage);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 

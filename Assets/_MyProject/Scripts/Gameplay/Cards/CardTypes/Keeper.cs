@@ -16,10 +16,10 @@ public class Keeper: Card
     
     protected override void Setup()
     {
-        Stats.UpdatedHealth += ShowHealth;
+        UpdatedHealth += ShowHealth;
 
         ShowHealth();
-        GameplayPlayer _player = IsMy ? GameplayManager.Instance.MyPlayer: GameplayManager.Instance.OpponentPlayer;
+        GameplayPlayer _player = My ? GameplayManager.Instance.MyPlayer: GameplayManager.Instance.OpponentPlayer;
         if (_player.FactionSO.Id==0)
         {
             Destroy(EffectsHolder.GetComponent<CyberKeeper>());
@@ -55,14 +55,14 @@ public class Keeper: Card
 
     private void OnDisable()
     {
-        Stats.UpdatedHealth -= ShowHealth;
+        UpdatedHealth -= ShowHealth;
         OnPositionedOnTable -= ShowUI;
         OnPositionedInHand -= HideUI;
     }
 
     private void ShowHealth()
     {
-        healthDisplay.text = Stats.Health.ToString(CultureInfo.InvariantCulture);
+        healthDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
     }
 
     private void ShowUI(CardBase _card)

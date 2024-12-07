@@ -51,7 +51,7 @@ public class Dash : AbilityEffect
             return;
         }
         applied = true;
-        keeper.Speed+=2;
+        keeper.ChangeSpeed(2);
     }
 
     public override void CancelEffect()

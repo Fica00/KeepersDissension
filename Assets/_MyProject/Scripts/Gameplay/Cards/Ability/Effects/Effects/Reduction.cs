@@ -14,7 +14,7 @@ public class Reduction : AbilityEffect
         bool _skipExecute = false;
         foreach (var _lifeForce in FindObjectsOfType<LifeForce>())
         {
-            if (_lifeForce.Stats.Health<=0)
+            if (_lifeForce.Health<=0)
             {
                 _skipExecute = true;
             }
@@ -41,7 +41,7 @@ public class Reduction : AbilityEffect
         bool _skipExecute = false;
         foreach (var _lifeForce in FindObjectsOfType<LifeForce>())
         {
-            if (_lifeForce.Stats.Health<=0)
+            if (_lifeForce.Health<=0)
             {
                 _skipExecute = true;
             }

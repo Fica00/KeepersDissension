@@ -48,7 +48,7 @@ public class CallToArms : AbilityEffect
 
         foreach (var _minion in _minions)
         {
-            _minion.Stats.Damage += powerChange;
+            _minion.ChangeDamage(powerChange);
         }
         isActive = true;
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
@@ -62,7 +62,7 @@ public class CallToArms : AbilityEffect
 
         foreach (var _minion in _minions)
         {
-            _minion.Stats.Damage += powerChange;
+            _minion.ChangeDamage(-powerChange);
         }
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }

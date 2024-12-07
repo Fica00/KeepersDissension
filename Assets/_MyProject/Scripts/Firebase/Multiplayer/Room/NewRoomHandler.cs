@@ -9,11 +9,11 @@ using Random = UnityEngine.Random;
 
 namespace FirebaseMultiplayer.Room
 {
-    public class RoomHandler
+    public class NewRoomHandler : MonoBehaviour
     {
         public static Action<RoomPlayer> OnPlayerJoined;
         public static Action<RoomPlayer> OnPlayerLeft;
-        public static Action<ActionData> OnNewAction;
+        public static Action<BoardData> OnBoardUpdated;
         public static Action OnILeftRoom;
 
         private DatabaseReference database;
@@ -23,16 +23,14 @@ namespace FirebaseMultiplayer.Room
         private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
 
         private string roomsPath;
-        private RoomData roomData;
+        private NewRoomData roomData;
         private string localPlayerId;
 
         public bool IsOwner => roomData.Owner == localPlayerId;
-        public RoomData RoomData => roomData;
+        public NewRoomData RoomData => roomData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
-
-        public bool ExecuteOldActionsFirst = false;
 
         public void Init(DatabaseReference _database, string _roomsPath)
         {
@@ -71,20 +69,13 @@ namespace FirebaseMultiplayer.Room
             }, _ => { Debug.Log(_); });
         }
 
-        public void SubscribeToRoom()
+        public void SubscribeToRoom(NewRoomData _roomData)
         {
-            ExecuteOldActionsFirst = false;
-            database.Child(RoomPath).ValueChanged += RoomUpdated;
-        }
-        
-        public void SubscribeToRoom(RoomData _roomData)
-        {
-            ExecuteOldActionsFirst = true;
             roomData = _roomData;
             database.Child(RoomPath).ValueChanged += RoomUpdated;
         }
 
-        public void UnsubscribeFromRoom()
+        private void UnsubscribeFromRoom()
         {
             if (roomData == null)
             {
@@ -107,13 +98,13 @@ namespace FirebaseMultiplayer.Room
             {
                 return;
             }
-            
-            if (roomData==null)
+
+            if (roomData == null)
             {
                 return;
             }
 
-            RoomData _newData = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
+            NewRoomData _newData = JsonConvert.DeserializeObject<NewRoomData>(_args.Snapshot.GetRawJsonValue());
             if (_newData == null)
             {
                 return;
@@ -126,11 +117,10 @@ namespace FirebaseMultiplayer.Room
 
             CheckIfPlayerJoined(_newData);
             CheckIfPlayerLeft(_newData);
-            CheckForNewAction(_newData);
             roomData = _newData;
         }
 
-        private void CheckIfPlayerJoined(RoomData _newData)
+        private void CheckIfPlayerJoined(NewRoomData _newData)
         {
             foreach (var _player in _newData.RoomPlayers)
             {
@@ -143,7 +133,7 @@ namespace FirebaseMultiplayer.Room
             }
         }
 
-        private void CheckIfPlayerLeft(RoomData _newData)
+        private void CheckIfPlayerLeft(NewRoomData _newData)
         {
             foreach (var _player in roomData.RoomPlayers)
             {
@@ -153,40 +143,6 @@ namespace FirebaseMultiplayer.Room
                 }
 
                 OnPlayerLeft?.Invoke(_player);
-            }
-        }
-
-        private void CheckForNewAction(RoomData _newData)
-        {
-            foreach (var _action in _newData.Actions)
-            {
-                bool _found = false;
-                foreach (var _oldAction in roomData.Actions)
-                {
-                    if (_action.Key == _oldAction.Key)
-                    {
-                        _found = true;
-                        break;
-                    }
-                }
-
-                if (_found)
-                {
-                    continue;
-                }
-
-                var _actionValue = _action.Value;
-                if (_actionValue.Data.Owner == localPlayerId)
-                {
-                    continue;
-                }
-
-                if (GameplayManager.Instance.IsExecutingOldActions)
-                {
-                    continue;
-                }
-                
-                OnNewAction?.Invoke(_actionValue);
             }
         }
 
@@ -203,13 +159,13 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
 
-        public void JoinRoom(RoomPlayer _playerData, RoomType _type, Action<JoinRoom> _callBack, string _name = default)
+        public void JoinRoom(RoomPlayer _playerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = default)
         {
             string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData), Type = _type, Name = _name });
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
-                var _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);
+                NewJoinRoom _responseData = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
                 roomData = _responseData.Room;
                 _responseData.Name = _name;
                 _responseData.Type = _type;
@@ -217,20 +173,20 @@ namespace FirebaseMultiplayer.Room
             }, _response =>
             {
                 Debug.Log(_response);
-                JoinRoom _data = JsonConvert.DeserializeObject<JoinRoom>(_response);
+                NewJoinRoom _data = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
                 _callBack?.Invoke(_data);
             }, _includeHeader: false);
         }
 
-        public void CreateRoom(RoomData _roomData, Action<CreateRoom> _callBack)
+        public void CreateRoom(NewRoomData _roomData, Action<NewCreateRoom> _callBack)
         {
             string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData) });
 
             WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
                 roomData = _roomData;
-                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
-            }, _response => { _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response)); });
+                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+            }, _response => { _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response)); });
         }
 
         public RoomPlayer GetOpponent()
@@ -250,26 +206,7 @@ namespace FirebaseMultiplayer.Room
 
         public void AddAction(ActionType _type, string _jsonData)
         {
-            if (GameplayManager.Instance.IsExecutingOldActions)
-            {
-                return;
-            }
-            GameplayActionBase _actionData = new GameplayActionBase { Owner = localPlayerId, Type = _type };
-            string _actionId = NewTimestampUuid();
-            ActionData _data = new ActionData { Data = _actionData, JsonData = _jsonData, Owner = FirebaseManager.Instance.Authentication.UserId, 
-            Id = _actionId, ActionsLeft = GameplayManager.Instance.MyPlayer.Actions};
-            roomData.Actions.Add(_actionId,_data);
-
-            database.Child(RoomPath).Child(nameof(roomData.Actions)).Child(_actionId).SetRawJsonValueAsync(JsonConvert.SerializeObject(_data));
-        }
-        
-        private static string NewTimestampUuid()
-        {
-            DateTime _now = DateTime.UtcNow;
-            long _timestamp = _now.Ticks;
-            string _timestampString = _timestamp.ToString("x");
-            string _uuid = _timestampString + Random.Range(1000,9999);
-            return _uuid;
+            //todo modify me
         }
     }
 }

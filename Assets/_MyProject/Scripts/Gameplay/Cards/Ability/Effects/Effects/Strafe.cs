@@ -22,7 +22,7 @@ public class Strafe : AbilityEffect
 
     private void Activate()
     {
-        keeper.MovementType = CardMovementType.EightDirections;
+        keeper.ChangeMovementType(CardMovementType.EightDirections);
     }
 
     public override void CancelEffect()
@@ -31,7 +31,8 @@ public class Strafe : AbilityEffect
         {
             return;
         }
-        keeper.MovementType = CardMovementType.FourDirections;
+        
+        keeper.ChangeMovementType(CardMovementType.FourDirections);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

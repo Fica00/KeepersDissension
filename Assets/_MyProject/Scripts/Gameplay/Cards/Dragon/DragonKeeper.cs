@@ -3,7 +3,7 @@ using System.Linq;
 
 public class DragonKeeper : CardSpecialAbility
 {
-    private CardBase effectedCard;
+    private Card effectedCard;
 
     public override void UseAbility()
     {
@@ -63,12 +63,12 @@ public class DragonKeeper : CardSpecialAbility
                     return;
                 }
 
-                effectedCard = _card;
+                effectedCard = _card as Card;
                 GameplayManager.Instance.MyPlayer.OnStartedTurn += EnableMinion;
                 GameplayManager.Instance.MyPlayer.Actions--;
                 GameplayManager.Instance.BuyMinion(effectedCard, 0,_placeMinion: false);
                 PlaceMinion();
-                effectedCard.CanBeUsed = false;
+                effectedCard.SetCanBeUsed(false);
                 DialogsManager.Instance.ShowOkDialog("This minion will be available next turn");
             }
         }
@@ -105,7 +105,7 @@ public class DragonKeeper : CardSpecialAbility
     private void EnableMinion()
     {
         GameplayManager.Instance.MyPlayer.OnStartedTurn -= EnableMinion;
-        effectedCard.CanBeUsed = true;
+        effectedCard.SetCanBeUsed(true);
         effectedCard = null;
     }
 

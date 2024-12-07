@@ -16,13 +16,13 @@ public class GameplayUIPVP : GameplayUI
     
     private void LeaveRoom()
     {
-        RoomHandler.OnILeftRoom += ShowMainMenu;
+        NewRoomHandler.OnILeftRoom += ShowMainMenu;
         FirebaseManager.Instance.RoomHandler.LeaveRoom();
     }
 
     private void ShowMainMenu()
     {
-        RoomHandler.OnILeftRoom -= ShowMainMenu;
+        NewRoomHandler.OnILeftRoom -= ShowMainMenu;
         SceneManager.LoadMainMenu();
     }
 }

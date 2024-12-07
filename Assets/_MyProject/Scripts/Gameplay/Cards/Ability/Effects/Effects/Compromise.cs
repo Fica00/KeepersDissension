@@ -24,7 +24,7 @@ public class Compromise : AbilityEffect
         List<CardBase> _cards = FindObjectsOfType<CardBase>().ToList();
         foreach (var _card in _cards)
         {
-            _card.Heal(amount);
+            (_card as Card).Heal(amount);
         }
     }
 }

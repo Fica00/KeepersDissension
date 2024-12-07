@@ -126,7 +126,7 @@ public class SniperStealth : CardSpecialAbility
                 if (_place.Id == stealthFromPlace)
                 {
                     originalCardMarker = _marker;
-                    ((Card)originalCardMarker).Stats = Card.Stats;
+                    ((Card)originalCardMarker).CopyStats(Card);
                 }
 
                 GameplayManager.Instance.PlaceCard(_marker, _place.Id);
@@ -201,7 +201,7 @@ public class SniperStealth : CardSpecialAbility
             if (_place.Id == stealthFromPlace)
             {
                 originalCardMarker = _marker;
-                ((Card)originalCardMarker).Stats = Card.Stats;
+                ((Card)originalCardMarker).CopyStats(Card);
             }
 
             GameplayManager.Instance.PlaceCard(_marker, _place.Id);
@@ -256,7 +256,7 @@ public class SniperStealth : CardSpecialAbility
         {
             if (!GameplayManager.Instance.MyTurn)
             {
-                if (CardBase.My && !GameplayManager.Instance.UsingVisionToDestroyMarkers)
+                if (CardBase.GetIsMy() && !GameplayManager.Instance.UsingVisionToDestroyMarkers)
                 {
                     GameplayManager.Instance.RequestResponseAction((CardBase as Card).Details.Id);
                 }

@@ -1,18 +1,16 @@
 using System;
-using UnityEngine;
 
 [Serializable]
 public class CardStats
 {
-    [HideInInspector] public int MaxHealth = -1;
-    [SerializeField] private float health;
+    public int MaxHealth = -1;
+    private int health;
 
-    public Action UpdatedHealth;
-    
     public int Range;
-    public float Damage;
+    public int Damage;
+    public int Speed;
 
-    public float Health
+    public int Health
     {
         get => health;
         set
@@ -27,7 +25,6 @@ public class CardStats
             {
                 health = MaxHealth;
             }
-            UpdatedHealth?.Invoke();
         }
     }
 }

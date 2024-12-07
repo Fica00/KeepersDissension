@@ -128,7 +128,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
       
-      if (_card.My != player.IsMy)
+      if (_card.GetIsMy() != player.IsMy)
       {
          return;
       }
@@ -185,7 +185,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
       
-      if (_card.My != player.IsMy)
+      if (_card.GetIsMy() != player.IsMy)
       {
          return;
       }

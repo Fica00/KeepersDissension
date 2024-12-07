@@ -41,7 +41,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
         
         foreach (var _ability in abilities)
         {
-            _ability.Setup(false);
+            _ability.Setup("Shop");
             _ability.SetParent(transform);
         }
     }
@@ -176,7 +176,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
     public void AddAbilityToShop(AbilityCard _ability)
     {
         abilitiesInShop.Add(_ability);
-        _ability.SetIsMy(false);
+        _ability.SetIsMy("Shop");
         ShowShop();
     }
 

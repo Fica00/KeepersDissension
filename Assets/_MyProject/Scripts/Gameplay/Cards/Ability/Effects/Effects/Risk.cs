@@ -34,10 +34,10 @@ public class Risk : AbilityEffect
         var _activatorsLifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My == _playerThatActivated.IsMy);
         var _otherLifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My == _otherPlayer.IsMy);
 
-        _activatorsLifeForce.Stats.Health -= 10;
-        _otherLifeForce.Stats.Health -= 5;
+        _activatorsLifeForce.ChangeHealth(-10);
+        _otherLifeForce.ChangeHealth(-5);
 
-        if (_activatorsLifeForce.Stats.Health<=0 && _otherLifeForce.Stats.Health<=0)
+        if (_activatorsLifeForce.Health<=0 && _otherLifeForce.Health<=0)
         {
             GameplayManager.Instance.UnchainGuardian();
             _playerThatActivated.DestroyCard(_activatorsLifeForce);
@@ -46,11 +46,11 @@ public class Risk : AbilityEffect
         }
         
         IsActive = false;
-        if (_activatorsLifeForce.Stats.Health<=0)
+        if (_activatorsLifeForce.Health<=0)
         {
             GameplayManager.Instance.StopGame(!_activatorsLifeForce.My);
         }
-        else if (_otherLifeForce.Stats.Health<=0)
+        else if (_otherLifeForce.Health<=0)
         {
             GameplayManager.Instance.StopGame(!_otherLifeForce.My);
         }

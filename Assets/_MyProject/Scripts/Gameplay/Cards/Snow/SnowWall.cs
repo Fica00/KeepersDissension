@@ -28,7 +28,7 @@ public class SnowWall : WallBase
 
         attackerPlace = AttackerPlace;
 
-        if (!CardBase.My)
+        if (!CardBase.GetIsMy())
         {
             return;
         }
@@ -36,21 +36,21 @@ public class SnowWall : WallBase
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(attackerPlace).GetCard();
         if (Collapse.IsActiveForMe)
         {
-            if (!_attacker.My)
+            if (!_attacker.GetIsMy())
             {
                 DamageAttacker(attackerPlace);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
-            if (_attacker.My)
+            if (_attacker.GetIsMy())
             {
                 DamageAttacker(attackerPlace);
             }
         }
 
         Debug.Log("Checking effect");
-        if (_attacker.My)
+        if (_attacker.GetIsMy())
         {
             Debug.Log(1111);
             if (Immunity.IsActiveForMe)

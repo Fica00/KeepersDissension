@@ -11,20 +11,20 @@ public class LifeForce : Card
 
     protected override void Setup()
     {
-        player = IsMy ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        Stats.UpdatedHealth += ShowHealth;
+        player = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
+        UpdatedHealth += ShowHealth;
         ShowHealth();
     }
 
     private void OnDisable()
     {
-        Stats.UpdatedHealth += ShowHealth;
+        UpdatedHealth += ShowHealth;
     }
 
     private void ShowHealth()
     {
-        lifeForceDisplay.text = Stats.Health.ToString(CultureInfo.InvariantCulture);
-        if (Stats.Health==0 && !Risk.IsActive)
+        lifeForceDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
+        if (Health==0 && !Risk.IsActive)
         {
             GameplayManager.Instance.StopGame(!player.IsMy);
         }

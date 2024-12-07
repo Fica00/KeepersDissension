@@ -6,14 +6,14 @@ public class HealthMatch : AbilityEffect
     {
         Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_element => _element.My);
         Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_element => !_element.My);
-        if (_myKeeper.Stats.Health>_opponentKeeper.Stats.Health)
+        if (_myKeeper.Health>_opponentKeeper.Health)
         {
-            _opponentKeeper.Stats.Health = _myKeeper.Stats.Health;
+            _opponentKeeper.SetHealth(_myKeeper.Health);
         }
         else
         {
-            float _difference = _opponentKeeper.Stats.Health-_myKeeper.Stats.Health;
-            _opponentKeeper.Stats.Health -= _difference;
+            int _difference = _opponentKeeper.Health-_myKeeper.Health;
+            _opponentKeeper.ChangeHealth(_difference);
         }
         
         MoveToActivationField();
@@ -23,16 +23,6 @@ public class HealthMatch : AbilityEffect
 
     public override void ActivateForOther()
     {
-        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_element => _element.My);
-        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_element => !_element.My);
-        if (_opponentKeeper.Stats.Health>_myKeeper.Stats.Health)
-        {
-            _myKeeper.Stats.Health = _opponentKeeper.Stats.Health;
-        }
-        else
-        {
-            float _difference = _myKeeper.Stats.Health - _opponentKeeper.Stats.Health;
-            _myKeeper.Stats.Health -= _difference;
-        }
+        
     }
 }

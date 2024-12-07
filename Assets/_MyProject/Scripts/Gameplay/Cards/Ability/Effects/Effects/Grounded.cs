@@ -46,7 +46,7 @@ public class Grounded : AbilityEffect
          return false;
       }
 
-      switch (_attackingCard.My)
+      switch ((_attackingCard as Card).My)
       {
          case true when isActiveForMe:
             Setup();

@@ -106,7 +106,7 @@ public class GameplayPlayer : MonoBehaviour
 
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
-            _card.Setup(IsMy);
+            _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
             AddCardToDeck(_card);
         }
 
@@ -116,7 +116,7 @@ public class GameplayPlayer : MonoBehaviour
             _card.Details.Id = 500 + _i;
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
-            _card.Setup(IsMy);
+            _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
             AddCardToDeck(_card);
         }
     }
@@ -216,7 +216,7 @@ public class GameplayPlayer : MonoBehaviour
 
         _cardBase.Destroy();
         _cardBase.ReturnFromHand();
-        _card.HasDied = true;
+        _card.SetHasDied(true);
     }
 
     public void DestroyWithoutNotify(CardBase _cardBase)
@@ -234,7 +234,7 @@ public class GameplayPlayer : MonoBehaviour
         }
 
         _cardBase.ReturnFromHand();
-        _card.HasDied = true;
+        _card.SetHasDied(true);
     }
 
     public void SetActionsWithoutNotify(int _amount)

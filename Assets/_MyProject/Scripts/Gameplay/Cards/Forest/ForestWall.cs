@@ -25,7 +25,7 @@ public class ForestWall : WallBase
             return;
         }
 
-        if (_card.My)
+        if (_card.GetIsMy())
         {
             GameplayManager.Instance.PlayAudioOnBoth("Leaves55",CardBase);
         }
@@ -48,14 +48,14 @@ public class ForestWall : WallBase
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
         if (Collapse.IsActiveForMe)
         {
-            if (!_attacker.My)
+            if (!_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
-            if (_attacker.My)
+            if (_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace);
             }
@@ -67,11 +67,11 @@ public class ForestWall : WallBase
             StartCoroutine(TryToHeal(_cardObject));
         }
 
-        if (Immunity.IsActiveForMe && _attacker.My)
+        if (Immunity.IsActiveForMe && _attacker.GetIsMy())
         {
             return;
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.My)
+        if (Immunity.IsActiveForOpponent && !_attacker.GetIsMy())
         {
             return;
         }
@@ -86,6 +86,5 @@ public class ForestWall : WallBase
         }
         Card _card = _cardObject as Card;
         _card.Heal(1);
-        GameplayManager.Instance.UpdateHealth(_card.Details.Id,_card.My,(int)_card.Stats.Health);
     }
 }

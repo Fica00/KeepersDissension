@@ -5,8 +5,9 @@ public class Minionized : AbilityEffect
     public static bool IsActive;
     private int counter;
     private GameplayPlayer player;
-    private float startingHealth;
-    private bool hasDied;
+    private int startingHealth;
+    private bool hasMyKeeperDied;
+    private bool hasOpponentKeeperDied;
     
     private void Awake()
     {
@@ -31,27 +32,22 @@ public class Minionized : AbilityEffect
 
     public override void ActivateForOwner()
     {
-        if (IsActive)
-        {
-            return;
-        }
-        player = GameplayManager.Instance.MyPlayer;
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        
     }
 
     private void Activate()
     {
-        hasDied = false;
+        hasMyKeeperDied = false;
+        hasOpponentKeeperDied = false;
         counter = 2;
         IsActive = true;
         Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        startingHealth = _myKeeper.Stats.Health;
-        _myKeeper.Stats.MaxHealth = 1;
-        _opponentKeeper.Stats.MaxHealth = 1;
-        _myKeeper.Stats.Health = 1;
-        _opponentKeeper.Stats.Health = 1;
+        startingHealth = _myKeeper.Health;
+        _myKeeper.SetMaxHealth(1);
+        _opponentKeeper.SetMaxHealth(1);
+        _myKeeper.SetHealth(1);
+        _opponentKeeper.SetHealth(1);
 
         player.OnEndedTurn += LowerCounter;
         GameplayManager.OnKeeperDied += CheckKeeper;
@@ -70,26 +66,26 @@ public class Minionized : AbilityEffect
         IsActive = false;
         player.OnEndedTurn -= LowerCounter;
         GameplayManager.OnKeeperDied -= CheckKeeper;
-        Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        _keeper.Stats.MaxHealth = -1;
-        if (!hasDied)
-        {
-            _keeper.Stats.Health = startingHealth;
-        }
-        else
-        {
-            _keeper.Stats.Health = 5;
-        }
-
-        
-        GameplayManager.Instance.UpdateHealth(_keeper.Details.Id,true,(int)_keeper.Stats.Health);
+        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+        _myKeeper.SetMaxHealth(-1);
+        _opponentKeeper.SetMaxHealth(-1);
+        _myKeeper.SetHealth(hasMyKeeperDied ? 5 : startingHealth);
+        _opponentKeeper.SetHealth(hasOpponentKeeperDied ? 5 : startingHealth);
     }
 
     private void CheckKeeper(Keeper _keeper)
     {
-        if (_keeper == FindObjectsOfType<Keeper>().ToList().Find(_myKeeper => _myKeeper.My))
+        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+        
+        if (_keeper == _myKeeper)
         {
-            hasDied = true;
+            hasMyKeeperDied = true;
+        }
+        else if (_keeper == _opponentKeeper)
+        {
+            hasOpponentKeeperDied = true;
         }
     }
 

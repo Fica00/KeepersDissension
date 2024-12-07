@@ -19,7 +19,7 @@ public class DragonWall : WallBase
             return;
         }
 
-        if (!CardBase.My)
+        if (!CardBase.GetIsMy())
         {
             return;
         }
@@ -29,24 +29,24 @@ public class DragonWall : WallBase
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
         if (Collapse.IsActiveForMe)
         {
-            if (!_attacker.My)
+            if (!_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace);
             }
         }
         else if (Collapse.IsActiveForOpponent)
         {
-            if (_attacker.My)
+            if (_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace);
             }
         }
         
-        if (Immunity.IsActiveForMe && _attacker.My)
+        if (Immunity.IsActiveForMe && _attacker.GetIsMy())
         {
             return;
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.My)
+        if (Immunity.IsActiveForOpponent && !_attacker.GetIsMy())
         {
             return;
         }

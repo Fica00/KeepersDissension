@@ -19,11 +19,11 @@ public class Guardian: Card
 
     public void Unchain()
     {
-        player = IsMy ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
+        player = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
         IsChained = false;
-        Stats.Damage += GainStatsOnUnchaining.Damage;
-        Stats.Health += GainStatsOnUnchaining.Health;
-        Stats.Range += GainStatsOnUnchaining.Range;
+        ChangeDamage(GainStatsOnUnchaining.Damage);
+        ChangeHealth(GainStatsOnUnchaining.Health);
+        ChangeRange(GainStatsOnUnchaining.Range);
 
         RectTransform _cardBaseTransform = Display.GetComponent<RectTransform>();
         Vector3 _startingScale = _cardBaseTransform.localScale;
@@ -37,20 +37,11 @@ public class Guardian: Card
         player.OnEndedTurn += AddSpeed;
         AddSpeed();
     }
-
-    public void AddSpeed()
-    {
-        if (IsChained)
-        {
-            return;
-        }
-        Speed = 2;
-    }
     
     
     protected override void Setup()
     {
-        Stats.UpdatedHealth += ShowHealth;
+        UpdatedHealth += ShowHealth;
         ShowHealth();
         chain.gameObject.SetActive(false);
     }
@@ -65,7 +56,7 @@ public class Guardian: Card
 
     private void OnDisable()
     {
-        Stats.UpdatedHealth += ShowHealth;
+        UpdatedHealth -= ShowHealth;
         if (player!=null)
         {
             player.OnEndedTurn -= AddSpeed;
@@ -96,10 +87,19 @@ public class Guardian: Card
     {
         AddSpeed();
     }
+    
+    private void AddSpeed()
+    {
+        if (IsChained)
+        {
+            return;
+        }
+        SetSpeed(2);
+    }
 
     private void ShowHealth()
     {
-        if (Stats.Health<=0)
+        if (Health<=0)
         {
             healthDisplay.text = 0.ToString();
             Debug.Log("Risk: "+Risk.IsActive);
@@ -109,7 +109,7 @@ public class Guardian: Card
             }
             return;
         }
-        healthDisplay.text = Stats.Health.ToString(CultureInfo.InvariantCulture);
+        healthDisplay.text = Health.ToString();
     }
 
     public void ShowChain()
@@ -124,7 +124,7 @@ public class Guardian: Card
         chain.gameObject.SetActive(true);
         RectTransform _rectTransform = GetComponent<RectTransform>();
         RectTransform _lifeForceRectTransform = _lifeForce.GetComponent<RectTransform>();
-        while (IsChained&& Stats.Health>0)
+        while (IsChained&& Health>0)
         {
             if (GetTablePlace()==null)
             {

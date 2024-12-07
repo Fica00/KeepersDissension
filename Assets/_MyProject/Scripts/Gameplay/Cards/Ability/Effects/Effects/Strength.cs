@@ -20,7 +20,7 @@ public class Strength : AbilityEffect
 
     private void Activate()
     {
-        keeper.Stats.Damage++;
+        keeper.ChangeDamage(1);
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
@@ -31,7 +31,7 @@ public class Strength : AbilityEffect
             return;
         }
 
-        keeper.Stats.Damage--;
+        keeper.ChangeDamage(-1);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

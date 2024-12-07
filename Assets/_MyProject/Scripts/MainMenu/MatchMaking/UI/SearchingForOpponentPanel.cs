@@ -16,13 +16,13 @@ public class SearchingForOpponentPanel : MonoBehaviour
     private void OnEnable()
     {
         cancelSearch.onClick.AddListener(CancelSearching);
-        RoomHandler.OnILeftRoom += HideSearching;
+        NewRoomHandler.OnILeftRoom += HideSearching;
     }
 
     private void OnDisable()
     {
         cancelSearch.onClick.RemoveListener(CancelSearching);
-        RoomHandler.OnILeftRoom -= HideSearching;
+        NewRoomHandler.OnILeftRoom -= HideSearching;
     }
 
     private void ShowSearching()

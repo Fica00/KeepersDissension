@@ -2,11 +2,11 @@ public class ScalerScale : CardSpecialAbility
 {
     private void Start()
     {
-        Card.CanMoveOnWall = true;
+        Card.SetCanMoveOnWall(true);
     }
 
     private void OnDisable()
     {
-        Card.CanMoveOnWall = false;
+        Card.SetCanMoveOnWall(false);
     }
 }

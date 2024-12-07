@@ -20,7 +20,7 @@ public class Weaken : AbilityEffect
 
     private void Activate()
     {
-        guardian.Stats.Damage=2;
+        guardian.SetDamage(2);
         AbilityCard.ActiveDisplay.gameObject.SetActive(true);
     }
 
@@ -31,7 +31,7 @@ public class Weaken : AbilityEffect
             return;
         }
 
-        guardian.Stats.Damage = 3;
+        guardian.SetDamage(3);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

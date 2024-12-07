@@ -35,7 +35,7 @@ public class GroundPound : AbilityEffect
                     Cost = 0,
                     IsMy = true,
                     CanTransferLoot = false,
-                    Damage = (int)_keeper.Stats.Damage,
+                    Damage = _keeper.Damage,
                     CanCounter = false
                 };
                 

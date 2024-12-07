@@ -31,7 +31,7 @@ public class CyberKeeper : CardSpecialAbility
             GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
             GameplayManager.Instance.SelectPlaceForSpecialAbility(
                 TablePlaceHandler.Id,
-                Card.Stats.Range,
+                Card.Range,
                 PlaceLookFor.Occupied,
                 CardMovementType.EightDirections,
                 false,

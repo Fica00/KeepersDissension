@@ -11,15 +11,18 @@ public class AbilityCard : CardBase
     public GameObject ActiveDisplay => activeDisplay;
     public AbilityEffect Effect => effect;
 
-    public override void Setup(bool _isMy)
+    private string owner;
+    public bool My => owner == FirebaseManager.Instance.PlayerId;
+
+    public void Setup(string _owner)
     {
-        IsMy = _isMy;
+        owner = _owner;
         Display.Setup(this);
     }
 
-    public void SetIsMy(bool _isMy)
+    public void SetIsMy(string _owner)
     {
-        IsMy = _isMy;
+        owner = _owner;
     }
 
     private void OnEnable()
@@ -68,7 +71,7 @@ public class AbilityCard : CardBase
             return;
         }
 
-        if (!IsMy)
+        if (!My)
         {
             return;
         }
@@ -114,7 +117,7 @@ public class AbilityCard : CardBase
         GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
     }
 
-    public override void SetParent(Transform _parent)
+    public void SetParent(Transform _parent)
     {
         Parent = _parent;
         transform.SetParent(_parent);
@@ -137,7 +140,7 @@ public class AbilityCard : CardBase
         {
             return;
         }
-        if (IsMy)
+        if (My)
         {
             effect.ActivateForOwner();
         }
@@ -150,5 +153,10 @@ public class AbilityCard : CardBase
     public AbilityEffect GetEffect()
     {
         return effect;
+    }
+
+    public override bool GetIsMy()
+    {
+        return My;
     }
 }

@@ -21,7 +21,7 @@ public class Range : AbilityEffect
 
     private void Activate()
     {
-        keeper.Stats.Range++;
+        keeper.ChangeRange(1);
     }
 
     public override void CancelEffect()
@@ -31,7 +31,7 @@ public class Range : AbilityEffect
             return;
         }
         
-        keeper.Stats.Range--;
+        keeper.ChangeRange(-1);
         AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }
