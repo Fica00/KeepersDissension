@@ -521,7 +521,7 @@ public class GameplayManagerPVP : GameplayManager
 
     private void ExecuteAttack(CardAction _action)
     {
-        if (Truce.IsActive&& _action.CanBeBlocked)
+        if (IsAbilityActive<Truce>() && _action.CanBeBlocked)
         {
             GameplayPlayer _player = _action.IsMy ? MyPlayer : OpponentPlayer;
             _player.Actions--;
@@ -624,7 +624,7 @@ public class GameplayManagerPVP : GameplayManager
                 //hunter ability
                 if (_attackingCard.My)
                 {
-                    if (Hunter.IsActive && _attackingCard is Keeper _keeper && _keeper.My && _defendingCard is Guardian _guardian && 
+                    if (IsAbilityActiveForMe<Hunter>() && _attackingCard is Keeper _keeper && _keeper.My && _defendingCard is Guardian _guardian && 
                         !_guardian.My)
                     {
                         _damage *= 2;
@@ -632,7 +632,7 @@ public class GameplayManagerPVP : GameplayManager
                 }
                 else
                 {
-                    if (Hunter.IsActiveForOpponent && _attackingCard is Keeper _keeper && !_keeper.My && _defendingCard is Guardian 
+                    if (IsAbilityActiveForOpponent<Hunter>() && _attackingCard is Keeper _keeper && !_keeper.My && _defendingCard is Guardian 
                     _guardian && _guardian.My)
                     {
                         _damage *= 2;
@@ -642,22 +642,22 @@ public class GameplayManagerPVP : GameplayManager
                 
                 if (_defendingCard is Keeper)
                 {
-                    if (Invincible.IsActive && _defendingCard.My&& _action.CanBeBlocked)
+                    if (IsAbilityActive<Invincible>() && _defendingCard.My&& _action.CanBeBlocked)
                     {
                         DialogsManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
                         _damage = 0;
                     }
-                    else if (Invincible.IsActiveForOpponent && !_defendingCard.My&& _action.CanBeBlocked)
+                    else if (IsAbilityActiveForOpponent<Invincible>() && !_defendingCard.My&& _action.CanBeBlocked)
                     {
                         DialogsManager.Instance.ShowOkDialog("Damage blocked by Invincible ability");
                         _damage = 0;
                     }
-                    else if (Steadfast.IsActive && _defendingCard.My && _attackingCard is Minion && !_attackingCard.My&& _action.CanBeBlocked)
+                    else if (IsAbilityActive<Steadfast>() && _defendingCard.My && _attackingCard is Minion && !_attackingCard.My&& _action.CanBeBlocked)
                     {
                         DialogsManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
                         _damage = 0;
                     }
-                    else if (Steadfast.IsActiveForOpponent && !_defendingCard.My && _attackingCard is Minion && 
+                    else if (IsAbilityActiveForOpponent<Steadfast>() && !_defendingCard.My && _attackingCard is Minion && 
                     _attackingCard.My && _action.CanBeBlocked)
                     {
                         DialogsManager.Instance.ShowOkDialog("Damage blocked by Steadfast ability");
@@ -666,21 +666,21 @@ public class GameplayManagerPVP : GameplayManager
 
                     if (_action.CanBeBlocked && !_usedGrounded)
                     {
-                        Armor _abilityEffect = FindObjectsOfType<AbilityEffect>().ToList().Find(_abilityEffect =>
+                        Armor _armor = FindObjectsOfType<AbilityEffect>().ToList().Find(_abilityEffect =>
                             _abilityEffect is Armor &&
-                            _abilityEffect.AbilityCard.My == _defendingCard.My) as Armor;
-                        if (_abilityEffect !=null && _abilityEffect.IsActive)
+                            _abilityEffect.IsMy == _defendingCard.My) as Armor;
+                        if (_armor !=null && _armor.IsActive)
                         {
-                            _abilityEffect.IsActive = false;
+                            _armor.MarkAsUsed();
                             _damage--;
                         }
                     }
                 }
 
-                if (HighStakes.IsActive && _action.CanBeBlocked)
+                if (IsAbilityActive<HighStakes>() && _action.CanBeBlocked)
                 {
                     _damage = 8;
-                    HighStakes.IsActive = false;
+                    FinishEffect<HighStakes>();
                 }
 
                 if (_defendingCard is Minion)
@@ -787,11 +787,10 @@ public class GameplayManagerPVP : GameplayManager
                 return;
             }
 
-            if ((Ambush.IsActiveForMe && !_defendingCard.My) || (Ambush.IsActiveForOpponent && _defendingCard.My))
+            if ((IsAbilityActiveForMe<Ambush>() && !_defendingCard.My) || (IsAbilityActiveForOpponent<Ambush>() && _defendingCard.My))
             {
                 DialogsManager.Instance.ShowOkDialog("Ignore next response action activated!");
-                Ambush.IsActiveForMe = false;
-                Ambush.IsActiveForOpponent = false;
+                FinishEffect<Ambush>();
                 return;
             }
 
@@ -820,11 +819,11 @@ public class GameplayManagerPVP : GameplayManager
 
             if (_defendingCard is Keeper _keeper)
             {
-                if (Subdued.IsActive)
+                if (IsAbilityActive<Subdued>())
                 {
-                    Subdued.IsActive = false;
+                    FinishEffect<Subdued>();
                 }
-                if (Explode.IsActive)
+                if (IsAbilityActive<Explode>())
                 {
                     BombExploded(_defendingCard.GetTablePlace().Id, false);
                 }
@@ -841,7 +840,7 @@ public class GameplayManagerPVP : GameplayManager
 
                 float _healthToRecover = (_keeper.Details.Stats.Health *_keeper.PercentageOfHealthToRecover)/100;
                 int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
-                if (Minionized.IsActive)
+                if (IsAbilityActive<Minionized>())
                 {
                     _heal = 1;
                 }
@@ -1172,7 +1171,7 @@ public class GameplayManagerPVP : GameplayManager
         {
             yield return new WaitForSeconds(0.5f);
             PlaceCard(_card, _placeId);
-            if (Comrade.IsActive)
+            if (IsAbilityActive<Comrade>())
             {
                 List<CardBase> _cards = MyPlayer.GetCardsInDeck(CardType.Minion).Cast<CardBase>().ToList();
                 if (_cards.Count==0)
@@ -1203,7 +1202,7 @@ public class GameplayManagerPVP : GameplayManager
 
     public override void EndTurn(bool _tellRoom = true)
     {
-        if (Casters.IsActive)
+        if (IsAbilityActive<Casters>())
         {
             return;
         }

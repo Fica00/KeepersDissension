@@ -96,7 +96,7 @@ public class TableActionsHandler : MonoBehaviour
                 break;
             case CardActionType.Move:
                 int _movingRange = _range;
-                if (SlowDown.IsActive)
+                if (GameplayManager.Instance.IsAbilityActive<SlowDown>())
                 {
                     SlowDown _slowDown = FindObjectOfType<SlowDown>();
                     if (!_slowDown.CanMoveCard(_card))
@@ -856,7 +856,7 @@ public class TableActionsHandler : MonoBehaviour
 
         if (_action.Type is CardActionType.Move or CardActionType.SwitchPlace or CardActionType.RamAbility)
         {
-            if (Hinder.IsActive)
+            if (GameplayManager.Instance.IsAbilityActive<Hinder>())
             {
                 foreach (var _placeInRange in GameplayManager.Instance.TableHandler.GetPlacesAround(_action.StartingPlaceId,
                              CardMovementType.EightDirections))
@@ -945,7 +945,7 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
-        if (Tar.IsActiveForOpponent)
+        if (GameplayManager.Instance.IsAbilityActiveForOpponent<Tar>())
         {
             if (_newAction.Type == CardActionType.Move || _newAction.Type == CardActionType.SwitchPlace)
             {

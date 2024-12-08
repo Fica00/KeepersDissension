@@ -16,6 +16,7 @@ public class AbilityCard : CardBase
     public bool My => abilityData.Owner == FirebaseManager.Instance.PlayerId;
     public string UniqueId => abilityData.UniqueId;
     public bool IsVetoed => abilityData.IsVetoed;
+    public int PlaceId => abilityData.PlaceId;
     public bool IsActive => abilityData.IsActive;
     public bool IsApplied => abilityData.IsApplied;
     public int RemainingCooldown => abilityData.RemainingCooldown;
@@ -102,7 +103,7 @@ public class AbilityCard : CardBase
             return false;
         }
 
-        if (Subdued.IsActive)
+        if (GameplayManager.Instance.IsAbilityActive<Subdued>())
         {
             DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return false;
@@ -113,20 +114,17 @@ public class AbilityCard : CardBase
     
     private void DoActivate()
     {
-        if (Tax.SelectedCard!=null)
+        if (GameplayManager.Instance.IsCardTaxed(UniqueId))
         {
-            if (Tax.SelectedCard==this && !Tax.IsActiveForMe)
+            if (GameplayManager.Instance.MyPlayer.StrangeMatter<=0)
             {
-                if (GameplayManager.Instance.MyPlayer.StrangeMatter<=0)
-                {
-                    DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
-                    return;
-                }
-
-                GameplayManager.Instance.MyPlayer.StrangeMatter--;
-                GameplayManager.Instance.ActivatedTaxedCard();
-                GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
+                DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
+                return;
             }
+
+            GameplayManager.Instance.MyPlayer.StrangeMatter--;
+            GameplayManager.Instance.ActivatedTaxedCard();
+            GameplayManager.Instance.TellOpponentToUpdateMyStrangeMatter();
         }
         
         GameplayManager.Instance.ActivateAbility(Details.Id);
@@ -247,5 +245,10 @@ public class AbilityCard : CardBase
     public void ChangeMultiplayer(int _amount)
     {
         abilityData.Multiplayer += _amount;
+    }
+
+    public void SetPlaceId(int _placeId)
+    {
+        abilityData.PlaceId = _placeId;
     }
 }

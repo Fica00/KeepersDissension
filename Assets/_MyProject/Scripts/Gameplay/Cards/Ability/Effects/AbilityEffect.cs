@@ -11,9 +11,8 @@ public class AbilityEffect : MonoBehaviour
     private AbilityCard AbilityCard => GetComponentInParent<AbilityCard>();
 
     public int Cooldown => cooldown;
-
     public bool IsActive => AbilityCard.IsActive;
-
+    public bool IsMy => AbilityCard.My;
     protected bool IsApplied => AbilityCard.IsApplied;
     protected int StartingRange => AbilityCard.StartingRange;
     protected int StartingDamage => AbilityCard.StartingDamage;
@@ -24,6 +23,7 @@ public class AbilityEffect : MonoBehaviour
     protected bool HasMyRequiredCardDied => AbilityCard.HasMyRequiredCardDied;
     protected bool HasOpponentsRequiredCardDied => AbilityCard.HasOpponentsRequiredCardDied;
     protected string UniqueId => AbilityCard.UniqueId;
+    protected int PlaceId => AbilityCard.PlaceId;
     
 
     public virtual void ActivateForOwner()
@@ -170,6 +170,19 @@ public class AbilityEffect : MonoBehaviour
     protected void SetHasOpponentsRequiredCardDied(bool _status)
     {
         AbilityCard.SetHasOpponentsRequiredCardDied(_status);
+    }
+    
+    public bool IsEffected(string _uniqueId)
+    {
+        foreach (var _effectedCard in GetEffectedCards())
+        {
+            if (_effectedCard.UniqueId == _uniqueId)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     protected List<Card> GetEffectedCards()

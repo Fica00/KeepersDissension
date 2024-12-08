@@ -102,8 +102,7 @@ public class Guardian: Card
         if (Health<=0)
         {
             healthDisplay.text = 0.ToString();
-            Debug.Log("Risk: "+Risk.IsActive);
-            if (Risk.IsActive)
+            if (GameplayManager.Instance.IsAbilityActive<Risk>())
             {
                 GameplayManager.Instance.StopGame(!My);
             }

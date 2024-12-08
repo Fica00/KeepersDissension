@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GameplayActions;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
@@ -202,7 +203,7 @@ public class GameplayManager : MonoBehaviour
         }
 
         int _price = UnchainingGuardianPrice - StrangeMatterCostChange;
-        if (Famine.IsActive)
+        if (IsAbilityActive<Famine>())
         {
             DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
             return;
@@ -818,6 +819,71 @@ public class GameplayManager : MonoBehaviour
             return false;
         }
 
+        if (!_vetoCard.IsActive)
+        {
+            return false;
+        }
+
         return _vetoCard.IsEffected(_uniqueCardId);
+    }
+    
+    public bool IsCardTaxed(string _uniqueId)
+    {
+        var _taxedCard = FindObjectOfType<Tax>();
+        if (_taxedCard == null)
+        {
+            return false;
+        }
+
+        if (!_taxedCard.IsActive)
+        {
+            return false;
+        }
+        
+        return _taxedCard.IsEffected(_uniqueId);
+    }
+    
+    public void FinishEffect<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as dynamic;
+        if (_ability == null)
+        {
+            return;
+        }
+
+        _ability.CancelEffect();
+    }
+    
+    public bool IsAbilityActiveForMe<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as dynamic;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive && _ability.IsMy;
+    }
+
+    public bool IsAbilityActiveForOpponent<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as dynamic;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive && !_ability.IsMy;
+    }
+
+    public bool IsAbilityActive<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as dynamic;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive;
     }
 }

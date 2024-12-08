@@ -46,14 +46,14 @@ public class ForestWall : WallBase
         }
         
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
-        if (Collapse.IsActiveForMe)
+        if (GameplayManager.Instance.IsAbilityActiveForMe<Collapse>())
         {
             if (!_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace);
             }
         }
-        else if (Collapse.IsActiveForOpponent)
+        else if (GameplayManager.Instance.IsAbilityActiveForOpponent<Collapse>())
         {
             if (_attacker.GetIsMy())
             {
@@ -67,11 +67,11 @@ public class ForestWall : WallBase
             StartCoroutine(TryToHeal(_cardObject));
         }
 
-        if (Immunity.IsActiveForMe && _attacker.GetIsMy())
+        if (GameplayManager.Instance.IsAbilityActiveForMe<Immunity>() && _attacker.GetIsMy())
         {
             return;
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.GetIsMy())
+        if (GameplayManager.Instance.IsAbilityActiveForOpponent<Immunity>() && !_attacker.GetIsMy())
         {
             return;
         }
@@ -85,6 +85,6 @@ public class ForestWall : WallBase
             yield break;
         }
         Card _card = _cardObject as Card;
-        _card.Heal(1);
+        _card.ChangeHealth(1);
     }
 }

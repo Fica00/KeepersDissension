@@ -81,7 +81,7 @@ public class Portal : AbilityEffect
             {
                 if (_cardThatMoved is Keeper)
                 {
-                    if (Penalty.IsActive)
+                    if (GameplayManager.Instance.IsAbilityActive<Penalty>())
                     {
                         CardAction _damageAction = new CardAction
                         {

@@ -8,6 +8,7 @@ public class AbilityData
     public string Owner;
     public bool IsVetoed;
     public int RemainingCooldown;
+    public int PlaceId;
     public int Cooldown;
     public bool IsActive;
     public List<string> EffectedCards = new();

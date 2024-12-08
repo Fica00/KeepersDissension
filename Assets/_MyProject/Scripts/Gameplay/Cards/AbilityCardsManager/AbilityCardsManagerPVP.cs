@@ -43,7 +43,7 @@ public class AbilityCardsManagerPVP : AbilityCardsManagerBase
             return;
         }
         
-        if (Famine.IsActive)
+        if (GameplayManager.Instance.IsAbilityActive<Famine>())
         {
             DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
             return;

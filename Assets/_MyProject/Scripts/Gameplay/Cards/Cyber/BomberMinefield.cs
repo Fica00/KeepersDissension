@@ -137,7 +137,7 @@ public class BomberMinefield : CardSpecialAbility
                 }
             }
             
-            if (Player.Actions<=0 && !Casters.IsActive && _checkActions)
+            if (Player.Actions<=0 && !GameplayManager.Instance.IsAbilityActiveForOpponent<Casters>() && _checkActions)
             {
                 DialogsManager.Instance.ShowOkDialog("You don't have anymore actions");
                 OnActivated?.Invoke();

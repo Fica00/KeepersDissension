@@ -139,7 +139,7 @@ public class OrgCard : CardSpecialAbility
 
         IEnumerator DelayPush()
         {
-            if (Immunity.IsActiveForMe)
+            if (GameplayManager.Instance.IsAbilityActiveForMe<Immunity>())
             {
                 yield break;
             }
@@ -161,7 +161,7 @@ public class OrgCard : CardSpecialAbility
 
         IEnumerator AttackSelf()
         {
-            if (Immunity.IsActiveForMe)
+            if (GameplayManager.Instance.IsAbilityActiveForMe<Immunity>())
             {
                 yield break;
             }

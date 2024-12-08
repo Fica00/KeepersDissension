@@ -54,20 +54,7 @@ public class Veto : AbilityEffect
             GameplayManager.Instance.GameState = _state;
             RemoveAction();
             OnActivated?.Invoke();
-            AbilityCard.RotateToBeVertical();
+            _card.RotateToBeVertical();
         }
-    }
-
-    public bool IsEffected(string _uniqueId)
-    {
-        foreach (var _effectedCard in GetEffectedCards())
-        {
-            if (_effectedCard.UniqueId == _uniqueId)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

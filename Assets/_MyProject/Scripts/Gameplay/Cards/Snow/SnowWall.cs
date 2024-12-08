@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class SnowWall : WallBase
 {
     private int attackerPlace;
@@ -34,14 +32,14 @@ public class SnowWall : WallBase
         }
         
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(attackerPlace).GetCard();
-        if (Collapse.IsActiveForMe)
+        if (GameplayManager.Instance.IsAbilityActiveForMe<Collapse>())
         {
             if (!_attacker.GetIsMy())
             {
                 DamageAttacker(attackerPlace);
             }
         }
-        else if (Collapse.IsActiveForOpponent)
+        else if (GameplayManager.Instance.IsAbilityActiveForOpponent<Collapse>())
         {
             if (_attacker.GetIsMy())
             {
@@ -49,31 +47,23 @@ public class SnowWall : WallBase
             }
         }
 
-        Debug.Log("Checking effect");
         if (_attacker.GetIsMy())
         {
-            Debug.Log(1111);
-            if (Immunity.IsActiveForMe)
+            if (GameplayManager.Instance.IsAbilityActiveForMe<Immunity>())
             {
-                Debug.Log(22222);
                 return;
             }
-            if (Tar.IsActiveForOpponent)
+            if (GameplayManager.Instance.IsAbilityActiveForMe<Tar>())
             {
-                Debug.Log(33333);
                 return;   
             }
         }
         else
         {
-                Debug.Log(444444);
-            if (Immunity.IsActiveForOpponent)
+            if (GameplayManager.Instance.IsAbilityActiveForOpponent<Immunity>())
             {
-                Debug.Log(555555);
                 return;
             }   
-            
-            
         }
 
         if (attackerPlace==TablePlaceHandler.Id)

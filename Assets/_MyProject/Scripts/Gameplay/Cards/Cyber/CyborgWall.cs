@@ -32,14 +32,14 @@ public class CyborgWall : WallBase
         }
 
         CardBase _attacker = GameplayManager.Instance.TableHandler.GetPlace(AttackerPlace).GetCard();
-        if (Collapse.IsActiveForMe)
+        if (GameplayManager.Instance.IsAbilityActiveForMe<Collapse>())
         {
             if (!_attacker.GetIsMy())
             {
                 DamageAttacker(AttackerPlace,2);
             }
         }
-        else if (Collapse.IsActiveForOpponent)
+        else if (GameplayManager.Instance.IsAbilityActiveForOpponent<Collapse>())
         {
             if (_attacker.GetIsMy())
             {
@@ -47,11 +47,11 @@ public class CyborgWall : WallBase
             }
         }
         
-        if (Immunity.IsActiveForMe && _attacker.GetIsMy())
+        if (GameplayManager.Instance.IsAbilityActiveForMe<Immunity>() && _attacker.GetIsMy())
         {
             return;
         }
-        if (Immunity.IsActiveForOpponent && !_attacker.GetIsMy())
+        if (GameplayManager.Instance.IsAbilityActiveForOpponent<Immunity>() && !_attacker.GetIsMy())
         {
             return;
         }

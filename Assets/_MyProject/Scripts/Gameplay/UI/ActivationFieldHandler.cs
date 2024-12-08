@@ -99,7 +99,7 @@ public class ActivationFieldHandler : MonoBehaviour
             return;
         }
         
-        if (Subdued.IsActive && GameplayCheats.CheckForCD)
+        if (GameplayManager.Instance.IsAbilityActive<Subdued>() && GameplayCheats.CheckForCD)
         {
             DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return;

@@ -8,7 +8,7 @@ public class Void : AbilityEffect
     
     public override void ActivateForOwner()
     {
-        GameplayManager.Instance.SelectPlaceForSpecialAbility(AbilityCard.GetTablePlace().Id,20,PlaceLookFor.Empty,
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(PlaceId,20,PlaceLookFor.Empty,
         CardMovementType.EightDirections,false,LookForCardOwner.Both,PlaceVoid);
 
         void PlaceVoid(int _placeId)
