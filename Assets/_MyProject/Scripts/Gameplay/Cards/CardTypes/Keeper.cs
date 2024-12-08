@@ -6,13 +6,6 @@ public class Keeper: Card
 {
     [SerializeField] private TextMeshProUGUI healthDisplay;
     [SerializeField] private GameObject healthHolder;
-    private int percentageOfHealthToRecover=100;
-
-    public int PercentageOfHealthToRecover
-    {
-        get => percentageOfHealthToRecover;
-        set => percentageOfHealthToRecover = value;
-    }
     
     protected override void Setup()
     {

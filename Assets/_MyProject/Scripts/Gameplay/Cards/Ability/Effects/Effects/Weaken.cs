@@ -1,37 +1,28 @@
-using System.Linq;
-
 public class Weaken : AbilityEffect
 {
-    private Guardian guardian;
     
     public override void ActivateForOwner()
     {
-        guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => !_guardian.My);
-        Activate();
+        var guardian = GameplayManager.Instance.GetOpponentGuardian();
+        AddEffectedCard(guardian.UniqueId);
+        SetIsActive(true);
+        guardian.SetDamage(2);
         RemoveAction();
         OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        guardian.SetDamage(2);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
     {
-        if (guardian==null)
+        if (!IsActive)
         {
             return;
         }
 
+        var guardian = GetEffectedCards()[0];
+        RemoveEffectedCard(guardian.UniqueId);
         guardian.SetDamage(3);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(false);
+        SetIsActive(false);
     }
 }

@@ -1,43 +1,25 @@
 public class Immunity : AbilityEffect
 {
-   public static bool IsActiveForMe;
-   public static bool IsActiveForOpponent;
-   private void Awake()
-   {
-      IsActiveForMe = false;
-      IsActiveForOpponent = false;
-   }
-
    public override void ActivateForOwner()
    {
       MoveToActivationField();
-      IsActiveForMe = true;
+      SetIsActive(true);
       RemoveAction();
       OnActivated?.Invoke();
       GameplayManager.Instance.MyPlayer.OnEndedTurn += DisableEffect;
-      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-   }
-
-   public override void ActivateForOther()
-   {
-      IsActiveForOpponent = true;
-      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-      GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableEffect;
+      ManageActiveDisplay(true);
    }
 
    private void DisableEffect()
    {
-      if (IsActiveForMe)
+      if (!IsActive)
       {
-         GameplayManager.Instance.MyPlayer.OnEndedTurn -= DisableEffect;
+         return;
       }
-      else
-      {
-         GameplayManager.Instance.OpponentPlayer.OnEndedTurn -= DisableEffect;
-      }
-      IsActiveForMe = false;
-      IsActiveForOpponent = false;
-      AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+      
+      GameplayManager.Instance.MyPlayer.OnEndedTurn -= DisableEffect;
+      SetIsActive(false);
+      ManageActiveDisplay(false);
    }
 
    public override void CancelEffect()

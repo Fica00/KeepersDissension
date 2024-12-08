@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FirebaseMultiplayer.Room
 {
     [Serializable]
-    public class NewRoomData
+    public class RoomData
     {
         public string Name;
         public string Id;

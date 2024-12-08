@@ -1,46 +1,36 @@
-using System.Linq;
 using UnityEngine;
 
 public class Delivery : AbilityEffect
 {
     [SerializeField] private Sprite sprite;
-    private Keeper keeper;
 
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
-        RemoveAction();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-        OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        MageCardDelivery _delivery = keeper.EffectsHolder.AddComponent<MageCardDelivery>();
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        SetIsActive(true);
+        MageCardDelivery _delivery = _keeper.EffectsHolder.AddComponent<MageCardDelivery>();
         _delivery.IsBaseCardsEffect = false;
         _delivery.Setup(true,sprite);
+        RemoveAction();
+        OnActivated?.Invoke();
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (GetEffectedCards().Count==0)
         {
             return;
         }
 
-        MageCardDelivery _delivery = keeper.EffectsHolder.GetComponent<MageCardDelivery>();
+        Card _keeper = GetEffectedCards()[0];
+        MageCardDelivery _delivery = _keeper.EffectsHolder.GetComponent<MageCardDelivery>();
         if (_delivery==null)
         {
             return;
         }
         
-        Destroy(_delivery);
+        ManageActiveDisplay(false);
     }
 }

@@ -1,37 +1,25 @@
-using System.Linq;
-
 public class Range : AbilityEffect
 {
-    private Keeper keeper;
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        _keeper.ChangeRange(1);
+        SetIsActive(true);
         RemoveAction();
         OnActivated?.Invoke();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-    
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void Activate()
-    {
-        keeper.ChangeRange(1);
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (!IsActive)
         {
             return;
         }
         
-        keeper.ChangeRange(-1);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        var _keeper = GetEffectedCards()[0];
+        _keeper.ChangeRange(-1);
+        ManageActiveDisplay(false);
     }
 }

@@ -1,37 +1,22 @@
 public class HighStakes : AbilityEffect
 {
-    public static bool IsActive;
-
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
     public override void ActivateForOwner()
     {
-        if (IsActive)
-        {
-            RemoveAction();
-            MoveToActivationField();
-            OnActivated?.Invoke();
-            return;
-        }
         RemoveAction();
         MoveToActivationField();
         OnActivated?.Invoke();
-        IsActive = true;
-        GameplayManager.Instance.EndTurn();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
+        
         if (IsActive)
         {
             return;
         }
-        IsActive = true;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        
+        RemoveAction();
+        MoveToActivationField();
+        OnActivated?.Invoke();
+        SetIsActive(true);
+        GameplayManager.Instance.EndTurn();
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
@@ -41,7 +26,7 @@ public class HighStakes : AbilityEffect
             return;
         }
 
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        IsActive = false;
+        ManageActiveDisplay(false);
+        SetIsActive(false);
     }
 }

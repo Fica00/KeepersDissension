@@ -3,12 +3,9 @@ using System.Linq;
 
 public class Tax : AbilityEffect
 {
-    public static bool IsActiveForMe;
-    public static CardBase SelectedCard;
-    
     public override void ActivateForOwner()
     {
-        IsActiveForMe = true;
+        SetIsActive(true);
         List<CardBase> _cards = new();
         List<AbilityCard> _availableCards = GameplayManager.Instance.OpponentPlayer.OwnedAbilities;
         foreach (var _availableCard in _availableCards.ToList())
@@ -38,24 +35,13 @@ public class Tax : AbilityEffect
 
         void SetAsTax(CardBase _selectedCard)
         {
-            SelectedCard = _selectedCard;
+            AddEffectedCard((_selectedCard as Card).UniqueId);
             RemoveAction();
             OnActivated?.Invoke();
             GameplayManager.Instance.SetTaxCard((_selectedCard as AbilityCard).Details.Id);
         }
         
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public void SetTaxedCard(int _cardId)
-    {
-        SelectedCard = FindObjectsOfType<AbilityCard>().ToList().Find(_card => _card.Details.Id == _cardId);
-    }
-
-    public override void ActivateForOther()
-    {
-        IsActiveForMe = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     private void OnDisable()
@@ -65,11 +51,12 @@ public class Tax : AbilityEffect
 
     public override void CancelEffect()
     {
-        if (SelectedCard== null)
+        if (!IsActive)
         {
             return;
         }
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        SelectedCard = null;
+        
+        ManageActiveDisplay(false);
+        RemoveEffectedCard(GetEffectedCards()[0].UniqueId);
     }
 }

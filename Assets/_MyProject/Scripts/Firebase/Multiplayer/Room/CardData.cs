@@ -14,4 +14,5 @@ public class CardData
     public bool HasDied;
     public bool CanBeUsed = true;
     public bool CanMove = true;
+    public int PercentageOfHealthToRecover=100;
 }

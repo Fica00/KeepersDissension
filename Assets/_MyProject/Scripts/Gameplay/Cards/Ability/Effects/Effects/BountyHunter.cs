@@ -1,21 +1,24 @@
-public class Subdued : AbilityEffect
+using UnityEngine;
+
+public class BountyHunter : AbilityEffect
 {
+    [SerializeField] private int amount;
+    
     public override void ActivateForOwner()
     {
-        SetIsActive(true);
-        MoveToActivationField();
         RemoveAction();
-        OnActivated?.Invoke();
+        SetIsActive(true);
         ManageActiveDisplay(true);
+        OnActivated?.Invoke();
     }
-
+    
     public override void CancelEffect()
     {
         if (!IsActive)
         {
             return;
         }
-        
+
         SetIsActive(false);
         ManageActiveDisplay(false);
     }

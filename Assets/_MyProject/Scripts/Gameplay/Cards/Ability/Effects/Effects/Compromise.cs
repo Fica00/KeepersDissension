@@ -9,22 +9,12 @@ public class Compromise : AbilityEffect
     public override void ActivateForOwner()
     {
         RemoveAction();
-        Activate();
-        MoveToActivationField();
-        OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        Activate();
-    }
-
-    private void Activate()
-    {
         List<CardBase> _cards = FindObjectsOfType<CardBase>().ToList();
         foreach (var _card in _cards)
         {
-            (_card as Card).Heal(amount);
+            (_card as Card)?.ChangeHealth(amount);
         }
+        MoveToActivationField();
+        OnActivated?.Invoke();
     }
 }

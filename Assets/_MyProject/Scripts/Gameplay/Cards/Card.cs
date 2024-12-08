@@ -20,8 +20,8 @@ public class Card : CardBase
     public bool My => cardData.Owner == FirebaseManager.Instance.PlayerId;
     public CardMovementType MovementType => cardData.MovementType;
     public bool HasDied => cardData.HasDied;
-
     public string UniqueId => cardData.CardUniqueId;
+    public int PercentageOfHealthToRecover => cardData.PercentageOfHealthToRecover;
     
 
     public void Setup(string _owner)
@@ -53,49 +53,24 @@ public class Card : CardBase
         //if a card like Keeper needs to initialize its own values
     }
 
-    public override bool IsWarrior()
-    {
-        CardType _type = Details.Type;
-        return _type is CardType.Minion or CardType.Guardian or CardType.Keeper;
-    }
-
-    public override bool IsAttackable()
-    {
-        CardType _type = Details.Type;
-        return  IsWarrior() || _type is CardType.Wall or CardType.LifeForce or CardType.Marker;
-    }
-    
-    public override bool IsLifeForce()
-    {
-        CardType _type = Details.Type;
-        return _type is CardType.LifeForce;
-    }
-
-    public void Heal(int _amount)
-    {
-        cardData.Stats.Health += _amount;
-        if (cardData.Stats.Health>Details.Stats.Health)
-        {
-            cardData.Stats.Health = Details.Stats.Health;
-        }
-    }
-
-    public void Heal()
+    public void HealFull()
     {
         float _amount = Details.Stats.Health - cardData.Stats.Health;
-        Heal((int)_amount);
+        ChangeHealth((int)_amount);
         UpdatedHealth?.Invoke();
     }
     
     public void SetHealth(int _amount)
     {
-        cardData.Stats.Health = _amount;
+        int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.Health);
+        cardData.Stats.Health = _alteredAmount;
         UpdatedHealth?.Invoke();
     }
 
     public void ChangeHealth(int _amount)
     {
-        cardData.Stats.Health += _amount;
+        int _newHealth = Math.Clamp(cardData.Stats.Health + _amount, 0, Details.Stats.Health);
+        cardData.Stats.Health = _newHealth;
         UpdatedHealth?.Invoke();
     }
 
@@ -175,6 +150,16 @@ public class Card : CardBase
         SetRotation();
     }
 
+    public void SetPercentageOfHealthToRecover(int _amount)
+    {
+        cardData.PercentageOfHealthToRecover = _amount;
+    }
+
+    public void ChangePercentageOfHealthToRecover(int _amount)
+    {
+        cardData.PercentageOfHealthToRecover += _amount;
+    }
+
     public void ChangeMovementType(CardMovementType _movementType)
     {
         cardData.MovementType = _movementType;
@@ -193,6 +178,24 @@ public class Card : CardBase
     public override bool GetIsMy()
     {
         return My;
+    }
+    
+    public override bool IsWarrior()
+    {
+        CardType _type = Details.Type;
+        return _type is CardType.Minion or CardType.Guardian or CardType.Keeper;
+    }
+
+    public override bool IsAttackable()
+    {
+        CardType _type = Details.Type;
+        return  IsWarrior() || _type is CardType.Wall or CardType.LifeForce or CardType.Marker;
+    }
+    
+    public override bool IsLifeForce()
+    {
+        CardType _type = Details.Type;
+        return _type is CardType.LifeForce;
     }
     
 }

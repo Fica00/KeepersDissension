@@ -789,4 +789,35 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public Card GetMyKeeper()
+    {
+        return FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+    }
+    
+    public Card GetOpponentKeeper()
+    {
+        return FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+    }    
+    
+    public Card GetOpponentGuardian()
+    {
+        return FindObjectsOfType<Guardian>().ToList().Find(_guardian => !_guardian.My);
+    }    
+    
+    public Card GetMyGuardian()
+    {
+        return FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
+    }
+
+    public bool IsCardVetoed(string _uniqueCardId)
+    {
+        var _vetoCard = FindObjectOfType<Veto>();
+        if (_vetoCard==null)
+        {
+            return false;
+        }
+
+        return _vetoCard.IsEffected(_uniqueCardId);
+    }
 }

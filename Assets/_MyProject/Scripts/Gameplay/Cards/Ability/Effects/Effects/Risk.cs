@@ -2,34 +2,23 @@ using System.Linq;
 
 public class Risk : AbilityEffect
 {
-    public static bool IsActive;
-
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
     public override void ActivateForOwner()
     {
-        Activate(true);
+        if (IsActive)
+        {
+            return;
+        }
+        
+        Activate();
         RemoveAction();
         OnActivated?.Invoke();
         MoveToActivationField();
     }
 
-    public override void ActivateForOther()
+    private void Activate()
     {
-        Activate(false);
-    }
-
-    private void Activate(bool _didIActivate)
-    {
-        IsActive = true;
-        GameplayPlayer _playerThatActivated =
-            _didIActivate ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        
-        GameplayPlayer _otherPlayer =
-            _didIActivate ? GameplayManager.Instance.OpponentPlayer : GameplayManager.Instance.MyPlayer;
+        GameplayPlayer _playerThatActivated = GameplayManager.Instance.MyPlayer;
+        GameplayPlayer _otherPlayer = GameplayManager.Instance.OpponentPlayer;
 
         var _activatorsLifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My == _playerThatActivated.IsMy);
         var _otherLifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My == _otherPlayer.IsMy);
@@ -45,7 +34,6 @@ public class Risk : AbilityEffect
             return;
         }
         
-        IsActive = false;
         if (_activatorsLifeForce.Health<=0)
         {
             GameplayManager.Instance.StopGame(!_activatorsLifeForce.My);

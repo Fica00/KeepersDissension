@@ -2,10 +2,6 @@ using System.Linq;
 
 public class Retaliate : AbilityEffect
 {
-    private int counter = 0;
-    private Keeper keeper;
-    private bool IsActive;
-    
     public override void ActivateForOwner()
     {
         if (IsActive)
@@ -15,62 +11,44 @@ public class Retaliate : AbilityEffect
             OnActivated?.Invoke();
             return;
         }
-        counter = 2;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+
+        SetRemainingCooldown(2);
+        SetIsActive(true);
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();
         GameplayManager.OnCardAttacked += CheckAttackingCard;
         GameplayManager.Instance.MyPlayer.OnEndedTurn += LowerCounter;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-        IsActive = true;
-    }
-
-    public override void ActivateForOther()
-    {
-        if (IsActive)
-        {
-            return;
-        }
-
-        IsActive = true;
-        counter = 2;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-        GameplayManager.Instance.OpponentPlayer.OnEndedTurn += DisableActiveDisplay;
-    }
-
-    private void DisableActiveDisplay()
-    {
-        if (counter>0)
-        {
-            counter--;
-            return;
-        }
-
-        IsActive = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(true);
     }
 
     private void LowerCounter()
     {
-        if (counter>0)
+        if (RemainingCooldown>0)
         {
-            counter--;
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
 
-        IsActive = false;
+        var _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        SetIsActive(false);
         GameplayManager.OnCardAttacked -= CheckAttackingCard;
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= LowerCounter;
+        ManageActiveDisplay(false);
     }
 
     private void CheckAttackingCard(CardBase _attackingCard, CardBase _defendingCard, int _damage)
     {
-        if (_defendingCard != keeper)
+        if (GetEffectedCards().Count == 0)
         {
             return;
         }
-        if (_attackingCard == keeper)
+        var _keeper = GetEffectedCards()[0];
+
+        if (_attackingCard == _keeper)
         {
             return;
         }
@@ -78,9 +56,9 @@ public class Retaliate : AbilityEffect
         CardAction _returnDamage = new CardAction
         {
             StartingPlaceId = _attackingCard.GetTablePlace().Id,
-            FirstCardId = (_attackingCard as Card).Details.Id,
+            FirstCardId = ((Card)_attackingCard).Details.Id,
             FinishingPlaceId = _attackingCard.GetTablePlace().Id,
-            SecondCardId = (_attackingCard as Card).Details.Id,
+            SecondCardId = ((Card)_attackingCard).Details.Id,
             Type = CardActionType.Attack,
             Cost = 0,
             IsMy = true,
@@ -100,13 +78,12 @@ public class Retaliate : AbilityEffect
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (GetEffectedCards().Count == 0)
         {
             return;
         }
         
-        counter = 0;
+        SetRemainingCooldown(0);
         LowerCounter();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

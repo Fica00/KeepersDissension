@@ -5,11 +5,10 @@ using FirebaseGameplay.Responses;
 using GameplayActions;
 using Newtonsoft.Json;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace FirebaseMultiplayer.Room
 {
-    public class NewRoomHandler : MonoBehaviour
+    public class RoomHandler : MonoBehaviour
     {
         public static Action<RoomPlayer> OnPlayerJoined;
         public static Action<RoomPlayer> OnPlayerLeft;
@@ -23,11 +22,11 @@ namespace FirebaseMultiplayer.Room
         private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
 
         private string roomsPath;
-        private NewRoomData roomData;
+        private RoomData roomData;
         private string localPlayerId;
 
         public bool IsOwner => roomData.Owner == localPlayerId;
-        public NewRoomData RoomData => roomData;
+        public RoomData RoomData => roomData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
@@ -69,7 +68,7 @@ namespace FirebaseMultiplayer.Room
             }, _ => { Debug.Log(_); });
         }
 
-        public void SubscribeToRoom(NewRoomData _roomData)
+        public void SubscribeToRoom(RoomData _roomData)
         {
             roomData = _roomData;
             database.Child(RoomPath).ValueChanged += RoomUpdated;
@@ -104,25 +103,25 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            NewRoomData _newData = JsonConvert.DeserializeObject<NewRoomData>(_args.Snapshot.GetRawJsonValue());
-            if (_newData == null)
+            RoomData _data = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
+            if (_data == null)
             {
                 return;
             }
 
-            if (_newData.RoomPlayers == null)
+            if (_data.RoomPlayers == null)
             {
                 return;
             }
 
-            CheckIfPlayerJoined(_newData);
-            CheckIfPlayerLeft(_newData);
-            roomData = _newData;
+            CheckIfPlayerJoined(_data);
+            CheckIfPlayerLeft(_data);
+            roomData = _data;
         }
 
-        private void CheckIfPlayerJoined(NewRoomData _newData)
+        private void CheckIfPlayerJoined(RoomData _data)
         {
-            foreach (var _player in _newData.RoomPlayers)
+            foreach (var _player in _data.RoomPlayers)
             {
                 if (DoesPlayerExist(_player.Id, roomData.RoomPlayers))
                 {
@@ -133,11 +132,11 @@ namespace FirebaseMultiplayer.Room
             }
         }
 
-        private void CheckIfPlayerLeft(NewRoomData _newData)
+        private void CheckIfPlayerLeft(RoomData _data)
         {
             foreach (var _player in roomData.RoomPlayers)
             {
-                if (DoesPlayerExist(_player.Id, _newData.RoomPlayers))
+                if (DoesPlayerExist(_player.Id, _data.RoomPlayers))
                 {
                     continue;
                 }
@@ -178,7 +177,7 @@ namespace FirebaseMultiplayer.Room
             }, _includeHeader: false);
         }
 
-        public void CreateRoom(NewRoomData _roomData, Action<NewCreateRoom> _callBack)
+        public void CreateRoom(RoomData _roomData, Action<NewCreateRoom> _callBack)
         {
             string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData) });
 

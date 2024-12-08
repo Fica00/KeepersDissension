@@ -10,7 +10,7 @@ using GameplayActions;
 
 public class GameplayManagerPVP : GameplayManager
 {
-    private NewRoomHandler roomHandler;
+    private RoomHandler roomHandler;
     [SerializeField] private GameObject inputBlocker;
     private bool wasLastBomberMine;
 
@@ -28,12 +28,12 @@ public class GameplayManagerPVP : GameplayManager
     private void OnEnable()
     {
         DataManager.Instance.PlayerData.CurrentRoomId = FirebaseManager.Instance.RoomHandler.RoomData.Id;
-        NewRoomHandler.OnPlayerLeft += OpponentLeftRoom;
+        RoomHandler.OnPlayerLeft += OpponentLeftRoom;
     }
 
     private void OnDisable()
     {
-        NewRoomHandler.OnPlayerLeft -= OpponentLeftRoom;
+        RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
         MyPlayer.UpdatedStrangeMatter -= TellOpponentThatIUpdatedWhiteStrangeMatter;
         WhiteStrangeMatter.UpdatedAmountInEconomy -= TellOpponentToUpdateWhiteStrangeMatterReserves;
     }

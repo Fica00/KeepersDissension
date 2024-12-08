@@ -1,29 +1,22 @@
-using System.Linq;
-
 public class Repel : AbilityEffect
 {
-    private Keeper keeper;
-    
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        SetIsActive(true);
         RemoveAction();
         OnActivated?.Invoke();
         GameplayManager.OnCardAttacked += CheckAttackingCard;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     private void OnDisable()
     {
-        if (keeper!=null)
+        if (!IsActive)
         {
-            GameplayManager.OnCardAttacked -= CheckAttackingCard;
+            return;
         }
+        
+        GameplayManager.OnCardAttacked -= CheckAttackingCard; 
     }
 
     private void CheckAttackingCard(CardBase _attackingCard, CardBase _defendingCard, int _damage)
@@ -33,17 +26,18 @@ public class Repel : AbilityEffect
             return;
         }
         
-        GameplayManager.Instance.PushCardBack(_defendingCard.GetTablePlace().Id,_attackingCard.GetTablePlace().Id, 100);
+        GameplayManager.Instance.PushCardBack(_defendingCard.GetTablePlace().Id,_attackingCard.GetTablePlace().Id);
     }
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (!IsActive)
         {
             return;
         }
         
         GameplayManager.OnCardAttacked -= CheckAttackingCard;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SetIsActive(false);
+        ManageActiveDisplay(false);
     }
 }

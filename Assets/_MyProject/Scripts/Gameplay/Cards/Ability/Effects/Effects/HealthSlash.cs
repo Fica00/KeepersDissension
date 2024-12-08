@@ -1,23 +1,10 @@
 using System;
-using System.Linq;
 
 public class HealthSlash : AbilityEffect
 {
     public override void ActivateForOwner()
     {
-        ApplyEffect(FindObjectsOfType<Keeper>().ToList().Find(_keeper=>!_keeper.My));
-        MoveToActivationField();
-        RemoveAction();
-        OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        
-    }
-
-    private void ApplyEffect(Keeper _keeper)
-    {
+        var _keeper = GameplayManager.Instance.GetOpponentKeeper();
         int _newHealth = (int)Math.Floor(_keeper.Health / 2.0);
         int _damage = _keeper.Health - _newHealth;
 
@@ -27,5 +14,8 @@ public class HealthSlash : AbilityEffect
         }
         
         _keeper.ChangeHealth(-_damage);
+        MoveToActivationField();
+        RemoveAction();
+        OnActivated?.Invoke();
     }
 }

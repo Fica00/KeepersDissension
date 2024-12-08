@@ -1,38 +1,26 @@
-using System.Linq;
-
 public class Strafe : AbilityEffect
 {
-    private Keeper keeper;
-    
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        _keeper.ChangeMovementType(CardMovementType.EightDirections);
+        AddEffectedCard(_keeper.UniqueId);
+        ManageActiveDisplay(true);
         RemoveAction();
         OnActivated?.Invoke();
     }
-
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void Activate()
-    {
-        keeper.ChangeMovementType(CardMovementType.EightDirections);
-    }
-
+    
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (!IsActive)
         {
             return;
         }
         
-        keeper.ChangeMovementType(CardMovementType.FourDirections);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        RemoveEffectedCard(_keeper.UniqueId);
+        SetIsActive(false);
+        _keeper.ChangeMovementType(CardMovementType.FourDirections);
+        ManageActiveDisplay(false);
     }
 }

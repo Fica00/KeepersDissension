@@ -1,14 +1,5 @@
 public class Truce : AbilityEffect
 {
-    private GameplayPlayer player;
-    public static bool IsActive = false;
-    private static int duration = 0;
-
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
     public override void ActivateForOwner()
     {
         if (IsActive)
@@ -20,42 +11,25 @@ public class Truce : AbilityEffect
         }
         
         MoveToActivationField();
-        duration = 3;
-        player = GameplayManager.Instance.MyPlayer;
-        IsActive = true;
-        player.OnEndedTurn += CheckForEnd;
+        SetRemainingCooldown(3);
+        SetIsActive(true);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += CheckForEnd;
         RemoveAction();
         OnActivated?.Invoke();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        if (IsActive)
-        {
-            return;
-        }
-        duration = 3;
-        player = GameplayManager.Instance.OpponentPlayer;
-        IsActive = true;
-        player.OnEndedTurn += CheckForEnd;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     private void CheckForEnd()
     {
-        if (duration==0)
+        if (RemainingCooldown > 0)
         {
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        duration--;
-
-        if (duration==0)
-        {
-            IsActive = false;
-            player.OnEndedTurn -= CheckForEnd;
-        }
+        
+        ManageActiveDisplay(false);
+        SetIsActive(false);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= CheckForEnd;
     }
 
     public override void CancelEffect()
@@ -64,7 +38,8 @@ public class Truce : AbilityEffect
         {
             return;
         }
-        duration = 1;
+        
+        SetRemainingCooldown(0);
         CheckForEnd();
     }
 }

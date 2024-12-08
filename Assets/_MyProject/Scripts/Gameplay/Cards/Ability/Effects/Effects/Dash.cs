@@ -1,76 +1,62 @@
-using System.Linq;
-
 public class Dash : AbilityEffect
 {
-    private Keeper keeper;
-    private GameplayPlayer player;
-    private bool applied;
-    
     public override void ActivateForOwner()
     {
-        player = GameplayManager.Instance.MyPlayer;
-        Activate(true);
+        Card _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += AddSpeed;
+        GameplayManager.OnCardMoved += AddSpeed;
+        SetIsActive(true);
+        AddSpeed();
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        player = GameplayManager.Instance.OpponentPlayer;
-        Activate(false);
-    }
-
-    private void Activate(bool _isMy)
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My==_isMy);
-        player.OnEndedTurn += AddSpeed;
-        GameplayManager.OnCardMoved += AddSpeed;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-        AddSpeed();
-    }
-
     private void AddSpeed(CardBase _card, int _starting, int _ending, bool _)
     {
+        var _effectedKeeper = GetEffectedCards()[0];
         if (_card is not Keeper _keeper)
         {
             return;
         }
-        if(_keeper != keeper)
+        if(_keeper != _effectedKeeper)
         {
             return;
         }
 
-        applied = false;
+        SetIsApplied(false);
         AddSpeed();
     }
 
     private void AddSpeed()
     {
-        if (applied)
+        if (IsApplied)
         {
             return;
         }
-        applied = true;
-        keeper.ChangeSpeed(2);
+        var _effectedKeeper = GetEffectedCards()[0];
+        SetIsApplied(true);
+        _effectedKeeper.ChangeSpeed(2);
     }
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (GetEffectedCards().Count==0)
         {
             return;
         }
-        player.OnEndedTurn -= AddSpeed;
+        
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= AddSpeed;
         GameplayManager.OnCardMoved -= AddSpeed;
-        player = null;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(false);
+        SetIsActive(false);
     }
 
     private void OnDisable()
     {
-        if (player!=null)
+        if (IsActive)
         {
-            player.OnEndedTurn -= AddSpeed;
+            GameplayManager.Instance.MyPlayer.OnEndedTurn -= AddSpeed;
         }
     }
 }

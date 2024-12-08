@@ -2,36 +2,27 @@ using System.Linq;
 
 public class Strength : AbilityEffect
 {
-    private Keeper keeper;
-    
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
+        var _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        _keeper.ChangeDamage(1);
+        AddEffectedCard(_keeper.UniqueId);
+        SetIsActive(true);
         RemoveAction();
         OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        keeper.ChangeDamage(1);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
     {
-        if (keeper==null)
+        if (IsActive)
         {
             return;
         }
 
-        keeper.ChangeDamage(-1);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        var _keeper = GetEffectedCards()[0];
+        _keeper.ChangeDamage(-1);
+        RemoveEffectedCard(_keeper.UniqueId);
+        ManageActiveDisplay(false);
     }
 }

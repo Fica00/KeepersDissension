@@ -1,18 +1,5 @@
-using System.Collections.Generic;
-
 public class SlowDown : AbilityEffect
 {
-    public static bool IsActive;
-    private List<Card> cardsThatMovedThisTurn = new ();
-    private GameplayPlayer player;
-    private GameplayPlayer activatingPlayer;
-    private int counter;
-
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
     public override void ActivateForOwner()
     {
         if (IsActive)
@@ -22,58 +9,43 @@ public class SlowDown : AbilityEffect
             OnActivated?.Invoke();
             return;   
         }
-        activatingPlayer = GameplayManager.Instance.MyPlayer;
-        Activate();
+        
+        SetIsActive(true);
+        ClearList();
+        SetRemainingCooldown(2);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += ClearList;
+        GameplayManager.OnCardMoved += AddCard;
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += LowerCounter;
+        ManageActiveDisplay(true);
+        
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        if (IsActive)
-        {
-            return;
-        }
-        activatingPlayer = GameplayManager.Instance.OpponentPlayer;
-        Activate();
-    }
-
-    private void Activate()
-    {
-        player = GameplayManager.Instance.MyPlayer;
-        IsActive = true;
-        ClearList();
-        counter = 2;
-        player.OnEndedTurn += ClearList;
-        GameplayManager.OnCardMoved += AddCard;
-        activatingPlayer.OnEndedTurn += LowerCounter;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
     private void LowerCounter()
     {
-        if (counter>0)
+        if (RemainingCooldown>0)
         {
-            counter--;
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
         
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        player.OnEndedTurn -= ClearList;
+        ManageActiveDisplay(false);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= ClearList;
         GameplayManager.OnCardMoved -= AddCard;
-        activatingPlayer.OnEndedTurn -= LowerCounter;
-        IsActive = false;
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= LowerCounter;
+        SetIsActive(false);
     }
 
     private void AddCard(CardBase _cardThatMoved, int _arg2, int _arg3, bool _)
     {
-        cardsThatMovedThisTurn.Add(_cardThatMoved as Card);
+        AddEffectedCard((_cardThatMoved as Card).UniqueId);
     }
 
     private void ClearList()
     {
-        cardsThatMovedThisTurn = new List<Card>();
+        ResetEffectedCards();
     }
 
     public bool CanMoveCard(Card _card)
@@ -83,17 +55,17 @@ public class SlowDown : AbilityEffect
             return true;
         }
 
-        return !cardsThatMovedThisTurn.Contains(_card);
+        return !GetEffectedCards().Find(_cardSavedCard =>_cardSavedCard.UniqueId == _card.UniqueId);
     }
 
     public override void CancelEffect()
     {
-        if (counter==0)
+        if (!IsActive)
         {
             return;
         }
 
-        counter = 0;
+        SetRemainingCooldown(0);
         LowerCounter();
     }
 }

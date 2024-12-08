@@ -5,29 +5,11 @@ using UnityEngine;
 public class CallToArms : AbilityEffect
 {
     [SerializeField] private int powerChange;
-    private bool isActive;
-    private bool isActiveForMe;
     
     public override void ActivateForOwner()
     {
-        Guardian _guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => !_guardian.My);
+        Guardian _guardian = GameplayManager.Instance.GetMyGuardian() as Guardian;
         if (_guardian.IsChained)
-        {
-            _guardian.OnUnchained += () => { ApplyEffect(true);};
-        }
-        else
-        {
-            ApplyEffect(true);
-        }
-
-        isActiveForMe = true;
-        RemoveAction();
-    }
-
-    public override void ActivateForOther()
-    {
-        Guardian _guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
-        if (!_guardian.IsChained)
         {
             _guardian.OnUnchained += () => { ApplyEffect(false);};
         }
@@ -35,11 +17,15 @@ public class CallToArms : AbilityEffect
         {
             ApplyEffect(false);
         }
+       
+
+        SetIsActive(true);
+        RemoveAction();
     }
 
     private void ApplyEffect(bool _applyToMyMinions)
     {
-        if (AbilityCard.IsVetoed)
+        if (GameplayManager.Instance.IsCardVetoed(UniqueId))
         {
             return;
         }
@@ -50,20 +36,25 @@ public class CallToArms : AbilityEffect
         {
             _minion.ChangeDamage(powerChange);
         }
-        isActive = true;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        SetIsActive(true);
+        ManageActiveDisplay(true);
     }
 
     public override void CancelEffect()
     {
-        if (!isActive) return;
+        if (!IsActive)
+        {
+            return;
+        }
+        
         List<Card> _minions = FindObjectsOfType<Card>().ToList().FindAll(_card => _card.Details.Type == CardType
-            .Minion && _card.My == isActiveForMe).ToList();
+            .Minion && _card.My == true).ToList();
 
         foreach (var _minion in _minions)
         {
             _minion.ChangeDamage(-powerChange);
         }
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SetIsActive(false);
+        ManageActiveDisplay(false);
     }
 }

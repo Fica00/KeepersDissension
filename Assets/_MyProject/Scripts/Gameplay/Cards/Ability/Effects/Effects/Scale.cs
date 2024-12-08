@@ -2,41 +2,33 @@ using System.Linq;
 
 public class Scale : AbilityEffect
 {
-    private Keeper keeper;
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        SetIsActive(true);
+        ManageActiveDisplay(true);
+        _keeper.EffectsHolder.AddComponent<ScalerScale>();
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        keeper.EffectsHolder.AddComponent<ScalerScale>();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
     public override void CancelEffect()
     {
-        if (keeper == null)
+        if (!IsActive)
         {
             return;
         }
 
-        ScalerScale _scale = keeper.EffectsHolder.GetComponent<ScalerScale>();
+        var _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        ScalerScale _scale = _keeper.EffectsHolder.GetComponent<ScalerScale>();
         if (_scale==null)
         {
             return;
         }
         
         Destroy(_scale);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(false);
     }
 }

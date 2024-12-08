@@ -115,7 +115,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
         else
         {
-            NewRoomData _roomData = new NewRoomData
+            RoomData _roomData = new RoomData
             {
                 Name = _response.Name,
                 Id = Guid.NewGuid().ToString(),
@@ -161,7 +161,7 @@ public class MatchMakingHandler : MonoBehaviour
         else
         {
             friendlyMatchCreateCallBack?.Invoke();
-            NewRoomHandler.OnPlayerJoined += PlayerJoined;
+            RoomHandler.OnPlayerJoined += PlayerJoined;
         }
     }
 

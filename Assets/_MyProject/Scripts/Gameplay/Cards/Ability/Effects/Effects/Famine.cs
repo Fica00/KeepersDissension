@@ -1,58 +1,37 @@
 public class Famine : AbilityEffect
 {
-    public static bool IsActive;
-    private int counter;
-    private GameplayPlayer gameplayPlayer;
-
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
     public override void ActivateForOwner()
-    {
-        gameplayPlayer = GameplayManager.Instance.MyPlayer;
-        MoveToActivationField();
-        Activate();
-        RemoveAction();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-        OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        gameplayPlayer = GameplayManager.Instance.OpponentPlayer;
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void Activate()
     {
         if (IsActive)
         {
             return;
         }
-        counter = 1;
-        IsActive = true;
-        gameplayPlayer.OnEndedTurn += Deactivate;
+        SetIsActive(true);
+        SetRemainingCooldown(1);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
+        MoveToActivationField();
+        RemoveAction();
+        ManageActiveDisplay(true);
+        OnActivated?.Invoke();
     }
 
     private void Deactivate()
     {
-        if (counter>0)
+        if (RemainingCooldown>0)
         {
-            counter--;
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
         
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        gameplayPlayer.OnEndedTurn -= Deactivate;
-        IsActive = false;
+        ManageActiveDisplay(false);
+        
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
+        SetIsActive(false);
     }
 
     public override void CancelEffect()
     {
-        counter = 0;
+        SetRemainingCooldown(0);
         Deactivate();
     }
 }

@@ -1,18 +1,5 @@
 public class Invincible : AbilityEffect
 {
-    public static bool IsActive;
-    public static bool IsActiveForOpponent;
-    
-    private GameplayPlayer player;
-
-    private int counter;
-
-    private void Awake()
-    {
-        IsActive = false;
-        IsActiveForOpponent = false;
-    }
-
     public override void ActivateForOwner()
     {
         if (IsActive)
@@ -22,46 +9,31 @@ public class Invincible : AbilityEffect
             OnActivated?.Invoke();
             return;
         }
-        counter = 1;
-        player = GameplayManager.Instance.MyPlayer;
-        IsActive = true;
-        player.OnEndedTurn += Deactivate;
+        SetRemainingCooldown(1);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
+        SetIsActive(true);
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        if (IsActiveForOpponent)
-        {
-            return;
-        }
-        counter = 1;
-        player = GameplayManager.Instance.OpponentPlayer;
-        IsActiveForOpponent = true;
-        player.OnEndedTurn += Deactivate;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     private void Deactivate()
     {
-        if (counter>0)
+        if (RemainingCooldown>0)
         {
-            counter--;
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
 
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        player.OnEndedTurn -= Deactivate;
-        IsActiveForOpponent = false;
-        IsActive = false;
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
+        ManageActiveDisplay(false);
+        SetIsActive(false);
     }
 
     public override void CancelEffect()
     {
-        counter = 0;
+        SetRemainingCooldown(0);
         Deactivate();
     }
 }

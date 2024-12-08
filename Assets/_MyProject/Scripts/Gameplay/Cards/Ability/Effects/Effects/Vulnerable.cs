@@ -1,31 +1,27 @@
-using System.Linq;
-
 public class Vulnerable : AbilityEffect
 {
-    private Keeper keeper;
+    private int change = 50;
+    
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
+        var _keeper = GameplayManager.Instance.GetOpponentKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        _keeper.ChangePercentageOfHealthToRecover(-change);
+        SetIsActive(true);
+        ManageActiveDisplay(true);
         RemoveAction();
         OnActivated?.Invoke();
     }
-
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        keeper.PercentageOfHealthToRecover -= 50;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
     public override void CancelEffect()
     {
-        keeper.PercentageOfHealthToRecover += 50;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        if (IsActive)
+        {
+            return;
+        }
+        
+        SetIsActive(false);
+        var _keeper = GetEffectedCards()[0];
+        _keeper.ChangePercentageOfHealthToRecover(change);
+        ManageActiveDisplay(false);
     }
 }

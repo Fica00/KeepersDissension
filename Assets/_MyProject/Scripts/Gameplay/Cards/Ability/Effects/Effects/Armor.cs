@@ -1,59 +1,47 @@
-using UnityEngine;
-
 public class Armor : AbilityEffect
 {
-    [HideInInspector] public bool IsActive;
-    private GameplayPlayer player;
-    private GameplayPlayer secondPlayer;
-    
     public override void ActivateForOwner()
     {
-        player = GameplayManager.Instance.MyPlayer;
-        secondPlayer = GameplayManager.Instance.OpponentPlayer;
-        player.OnStartedTurn += Activate;
-        secondPlayer.OnStartedTurn += Activate;
+        GameplayManager.Instance.MyPlayer.OnStartedTurn += Activate;
+        GameplayManager.Instance.OpponentPlayer.OnStartedTurn += Activate;
         Activate();
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        player = GameplayManager.Instance.OpponentPlayer;
-        secondPlayer = GameplayManager.Instance.MyPlayer;
-        player.OnStartedTurn += Activate;
-        secondPlayer.OnStartedTurn += Activate;
-        Activate();
-    }
-
     private void OnDisable()
     {
-        if (player==null)
+        if (!IsActive)
         {
             return;
         }
 
-        player.OnStartedTurn -= Activate;
-        secondPlayer.OnStartedTurn -= Activate;
-        player = null;
-        secondPlayer = null;
+        GameplayManager.Instance.MyPlayer.OnStartedTurn -= Activate;
+        GameplayManager.Instance.OpponentPlayer.OnStartedTurn -= Activate;
     }
     
     private void Activate()
     {
-        IsActive = true;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        SetIsActive(true);
+        ManageActiveDisplay(true);
+        SetCanExecuteThisTurn(true);
+    }
+
+    public void MarkAsUsed()
+    {
+        ManageActiveDisplay(false);
+        SetCanExecuteThisTurn(false);
     }
 
     public override void CancelEffect()
     {
-        if (player == null)
+        if (!IsActive)
         {
             return;
         }
 
         OnDisable();
-        IsActive = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SetIsActive(false);
+        ManageActiveDisplay(false);
     }
 }

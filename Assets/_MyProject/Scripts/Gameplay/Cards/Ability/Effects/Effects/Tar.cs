@@ -1,18 +1,8 @@
 public class Tar : AbilityEffect
 {
-    public static bool IsActiveForMe;
-    public static bool IsActiveForOpponent;
-    private GameplayPlayer player;
-
-    private void Awake()
-    {
-        IsActiveForOpponent = false;
-        IsActiveForMe = false;
-    }
-
     public override void ActivateForOwner()
     {
-        if (IsActiveForMe)
+        if (IsActive)
         {
             RemoveAction();
             MoveToActivationField();
@@ -20,49 +10,36 @@ public class Tar : AbilityEffect
             return;
         }
 
-        player = GameplayManager.Instance.OpponentPlayer;
-        IsActiveForMe = true;
-        player.OnEndedTurn += ChangeEffect;
+        SetIsActive(true);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += TryEnd;
         MoveToActivationField();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
         RemoveAction();
+        SetRemainingCooldown(1);
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
+    private void TryEnd()
     {
-        if (IsActiveForOpponent)
+        if (RemainingCooldown>0)
         {
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
-
-        player = GameplayManager.Instance.MyPlayer;
-        IsActiveForOpponent = true;
-        player.OnEndedTurn += ChangeEffect;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void ChangeEffect()
-    {
-        player.OnEndedTurn -= ChangeEffect;
-        player.OnEndedTurn += RemoveEffect;
-    }
-
-    private void RemoveEffect()
-    {
-        player.OnEndedTurn -= RemoveEffect;        
-        IsActiveForMe = false;
-        IsActiveForOpponent = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        
+        SetIsActive(false);
+        ManageActiveDisplay(false);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= TryEnd;
     }
 
     public override void CancelEffect()
     {
-        if (!(IsActiveForMe&& IsActiveForOpponent))
+        if (!IsActive)
         {
             return;
         }
         
-        RemoveEffect();
+        SetRemainingCooldown(0);
+        TryEnd();
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class Depelete : AbilityEffect
 {
@@ -7,16 +6,11 @@ public class Depelete : AbilityEffect
 
     public override void ActivateForOwner()
     {
+        GameplayPlayer _player = GameplayManager.Instance.OpponentPlayer;
+        int _amount = Math.Min(amount,_player.StrangeMatter);
+        _player.RemoveStrangeMatter(_amount);
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();
-    }
-
-    public override void ActivateForOther()
-    {
-        GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
-        int _amount = Math.Min(amount,_player.StrangeMatter);
-        Debug.Log(_amount);
-        _player.RemoveStrangeMatter(_amount);
     }
 }

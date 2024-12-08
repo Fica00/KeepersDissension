@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class AbilityCardDetails: CardDetailsBase
 {
     public new AbilityCardType Type;
-    public List<AbilityEffectsType> Effects;
     public AbilityColor Color;
     public bool CanBeGivenToPlayer;
 }

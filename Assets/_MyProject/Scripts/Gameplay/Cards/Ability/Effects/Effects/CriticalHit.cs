@@ -1,49 +1,38 @@
-using System.Linq;
-
 public class CriticalHit : AbilityEffect
 {
-    private bool isActive;
-    private int startingRange;
-    private int startingDamage;
-    private Keeper keeper;
-    
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         MoveToActivationField();
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void Activate()
-    {
-        if (isActive)
+        if (IsActive)
         {
+            RemoveAction();
             return;
         }
-
-        GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
-        isActive = true;
-        startingRange = keeper.Range;
-        startingDamage = keeper.Damage;
-        keeper.SetRange(1);
-        keeper.SetDamage(3);
-        ForceKeeperAttack();
+        
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        Activate(_keeper);
+        ManageActiveDisplay(true);
     }
 
-    private void ForceKeeperAttack()
+    private void Activate(Card _keeper)
+    {
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
+        SetIsActive(true);
+        SetStartingRange(_keeper.Range);
+        SetStartingDamage(_keeper.Damage);
+        _keeper.SetRange(1);
+        _keeper.SetDamage(3);
+        ForceKeeperAttack(_keeper);
+    }
+
+    private void ForceKeeperAttack(Card _keeper)
     {
         GameplayState _state = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
 
-        TablePlaceHandler _keeperTablePlace = keeper.GetTablePlace();
-        GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id,1,PlaceLookFor.Both, keeper.MovementType,false,LookForCardOwner
-        .Both,Attack,false);
+        TablePlaceHandler _keeperTablePlace = _keeper.GetTablePlace();
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id,1,PlaceLookFor.Both, _keeper.MovementType,false,LookForCardOwner.Both,Attack,false);
 
         void Attack(int _placeId)
         {
@@ -64,14 +53,14 @@ public class CriticalHit : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _keeperTablePlace.Id,
-                FirstCardId = keeper.Details.Id,
+                FirstCardId = _keeper.Details.Id,
                 FinishingPlaceId = _placeId,
                 SecondCardId = _place.GetCard().Details.Id,
                 Type = CardActionType.Attack,
                 Cost = 0,
                 IsMy = true,
                 CanTransferLoot = true,
-                Damage = keeper.Damage,
+                Damage = _keeper.Damage,
                 CanCounter = true,
                 GiveLoot = false
             };
@@ -91,21 +80,23 @@ public class CriticalHit : AbilityEffect
 
     public override void CancelEffect()
     {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(false);
     }
 
     private void Deactivate()
     {
-        if (!isActive)
+        if (!IsActive)
         {
             return;
         }
         
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
-        isActive = false;
-        keeper.SetRange(startingRange);
-        keeper.SetDamage(startingDamage);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SetIsActive(false);
+        var _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        _keeper.SetRange(StartingRange);
+        _keeper.SetDamage(StartingDamage);
+        ManageActiveDisplay(false);
     }
 
 }

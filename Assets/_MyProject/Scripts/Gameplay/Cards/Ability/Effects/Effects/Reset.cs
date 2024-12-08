@@ -36,7 +36,7 @@ public class Reset : AbilityEffect
             AbilityEffect _effect = null;
             if (_ability != null)
             {
-                _effect = _ability.GetEffect();
+                _effect = _ability.Effect;
             }
 
             if (_effect ==null)
@@ -44,7 +44,7 @@ public class Reset : AbilityEffect
                 return;
             }
 
-            _effect.SetCooldown(0);
+            _effect.SetRemainingCooldown(0);
             GameplayManager.Instance.PlaceAbilityOnTable(_ability.Details.Id);
             RemoveAction();
             OnActivated?.Invoke();

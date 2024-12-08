@@ -1,48 +1,31 @@
-using System.Linq;
-
 public class Snipe : AbilityEffect
 {
-    private bool isActive;
-    private int startingRange;
-    private int startingDamage;
-    private Keeper keeper;
-
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        MoveToActivationField();
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    private void Activate()
-    {
-        if (isActive)
+        if (IsActive)
         {
             return;
         }
-
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        MoveToActivationField();
         GameplayManager.Instance.MyPlayer.OnEndedTurn += Deactivate;
-        isActive = true;
-        startingRange = keeper.Range;
-        startingDamage = keeper.Damage;
-        keeper.SetRange(3);
-        keeper.SetDamage(1);
-        ForceKeeperAttack();
+        SetIsActive(true);
+        SetStartingDamage(_keeper.Damage);
+        SetStartingRange(_keeper.Range);
+        _keeper.SetRange(3);
+        _keeper.SetDamage(1);
+        ForceKeeperAttack(_keeper);
+        ManageActiveDisplay(true);
     }
-
-    private void ForceKeeperAttack()
+    
+    private void ForceKeeperAttack(Card _keeper)
     {
         GameplayState _state = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
 
-        TablePlaceHandler _keeperTablePlace = keeper.GetTablePlace();
-        GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id, 3, PlaceLookFor.Both, keeper.MovementType, false, LookForCardOwner
+        TablePlaceHandler _keeperTablePlace = _keeper.GetTablePlace();
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id, 3, PlaceLookFor.Both, _keeper.MovementType, false, LookForCardOwner
         .Both, Attack, false);
 
         void Attack(int _placeId)
@@ -62,7 +45,7 @@ public class Snipe : AbilityEffect
             }
 
             Card _card = _place.GetCard();
-            if (_card is Wall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(keeper.GetTablePlace(),_place)>1)
+            if (_card is Wall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_keeper.GetTablePlace(),_place)>1)
             {
                 Finish();
                 return;
@@ -71,14 +54,14 @@ public class Snipe : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _keeperTablePlace.Id,
-                FirstCardId = keeper.Details.Id,
+                FirstCardId = _keeper.Details.Id,
                 FinishingPlaceId = _placeId,
                 SecondCardId = _place.GetCard().Details.Id,
                 Type = CardActionType.Attack,
                 Cost = 0,
                 IsMy = true,
                 CanTransferLoot = true,
-                Damage = keeper.Damage,
+                Damage = _keeper.Damage,
                 CanCounter = true,
                 GiveLoot = false
             };
@@ -98,20 +81,22 @@ public class Snipe : AbilityEffect
 
     private void Deactivate()
     {
-        if (!isActive)
+        if (!IsActive)
         {
             return;
         }
 
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= Deactivate;
-        isActive = false;
-        keeper.SetRange(startingRange);
-        keeper.SetDamage(startingDamage);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        SetIsActive(false);
+        var _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        _keeper.SetRange(StartingRange);
+        _keeper.SetDamage(StartingDamage);
+        ManageActiveDisplay(false);
     }
 
     public override void CancelEffect()
     {
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        Deactivate();
     }
 }

@@ -8,9 +8,4 @@ public class Return : AbilityEffect
         RemoveAction();
         OnActivated?.Invoke();
     }
-
-    public override void ActivateForOther()
-    {
-        GameplayManager.Instance.MyPlayer.StrangeMatter = 0;
-    }
 }

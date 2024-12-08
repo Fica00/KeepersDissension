@@ -1,28 +1,14 @@
 public class Hunter : AbilityEffect
 {
-    public static bool IsActive;
-    public static bool IsActiveForOpponent;
-
-    private void Awake()
-    {
-        IsActive = false;
-        IsActiveForOpponent = false;
-    }
-
     public override void ActivateForOwner()
     {
-        IsActive = true;
+        SetIsActive(true);
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        IsActiveForOpponent = true;
-    }
-
     public override void CancelEffect()
     {
-        IsActiveForOpponent = false;
+        SetIsActive(false);
     }
 }

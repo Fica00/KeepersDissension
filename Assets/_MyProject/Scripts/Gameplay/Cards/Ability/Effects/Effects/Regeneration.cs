@@ -1,25 +1,19 @@
-using System;
-using System.Linq;
-
 public class Regeneration : AbilityEffect
 {
-    private int amountToHeal=1;
-    private GameplayPlayer player;
-    private Keeper keeper;
-    private bool isActive;
-    private int counter=-1;
+    private int amountToHeal = 1;
     
     public override void ActivateForOwner()
     {
-        if (counter==-1)
+        if (Multiplayer==-1)
         {
-            counter = 1;
+            SetMultiplayer(1);
         }
         else
         {
-            counter++;
+            SetMultiplayer(Multiplayer+1);
         }
-        if (isActive)
+        
+        if (IsActive)
         {
             MoveToActivationField();
             RemoveAction();
@@ -27,61 +21,40 @@ public class Regeneration : AbilityEffect
             OnActivated?.Invoke();
             return;
         }
-        isActive = true;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+        
+        SetIsActive(true);
         Activate();
         MoveToActivationField();
-        player = GameplayManager.Instance.MyPlayer;
-        player.OnStartedTurn += ActivateAndUnsubscribe;
+        GameplayManager.Instance.MyPlayer.OnStartedTurn += ActivateAndUnsubscribe;
         RemoveAction();
         OnActivated?.Invoke();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOther()
-    {
-        if (counter==-1)
-        {
-            counter = 1;
-        }
-        else
-        {
-            counter++;
-        }
-        if (isActive)
-        {
-            Activate();
-            return;
-        }
-        player = GameplayManager.Instance.OpponentPlayer;
-        player.OnStartedTurn += ActivateAndUnsubscribe;
-        isActive = true;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+        ManageActiveDisplay(true);
     }
 
     private void ActivateAndUnsubscribe()
     {
-        player.OnStartedTurn -= ActivateAndUnsubscribe;
-        if (isActive)
+        if (!IsActive)
         {
-            Activate(counter);
+            return;
         }
-
-        counter = 0;
-        isActive = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        
+        Activate(Multiplayer);
+        GameplayManager.Instance.MyPlayer.OnStartedTurn -= ActivateAndUnsubscribe;
+        SetMultiplayer(0);
+        SetIsActive(false);
+        ManageActiveDisplay(false);
     }
 
     private void Activate(int _amount=-1)
     {
-        keeper.Heal(_amount == -1 ? amountToHeal : _amount);
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        _keeper.ChangeHealth(_amount == -1 ? amountToHeal : _amount);
     }
 
     public override void CancelEffect()
     {
-        isActive = false;
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        GameplayManager.Instance.MyPlayer.OnStartedTurn -= ActivateAndUnsubscribe;
+        SetIsActive(false);
+        ManageActiveDisplay(false);
     }
 }

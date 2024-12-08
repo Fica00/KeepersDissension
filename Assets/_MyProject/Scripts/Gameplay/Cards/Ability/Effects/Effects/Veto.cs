@@ -57,4 +57,17 @@ public class Veto : AbilityEffect
             AbilityCard.RotateToBeVertical();
         }
     }
+
+    public bool IsEffected(string _uniqueId)
+    {
+        foreach (var _effectedCard in GetEffectedCards())
+        {
+            if (_effectedCard.UniqueId == _uniqueId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

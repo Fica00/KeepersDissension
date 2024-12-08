@@ -16,7 +16,7 @@ public class FirebaseManager : MonoBehaviour
 
     public static FirebaseManager Instance;
     public FirebaseAuthentication Authentication = new();
-    public NewRoomHandler RoomHandler = new();
+    public RoomHandler RoomHandler = new();
     private DatabaseReference database;
 
     public string PlayerId => Authentication.UserId;

@@ -20,9 +20,4 @@ public class HealthMatch : AbilityEffect
         RemoveAction();
         OnActivated?.Invoke();
     }
-
-    public override void ActivateForOther()
-    {
-        
-    }
 }

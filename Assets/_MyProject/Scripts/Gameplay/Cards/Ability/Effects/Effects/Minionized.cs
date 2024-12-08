@@ -1,20 +1,6 @@
-using System.Linq;
-
 public class Minionized : AbilityEffect
 {
-    public static bool IsActive;
-    private int counter;
-    private GameplayPlayer player;
-    private int startingHealth;
-    private bool hasMyKeeperDied;
-    private bool hasOpponentKeeperDied;
-    
-    private void Awake()
-    {
-        IsActive = false;
-    }
-
-    public override void ActivateForOther()
+    public override void ActivateForOwner()
     {
         if (IsActive)
         {
@@ -23,69 +9,65 @@ public class Minionized : AbilityEffect
             OnActivated?.Invoke();
             return;
         }
-        player = GameplayManager.Instance.OpponentPlayer;
         MoveToActivationField();
         Activate();
         OnActivated?.Invoke();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
-    public override void ActivateForOwner()
-    {
-        
+        ManageActiveDisplay(true);
     }
 
     private void Activate()
     {
-        hasMyKeeperDied = false;
-        hasOpponentKeeperDied = false;
-        counter = 2;
-        IsActive = true;
-        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        startingHealth = _myKeeper.Health;
+        SetHasMyRequiredCardDied(false);
+        SetHasOpponentsRequiredCardDied(false);
+        SetRemainingCooldown(2);
+        SetIsActive(true);
+        Card _myKeeper = GameplayManager.Instance.GetMyKeeper();
+        Card _opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
+        SetStartingHealth(_myKeeper.Health);
+        SetOpponentsStartingHealth(_opponentKeeper.Health);
+        
         _myKeeper.SetMaxHealth(1);
         _opponentKeeper.SetMaxHealth(1);
         _myKeeper.SetHealth(1);
         _opponentKeeper.SetHealth(1);
 
-        player.OnEndedTurn += LowerCounter;
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += LowerCounter;
         GameplayManager.OnKeeperDied += CheckKeeper;
         RemoveAction();
     }
 
     private void LowerCounter()
     {
-        if (counter>0)
+        if (RemainingCooldown>0)
         {
-            counter--;
+            SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
 
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-        IsActive = false;
-        player.OnEndedTurn -= LowerCounter;
+        ManageActiveDisplay(false);
+        SetIsActive(false);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= LowerCounter;
         GameplayManager.OnKeeperDied -= CheckKeeper;
-        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+        Card _myKeeper = GameplayManager.Instance.GetMyKeeper();
+        Card _opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
         _myKeeper.SetMaxHealth(-1);
         _opponentKeeper.SetMaxHealth(-1);
-        _myKeeper.SetHealth(hasMyKeeperDied ? 5 : startingHealth);
-        _opponentKeeper.SetHealth(hasOpponentKeeperDied ? 5 : startingHealth);
+        _myKeeper.SetHealth(HasMyRequiredCardDied ? 5 : StartingHealth);
+        _opponentKeeper.SetHealth(HasOpponentsRequiredCardDied ? 5 : OpponentsStartingHealth);
     }
 
     private void CheckKeeper(Keeper _keeper)
     {
-        Keeper _myKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Keeper _opponentKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+        Card _myKeeper = GameplayManager.Instance.GetMyKeeper();
+        Card _opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
         
         if (_keeper == _myKeeper)
         {
-            hasMyKeeperDied = true;
+            SetHasMyRequiredCardDied(true);
         }
         else if (_keeper == _opponentKeeper)
         {
-            hasOpponentKeeperDied = true;
+            SetHasOpponentsRequiredCardDied(true);
         }
     }
 
@@ -95,8 +77,8 @@ public class Minionized : AbilityEffect
         {
             return;
         }
-        counter = 0;
+        
+        SetRemainingCooldown(0);
         LowerCounter();
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
     }
 }

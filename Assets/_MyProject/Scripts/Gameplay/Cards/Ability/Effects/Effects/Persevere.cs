@@ -1,55 +1,51 @@
-using System.Linq;
-
 public class Persevere : AbilityEffect
 {
-    private bool isApplied;
     private int attackChange=1;
-    private Keeper effectedKeeper;
     
     public override void ActivateForOwner()
     {
-        effectedKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
+        Card _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        _keeper.UpdatedHealth += CheckKeeper;
+        CheckKeeper(_keeper);
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        effectedKeeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        effectedKeeper.UpdatedHealth += CheckKeeper;
-        CheckKeeper();
-    }
-
     private void CheckKeeper()
     {
-        if (isApplied&&effectedKeeper.Health>2)
+        Card _keeper = GetEffectedCards()[0];
+        CheckKeeper(_keeper);
+    }
+
+    private void CheckKeeper(Card _keeper)
+    {
+        if (IsApplied&&_keeper.Health>2)
         {
-            isApplied = false;
-            effectedKeeper.ChangeDamage(-attackChange) ;
-            AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+            SetIsApplied(false);
+            _keeper.ChangeDamage(-attackChange) ;
+            ManageActiveDisplay(false);
         }
-        else if (!isApplied&& effectedKeeper.Health<=2)
+        else if (!IsApplied&& _keeper.Health<=2)
         {
-            isApplied = true;
-            effectedKeeper.ChangeDamage(attackChange);
-            AbilityCard.ActiveDisplay.gameObject.SetActive(true);
+            SetIsApplied(true);
+            _keeper.ChangeDamage(attackChange);
+            ManageActiveDisplay(true);
         }
     }
 
     public override void CancelEffect()
     {
-        effectedKeeper.UpdatedHealth -= CheckKeeper;
-        if (isApplied)
+        Card _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        _keeper.UpdatedHealth -= CheckKeeper;
+        if (!IsApplied)
         {
-            isApplied = false;
-            effectedKeeper.ChangeDamage(-attackChange) ;
-            AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+            return;
         }
+        
+        SetIsApplied(false);
+        _keeper.ChangeDamage(-attackChange);
+        ManageActiveDisplay(false);
     }
 }

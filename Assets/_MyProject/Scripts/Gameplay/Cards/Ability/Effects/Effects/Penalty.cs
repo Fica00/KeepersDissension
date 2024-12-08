@@ -1,14 +1,5 @@
-using UnityEngine;
-
 public class Penalty : AbilityEffect
 {
-   public static bool IsActive;
-
-   private void Awake()
-   {
-      IsActive = false;
-   }
-
    public override void ActivateForOwner()
    {
       if (IsActive)
@@ -18,31 +9,15 @@ public class Penalty : AbilityEffect
          OnActivated?.Invoke();
          return;
       }
-      Activate();
-      RemoveAction();
-      OnActivated?.Invoke();
-      MoveToActivationField();
-      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-   }
-
-   public override void ActivateForOther()
-   {
-      if (IsActive)
-      {
-         return;
-      }
-
-      IsActive = true;
-      AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-      GameplayManager.Instance.OpponentPlayer.OnStartedTurn += RemoveEffect;
-   }
-
-   private void Activate()
-   {
-      IsActive = true;
+      
       GameplayManager.OnCardMoved += CheckMove;
       GameplayManager.OnSwitchedPlace += CheckCards;
       GameplayManager.Instance.MyPlayer.OnStartedTurn += RemoveEffect;
+      SetIsActive(true);
+      RemoveAction();
+      OnActivated?.Invoke();
+      MoveToActivationField();
+      ManageActiveDisplay(true);
    }
 
    private void CheckCards(CardBase _card1, CardBase _card2)
@@ -54,11 +29,6 @@ public class Penalty : AbilityEffect
    private void CheckMove(CardBase _cardBase, int _movedFrom, int _movedTo, bool _didTeleport)
    {
       if (_cardBase is not Keeper _keeper)
-      {
-         return;
-      }
-
-      if (_keeper.My)
       {
          return;
       }
@@ -90,20 +60,21 @@ public class Penalty : AbilityEffect
          CanCounter = false
       };
       GameplayManager.Instance.ExecuteCardAction(_attackAction);
-      RemoveAction();
    }
 
    private void RemoveEffect()
    {
-      AbilityCard.ActiveDisplay.gameObject.SetActive(false);
-      IsActive = false;
+      ManageActiveDisplay(false);
+      SetIsActive(false);
       try
       {
          GameplayManager.OnCardMoved -= CheckMove;
+         GameplayManager.OnSwitchedPlace -= CheckCards;
          GameplayManager.Instance.MyPlayer.OnStartedTurn -= RemoveEffect;
       }
       catch
       {
+         //
       }
       
    }

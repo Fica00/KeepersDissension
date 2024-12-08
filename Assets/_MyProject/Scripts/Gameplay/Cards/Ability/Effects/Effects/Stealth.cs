@@ -1,41 +1,32 @@
-using System.Linq;
 using UnityEngine;
 
 public class Stealth : AbilityEffect
 {
     [SerializeField] private Sprite sprite;
-    private Keeper keeper;
 
     public override void ActivateForOwner()
     {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        
+        SniperStealth _stun = _keeper.EffectsHolder.AddComponent<SniperStealth>();
+        _stun.IsBaseCardsEffect = false;
+        _stun.Setup(true,sprite); 
+        ManageActiveDisplay(false);
         RemoveAction();
         OnActivated?.Invoke();
     }
 
-    public override void ActivateForOther()
-    {
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        SniperStealth _stun = keeper.EffectsHolder.AddComponent<SniperStealth>();
-        _stun.IsBaseCardsEffect = false;
-        _stun.Setup(true,sprite);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(true);
-    }
-
     public override void CancelEffect()
     {
-        if (keeper == null)
+        Card _keeper = GetEffectedCards()[0];
+        RemoveEffectedCard(_keeper.UniqueId);
+        if (_keeper == null)
         {
             return;
         }
 
-        SniperStealth _stealth = keeper.EffectsHolder.GetComponent<SniperStealth>();
+        SniperStealth _stealth = _keeper.EffectsHolder.GetComponent<SniperStealth>();
 
         if (_stealth==null)
         {
@@ -43,6 +34,6 @@ public class Stealth : AbilityEffect
         }
         
         Destroy(_stealth);
-        AbilityCard.ActiveDisplay.gameObject.SetActive(false);
+        ManageActiveDisplay(false);
     }
 }

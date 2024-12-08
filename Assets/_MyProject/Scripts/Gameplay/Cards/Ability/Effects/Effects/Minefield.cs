@@ -1,53 +1,44 @@
-using System.Linq;
 using UnityEngine;
 
 public class Minefield : AbilityEffect
 {
     [SerializeField] private Sprite sprite;
-    private Keeper keeper;
-    private GameplayPlayer player;
 
     public override void ActivateForOwner()
     {
         MoveToActivationField();
-        player = GameplayManager.Instance.MyPlayer;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
-        Activate();
-    }
-
-    public override void ActivateForOther()
-    {
-        player = GameplayManager.Instance.OpponentPlayer;
-        keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
-        Activate();
-    }
-
-    private void Activate()
-    {
-        BomberMinefield _bomberMinefield = keeper.EffectsHolder.AddComponent<BomberMinefield>();
+        var _player = GameplayManager.Instance.MyPlayer;
+        var _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
+        SetIsActive(true);
+        BomberMinefield _bomberMinefield = _keeper.EffectsHolder.AddComponent<BomberMinefield>();
         _bomberMinefield.IsBaseCardsEffect = false;
         _bomberMinefield.Setup(false,sprite);
         _bomberMinefield.OnActivated += Finish;
         _bomberMinefield.UseAbilityFree();
-        
-        player.OnEndedTurn += RemoveEffect;
+        _player.OnEndedTurn += RemoveEffect;
     }
 
     private void Finish()
     {
-        BomberMinefield _bomberMinefield = keeper.EffectsHolder.GetComponent<BomberMinefield>();
+        Card _keeper = GetEffectedCards()[0];
+        BomberMinefield _bomberMinefield = _keeper.EffectsHolder.GetComponent<BomberMinefield>();
         _bomberMinefield.OnActivated -= Finish;
-        if (keeper.My)
-        {
-            RemoveAction();
-        }
+        RemoveAction();
         OnActivated?.Invoke();
     }
 
     private void RemoveEffect()
     {
-        player.OnEndedTurn -= RemoveEffect;
-        BomberMinefield _effect = keeper.EffectsHolder.GetComponent<BomberMinefield>();
+        if (!IsActive)
+        {
+            return;
+        }
+        
+        SetIsActive(false);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= RemoveEffect;
+        Card _keeper = GetEffectedCards()[0];
+        BomberMinefield _effect = _keeper.EffectsHolder.GetComponent<BomberMinefield>();
         if (_effect!=null)
         {
             Destroy(_effect);

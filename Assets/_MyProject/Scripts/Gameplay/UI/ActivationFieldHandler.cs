@@ -116,7 +116,7 @@ public class ActivationFieldHandler : MonoBehaviour
             _indexOfCard++;
         }
 
-        AbilityEffect _effect = (_cardBase as AbilityCard)?.GetEffect();
+        AbilityEffect _effect = (_cardBase as AbilityCard)?.Effect;
         int _amountOfCardsOnTop = shownCards.Count - _indexOfCard;
         bool _canReturn = _effect.Cooldown <= _amountOfCardsOnTop;
         if (!GameplayCheats.CheckForCD)
