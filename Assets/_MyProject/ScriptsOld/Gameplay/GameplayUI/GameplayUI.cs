@@ -72,8 +72,8 @@ public class GameplayUI : MonoBehaviour
 
     public void SetupTableBackground()
     {
-        topBackground.sprite = GameplayManager.Instance.OpponentPlayer.FactionSO.Board;
-        botBackground.sprite = GameplayManager.Instance.MyPlayer.FactionSO.Board;
+        topBackground.sprite = GameplayManager.Instance.OpponentPlayer.FactionSo.Board;
+        botBackground.sprite = GameplayManager.Instance.MyPlayer.FactionSo.Board;
     }
 
     public void ForceActionUpdate(int _amountOfAction, bool _my, bool _isResponseAction)

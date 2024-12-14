@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FirebaseMultiplayer.Room;
-using GameplayActions;
 using UnityEngine;
 
 public class GameplayPlayer : MonoBehaviour
@@ -11,11 +9,12 @@ public class GameplayPlayer : MonoBehaviour
     public Action OnStartedTurn;
     public Action OnEndedTurn;
     public Action UpdatedDeck;
-    public Action<AbilityCard> UpdatedOwnedAbilities;
-    public bool IsMy { get; private set; }
-    public FactionSO FactionSO { get; private set; }
     public Action UpdatedActions;
     public Action UpdatedStrangeMatter;
+    
+    public bool IsMy { get; private set; }
+    public FactionSO FactionSo { get; private set; }
+
 
     [SerializeField] private TableSideHandler tableSideHandler;
     [SerializeField] private CardsInHandHandler cardsInHandHandler;
@@ -74,7 +73,7 @@ public class GameplayPlayer : MonoBehaviour
     public void Setup(int _factionId, bool _isMy)
     {
         IsMy = _isMy;
-        FactionSO = FactionSO.Get(_factionId);
+        FactionSo = FactionSO.Get(_factionId);
         tableSideHandler.Setup(this);
         SetupCardsInDeck();
         cardsInHandHandler.Setup(this);
@@ -86,7 +85,7 @@ public class GameplayPlayer : MonoBehaviour
         Transform _cardsHolder = tableSideHandler.CardsHolder;
         int _lastIdOfCard = 0;
         Card _wallCard = default;
-        foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSO))
+        foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSo))
         {
             if (_cardInDeck == null)
             {
@@ -162,11 +161,12 @@ public class GameplayPlayer : MonoBehaviour
 
     public void TryRemoveCardFromDeck(Card _card)
     {
-        if (deck.Cards.Contains(_card))
+        if (!deck.Cards.Contains(_card))
         {
-            deck.Cards.Remove(_card);
-            UpdatedDeck?.Invoke();
+            return;
         }
+        deck.Cards.Remove(_card);
+        UpdatedDeck?.Invoke();
     }
 
     public void RemoveAbilityFromDeck(int _cardId)
@@ -264,7 +264,6 @@ public class GameplayPlayer : MonoBehaviour
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _abilityId);
         ownedAbilities.Add(_ability);
         cardsInHandHandler.HideCards();
-        UpdatedOwnedAbilities?.Invoke(_ability);
 
         if (!IsMy)
         {
@@ -284,10 +283,5 @@ public class GameplayPlayer : MonoBehaviour
             yield return new WaitForSeconds(1);
             GameplayManager.Instance.ActivateAbility(_ability.Details.Id);
         }
-    }
-
-    public List<AbilityCard> GetOwnedAbilities()
-    {
-        return ownedAbilities;
     }
 }

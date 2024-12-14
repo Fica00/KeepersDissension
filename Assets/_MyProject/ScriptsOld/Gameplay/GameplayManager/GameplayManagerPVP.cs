@@ -506,8 +506,6 @@ public class GameplayManagerPVP : GameplayManager
             }
         }
         
-        OnGonnaSwitchPlace?.Invoke(_firstCard,_secondCard);
-
         _firstCard.MoveToPosition(_destination);
         _secondCard.MoveToPosition(_startingDestination);
 
@@ -1702,7 +1700,7 @@ public class GameplayManagerPVP : GameplayManager
             return;
         }
 
-        Sprite _bombSprite = _cardBase.GetIsMy() ? MyPlayer.FactionSO.BombSprite : OpponentPlayer.FactionSO.BombSprite;
+        Sprite _bombSprite = _cardBase.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
         _cardBase.Display.ChangeSprite(_bombSprite);
         OnFoundBombMarker?.Invoke(_cardBase);
     }
@@ -1876,7 +1874,6 @@ public class GameplayManagerPVP : GameplayManager
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability =>
             _ability.Details.Id == _cardId && _ability.My == _isMy);
         _ability.Activate();
-        OnActivatedAbility?.Invoke(_ability);
         AudioManager.Instance.PlaySoundEffect("AbilityCardUsed");
     }
 

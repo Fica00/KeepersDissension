@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FirebaseMultiplayer.Room
 {
-    public class RoomHandler : MonoBehaviour
+    public class RoomHandler
     {
         public static Action<RoomPlayer> OnPlayerJoined;
         public static Action<RoomPlayer> OnPlayerLeft;

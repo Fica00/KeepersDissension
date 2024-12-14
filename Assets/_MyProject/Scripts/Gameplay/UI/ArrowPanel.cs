@@ -9,7 +9,6 @@ public class ArrowPanel : MonoBehaviour
     public static Action OnHide;
     
     public Action OnOpened;
-    public Action OnClosed;
     
     [SerializeField] private Button showButton;
     [SerializeField] private Transform holder;
@@ -38,7 +37,6 @@ public class ArrowPanel : MonoBehaviour
 
     public void Hide()
     {
-        OnClosed?.Invoke();
         OnHide?.Invoke();
         holder.DOScale(closedScale, 0.5f);
         showButton.gameObject.SetActive(true); 

@@ -12,7 +12,7 @@ public class ChooseCardPanel : MonoBehaviour
     [SerializeField] private Transform cardsHolder;
     [SerializeField] private Button cancelButton;
     
-    private Vector3 sizeOfCards = new Vector3(2, 2, 1);
+    private Vector3 sizeOfCards = new(2, 2, 1);
     private List<CardBase> shownCards = new ();
     private Action<CardBase> callBack;
     private Dictionary<CardBase, TablePlaceHandler> cardsDict = new();

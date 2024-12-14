@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,8 +31,7 @@ public class ShowAbilityCardsToBuyHand : MonoBehaviour
         {
             return;
         }
-        GameplayPlayer _player = FindObjectsOfType<GameplayPlayer>().ToList().Find(_player => _player.IsMy);
-        _player.ShowCards(CardType.Ability);
+        GameplayManager.Instance.MyPlayer.ShowCards(CardType.Ability);
     }
 
 }

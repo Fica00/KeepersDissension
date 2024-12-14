@@ -36,28 +36,34 @@ public class Initialization : MonoBehaviour
 
     private void CollectData()
     {
+        Debug.Log(666666666);
         FirebaseManager.Instance.CollectData(CheckForVerification);
     }
 
     private void CheckForVerification(bool _status)
     {
+        Debug.Log(777777);
         if (!_status)
         {
+            Debug.Log(8888);
             Authenticate();
             return;
         }
 
+        Debug.Log(999999);
         AuthenticationHandler.Instance.VerifyAccount(SetupNotifications);
     }
 
     private void SetupNotifications()
     {
+        Debug.Log("aaaaaaaaa");
         FirebaseManager.Instance.RoomHandler.SetLocalPlayerId(FirebaseManager.Instance.Authentication.UserId);
         FirebaseNotificationHandler.Instance.Init(FirebaseDatabase.DefaultInstance.RootReference, LoadAppropriateScene);
     }
 
     private void LoadAppropriateScene()
     {
+        Debug.Log(FirebaseManager.Instance.Authentication.UserId);
         DeviceIdHandler.Instance.Setup();
         SceneManager.LoadMainMenu();
     }

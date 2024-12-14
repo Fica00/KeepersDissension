@@ -13,25 +13,25 @@ public class Keeper: Card
 
         ShowHealth();
         GameplayPlayer _player = My ? GameplayManager.Instance.MyPlayer: GameplayManager.Instance.OpponentPlayer;
-        if (_player.FactionSO.Id==0)
+        if (_player.FactionSo.Id==0)
         {
             Destroy(EffectsHolder.GetComponent<CyberKeeper>());
             Destroy(EffectsHolder.GetComponent<DragonKeeper>());
             Destroy(EffectsHolder.GetComponent<ForestKeeper>());
         }
-        else if(_player.FactionSO.Id==1)
+        else if(_player.FactionSo.Id==1)
         {
             Destroy(EffectsHolder.GetComponent<SnowKeeper>());
             Destroy(EffectsHolder.GetComponent<DragonKeeper>());
             Destroy(EffectsHolder.GetComponent<ForestKeeper>());
         }
-        else if (_player.FactionSO.Id==2)
+        else if (_player.FactionSo.Id==2)
         {
             Destroy(EffectsHolder.GetComponent<SnowKeeper>());
             Destroy(EffectsHolder.GetComponent<CyberKeeper>());
             Destroy(EffectsHolder.GetComponent<ForestKeeper>());
         }
-        else if (_player.FactionSO.Id==3)
+        else if (_player.FactionSo.Id==3)
         {
             Destroy(EffectsHolder.GetComponent<SnowKeeper>());
             Destroy(EffectsHolder.GetComponent<CyberKeeper>());

@@ -11,12 +11,10 @@ public class GameplayManager : MonoBehaviour
     public static Action<CardBase, int, int, bool> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
-    public static Action<CardBase, CardBase> OnGonnaSwitchPlace;
     public static Action<CardBase> OnPlacedCard;
     public static Action<Keeper> OnKeeperDied;
     public static GameplayManager Instance;
     public static Action FinishedSetup;
-    public static Action<CardBase> OnActivatedAbility;
     public static Action<CardBase> OnFoundBombMarker;
     public static Action OnUnchainedGuardian;
     public GameplayPlayer MyPlayer;

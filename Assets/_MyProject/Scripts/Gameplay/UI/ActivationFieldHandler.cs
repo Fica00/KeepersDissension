@@ -11,7 +11,7 @@ public class ActivationFieldHandler : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Transform cardsHolder;
     
-    private Vector3 sizeOfCards = new Vector3(2, 2, 1);
+    private Vector3 sizeOfCards = new (2, 2, 1);
     private List<CardBase> shownCards = new ();
     private int placeId;
 
