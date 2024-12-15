@@ -29,12 +29,11 @@ public class Teleport : AbilityEffect
                         CardAction _damageSelf = new CardAction()
                         {
                             StartingPlaceId = _keeper.GetTablePlace().Id,
-                            FirstCardId = _keeper.Details.Id,
+                            FirstCardId = _keeper.UniqueId,
                             FinishingPlaceId = _keeper.GetTablePlace().Id,
-                            SecondCardId = _keeper.Details.Id,
+                            SecondCardId = _keeper.UniqueId,
                             Type = CardActionType.Attack,
                             Cost = 0,
-                            IsMy = true,
                             CanTransferLoot = false,
                             Damage = 1,
                             CanCounter = false
@@ -68,12 +67,10 @@ public class Teleport : AbilityEffect
             CardAction _teleportAction = new CardAction
             {
                 StartingPlaceId = _keeper.GetTablePlace().Id,
-                FirstCardId = _keeper.Details.Id,
+                FirstCardId = _keeper.UniqueId,
                 FinishingPlaceId = _placeId,
-                SecondCardId = 0,
                 Type = CardActionType.Move,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 0,
                 CanCounter = false

@@ -27,7 +27,7 @@ public class CyberKeeper : CardSpecialAbility
 
         void Use()
         {
-            GameplayManager.Instance.TellOpponentThatIUsedUltimate();
+            // GameplayManager.Instance.TellOpponentThatIUsedUltimate();
             GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
             GameplayManager.Instance.SelectPlaceForSpecialAbility(
                 TablePlaceHandler.Id,
@@ -78,7 +78,7 @@ public class CyberKeeper : CardSpecialAbility
                 Player.Actions--;
                 GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
                 CanUseAbility = false;
-                GameplayManager.Instance.ChangeOwnerOfCard(_id);
+                // GameplayManager.Instance.ChangeOwnerOfCard(_id);
                 effectedCard = _cardAtSpot;
                 CardBase.OnGotDestroyed += CheckIfGotDestroyed;
                 Player.OnEndedTurn += ReturnCard;
@@ -94,7 +94,6 @@ public class CyberKeeper : CardSpecialAbility
         }
 
         Unsubscribe();
-        GameplayManager.Instance.OpponentCardDiedInMyPosition(((Card)_cardBase).Details.Id);
     }
 
     private void ReturnCard()
@@ -113,7 +112,7 @@ public class CyberKeeper : CardSpecialAbility
             }
             Unsubscribe();
             int _id = effectedCard.GetTablePlace().Id;
-            GameplayManager.Instance.ChangeOwnerOfCard(_id);
+            // GameplayManager.Instance.ChangeOwnerOfCard(_id);
 
             if (_stealthAbility!=null)
             {
@@ -137,7 +136,7 @@ public class CyberKeeper : CardSpecialAbility
         IEnumerator TellOpponentToActivateStealth(int _placeId,int _placeMinionsFrom)
         {
             yield return new WaitForSeconds(1);
-            GameplayManager.Instance.TellOpponentToUseStealth(((Card)effectedCard).Details.Id,_placeId,_placeMinionsFrom);
+            // GameplayManager.Instance.TellOpponentToUseStealth(((Card)effectedCard).Details.Id,_placeId,_placeMinionsFrom);
         }
     }
 

@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class BomberCard : CardSpecialAbility
 {
-    private int bombDamage = 3;
     [HideInInspector]public bool ExplodeOnDeath;
-
 
     private void OnEnable()
     {

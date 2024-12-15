@@ -5,12 +5,11 @@ using UnityEngine.Serialization;
 public class CardAction
 {
     public int StartingPlaceId;
-    public int FirstCardId=-1;
+    public string FirstCardId=string.Empty;
     public int FinishingPlaceId;
-    public int SecondCardId=-1;
+    public string SecondCardId=string.Empty;
     public CardActionType Type;
     public int Cost;
-    public bool IsMy;
     public bool CanTransferLoot = true;
     public int Damage=-1;
     public bool CanCounter = true;
@@ -33,7 +32,6 @@ public class CardAction
                SecondCardId == _other.SecondCardId &&
                Type == _other.Type &&
                Cost == _other.Cost &&
-               IsMy == _other.IsMy &&
                CanTransferLoot == _other.CanTransferLoot &&
                Damage == _other.Damage &&
                CanCounter == _other.CanCounter &&

@@ -142,7 +142,7 @@ public class GameplayPlayer : MonoBehaviour
         deck.AddNewCard(_card);
     }
 
-    public Card GetCard(int _cardId)
+    public Card GetCard(string _cardId)
     {
         return deck.DrawCard(_cardId);
     }
@@ -152,7 +152,7 @@ public class GameplayPlayer : MonoBehaviour
         return deck.DrawCard(_type);
     }
 
-    public void RemoveCardFromDeck(int _cardId)
+    public void RemoveCardFromDeck(string _cardId)
     {
         Card _drawnCard = deck.DrawCard(_cardId);
         deck.Cards.Remove(_drawnCard);
@@ -255,7 +255,7 @@ public class GameplayPlayer : MonoBehaviour
         }
 
         StrangeMatter -= _amount;
-        GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy += _amount;
+        GameplayManager.Instance.ChangeStrangeMaterInEconomy(_amount);
         UpdatedStrangeMatter?.Invoke();
     }
 
@@ -270,7 +270,7 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        GameplayManager.Instance.PlaceAbilityOnTable(_ability.Details.Id);
+        GameplayManager.Instance.PlaceAbilityOnTable(_ability.UniqueId);
 
         if (_ability.Details.Type == AbilityCardType.Passive)
         {
@@ -281,7 +281,7 @@ public class GameplayPlayer : MonoBehaviour
         IEnumerator ActivateAbility()
         {
             yield return new WaitForSeconds(1);
-            GameplayManager.Instance.ActivateAbility(_ability.Details.Id);
+            GameplayManager.Instance.ActivateAbility(_ability.UniqueId);
         }
     }
 }

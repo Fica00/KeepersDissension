@@ -71,13 +71,13 @@ public class SnowWall : WallBase
             return;
         }
 
-        GameplayManager.Instance.ChangeMovementForCard(attackerPlace, false);
+        // GameplayManager.Instance.ChangeMovementForCard(attackerPlace, false);
         GameplayManager.Instance.MyPlayer.OnStartedTurn += Unsubscribe;
     }
 
     private void Unsubscribe()
     {
         GameplayManager.Instance.MyPlayer.OnStartedTurn -= Unsubscribe;
-        GameplayManager.Instance.ChangeMovementForCard(attackerPlace, true);
+        // GameplayManager.Instance.ChangeMovementForCard(attackerPlace, true);
     }
 }

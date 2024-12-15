@@ -23,10 +23,10 @@ public class SnowKeeper : CardSpecialAbility
         
         void Use()
         {
-            GameplayManager.Instance.TellOpponentThatIUsedUltimate();
+            // GameplayManager.Instance.TellOpponentThatIUsedUltimate();
             Player.Actions--;
             GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
-            GameplayManager.Instance.HandleSnowUltimate(false);
+            // GameplayManager.Instance.HandleSnowUltimate(false);
             Player.OnStartedTurn += EndEffect;
             CanUseAbility = false;
         }
@@ -35,6 +35,6 @@ public class SnowKeeper : CardSpecialAbility
     private void EndEffect()
     {
         Player.OnStartedTurn -= EndEffect;
-        GameplayManager.Instance.HandleSnowUltimate(true);
+        // GameplayManager.Instance.HandleSnowUltimate(true);
     }
 }

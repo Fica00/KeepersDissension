@@ -78,12 +78,11 @@ public class Void : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _effectedPlaceId,
-                FirstCardId = _effectedCard.Details.Id,
+                FirstCardId = _effectedCard.UniqueId,
                 FinishingPlaceId = _effectedPlaceId,
-                SecondCardId = _effectedCard.Details.Id,
+                SecondCardId = _effectedCard.UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 20,
                 CanCounter = false,

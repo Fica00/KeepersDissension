@@ -27,7 +27,7 @@ public class DragonKeeper : CardSpecialAbility
 
         void Use()
         {
-            GameplayManager.Instance.TellOpponentThatIUsedUltimate();
+            // GameplayManager.Instance.TellOpponentThatIUsedUltimate();
             CanUseAbility = false;
 
             List<Card> _availableCards = GameplayManager.Instance.MyPlayer.GetCardsInDeck(CardType.Minion);
@@ -66,8 +66,7 @@ public class DragonKeeper : CardSpecialAbility
                 effectedCard = _card as Card;
                 GameplayManager.Instance.MyPlayer.OnStartedTurn += EnableMinion;
                 GameplayManager.Instance.MyPlayer.Actions--;
-                GameplayManager.Instance.BuyMinion(effectedCard, 0,_placeMinion: false);
-                PlaceMinion();
+                GameplayManager.Instance.BuyMinion(effectedCard, 0);
                 effectedCard.SetCanBeUsed(false);
                 DialogsManager.Instance.ShowOkDialog("This minion will be available next turn");
             }
@@ -76,7 +75,7 @@ public class DragonKeeper : CardSpecialAbility
 
     private void PlaceMinion()
     {
-        List<int> _placesNearLifeForce = new List<int>(){10,12,18,17,19,9,13,19,16,23,24,25,26,27};
+        List<int> _placesNearLifeForce = new List<int> {10,12,18,17,19,9,13,19,16,23,24,25,26,27};
         int _availablePlaceId=-1;
         foreach (var _placeId in _placesNearLifeForce)
         {

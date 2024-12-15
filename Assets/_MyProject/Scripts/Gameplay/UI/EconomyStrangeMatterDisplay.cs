@@ -39,16 +39,15 @@ public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
             return;
         }
 
-        if (GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy==0)
+        if (GameplayManager.Instance.StrangeMaterInEconomy()==0)
         {
             DialogsManager.Instance.ShowOkDialog("There is no more white strange matter in the economy reserves");
             return;
         }
 
         GameplayManager.Instance.MyPlayer.Actions--;
-        GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy--;
+        GameplayManager.Instance.ChangeStrangeMaterInEconomy(-1);
         GameplayManager.Instance.BuyMatter();
-        GameplayManager.Instance.ForceUpdatePlayerActions();
     }
 
 }

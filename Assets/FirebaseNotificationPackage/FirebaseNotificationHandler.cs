@@ -85,11 +85,6 @@ public class FirebaseNotificationHandler : MonoBehaviour
     
     public void SendNotificationToUser(string _userId, string _title, string _body)
     {
-        if (GameplayManager.Instance.IsExecutingOldActions)
-        {
-            return;
-        }
-        
         GetTokenForUser(_userId, _token =>
         {
             if (_token == null)
@@ -133,10 +128,6 @@ public class FirebaseNotificationHandler : MonoBehaviour
 
     private void SendNotificationToToken(string _token, string _title, string _body)
     {
-        if (GameplayManager.Instance.IsExecutingOldActions)
-        {
-            return;
-        }
         return;
         Debug.Log("sending notif");
         WebRequests.Instance.SetUserToken(_token);

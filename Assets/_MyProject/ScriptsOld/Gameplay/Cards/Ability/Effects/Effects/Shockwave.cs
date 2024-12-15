@@ -40,12 +40,11 @@ public class Shockwave : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _card.GetTablePlace().Id,
-                FirstCardId = _card.Details.Id,
+                FirstCardId = _card.UniqueId,
                 FinishingPlaceId = _card.GetTablePlace().Id,
-                SecondCardId = _card.Details.Id,
+                SecondCardId = _card.UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = _damage,
                 CanCounter = false,
@@ -62,7 +61,7 @@ public class Shockwave : AbilityEffect
             yield return new WaitForSeconds(2);
             GameplayManager.Instance.MyPlayer.RemoveStrangeMatter(GameplayManager.Instance.MyPlayer.StrangeMatter - 
             _myStrangeMatter);
-            GameplayManager.Instance.TellOpponentToRemoveStrangeMatter(GameplayManager.Instance.OpponentPlayer
+            GameplayManager.Instance.ChangeOpponentsStrangeMatter(GameplayManager.Instance.OpponentPlayer
             .StrangeMatter-_opponentStrangeMatter);
             GameplayManager.Instance.GameState = _state;
             RemoveAction();

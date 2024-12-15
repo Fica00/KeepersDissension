@@ -30,7 +30,7 @@ public class WallBase : CardSpecialAbility
             yield break;
         }
         
-        int _cardId =_card.Details.Id;
+        string _cardId =_card.UniqueId;
         CardAction _attackAction = new CardAction
         {
             StartingPlaceId = _card.GetTablePlace().Id,
@@ -39,7 +39,6 @@ public class WallBase : CardSpecialAbility
             SecondCardId = _cardId,
             Type = CardActionType.Attack,
             Cost = 0,
-            IsMy = true,
             CanTransferLoot = false,
             Damage = 1,
             GiveLoot = true,

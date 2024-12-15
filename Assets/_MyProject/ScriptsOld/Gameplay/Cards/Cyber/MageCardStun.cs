@@ -19,7 +19,7 @@ public class MageCardStun : CardSpecialAbility
         CanUseAbility = true;
         if (placeEffectedByStun != -1)
         {
-            GameplayManager.Instance.ChangeMovementForCard(placeEffectedByStun, true);
+            // GameplayManager.Instance.ChangeMovementForCard(placeEffectedByStun, true);
             placeEffectedByStun = -1;
         }
     }
@@ -97,7 +97,7 @@ public class MageCardStun : CardSpecialAbility
 
             placeEffectedByStun = _id;
             GameplayManager.Instance.TellOpponentSomething("Opponent used Mage stun ability");
-            GameplayManager.Instance.ChangeMovementForCard(_id, false);
+            // GameplayManager.Instance.ChangeMovementForCard(_id, false);
             Player.Actions--;
         }
     }

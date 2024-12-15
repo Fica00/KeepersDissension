@@ -50,12 +50,11 @@ public class Snipe : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _keeperTablePlace.Id,
-                FirstCardId = _keeper.Details.Id,
+                FirstCardId = _keeper.UniqueId,
                 FinishingPlaceId = _placeId,
-                SecondCardId = _place.GetCard().Details.Id,
+                SecondCardId = _place.GetCard().UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = true,
                 Damage = _keeper.Damage,
                 CanCounter = true,

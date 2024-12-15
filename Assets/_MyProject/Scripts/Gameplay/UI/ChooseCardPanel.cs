@@ -93,7 +93,7 @@ public class ChooseCardPanel : MonoBehaviour
                 if (_shownCard is AbilityCard _card)
                 {
                     var _place = cardsDict[_card];
-                    GameplayManager.Instance.PlaceAbilityOnTable(_card.Details.Id,_place.Id,false);
+                    GameplayManager.Instance.PlaceAbilityOnTable(_card.UniqueId,_place.Id);
                     continue;
                 }
             }

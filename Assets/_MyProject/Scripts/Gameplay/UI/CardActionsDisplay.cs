@@ -147,7 +147,7 @@ public class CardActionsDisplay : MonoBehaviour
         if (GameplayManager.Instance.GameState == GameplayState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
         {
             int _id = FindObjectsOfType<Card>().ToList().Find(_card =>
-                _card.Details.Id == GameplayManager.Instance.IdOfCardWithResponseAction && _card.My).GetTablePlace().Id;
+                _card.UniqueId == GameplayManager.Instance.IdOfCardWithResponseAction() && _card.My).GetTablePlace().Id;
             if (_id != _placeId)
             {
                 _placeId = _id;

@@ -37,7 +37,6 @@ public class Tax : AbilityEffect
             AddEffectedCard((_selectedCard as Card)?.UniqueId);
             RemoveAction();
             OnActivated?.Invoke();
-            GameplayManager.Instance.SetTaxCard(((AbilityCard)_selectedCard).Details.Id);
         }
         
         SetIsActive(true);

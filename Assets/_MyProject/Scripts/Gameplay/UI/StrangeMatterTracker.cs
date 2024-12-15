@@ -25,7 +25,7 @@ public class StrangeMatterTracker : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayManager.Instance.WhiteStrangeMatter.UpdatedAmountInEconomy += ShowAmountInEconomy;
+        GameplayManager.UpdatedAmountInEconomy += ShowAmountInEconomy;
         buyStrangeMatter.onClick.AddListener(BuyStrangeMatter);
     }
 
@@ -37,7 +37,7 @@ public class StrangeMatterTracker : MonoBehaviour
         }
         myPlayer.UpdatedStrangeMatter -= ShowMyStrangeMatter;
         opponentPlayer.UpdatedStrangeMatter -= ShowOpponentStrangeMatter;
-        GameplayManager.Instance.WhiteStrangeMatter.UpdatedAmountInEconomy -= ShowAmountInEconomy;
+        GameplayManager.UpdatedAmountInEconomy -= ShowAmountInEconomy;
         buyStrangeMatter.onClick.RemoveListener(BuyStrangeMatter);
     }
 
@@ -55,7 +55,7 @@ public class StrangeMatterTracker : MonoBehaviour
 
     public void ShowAmountInEconomy()
     {
-        strangeMatterInEconomy.text = GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy.ToString();
+        strangeMatterInEconomy.text = GameplayManager.Instance.StrangeMaterInEconomy().ToString();
     }
 
     private void BuyStrangeMatter()

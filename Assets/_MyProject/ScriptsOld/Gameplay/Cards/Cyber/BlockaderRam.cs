@@ -5,7 +5,7 @@ public class BlockaderRam : CardSpecialAbility
 {
     private int chanceForPush = 100;
 
-    public void TryAndPush(int _placeIdOfFirstCard, int _placeIdOfSecondCard, int _firstCardId, int _secondCardId)
+    public void TryAndPush(int _placeIdOfFirstCard, int _placeIdOfSecondCard, string _firstCardId, string _secondCardId)
     {
         Card _cardInFrontOfSecondCard = GameplayManager.Instance.TableHandler.CheckForCardInFront(_placeIdOfFirstCard, _placeIdOfSecondCard);
         if (_cardInFrontOfSecondCard == null)
@@ -67,7 +67,6 @@ public class BlockaderRam : CardSpecialAbility
                 SecondCardId = _secondCardId,
                 Type = CardActionType.Attack,
                 Cost = 1,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 1,
                 CanCounter = false,
@@ -84,12 +83,11 @@ public class BlockaderRam : CardSpecialAbility
             yield return new WaitForSeconds(0.5f);
             CardAction _moveSelf = new CardAction()
             {
-                FirstCardId = Card.Details.Id,
+                FirstCardId = Card.UniqueId,
                 StartingPlaceId = _placeIdOfFirstCard,
                 FinishingPlaceId = _placeIdOfSecondCard,
                 Type = CardActionType.Move,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false,

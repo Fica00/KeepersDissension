@@ -27,6 +27,7 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsOwner => roomData.Owner == localPlayerId;
         public RoomData RoomData => roomData;
+        public BoardData BoardData => roomData.BoardData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
@@ -202,10 +203,19 @@ namespace FirebaseMultiplayer.Room
 
             throw new Exception("Can't find opponent");
         }
-
-        public void AddAction(ActionType _type, string _jsonData)
+        
+        public RoomPlayer GetMyPlayer()
         {
-            //todo modify me
+            foreach (var _player in roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    return _player;
+                }
+
+            }
+
+            throw new Exception("Can't find opponent");
         }
     }
 }

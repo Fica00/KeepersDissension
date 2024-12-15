@@ -17,7 +17,7 @@ public class MageCardDelivery : CardSpecialAbility
     {
         if (cardEffectedByDeliver != -1)
         {
-            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,false, isEffectedCardMy);
+            // GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,false, isEffectedCardMy);
             cardEffectedByDeliver = -1;
         }
     }
@@ -97,7 +97,7 @@ public class MageCardDelivery : CardSpecialAbility
             cardEffectedByDeliver = _card.Details.Id;
             isEffectedCardMy = _card.My;
             GameplayManager.Instance.TellOpponentSomething("Opponent used his Delivery ability");
-            GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,true,isEffectedCardMy);
+            // GameplayManager.Instance.ChangeCanFlyToDodge(cardEffectedByDeliver,true,isEffectedCardMy);
             Player.Actions--;
            
         }

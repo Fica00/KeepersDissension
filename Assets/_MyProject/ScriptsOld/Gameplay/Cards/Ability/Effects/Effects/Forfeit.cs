@@ -54,12 +54,11 @@ public class Forfeit : AbilityEffect
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _clickedPlace.Id,
-                FirstCardId = _clickedPlace.GetCardNoWall().Details.Id,
+                FirstCardId = _clickedPlace.GetCardNoWall().UniqueId,
                 FinishingPlaceId = _clickedPlace.Id,
-                SecondCardId = _clickedPlace.GetCardNoWall().Details.Id,
+                SecondCardId = _clickedPlace.GetCardNoWall().UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 10,
                 CanCounter = false

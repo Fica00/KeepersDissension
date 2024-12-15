@@ -48,12 +48,11 @@ public class Retaliate : AbilityEffect
         CardAction _returnDamage = new CardAction
         {
             StartingPlaceId = _attackingCard.GetTablePlace().Id,
-            FirstCardId = ((Card)_attackingCard).Details.Id,
+            FirstCardId = ((Card)_attackingCard).UniqueId,
             FinishingPlaceId = _attackingCard.GetTablePlace().Id,
-            SecondCardId = ((Card)_attackingCard).Details.Id,
+            SecondCardId = ((Card)_attackingCard).UniqueId,
             Type = CardActionType.Attack,
             Cost = 0,
-            IsMy = true,
             CanTransferLoot = false,
             Damage = _damage,
             CanCounter = false,

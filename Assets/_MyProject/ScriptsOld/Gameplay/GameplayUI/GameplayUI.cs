@@ -70,7 +70,13 @@ public class GameplayUI : MonoBehaviour
         unchainGuardianButton.interactable = false;
     }
 
-    public void SetupTableBackground()
+    public void Setup()
+    {
+        SetupTableBackground();
+        SetupActionAndTurnDisplay();
+    }
+
+    private void SetupTableBackground()
     {
         topBackground.sprite = GameplayManager.Instance.OpponentPlayer.FactionSo.Board;
         botBackground.sprite = GameplayManager.Instance.MyPlayer.FactionSo.Board;
@@ -81,7 +87,7 @@ public class GameplayUI : MonoBehaviour
         actionAndTurnDisplay.ForceChange(_amountOfAction,_my,_isResponseAction);
     }
     
-    public void SetupActionAndTurnDisplay()
+    private void SetupActionAndTurnDisplay()
     {
         actionAndTurnDisplay.Setup(GameplayManager.Instance.MyPlayer,GameplayManager.Instance.OpponentPlayer);
         strangeMatterTracker.Setup(GameplayManager.Instance.MyPlayer,GameplayManager.Instance.OpponentPlayer);

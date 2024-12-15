@@ -54,6 +54,6 @@ public class ScalerLeapfrog : CardSpecialAbility
             return;
         }
 
-        GameplayManager.Instance.RequestResponseAction(((Card)CardBase).Details.Id);
+        // GameplayManager.Instance.RequestResponseAction(((Card)CardBase).UniqueId);
     }
 }

@@ -8,8 +8,6 @@ public class StrangeMatter
     
     [SerializeField] private int amountInEconomy;
 
-    public int Value;
-
     public int AmountInEconomy
     {
         get => amountInEconomy;

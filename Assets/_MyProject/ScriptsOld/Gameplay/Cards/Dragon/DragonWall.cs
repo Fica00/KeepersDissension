@@ -73,12 +73,11 @@ public class DragonWall : WallBase
             CardAction _attackAction = new CardAction
             {
                 StartingPlaceId = _placeAround.Id,
-                FirstCardId = _cardThatCanBeAttacked.Details.Id,
+                FirstCardId = _cardThatCanBeAttacked.UniqueId,
                 FinishingPlaceId = _placeAround.Id,
-                SecondCardId = _cardThatCanBeAttacked.Details.Id,
+                SecondCardId = _cardThatCanBeAttacked.UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 1,
                 CanCounter = false,

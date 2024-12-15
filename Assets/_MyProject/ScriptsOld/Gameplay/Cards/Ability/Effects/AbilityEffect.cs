@@ -89,11 +89,10 @@ public class AbilityEffect : MonoBehaviour
         CardAction _action = new CardAction
         {
             StartingPlaceId = AbilityCard == null ? 1 : AbilityCard.GetTablePlace().Id,
-            FirstCardId = AbilityCard.Details.Id,
+            FirstCardId = AbilityCard.UniqueId,
             FinishingPlaceId = _player.TableSideHandler.ActivationField.Id,
             Type = CardActionType.MoveAbility,
             Cost = 0,
-            IsMy = true,
             CanTransferLoot = false,
             Damage = 0,
             CanCounter = false

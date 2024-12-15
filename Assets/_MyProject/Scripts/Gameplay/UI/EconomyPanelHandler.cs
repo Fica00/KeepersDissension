@@ -33,7 +33,7 @@ public class EconomyPanelHandler : MonoBehaviour
     {
         ClearShowObjects();
         
-        for (int _i = 0; _i < GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy; _i++)
+        for (int _i = 0; _i < GameplayManager.Instance.StrangeMaterInEconomy(); _i++)
         {
             EconomyStrangeMatterDisplay _matter = Instantiate(matterPrefab, matterHolder);
             _matter.Setup();

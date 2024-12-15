@@ -140,7 +140,7 @@ public class ActivationFieldHandler : MonoBehaviour
             _cardBase.transform.SetParent(null);
             _cardBase.PositionInHand();
             Close();
-            GameplayManager.Instance.ReturnAbilityFromActivationField(((AbilityCard)_cardBase).Details.Id);
+            GameplayManager.Instance.ReturnAbilityFromActivationField(((AbilityCard)_cardBase).UniqueId);
         }
         else
         {

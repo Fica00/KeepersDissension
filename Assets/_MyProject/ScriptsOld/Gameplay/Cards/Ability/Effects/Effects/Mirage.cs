@@ -57,12 +57,11 @@ public class Mirage : AbilityEffect
             CardAction _switchPosition = new CardAction
             {
                 StartingPlaceId = _keeper.GetTablePlace().Id,
-                FirstCardId = _keeper.Details.Id,
+                FirstCardId = _keeper.UniqueId,
                 FinishingPlaceId = _clickedPlace.Id,
-                SecondCardId = _clickedPlace.GetCardNoWall().Details.Id,
+                SecondCardId = _clickedPlace.GetCardNoWall().UniqueId,
                 Type = CardActionType.SwitchPlace,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = 10,
                 CanCounter = false

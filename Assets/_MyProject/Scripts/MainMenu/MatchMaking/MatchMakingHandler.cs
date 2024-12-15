@@ -84,7 +84,7 @@ public class MatchMakingHandler : MonoBehaviour
         {
             Id = FirebaseManager.Instance.Authentication.UserId,
             FactionId = DataManager.Instance.PlayerData.FactionId,
-            DateCrated = DataManager.Instance.PlayerData.DateCreated,
+            DateCreated = DataManager.Instance.PlayerData.DateCreated,
             MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed,
             Name = DataManager.Instance.PlayerData.Name
         };
@@ -128,7 +128,7 @@ public class MatchMakingHandler : MonoBehaviour
                     {
                         Id = FirebaseManager.Instance.Authentication.UserId,
                         FactionId = DataManager.Instance.PlayerData.FactionId,
-                        DateCrated = DataManager.Instance.PlayerData.DateCreated,
+                        DateCreated = DataManager.Instance.PlayerData.DateCreated,
                         MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
                     }
                 }

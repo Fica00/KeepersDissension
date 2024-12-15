@@ -89,16 +89,7 @@ public class ScoutVision : CardSpecialAbility
                 yield break;
             }
             
-            GameplayManager.Instance.CheckForBombInMarkers(_markerPositions,DestroyMarker);
-
-            void DestroyMarker(List<int> _bombPlaces)
-            {
-                foreach (var _markerPlace in _bombPlaces)
-                {
-                    GameplayManager.Instance.MarkMarkerAsBomb(_markerPlace);
-                    _markerPositions.Remove(_markerPlace);
-                }
-            }
+            // GameplayManager.Instance.CheckForBombInMarkers(_markerPositions,DestroyMarker);
         }
     }
 }

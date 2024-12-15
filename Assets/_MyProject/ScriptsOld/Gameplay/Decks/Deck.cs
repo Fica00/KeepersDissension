@@ -20,9 +20,9 @@ public class Deck
         return Cards.Find(_card => _card.Details.Type == _type);
     }
 
-    public Card DrawCard(int _id)
+    public Card DrawCard(string _id)
     {
-        return Cards.Find(_card => _card.Details.Id == _id);
+        return Cards.Find(_card => _card.UniqueId == _id);
     }
 
     public AbilityCard DrawAbility(int _id)

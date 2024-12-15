@@ -39,7 +39,7 @@ public class BomberMinefield : CardSpecialAbility
             _markerPlaces.Add(_tablePlace.Id);
         }
         
-        GameplayManager.Instance.TryDestroyMarkers(_markerPlaces);
+        // GameplayManager.Instance.TryDestroyMarkers(_markerPlaces);
     }
 
     private void OnDisable()

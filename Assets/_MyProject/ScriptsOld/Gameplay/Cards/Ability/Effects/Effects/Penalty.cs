@@ -41,12 +41,11 @@ public class Penalty : AbilityEffect
       CardAction _attackAction = new CardAction
       {
          StartingPlaceId = _movedTo,
-         FirstCardId = _keeper.Details.Id,
+         FirstCardId = _keeper.UniqueId,
          FinishingPlaceId = _movedTo,
-         SecondCardId = _keeper.Details.Id,
+         SecondCardId = _keeper.UniqueId,
          Type = CardActionType.Attack,
          Cost = 0,
-         IsMy = true,
          CanTransferLoot = false,
          Damage = _distance,
          CanCounter = false

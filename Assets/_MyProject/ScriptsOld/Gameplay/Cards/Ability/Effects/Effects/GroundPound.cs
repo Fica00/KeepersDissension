@@ -28,12 +28,11 @@ public class GroundPound : AbilityEffect
                 CardAction _action = new CardAction
                 {
                     StartingPlaceId = _card.GetTablePlace().Id,
-                    FirstCardId = _card.Details.Id,
+                    FirstCardId = _card.UniqueId,
                     FinishingPlaceId = _card.GetTablePlace().Id,
-                    SecondCardId = _card.Details.Id,
+                    SecondCardId = _card.UniqueId,
                     Type = CardActionType.Attack,
                     Cost = 0,
-                    IsMy = true,
                     CanTransferLoot = false,
                     Damage = _keeper.Damage,
                     CanCounter = false

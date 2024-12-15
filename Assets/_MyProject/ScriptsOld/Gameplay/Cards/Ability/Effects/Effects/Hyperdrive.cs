@@ -41,13 +41,13 @@ public class Hyperdrive : AbilityEffect
         {
             abilityCard.Effect.OnActivated += ActivateNextCard;
         }
-        GameplayManager.Instance.PlaceAbilityOnTable(abilityCard.Details.Id);
+        GameplayManager.Instance.PlaceAbilityOnTable(abilityCard.UniqueId);
         StartCoroutine(AcitvateAbility());
 
         IEnumerator AcitvateAbility()
         {
             yield return new WaitForSeconds(1f);
-            GameplayManager.Instance.ActivateAbility(abilityCard.Details.Id);
+            GameplayManager.Instance.ActivateAbility(abilityCard.UniqueId);
         }
     }
 

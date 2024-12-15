@@ -44,7 +44,7 @@ public class ResolveMultipleActions : MonoBehaviour
                     Card _defender = default;
                     foreach (var _cardOnPlace in _defenderPlace.GetCards())
                     {
-                        if (_cardOnPlace is Card _card && _card.Details.Id == _action.SecondCardId)
+                        if (_cardOnPlace is Card _card && _card.UniqueId == _action.SecondCardId)
                         {
                             _defender = _card;
                         }

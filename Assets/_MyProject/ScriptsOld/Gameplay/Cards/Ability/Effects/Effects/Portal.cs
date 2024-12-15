@@ -19,7 +19,7 @@ public class Portal : AbilityEffect
         void OnPlaceSelected(int _selectedPlace)
         {
             Card _portal = CardsManager.Instance.CreateCard(portalId, true);
-            GameplayManager.Instance.PlaceCard(_portal, _selectedPlace, true);
+            GameplayManager.Instance.PlaceCard(_portal, _selectedPlace);
             AddEffectedCard(_portal.UniqueId);;
             if (GetEffectedCards().Count == 2)
             {
@@ -85,12 +85,11 @@ public class Portal : AbilityEffect
                         CardAction _damageAction = new CardAction
                         {
                             StartingPlaceId = _startingPosition,
-                            FirstCardId = ((Card)_cardThatMoved).Details.Id,
+                            FirstCardId = ((Card)_cardThatMoved).UniqueId,
                             FinishingPlaceId = _startingPosition,
-                            SecondCardId = ((Card)_cardThatMoved).Details.Id,
+                            SecondCardId = ((Card)_cardThatMoved).UniqueId,
                             Type = CardActionType.Attack,
                             Cost = 1,
-                            IsMy = true,
                             CanTransferLoot = false,
                             Damage = 1,
                             CanCounter = false,
@@ -110,7 +109,7 @@ public class Portal : AbilityEffect
                 GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
             {
                 HandleBlockader(_exitIndex, _exitPortal.GetTablePlace().Id, (_cardThatMoved as Card), _cardThatMoved.GetTablePlace().Id, _exitIndex,
-                    (_cardThatMoved as Card).Details.Id, GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).GetCard().Details.Id);
+                    (_cardThatMoved as Card)?.UniqueId, GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).GetCard().UniqueId);
                 yield break;
             }
 
@@ -120,12 +119,11 @@ public class Portal : AbilityEffect
                 CardAction _damageSelf = new CardAction
                 {
                     StartingPlaceId = _cardThatMoved.GetTablePlace().Id,
-                    FirstCardId = ((Card)(_cardThatMoved)).Details.Id,
+                    FirstCardId = ((Card)(_cardThatMoved)).UniqueId,
                     FinishingPlaceId = _cardThatMoved.GetTablePlace().Id,
-                    SecondCardId = ((Card)(_cardThatMoved)).Details.Id,
+                    SecondCardId = ((Card)(_cardThatMoved)).UniqueId,
                     Type = CardActionType.Attack,
                     Cost = 0,
-                    IsMy = true,
                     CanTransferLoot = false,
                     Damage = 1,
                     CanCounter = false,
@@ -138,12 +136,11 @@ public class Portal : AbilityEffect
                 CardAction _moveAction = new CardAction
                 {
                     StartingPlaceId = _cardThatMoved.GetTablePlace().Id,
-                    FirstCardId = ((Card)(_cardThatMoved)).Details.Id,
+                    FirstCardId = ((Card)(_cardThatMoved)).UniqueId,
                     FinishingPlaceId = _exitIndex,
-                    SecondCardId = ((Card)(_cardThatMoved)).Details.Id,
+                    SecondCardId = ((Card)(_cardThatMoved)).UniqueId,
                     Type = CardActionType.Move,
                     Cost = 0,
-                    IsMy = true,
                     CanTransferLoot = false,
                     Damage = 0,
                     CanCounter = false,
@@ -155,8 +152,9 @@ public class Portal : AbilityEffect
             }
         }
 
-        void HandleBlockader(int _exitIndex, int _exitPortalIndex, Card _card, int _placeIdOfFirstCard, int _placeIdOfSecondCard, int _firstCardId,
-            int _secondCardId)
+        void HandleBlockader(int _exitIndex, int _exitPortalIndex, Card _card, int _placeIdOfFirstCard, int _placeIdOfSecondCard, string 
+                _firstCardId,
+            string _secondCardId)
         {
             Card _cardInFrontOfSecondCard = GameplayManager.Instance.TableHandler.CheckForCardInFront(_exitIndex, _exitPortalIndex);
 
@@ -177,7 +175,6 @@ public class Portal : AbilityEffect
                         FinishingPlaceId = _startingPosition,
                         Type = CardActionType.Move,
                         Cost = 1,
-                        IsMy = true,
                         CanTransferLoot = false,
                         Damage = 0,
                         CanCounter = false,
@@ -199,7 +196,6 @@ public class Portal : AbilityEffect
                     SecondCardId = _secondCardId,
                     Type = CardActionType.Attack,
                     Cost = 1,
-                    IsMy = true,
                     CanTransferLoot = false,
                     Damage = 1,
                     CanCounter = false,
@@ -215,12 +211,11 @@ public class Portal : AbilityEffect
                 yield return new WaitForSeconds(0.5f);
                 CardAction _moveSelf = new CardAction()
                 {
-                    FirstCardId = _card.Details.Id,
+                    FirstCardId = _card.UniqueId,
                     StartingPlaceId = _placeIdOfFirstCard,
                     FinishingPlaceId = _placeIdOfSecondCard,
                     Type = CardActionType.Move,
                     Cost = 0,
-                    IsMy = true,
                     CanTransferLoot = false,
                     Damage = -1,
                     CanCounter = false,

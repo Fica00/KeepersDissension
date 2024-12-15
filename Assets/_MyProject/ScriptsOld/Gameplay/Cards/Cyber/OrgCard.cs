@@ -120,13 +120,12 @@ public class OrgCard : CardSpecialAbility
             CardAction _additionalAction = new CardAction()
             {
                 StartingPlaceId = _attackingCard.GetTablePlace().Id,
-                FirstCardId = _attackingCard.Details.Id,
+                FirstCardId = _attackingCard.UniqueId,
                 FinishingPlaceId = _availablePlace.Id,
-                SecondCardId = GameplayManager.Instance.TableHandler.GetPlace(_availablePlace.Id).GetCard().Details.Id,
+                SecondCardId = GameplayManager.Instance.TableHandler.GetPlace(_availablePlace.Id).GetCard().UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
                 CanTransferLoot = false,
-                IsMy = true,
                 CanCounter = true,
                 Damage = Card.Damage
             };
@@ -173,12 +172,11 @@ public class OrgCard : CardSpecialAbility
             CardAction _destroySelf = new CardAction
             {
                 StartingPlaceId = _attackingCard.GetTablePlace().Id,
-                FirstCardId = _attackingCard.Details.Id,
+                FirstCardId = _attackingCard.UniqueId,
                 FinishingPlaceId = _attackingCard.GetTablePlace().Id,
-                SecondCardId = _attackingCard.Details.Id,
+                SecondCardId = _attackingCard.UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = Card.Damage,
                 CanCounter = false,

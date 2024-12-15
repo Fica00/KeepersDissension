@@ -47,11 +47,23 @@ public class Veto : AbilityEffect
         
         void VetoCard(CardBase _card)
         {
-            GameplayManager.Instance.VetoCard(_card as AbilityCard);
+            SetIsActive(true);
+            AddEffectedCard((_card as AbilityCard)?.UniqueId);
             GameplayManager.Instance.GameState = _state;
             RemoveAction();
             OnActivated?.Invoke();
             _card.RotateToBeVertical();
         }
+    }
+
+    protected override void CancelEffect()
+    {
+        if (!IsActive)
+        {
+            return;
+        }
+        
+        SetIsActive(false);
+        ClearEffectedCards();
     }
 }

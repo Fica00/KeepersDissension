@@ -37,7 +37,7 @@ public class AbilityCardsManagerPVP : AbilityCardsManagerBase
 
     protected override void TryBuyAbilityCard(AbilityCard _abilityCard)
     {
-        int _price = abilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange;
+        int _price = abilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
         if (_abilityCard==null)
         {
             return;

@@ -83,7 +83,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
 
         GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
 
-        int _price = abilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange;
+        int _price = abilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
 
         if (_player.StrangeMatter<_price && !GameplayCheats.HasUnlimitedGold)
         {

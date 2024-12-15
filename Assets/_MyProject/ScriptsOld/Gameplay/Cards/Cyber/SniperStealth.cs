@@ -85,12 +85,11 @@ public class SniperStealth : CardSpecialAbility
 
             CardAction _moveAction = new CardAction
             {
-                FirstCardId = Card.Details.Id,
+                FirstCardId = Card.UniqueId,
                 StartingPlaceId = _originalPlace,
                 FinishingPlaceId = 0,
                 Type = CardActionType.Move,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false
@@ -170,12 +169,11 @@ public class SniperStealth : CardSpecialAbility
 
         CardAction _moveAction = new CardAction
         {
-            FirstCardId = Card.Details.Id,
+            FirstCardId = Card.UniqueId,
             StartingPlaceId = _originalPlace,
             FinishingPlaceId = 0,
             Type = CardActionType.Move,
             Cost = 0,
-            IsMy = true,
             CanTransferLoot = false,
             Damage = -1,
             CanCounter = false
@@ -256,9 +254,9 @@ public class SniperStealth : CardSpecialAbility
         {
             if (!GameplayManager.Instance.MyTurn)
             {
-                if (CardBase.GetIsMy() && !GameplayManager.Instance.UsingVisionToDestroyMarkers)
+                if (CardBase.GetIsMy())
                 {
-                    GameplayManager.Instance.RequestResponseAction((CardBase as Card).Details.Id);
+                    // GameplayManager.Instance.RequestResponseAction((CardBase as Card).UniqueId);
                 }
             }
             StartCoroutine(ReturnToPlaceRoutine());
@@ -277,12 +275,11 @@ public class SniperStealth : CardSpecialAbility
             {
                 CardAction _moveBackAction = new CardAction
                 {
-                    FirstCardId = _place.GetCardNoWall().Details.Id,
+                    FirstCardId = _place.GetCardNoWall().UniqueId,
                     StartingPlaceId = _place.Id,
                     FinishingPlaceId = ReturnDiscoveryCardTo,
                     Type = CardActionType.Move,
                     Cost = 0,
-                    IsMy = false,
                     CanTransferLoot = false,
                     Damage = -1,
                     CanCounter = false
@@ -293,12 +290,11 @@ public class SniperStealth : CardSpecialAbility
             yield return new WaitForSeconds(0.3f);
             CardAction _moveAction = new CardAction
             {
-                FirstCardId = Card.Details.Id,
+                FirstCardId = Card.UniqueId,
                 StartingPlaceId = 0,
                 FinishingPlaceId = stealthFromPlace,
                 Type = CardActionType.Move,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false
@@ -316,10 +312,9 @@ public class SniperStealth : CardSpecialAbility
                 StartingPlaceId = GameplayManager.Instance.LastAction.StartingPlaceId,
                 FirstCardId = GameplayManager.Instance.LastAction.FirstCardId,
                 FinishingPlaceId = Card.GetTablePlace().Id,
-                SecondCardId = Card.Details.Id,
+                SecondCardId = Card.UniqueId,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = true,
                 Damage = GameplayManager.Instance.LastAction.Damage,
                 CanCounter = false,
@@ -340,12 +335,11 @@ public class SniperStealth : CardSpecialAbility
             yield return new WaitForSeconds(0.3f);
             CardAction _moveAction = new CardAction
             {
-                FirstCardId = Card.Details.Id,
+                FirstCardId = Card.UniqueId,
                 StartingPlaceId = 0,
                 FinishingPlaceId = stealthFromPlace,
                 Type = CardActionType.Move,
                 Cost = 0,
-                IsMy = true,
                 CanTransferLoot = false,
                 Damage = -1,
                 CanCounter = false
@@ -374,7 +368,7 @@ public class SniperStealth : CardSpecialAbility
 
             _places.Add(_place.Id);
         }
-        GameplayManager.Instance.TryDestroyMarkers(_places);
+        // GameplayManager.Instance.TryDestroyMarkers(_places);
         CanUseAbility = true;
     }
 

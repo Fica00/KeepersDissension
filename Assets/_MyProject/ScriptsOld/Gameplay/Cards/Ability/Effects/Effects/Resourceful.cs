@@ -1,9 +1,10 @@
 public class Resourceful : AbilityEffect
 {
+    private int amount = 2;
     protected override void ActivateForOwner()
     {
         SetIsActive(true);
-        GameplayManager.Instance.StrangeMatterCostChange += 2;
+        GameplayManager.Instance.ChangeStrangeMatterCostChange(amount);
         GameplayManager.Instance.MyPlayer.OnStartedTurn += RemoveEffect;
         MoveToActivationField();
         RemoveAction();
@@ -15,7 +16,7 @@ public class Resourceful : AbilityEffect
     {
         SetIsActive(false);
         GameplayManager.Instance.MyPlayer.OnStartedTurn -= RemoveEffect;
-        GameplayManager.Instance.StrangeMatterCostChange -= 2;
+        GameplayManager.Instance.ChangeStrangeMatterCostChange(-amount);
         ManageActiveDisplay(false);
     }
 

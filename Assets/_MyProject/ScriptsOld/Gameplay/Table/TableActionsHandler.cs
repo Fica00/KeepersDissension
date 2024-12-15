@@ -121,7 +121,6 @@ public class TableActionsHandler : MonoBehaviour
         foreach (var _action in possibleActions)
         {
             _action.StartingPlaceId = _placeId;
-            _action.IsMy = true;
             if (_card.Speed != 0)
             {
                 _action.Cost = _action.Type == CardActionType.SwitchPlace ? 2 : 1;
@@ -192,10 +191,10 @@ public class TableActionsHandler : MonoBehaviour
 
             possibleActions.Add(new CardAction()
             {
-                FirstCardId = _card.Details.Id,
+                FirstCardId = _card.UniqueId,
                 StartingPlaceId = _startingPlace.Id,
                 FinishingPlaceId = _placeAround.Id,
-                SecondCardId = _cardAtPlace.Details.Id,
+                SecondCardId = _cardAtPlace.UniqueId,
                 Type = CardActionType.RamAbility,
                 Cost = _actionCost,
             });
@@ -325,7 +324,7 @@ public class TableActionsHandler : MonoBehaviour
             {
                 possibleActions.Add(new CardAction()
                 {
-                    FirstCardId = _warriorCard.Details.Id, FinishingPlaceId = _placeAround.Id, Type = CardActionType.Move, Cost = _actionCost,
+                    FirstCardId = _warriorCard.UniqueId, FinishingPlaceId = _placeAround.Id, Type = CardActionType.Move, Cost = _actionCost,
                 });
 
                 _placeAround.SetColor(Color.blue);
@@ -381,7 +380,7 @@ public class TableActionsHandler : MonoBehaviour
 
             possibleActions.Add(new CardAction()
             {
-                FirstCardId = _warriorCard.Details.Id,
+                FirstCardId = _warriorCard.UniqueId,
                 StartingPlaceId = _warriorCard.GetTablePlace().Id,
                 FinishingPlaceId = _placeInFront.Id,
                 Type = CardActionType.Move,
@@ -472,8 +471,8 @@ public class TableActionsHandler : MonoBehaviour
 
                 possibleActions.Add(new CardAction
                 {
-                    FirstCardId = _card.Details.Id,
-                    SecondCardId = ((Card)_cardAtPlace).Details.Id,
+                    FirstCardId = _card.UniqueId,
+                    SecondCardId = ((Card)_cardAtPlace).UniqueId,
                     FinishingPlaceId = _placeAround.Id,
                     Type = CardActionType.SwitchPlace,
                     Cost = _actionCost,
@@ -605,8 +604,8 @@ public class TableActionsHandler : MonoBehaviour
             
             possibleActions.Add(new CardAction()
             {
-                FirstCardId = _attackingCard.Details.Id,
-                SecondCardId = ((Card)_attackedCard).Details.Id,
+                FirstCardId = _attackingCard.UniqueId,
+                SecondCardId = ((Card)_attackedCard).UniqueId,
                 FinishingPlaceId = _attackablePlace.Id,
                 Type = CardActionType.Attack,
                 Cost = _actionCost,
@@ -671,9 +670,9 @@ public class TableActionsHandler : MonoBehaviour
             if (_action.Type == CardActionType.Attack)
             {
                 _attackingCard = tableHandler.GetPlace(_action.StartingPlaceId).GetCards().Cast<Card>().ToList()
-                    .Find(_card => _card.Details.Id == _action.FirstCardId);
+                    .Find(_card => _card.UniqueId == _action.FirstCardId);
                 _defendingCard = tableHandler.GetPlace(_action.FinishingPlaceId).GetCards().Cast<Card>().ToList()
-                    .Find(_card => _card.Details.Id == _action.SecondCardId);
+                    .Find(_card => _card.UniqueId == _action.SecondCardId);
                 string _question = string.Empty;
                 if (_attackingCard.GetIsMy() && _defendingCard.GetIsMy())
                 {
@@ -713,7 +712,7 @@ public class TableActionsHandler : MonoBehaviour
 
             foreach (var _cardBase in _place.GetCards())
             {
-                if (_cardBase is Card _possibleCard && _possibleCard.Details.Id == _action.FirstCardId)
+                if (_cardBase is Card _possibleCard && _possibleCard.UniqueId == _action.FirstCardId)
                 {
                     _cardAtPlace = _possibleCard;
                     break;
@@ -760,11 +759,10 @@ public class TableActionsHandler : MonoBehaviour
                             CardAction _pushAction = new CardAction
                             {
                                 StartingPlaceId = _exitPlace.Id,
-                                FirstCardId = _cardAtExitPlace.Details.Id,
+                                FirstCardId = _cardAtExitPlace.UniqueId,
                                 FinishingPlaceId = placeInFront.Id,
                                 Type = CardActionType.Move,
                                 Cost = 0,
-                                IsMy = true,
                                 CanTransferLoot = false,
                                 Damage = 0,
                                 CanCounter = false,
@@ -772,16 +770,15 @@ public class TableActionsHandler : MonoBehaviour
                             };
                             GameplayManager.Instance.ExecuteCardAction(_pushAction);
                             // Now move the moving card into the exit place
-                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.Details.Id == _action.FirstCardId);
+                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.UniqueId == _action.FirstCardId);
 
                             CardAction _moveAction = new CardAction
                             {
                                 StartingPlaceId = _movingCard.GetTablePlace().Id,
-                                FirstCardId = _movingCard.Details.Id,
+                                FirstCardId = _movingCard.UniqueId,
                                 FinishingPlaceId = _exitPlace.Id,
                                 Type = CardActionType.Move,
                                 Cost = 0,
-                                IsMy = true,
                                 CanTransferLoot = false,
                                 Damage = 0,
                                 CanCounter = false,
@@ -795,17 +792,16 @@ public class TableActionsHandler : MonoBehaviour
                         else
                         {
                             int _cardsPlace = _cardAtExitPlace.GetTablePlace().Id;
-                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.Details.Id == _action.FirstCardId);
+                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.UniqueId == _action.FirstCardId);
 
                             CardAction _damageOtherCard = new CardAction
                             {
                                 StartingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
-                                FirstCardId = _cardAtExitPlace.Details.Id,
+                                FirstCardId = _cardAtExitPlace.UniqueId,
                                 FinishingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
-                                SecondCardId = _cardAtExitPlace.Details.Id,
+                                SecondCardId = _cardAtExitPlace.UniqueId,
                                 Type = CardActionType.Attack,
                                 Cost = 0,
-                                IsMy = true,
                                 CanTransferLoot = false,
                                 Damage = 1,
                                 CanCounter = false,
@@ -818,11 +814,10 @@ public class TableActionsHandler : MonoBehaviour
                                 CardAction _moveAction = new CardAction
                                 {
                                     StartingPlaceId = _currentPlace.Id,
-                                    FirstCardId = _movingCard.Details.Id,
+                                    FirstCardId = _movingCard.UniqueId,
                                     FinishingPlaceId = _cardsPlace,
                                     Type = CardActionType.Move,
                                     Cost = 0,
-                                    IsMy = true,
                                     CanTransferLoot = false,
                                     Damage = 0,
                                     CanCounter = false,
@@ -883,7 +878,6 @@ public class TableActionsHandler : MonoBehaviour
             FinishingPlaceId = _action.FinishingPlaceId,
             Type = _action.Type,
             Cost = _action.Cost,
-            IsMy = _action.IsMy,
             CanTransferLoot = _action.CanTransferLoot,
             Damage = _action.Damage,
             CanCounter = _action.CanCounter,
@@ -920,7 +914,7 @@ public class TableActionsHandler : MonoBehaviour
         {
             if (_cardBase is Card _cardOnPlace)
             {
-                if (_cardOnPlace.Details.Id == _newAction.FirstCardId)
+                if (_cardOnPlace.UniqueId == _newAction.FirstCardId)
                 {
                     _card = _cardOnPlace;
                     break;
