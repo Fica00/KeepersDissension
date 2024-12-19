@@ -9,7 +9,13 @@ public class RoomGameplayPlayer
     public int StrangeMatter;
     public List<CardData> CardsInDeck = new();
     public List<AbilityData> AbilitiesInDeck = new();
+    public int amountOfAbilitiesPlayerCanBuy = 7;
 
     public bool IsMy => PlayerId == FirebaseManager.Instance.PlayerId;
-    public int AmountOfAbilitiesPlayerCanBuy => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? 1000 : 7;
+
+    public int AmountOfAbilitiesPlayerCanBuy
+    {
+        get => amountOfAbilitiesPlayerCanBuy;
+        set => amountOfAbilitiesPlayerCanBuy = value;
+    }
 }
