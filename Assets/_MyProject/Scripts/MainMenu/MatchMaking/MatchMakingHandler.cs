@@ -121,6 +121,7 @@ public class MatchMakingHandler : MonoBehaviour
                 Id = Guid.NewGuid().ToString(),
                 Type = _response.Type,
                 Status = RoomStatus.SearchingForOpponent,
+                GameplayState = GameplayState.WaitingForPlayersToLoad,
                 Owner = FirebaseManager.Instance.Authentication.UserId,
                 RoomPlayers = new List<RoomPlayer>
                 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace FirebaseMultiplayer.Room
 {
@@ -14,18 +15,11 @@ namespace FirebaseMultiplayer.Room
         public List<AbilityData> AbilitiesInShop = new();
         public List<AbilityData> AvailableAbilities = new();
         
-        public RoomGameplayPlayer MyPlayer => PlayersData.First(_player => _player.IsMy);
-        public RoomGameplayPlayer OpponentPlayer => PlayersData.First(_player => !_player.IsMy);
-        
-        public BoardData()
-        {
-            PlayersData.Add(new RoomGameplayPlayer { PlayerId = FirebaseManager.Instance.PlayerId, LootChange = 0, StrangeMatter = 0 });
-            PlayersData.Add(new RoomGameplayPlayer { PlayerId = FirebaseManager.Instance.OpponentId, LootChange = 0, StrangeMatter = 0 });
-        }
+        [JsonIgnore] public RoomGameplayPlayer MyPlayer => PlayersData.First(_player => _player.IsMy);
+        [JsonIgnore] public RoomGameplayPlayer OpponentPlayer => PlayersData.First(_player => !_player.IsMy);
 
-
-        public int AmountOfStartingAbilities => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? 0 : 7;
-        public int AmountOfCardsInShop => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? UnityEngine.Resources.LoadAll("Abilities").Length : 3;
+        [JsonIgnore] public int AmountOfStartingAbilities => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? 0 : 7;
+        [JsonIgnore] public int AmountOfCardsInShop => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? UnityEngine.Resources.LoadAll("Abilities").Length : 3;
         
         public int AbilityCardPrice => 5;
 
