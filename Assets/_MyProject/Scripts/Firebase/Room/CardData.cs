@@ -4,7 +4,7 @@ using System;
 public class CardData
 {
     public string Owner;
-    public string CardUniqueId;
+    public string UniqueId;
     public int CardId;
     public bool IsVoid;
     public bool CanFlyToDodgeAttack;

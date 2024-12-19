@@ -64,7 +64,7 @@ public class Forfeit : AbilityEffect
                 CanCounter = false
             };
             GameplayManager.Instance.ExecuteCardAction(_attackAction);
-            GameplayManager.Instance.MyPlayer.StrangeMatter += 2;
+            GameplayManager.Instance.ChangeMyStrangeMatter(2);
             GameplayManager.Instance.GameState = GameplayState.Playing;
             RemoveAction();
             OnActivated?.Invoke();

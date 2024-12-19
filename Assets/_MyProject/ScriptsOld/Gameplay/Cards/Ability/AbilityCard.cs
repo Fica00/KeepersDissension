@@ -12,6 +12,7 @@ public class AbilityCard : CardBase
     public AbilityEffect Effect => effect;
     
     private AbilityData abilityData;
+    public AbilityData Data => abilityData;
 
     public bool My => abilityData.Owner == FirebaseManager.Instance.PlayerId;
     public string UniqueId => abilityData.UniqueId;
@@ -30,9 +31,9 @@ public class AbilityCard : CardBase
     public bool HasOpponentsRequiredCardDied => abilityData.HasOpponentsRequiredCardDied;
     public List<string> EffectedCards => abilityData.EffectedCards;
 
-    public void Setup(string _owner)
+    public void Setup(string _owner, int _cardId)
     {
-        abilityData = new AbilityData { Owner = _owner, IsVetoed = false, Cooldown = Effect.Cooldown, UniqueId = Guid.NewGuid().ToString()};
+        abilityData = new AbilityData { Owner = _owner, IsVetoed = false, Cooldown = Effect.Cooldown, UniqueId = Guid.NewGuid().ToString(), CardId = _cardId};
         Display.Setup(this);
     }
 
@@ -116,13 +117,13 @@ public class AbilityCard : CardBase
     {
         if (GameplayManager.Instance.IsCardTaxed(UniqueId))
         {
-            if (GameplayManager.Instance.MyPlayer.StrangeMatter<=0)
+            if (GameplayManager.Instance.MyStrangeMatter()<=0)
             {
                 DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
                 return;
             }
 
-            GameplayManager.Instance.MyPlayer.StrangeMatter--;
+            GameplayManager.Instance.ChangeMyStrangeMatter(-1);
         }
         
         GameplayManager.Instance.ActivateAbility(UniqueId);

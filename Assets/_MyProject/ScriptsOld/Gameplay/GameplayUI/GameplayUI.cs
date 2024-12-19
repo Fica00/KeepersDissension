@@ -90,7 +90,7 @@ public class GameplayUI : MonoBehaviour
     private void SetupActionAndTurnDisplay()
     {
         actionAndTurnDisplay.Setup(GameplayManager.Instance.MyPlayer,GameplayManager.Instance.OpponentPlayer);
-        strangeMatterTracker.Setup(GameplayManager.Instance.MyPlayer,GameplayManager.Instance.OpponentPlayer);
+        strangeMatterTracker.Setup();
     }
 
     public virtual void ShowResult(bool _didIWin)

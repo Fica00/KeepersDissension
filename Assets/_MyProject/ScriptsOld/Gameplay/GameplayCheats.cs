@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameplayCheats : MonoBehaviour
 {
     public static bool UnlimitedActions;
-    public static bool CheckForCD;
+    public static bool CheckForCd;
     public static bool HasUnlimitedGold;
     
     [SerializeField] private Toggle unlimitedActions;
@@ -21,7 +21,7 @@ public class GameplayCheats : MonoBehaviour
     private void Awake()
     {
         UnlimitedActions = false;
-        CheckForCD = true;
+        CheckForCd = true;
         HasUnlimitedGold = false;
         gameObject.SetActive(FirebaseManager.Instance.RoomHandler.IsTestingRoom);
     }
@@ -30,7 +30,7 @@ public class GameplayCheats : MonoBehaviour
     {
         hasUnlimitedGold.onValueChanged.AddListener(ToggleUnlimitedGold);
         unlimitedActions.onValueChanged.AddListener(ToggleUnlimitedActions);
-        checkForCD.onValueChanged.AddListener(ToggleCheckForCD);
+        checkForCD.onValueChanged.AddListener(ToggleCheckForCd);
         healGuardianButton.onClick.AddListener(HealGuardian);
         healKeeperButton.onClick.AddListener(HealKeeper);
         showButton.onClick.AddListener(Show);
@@ -41,7 +41,7 @@ public class GameplayCheats : MonoBehaviour
     {
         hasUnlimitedGold.onValueChanged.RemoveListener(ToggleUnlimitedGold);
         unlimitedActions.onValueChanged.RemoveListener(ToggleUnlimitedActions);
-        checkForCD.onValueChanged.RemoveListener(ToggleCheckForCD);
+        checkForCD.onValueChanged.RemoveListener(ToggleCheckForCd);
         healGuardianButton.onClick.RemoveListener(HealGuardian);
         healKeeperButton.onClick.RemoveListener(HealKeeper);
         showButton.onClick.RemoveListener(Show);
@@ -62,9 +62,9 @@ public class GameplayCheats : MonoBehaviour
         }
     }    
     
-    private void ToggleCheckForCD(bool _status)
+    private void ToggleCheckForCd(bool _status)
     {
-        CheckForCD = _status;
+        CheckForCd = _status;
     }
 
     private void HealGuardian()

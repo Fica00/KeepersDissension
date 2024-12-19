@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class AbilityShopDisplay : MonoBehaviour, IPointerDownHandler, IPointerClickHandler, IPointerUpHandler
 {
-    public static Action<CardBase> OnCardPressed;
-    public static Action<AbilityCard> OnAbilityClicked;
+    public static Action<AbilityData> OnCardPressed;
+    public static Action<AbilityData> OnAbilityClicked;
     [SerializeField] private Image foreground;
     
     private bool isPointerDown;
@@ -14,9 +14,9 @@ public class AbilityShopDisplay : MonoBehaviour, IPointerDownHandler, IPointerCl
     private float pointerDownTimer;
     private const float LONG_PRESS_THRESHOLD = 0.5f;
 
-    public AbilityCard Ability { get; private set; }
+    public AbilityData Ability { get; private set; }
 
-    public void Setup(AbilityCard _card)
+    public void Setup(AbilityData _card)
     {
         if (_card==null)
         {
@@ -24,10 +24,10 @@ public class AbilityShopDisplay : MonoBehaviour, IPointerDownHandler, IPointerCl
             return;
         }
 
-        gameObject.name = _card.name;
+        gameObject.name = CardsManager.Instance.GetAbilityName(_card.CardId);
         Ability = _card;
         foreground.enabled = true;
-        foreground.sprite = _card.Details.Foreground;
+        foreground.sprite = CardsManager.Instance.GetAbilityImage(_card.CardId);
     }
 
     public void OnPointerClick(PointerEventData _eventData)

@@ -19,8 +19,8 @@ public class Shockwave : AbilityEffect
             return;
         }
 
-        int _myStrangeMatter = GameplayManager.Instance.MyPlayer.StrangeMatter;
-        int _opponentStrangeMatter = GameplayManager.Instance.OpponentPlayer.StrangeMatter;
+        int _myStrangeMatter = GameplayManager.Instance.MyStrangeMatter();
+        int _opponentStrangeMatter = GameplayManager.Instance.OpponentsStrangeMatter();
         
         GameplayState _state = GameplayManager.Instance.GameState;
         GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
@@ -58,11 +58,11 @@ public class Shockwave : AbilityEffect
 
         IEnumerator RemoveStrangeMatter()
         {
+            var _gameplayInstance = GameplayManager.Instance;
             yield return new WaitForSeconds(2);
-            GameplayManager.Instance.MyPlayer.RemoveStrangeMatter(GameplayManager.Instance.MyPlayer.StrangeMatter - 
-            _myStrangeMatter);
-            GameplayManager.Instance.ChangeOpponentsStrangeMatter(GameplayManager.Instance.OpponentPlayer
-            .StrangeMatter-_opponentStrangeMatter);
+            _gameplayInstance.ChangeMyStrangeMatter(_gameplayInstance.MyStrangeMatter() - 
+                                                    _myStrangeMatter);
+            _gameplayInstance.ChangeOpponentsStrangeMatter(_gameplayInstance.OpponentsStrangeMatter()-_opponentStrangeMatter);
             GameplayManager.Instance.GameState = _state;
             RemoveAction();
             OnActivated?.Invoke();

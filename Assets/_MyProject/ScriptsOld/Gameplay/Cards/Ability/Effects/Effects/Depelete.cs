@@ -7,9 +7,8 @@ public class Depelete : AbilityEffect
 
     protected override void ActivateForOwner()
     {
-        GameplayPlayer _player = GameplayManager.Instance.OpponentPlayer;
-        int _amount = Math.Min(amount,_player.StrangeMatter);
-        _player.RemoveStrangeMatter(_amount);
+        int _amount = Math.Min(amount,GameplayManager.Instance.OpponentsStrangeMatter());
+        GameplayManager.Instance.ChangeOpponentsStrangeMatter(-_amount);
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();

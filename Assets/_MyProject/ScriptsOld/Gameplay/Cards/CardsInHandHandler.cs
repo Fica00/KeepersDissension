@@ -79,7 +79,7 @@ public class CardsInHandHandler : MonoBehaviour
 
    private void ShowOtherCards(CardType _type)
    {
-      foreach (var _card in player.GetCardsInDeck(_type))
+      foreach (var _card in player.GetAllCardsOfType(_type))
       {
          _card.transform.SetParent(cardsHolder);
          _card.PositionInHand(true);
@@ -150,10 +150,10 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (player.GetCardsInDeck(CardType.Minion).Contains(_card as Minion))
+      if (player.GetAllCardsOfType(CardType.Minion).Contains(_card as Minion))
       {
          int _buyPrice = 10 - GameplayManager.Instance.StrangeMatterCostChange();
-         if (player.StrangeMatter < _buyPrice&& !GameplayCheats.HasUnlimitedGold)
+         if (GameplayManager.Instance.MyStrangeMatter() < _buyPrice&& !GameplayCheats.HasUnlimitedGold)
          {
             DialogsManager.Instance.ShowOkDialog($"You need {_buyPrice} strange matter to buy minion");
             return;
@@ -208,7 +208,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (player.StrangeMatter < _buildPrice && !GameplayCheats.HasUnlimitedGold)
+      if (GameplayManager.Instance.MyStrangeMatter() < _buildPrice && !GameplayCheats.HasUnlimitedGold)
       {
          DialogsManager.Instance.ShowOkDialog($"You need {_buildPrice} strange matter to build wall");
          return;

@@ -198,7 +198,7 @@ public class BomberMinefield : CardSpecialAbility
                     continue;
                 }
                 
-                _marker = Player.GetCard(CardType.Marker);
+                _marker = Player.GetCardOfType(CardType.Marker);
                 _markers.Add(_marker);
                 if (_marker == null)
                 {

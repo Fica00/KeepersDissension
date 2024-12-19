@@ -99,7 +99,7 @@ public class ActivationFieldHandler : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.IsAbilityActive<Subdued>() && GameplayCheats.CheckForCD)
+        if (GameplayManager.Instance.IsAbilityActive<Subdued>() && GameplayCheats.CheckForCd)
         {
             DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return;
@@ -119,7 +119,7 @@ public class ActivationFieldHandler : MonoBehaviour
         AbilityEffect _effect = (_cardBase as AbilityCard)?.Effect;
         int _amountOfCardsOnTop = shownCards.Count - _indexOfCard;
         bool _canReturn = _effect.Cooldown <= _amountOfCardsOnTop;
-        if (!GameplayCheats.CheckForCD)
+        if (!GameplayCheats.CheckForCd)
         {
             _canReturn = true;
         }

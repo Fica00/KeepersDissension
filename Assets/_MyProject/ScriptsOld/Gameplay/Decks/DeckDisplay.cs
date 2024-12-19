@@ -50,7 +50,7 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
         {
             return;
         }
-        Card _card = player.PeakNextCard(type);
+        Card _card = player.GetCardOfType(type);
         display.sprite = _card==null ? player.FactionSo.CardBackground : _card.Details.Foreground;
     }
 }

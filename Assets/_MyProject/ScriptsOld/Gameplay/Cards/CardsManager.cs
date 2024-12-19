@@ -7,13 +7,15 @@ public class CardsManager : MonoBehaviour
     public static CardsManager Instance;
 
     private List<Card> allCards;
-
+    private List<AbilityCard> allAbilities;
+    
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             allCards = Resources.LoadAll<Card>("Cards/").ToList();
+            allAbilities = Resources.LoadAll<AbilityCard>("Abilities").ToList();
         }
         else
         {
@@ -21,16 +23,24 @@ public class CardsManager : MonoBehaviour
         }
     }
 
-    public List<AbilityCard> GetAbilityCards()
+    public string GetAbilityName(int _id)
     {
-        List<AbilityCard> _abilities = Resources.LoadAll<AbilityCard>("Abilities").ToList();
-        List<AbilityCard> _abilityObjects = new List<AbilityCard>();
-        foreach (var _ability in _abilities)
-        {
-            _abilityObjects.Add(Instantiate(_ability));
-        }
+        return allAbilities.Find(_ability => _ability.Details.Id == _id).name;
+    }
 
-        return _abilityObjects;
+    public Sprite GetAbilityImage(int _id)
+    {
+        return allAbilities.Find(_ability => _ability.Details.Id == _id).Details.Foreground;
+    }
+    
+    public Sprite GetAbilityBackground(int _id)
+    {
+        return allAbilities.Find(_ability => _ability.Details.Id == _id).Details.Background;
+    }
+    
+    public bool CanAbilityBeGiven(int _id)
+    {
+        return allAbilities.Find(_ability => _ability.Details.Id == _id).Details.CanBeGivenToPlayer;
     }
 
     public Card CreateCard(int _cardId, bool _isMy)
@@ -59,7 +69,6 @@ public class CardsManager : MonoBehaviour
             return _desiredCard;
         }
     }
-    
 
     public List<Card> Get(FactionSO _faction)
     {

@@ -10,26 +10,30 @@ public class GameplayPlayer : MonoBehaviour
     public Action OnEndedTurn;
     public Action UpdatedDeck;
     public Action UpdatedActions;
-    public Action UpdatedStrangeMatter;
+    public Action<CardData> OnAddedCard;
+    public Action<AbilityData> OnAddedAbility;
+    public Action<string> OnRemovedCard;
+    public Action<string> OnRemovedAbility;
     
-    public bool IsMy { get; private set; }
-    public FactionSO FactionSo { get; private set; }
-
-
     [SerializeField] private TableSideHandler tableSideHandler;
     [SerializeField] private CardsInHandHandler cardsInHandHandler;
     [SerializeField] private Transform destroyedCardsHolder;
 
-    private List<AbilityCard> ownedAbilities = new();
-    public List<AbilityCard> OwnedAbilities => ownedAbilities;
-
-    private Deck deck = new();
-    private int lifeForce;
+    private bool isMy;
     private int actions;
-    private int strangeMatter;
+    private FactionSO factionSo;
+    private List<AbilityCard> ownedAbilities = new();
+    private List<Card> cardsInDeck = new();
+    private List<AbilityCard> abilitiesInHand = new();
 
-    public int AmountOfAbilitiesPlayerCanBuy;
+    public List<AbilityCard> OwnedAbilities => ownedAbilities;
+    
     public TableSideHandler TableSideHandler => tableSideHandler;
+    
+    public bool IsMy => isMy;
+    
+    public FactionSO FactionSo => factionSo;
+
     public int Actions
     {
         get => actions;
@@ -54,30 +58,13 @@ public class GameplayPlayer : MonoBehaviour
         }
     }
 
-    public int StrangeMatter
-    {
-        get => strangeMatter;
-        set
-        {
-            if (value < strangeMatter && GameplayCheats.HasUnlimitedGold)
-            {
-                return;
-            }
-
-            strangeMatter = value;
-            UpdatedStrangeMatter?.Invoke();
-        }
-    }
-
-
     public void Setup(int _factionId, bool _isMy)
     {
-        IsMy = _isMy;
-        FactionSo = FactionSO.Get(_factionId);
+        isMy = _isMy;
+        factionSo = FactionSO.Get(_factionId);
         tableSideHandler.Setup(this);
         SetupCardsInDeck();
         cardsInHandHandler.Setup(this);
-        AmountOfAbilitiesPlayerCanBuy = GameplayManager.Instance.AmountOfAbilitiesPlayerCanBuy;
     }
 
     private void SetupCardsInDeck()
@@ -106,7 +93,7 @@ public class GameplayPlayer : MonoBehaviour
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            AddCardToDeck(_card);
+            AddNewCard(_card);
         }
 
         for (int _i = 0; _i < 30; _i++)
@@ -116,7 +103,7 @@ public class GameplayPlayer : MonoBehaviour
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            AddCardToDeck(_card);
+            AddNewCard(_card);
         }
     }
 
@@ -131,55 +118,7 @@ public class GameplayPlayer : MonoBehaviour
         Actions = 0;
         OnEndedTurn?.Invoke();
     }
-
-    public void AddCardToDeck(AbilityCard _ability)
-    {
-        deck.AddNewCard(_ability);
-    }
-
-    public void AddCardToDeck(Card _card)
-    {
-        deck.AddNewCard(_card);
-    }
-
-    public Card GetCard(string _cardId)
-    {
-        return deck.DrawCard(_cardId);
-    }
-
-    public Card GetCard(CardType _type)
-    {
-        return deck.DrawCard(_type);
-    }
-
-    public void RemoveCardFromDeck(string _cardId)
-    {
-        Card _drawnCard = deck.DrawCard(_cardId);
-        deck.Cards.Remove(_drawnCard);
-        UpdatedDeck?.Invoke();
-    }
-
-    public void TryRemoveCardFromDeck(Card _card)
-    {
-        if (!deck.Cards.Contains(_card))
-        {
-            return;
-        }
-        deck.Cards.Remove(_card);
-        UpdatedDeck?.Invoke();
-    }
-
-    public void RemoveAbilityFromDeck(int _cardId)
-    {
-        AbilityCard _drawnCard = deck.DrawAbility(_cardId);
-        deck.Abilities.Remove(_drawnCard);
-    }
-
-    public Card PeakNextCard(CardType _cardType)
-    {
-        return deck.DrawCard(_cardType);
-    }
-
+    
     public void ShowCards(CardType _type)
     {
         cardsInHandHandler.ShowCards(this, _type);
@@ -188,16 +127,6 @@ public class GameplayPlayer : MonoBehaviour
     public void HideCards()
     {
         cardsInHandHandler.HideCards();
-    }
-
-    public List<Card> GetCardsInDeck(CardType _type)
-    {
-        return deck.Cards.FindAll(_card => _card.Details.Type == _type);
-    }
-
-    public List<AbilityCard> GetAbilities()
-    {
-        return deck.Abilities;
     }
 
     public void DestroyCard(CardBase _cardBase)
@@ -209,9 +138,9 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        if (!deck.Cards.Contains(_card))
+        if (!ContainsCard(_card))
         {
-            deck.Cards.Add(_card);
+            AddNewCard(_card);
         }
 
         _cardBase.Destroy();
@@ -228,40 +157,18 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        if (!deck.Cards.Contains(_card))
+        if (!ContainsCard(_card))
         {
-            deck.Cards.Add(_card);
+            AddNewCard(_card);
         }
 
         _cardBase.ReturnFromHand();
         _card.SetHasDied(true);
     }
 
-    public void SetActionsWithoutNotify(int _amount)
+    public void AddOwnedAbility(string _abilityId)
     {
-        actions = _amount;
-    }
-
-    public void RemoveStrangeMatter(int _amount)
-    {
-        if (!IsMy)
-        {
-            return;
-        }
-
-        if (GameplayCheats.HasUnlimitedGold)
-        {
-            return;
-        }
-
-        StrangeMatter -= _amount;
-        GameplayManager.Instance.ChangeStrangeMaterInEconomy(_amount);
-        UpdatedStrangeMatter?.Invoke();
-    }
-
-    public void AddOwnedAbility(int _abilityId)
-    {
-        AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.Details.Id == _abilityId);
+        AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _abilityId);
         ownedAbilities.Add(_ability);
         cardsInHandHandler.HideCards();
 
@@ -283,5 +190,92 @@ public class GameplayPlayer : MonoBehaviour
             yield return new WaitForSeconds(1);
             GameplayManager.Instance.ActivateAbility(_ability.UniqueId);
         }
+    }
+    
+    public void AddNewCard(Card _card)
+    {
+        cardsInDeck.Add(_card);
+        OnAddedCard?.Invoke(_card.Data);
+    }
+    
+    public void AddNewCard(AbilityCard _card)
+    {
+        abilitiesInHand.Add(_card);
+        OnAddedAbility?.Invoke(_card.Data);
+    }
+
+    public void RemoveCard(string _uniqueId)
+    {
+        Card _card = null;
+        foreach (var _cardInDeck in cardsInDeck)
+        {
+            if (_cardInDeck.UniqueId != _uniqueId)
+            {
+                continue;
+            }
+
+            _card = _cardInDeck;
+            break;
+        }
+        
+        if (_card==null)
+        {
+            return;
+        }
+        cardsInDeck.Remove(_card);
+        UpdatedDeck?.Invoke();
+        OnRemovedCard?.Invoke(_card.UniqueId);
+    }
+
+    public void RemoveAbility(string _uniqueId)
+    {
+        AbilityCard _ability = null;
+        foreach (var _abilityInDeck in abilitiesInHand)
+        {
+            if (_abilityInDeck.UniqueId != _uniqueId)
+            {
+                continue;
+            }
+
+            _ability = _abilityInDeck;
+            break;
+        }
+        
+        if (_ability == null)
+        {
+            return;    
+        }
+        abilitiesInHand.Remove(_ability);
+        OnRemovedAbility?.Invoke(_ability.UniqueId);
+    }
+    
+    public bool ContainsCard(Card _card)
+    {
+        return cardsInDeck.Find(_cardInDeck => _cardInDeck.UniqueId == _card.UniqueId);
+    }
+    
+    public List<AbilityCard> GetAbilities()
+    {
+        return abilitiesInHand;
+    }
+
+    public AbilityCard GetAbility(string _uniqueId)
+    {
+        return abilitiesInHand.Find(_ability => _ability.UniqueId == _uniqueId);
+    }
+    
+    public Card GetCardOfType(CardType _type)
+    {
+        return cardsInDeck.Find(_card => _card.Details.Type == _type);
+    }
+    
+    public List<Card> GetAllCardsOfType(CardType _type)
+    {
+        return cardsInDeck.FindAll(_card => _card.Details.Type == _type);
+    }
+    
+    public Card DrawCard(string _id)
+    {
+        return cardsInDeck.Find(_card => _card.UniqueId == _id);
     }
 }

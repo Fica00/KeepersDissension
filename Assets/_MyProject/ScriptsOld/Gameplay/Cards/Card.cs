@@ -7,6 +7,7 @@ public class Card : CardBase
 
     public CardDetails Details;
     private CardData cardData;
+    public CardData Data;
 
     public int Health => cardData.Stats.Health;
     public int Range => cardData.Stats.Range;
@@ -20,7 +21,7 @@ public class Card : CardBase
     public bool My => cardData.Owner == FirebaseManager.Instance.PlayerId;
     public CardMovementType MovementType => cardData.MovementType;
     public bool HasDied => cardData.HasDied;
-    public string UniqueId => cardData.CardUniqueId;
+    public string UniqueId => cardData.UniqueId;
     public int PercentageOfHealthToRecover => cardData.PercentageOfHealthToRecover;
     
 
@@ -29,7 +30,7 @@ public class Card : CardBase
         cardData = new CardData
         {
             Owner = _owner,
-            CardUniqueId = Guid.NewGuid().ToString(),
+            UniqueId = Guid.NewGuid().ToString(),
             CardId = Details.Id,
             IsVoid = false,
             CanFlyToDodgeAttack = false,

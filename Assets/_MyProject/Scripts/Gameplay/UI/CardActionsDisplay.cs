@@ -16,7 +16,6 @@ public class CardActionsDisplay : MonoBehaviour
     [SerializeField] private AbilityTrigger abilityTriggerPrefab;
     [SerializeField] private Transform myAbilitiesHolder;
     [SerializeField] private Transform effectAbilitiesHolder;
-    [SerializeField] private EffectDisplay effectPrefab;
     [SerializeField] private Transform effectsHolder;
     [SerializeField] private Button unchainButton;
     [SerializeField] private Image xDisplay;

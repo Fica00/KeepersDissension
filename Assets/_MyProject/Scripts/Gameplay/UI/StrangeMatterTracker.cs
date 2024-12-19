@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,52 +11,32 @@ public class StrangeMatterTracker : MonoBehaviour
 
     [SerializeField] private Button buyStrangeMatter;
     [SerializeField] private ArrowPanel economyPanel;
-    private GameplayPlayer myPlayer;
-    private GameplayPlayer opponentPlayer;
 
-    public void Setup(GameplayPlayer _myPlayer, GameplayPlayer _opponentPlayer)
+    public void Setup()
     {
-        myPlayer = _myPlayer;
-        opponentPlayer = _opponentPlayer;
+        StartCoroutine(ShowStrangeMatter());
+    }
 
-        myPlayer.UpdatedStrangeMatter += ShowMyStrangeMatter;
-        opponentPlayer.UpdatedStrangeMatter += ShowOpponentStrangeMatter;
-        ShowAmountInEconomy();
+    private IEnumerator ShowStrangeMatter()
+    {
+        while (gameObject.activeSelf)
+        {
+            myStrangeMatter.text = GameplayManager.Instance.MyStrangeMatter().ToString();
+            opponentsStrangeMatter.text = GameplayManager.Instance.OpponentsStrangeMatter().ToString();
+            strangeMatterInEconomy.text = GameplayManager.Instance.StrangeMaterInEconomy().ToString();
+            yield return new WaitForSeconds(1);
+        }
     }
 
     private void OnEnable()
     {
-        GameplayManager.UpdatedAmountInEconomy += ShowAmountInEconomy;
         buyStrangeMatter.onClick.AddListener(BuyStrangeMatter);
     }
 
     private void OnDisable()
     {
-        if (myPlayer==null)
-        {
-            return;
-        }
-        myPlayer.UpdatedStrangeMatter -= ShowMyStrangeMatter;
-        opponentPlayer.UpdatedStrangeMatter -= ShowOpponentStrangeMatter;
-        GameplayManager.UpdatedAmountInEconomy -= ShowAmountInEconomy;
         buyStrangeMatter.onClick.RemoveListener(BuyStrangeMatter);
-    }
-
-    private void ShowMyStrangeMatter()
-    {
-        myStrangeMatter.text = myPlayer.StrangeMatter.ToString();
-        ShowAmountInEconomy();
-    }
-
-    public void ShowOpponentStrangeMatter()
-    {
-        opponentsStrangeMatter.text = opponentPlayer.StrangeMatter.ToString();
-        ShowAmountInEconomy();
-    }
-
-    public void ShowAmountInEconomy()
-    {
-        strangeMatterInEconomy.text = GameplayManager.Instance.StrangeMaterInEconomy().ToString();
+        StopAllCoroutines();
     }
 
     private void BuyStrangeMatter()

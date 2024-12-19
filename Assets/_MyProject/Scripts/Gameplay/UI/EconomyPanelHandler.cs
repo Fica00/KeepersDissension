@@ -72,8 +72,7 @@ public class EconomyPanelHandler : MonoBehaviour
                 return;
             }
             
-            GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
-            _player.StrangeMatter++;
+            GameplayManager.Instance.ChangeMyStrangeMatter(1);
         });
     }
 }

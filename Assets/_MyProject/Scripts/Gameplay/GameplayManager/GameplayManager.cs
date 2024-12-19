@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-    public static Action UpdatedAmountInEconomy;
     public static Action<CardBase, int, int, bool> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
@@ -22,7 +21,6 @@ public class GameplayManager : MonoBehaviour
     public TableHandler TableHandler;
     public int AmountOfActionsPerTurn;
     public int UnchainingGuardianPrice;
-    public int AmountOfAbilitiesPlayerCanBuy;
     
     [HideInInspector] public CardAction LastAction;
     [HideInInspector] public GameplayState GameState;
@@ -203,7 +201,7 @@ public class GameplayManager : MonoBehaviour
 
         int _price = UnchainingGuardianPrice - StrangeMatterCostChange();
 
-        if (MyPlayer.StrangeMatter < _price && !GameplayCheats.HasUnlimitedGold)
+        if (MyStrangeMatter() < _price && !GameplayCheats.HasUnlimitedGold)
         {
             DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
             return;
@@ -214,7 +212,7 @@ public class GameplayManager : MonoBehaviour
 
     private void YesUnchain(int _price)
     {
-        MyPlayer.RemoveStrangeMatter(_price);
+        ChangeMyStrangeMatter(-_price);
         UnchainGuardian();
         MyPlayer.Actions--;
     }
@@ -359,7 +357,7 @@ public class GameplayManager : MonoBehaviour
         {
             return;
         }
-        CardBase _selectedCard = MyPlayer.GetCard(CardType.Wall);
+        CardBase _selectedCard = MyPlayer.GetCardOfType(CardType.Wall);
         PlaceCard(_selectedCard, _positionId);
     }
 
@@ -368,12 +366,12 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
+    public virtual void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToShop(int _abilityId)
+    public virtual void AddAbilityToShop(string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -568,12 +566,12 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromShop(int _abilityId)
+    public virtual void BuyAbilityFromShop(string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromHand(int _abilityId)
+    public virtual void BuyAbilityFromHand(string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -1084,7 +1082,32 @@ public class GameplayManager : MonoBehaviour
         return true;
     }
 
+    public virtual int MyStrangeMatter()
+    {
+        throw new Exception();
+    }
+
+    public virtual int OpponentsStrangeMatter()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChangeMyStrangeMatter(int _amount)
+    {
+        throw new Exception();
+    }
+    
     public virtual void ChangeOpponentsStrangeMatter(int _amount)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfAbilitiesPlayerCanBuy()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChangeAmountOfAbilitiesICanBuy(int _amount)
     {
         throw new Exception();
     }

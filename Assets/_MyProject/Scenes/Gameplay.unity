@@ -9773,11 +9773,24 @@ MonoBehaviour:
   AmountOfActionsPerTurn: 3
   UnchainingGuardianPrice: 20
   AmountOfAbilitiesPlayerCanBuy: 7
-  WhiteStrangeMatter:
-    amountInEconomy: 20
-    Value: 1
-  StrangeMatterCostChange: 0
-  ShouldIPlaceStartingWall: 0
+  LastAction:
+    StartingPlaceId: 0
+    FirstCardId: -1
+    FinishingPlaceId: 0
+    SecondCardId: -1
+    Type: 0
+    Cost: 0
+    CanTransferLoot: 1
+    Damage: -1
+    CanCounter: 1
+    GiveLoot: 0
+    CanBeBlocked: 1
+    ResetSpeed: 0
+    DidTeleport: 0
+    DiedByBomb: 0
+    AllowCardEffectOnDeath: 1
+  GameState: 0
+  healthTracker: {fileID: 1497496152}
   simplePanels:
   - {fileID: 89120723}
   - {fileID: 201309828}
@@ -9792,30 +9805,6 @@ MonoBehaviour:
   forestMarker: {fileID: 21300000, guid: 3d53ff9b6f102204ba1c18318ce257f9, type: 3}
   bombEffect: {fileID: 6507998695647225779, guid: e8f5e9da827f53e45b38c76ed387acc0,
     type: 3}
-  UsingVisionToDestroyMarkers: 0
-  LastAction:
-    StartingPlaceId: 0
-    FirstCardId: -1
-    FinishingPlaceId: 0
-    SecondCardId: -1
-    Type: 0
-    Cost: 0
-    IsMy: 0
-    CanTransferLoot: 1
-    Damage: -1
-    CanCounter: 1
-    GiveLoot: 0
-    CanBeBlocked: 1
-    ResetSpeed: 0
-    DidTeleport: 0
-    DiedByBomb: 0
-    AllowCardEffectOnDeath: 1
-  GameState: 0
-  healthTracker: {fileID: 1497496152}
-  LootChanges: 0000000000000000
-  IdOfCardWithResponseAction: 0
-  IsExecutingOldActions: 0
-  inputBlocker: {fileID: 507386139}
 --- !u!1 &1246050847
 GameObject:
   m_ObjectHideFlags: 0
@@ -17225,7 +17214,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25.774994, y: 0}
+  m_AnchoredPosition: {x: 25.775024, y: 0}
   m_SizeDelta: {x: -48.526, y: 71.323}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1591591194
@@ -35885,7 +35874,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9556584
+      value: -9602262
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}

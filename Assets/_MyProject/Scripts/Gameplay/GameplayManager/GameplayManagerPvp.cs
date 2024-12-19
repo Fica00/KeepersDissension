@@ -10,27 +10,31 @@ public class GameplayManagerPvp : GameplayManager
 {
     private RoomHandler roomHandler;
     private RoomData RoomData => roomHandler.RoomData;
+    private BoardData boardData => roomHandler.RoomData.BoardData;
 
     protected override void Awake()
     {
         base.Awake();
         roomHandler = FirebaseManager.Instance.RoomHandler;
         DataManager.Instance.PlayerData.CurrentRoomId = RoomData.Id;
-
-        if (roomHandler.IsTestingRoom)
-        {
-            AmountOfAbilitiesPlayerCanBuy = 1000;
-        }
     }
 
     private void OnEnable()
     {
         RoomHandler.OnPlayerLeft += OpponentLeftRoom;
+        MyPlayer.OnAddedCard += AddCard;
+        MyPlayer.OnAddedAbility += AddAbility;
+        MyPlayer.OnRemovedCard += RemoveCard;
+        MyPlayer.OnRemovedAbility += RemoveAbility;
     }
 
     private void OnDisable()
     {
         RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
+        MyPlayer.OnAddedCard -= AddCard;
+        MyPlayer.OnAddedAbility -= AddAbility;
+        MyPlayer.OnRemovedCard -= RemoveCard;
+        MyPlayer.OnRemovedAbility -= RemoveAbility;
     }
 
     private void OpponentLeftRoom(RoomPlayer _player)
@@ -42,6 +46,58 @@ public class GameplayManagerPvp : GameplayManager
 
         DialogsManager.Instance.ShowOkDialog("Opponent resigned");
         StopGame(true);
+    }
+    
+    private void AddCard(CardData _cardData)
+    {
+        boardData.MyPlayer.CardsInDeck.Add(_cardData);
+    }
+
+    private void AddAbility(AbilityData _abilityData)
+    {
+        boardData.MyPlayer.AbilitiesInDeck.Add(_abilityData);
+    }
+
+    private void RemoveCard(string _uniqueId)
+    {
+        CardData _cardData = null;
+        foreach (var _card in boardData.MyPlayer.CardsInDeck)
+        {
+            if (_card.UniqueId != _uniqueId)
+            {
+                continue;                
+            }
+
+            _cardData = _card;
+            break;
+        }
+        if (_cardData ==null)
+        {
+            return;
+        }
+
+        boardData.MyPlayer.CardsInDeck.Remove(_cardData);
+    }
+
+    private void RemoveAbility(string _uniqueId)
+    {
+        AbilityData _cardData = null;
+        foreach (var _card in boardData.MyPlayer.AbilitiesInDeck)
+        {
+            if (_card.UniqueId != _uniqueId)
+            {
+                continue;                
+            }
+
+            _cardData = _card;
+            break;
+        }
+        if (_cardData ==null)
+        {
+            return;
+        }
+
+        boardData.MyPlayer.AbilitiesInDeck.Remove(_cardData);    
     }
 
     protected override void SetupTable()
@@ -122,34 +178,33 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
         
-        _player.RemoveCardFromDeck(_cardId);
+        _player.RemoveCard(_cardId);
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
         OnPlacedCard?.Invoke(_card);
     }
     
-    public override void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId)
+    public override void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
     {
-        GameplayPlayer _player = _isMyPlayer ? MyPlayer : OpponentPlayer;
-        AbilityCard _ability = AbilityCardsManagerBase.Instance.DrawAbilityCard(_abilityId);
-        if (_ability==null)
+        var _player = _isMyPlayer ? FirebaseManager.Instance.RoomHandler.BoardData.MyPlayer : FirebaseManager.Instance.RoomHandler.BoardData.OpponentPlayer;
+        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Find(_ability => _ability.UniqueId == _abilityId);
+        if (_abilityData==null)
         {
             return;
         }
-
-        _player.AddCardToDeck(_ability);
-        _ability.SetIsMy(FirebaseManager.Instance.PlayerId);
-        AbilityCardsManagerBase.Instance.RemoveAbility(_ability);
+        
+        _player.AbilitiesInDeck.Add(_abilityData);
+        FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Remove(_abilityData);
     }
 
-    public override void AddAbilityToShop(int _abilityId)
+    public override void AddAbilityToShop(string _abilityId)
     {
-        AbilityCard _ability = AbilityCardsManagerBase.Instance.DrawAbilityCard(_abilityId);
-        if (_ability==null)
+        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Find(_ability => _ability.UniqueId == _abilityId);
+        if (_abilityData==null)
         {
             return;
         }
-        AbilityCardsManagerBase.Instance.RemoveAbility(_ability);
-        AbilityCardsManagerBase.Instance.AddAbilityToShop(_ability);
+        FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Remove(_abilityData);
+        FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
     }
 
     protected override void ExecuteMove(CardAction _action)
@@ -596,12 +651,12 @@ public class GameplayManagerPvp : GameplayManager
                 
                 if (_defendingCard.My)
                 {
-                    MyPlayer.AddCardToDeck(_defendingCard);
+                    MyPlayer.AddNewCard(_defendingCard);
                     PlaceKeeperOnTable(_defendingCard);
                 }
                 else
                 {
-                    OpponentPlayer.AddCardToDeck(_defendingCard);
+                    OpponentPlayer.AddNewCard(_defendingCard);
                 }
 
                 float _healthToRecover = (_keeper.Details.Stats.Health *_keeper.PercentageOfHealthToRecover)/100;
@@ -710,7 +765,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (_action.GiveLoot)
                 {
-                    ChangeOpponentsStrangeMatter(MyPlayer.StrangeMatter);
+                    ChangeOpponentsStrangeMatter(MyStrangeMatter());
                 }
                 return;
             }
@@ -726,7 +781,7 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     return;
                 }
-                MyPlayer.StrangeMatter += OpponentPlayer.StrangeMatter;
+                ChangeMyStrangeMatter(OpponentsStrangeMatter());
             }
         }
 
@@ -780,12 +835,12 @@ public class GameplayManagerPvp : GameplayManager
         
     private int LootChangeForRoomOwner()
     {
-        return roomHandler.IsOwner ? roomHandler.BoardData.LootChanges[0] : roomHandler.BoardData.LootChanges[1];
+        return roomHandler.IsOwner ? boardData.MyPlayer.LootChange : boardData.OpponentPlayer.LootChange;
     }
 
     private int LootChangeForOther()
     {
-        return roomHandler.IsOwner ? roomHandler.BoardData.LootChanges[1] : roomHandler.BoardData.LootChanges[0];
+        return roomHandler.IsOwner ? boardData.OpponentPlayer.LootChange : boardData.MyPlayer.LootChange;
     }
 
     private IEnumerator GetPlaceOnTable(Action<int> _callBack, bool _wholeTable = false)
@@ -878,7 +933,7 @@ public class GameplayManagerPvp : GameplayManager
             PlaceCard(_card, _placeId);
             if (IsAbilityActive<Comrade>())
             {
-                List<CardBase> _cards = MyPlayer.GetCardsInDeck(CardType.Minion).Cast<CardBase>().ToList();
+                List<CardBase> _cards = MyPlayer.GetAllCardsOfType(CardType.Minion).Cast<CardBase>().ToList();
                 if (_cards.Count==0)
                 {
                     yield break;
@@ -973,7 +1028,14 @@ public class GameplayManagerPvp : GameplayManager
             GameplayPlayer _player = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
             if (_player.IsMy)
             {
-                _player.RemoveStrangeMatter(_cost);
+                if (_cardBase.GetIsMy())
+                {
+                    ChangeMyStrangeMatter(-_cost);
+                }
+                else
+                {
+                    ChangeOpponentsStrangeMatter(-_cost);
+                }
             }
 
             PlaceCard(_player, _cardId, _positionId);
@@ -1010,7 +1072,14 @@ public class GameplayManagerPvp : GameplayManager
         GameplayPlayer _player = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
         if (_player.IsMy)
         {
-            _player.RemoveStrangeMatter(_cost);
+            if (_player.IsMy)
+            {
+                ChangeMyStrangeMatter(-_cost);
+            }
+            else
+            {
+                ChangeOpponentsStrangeMatter(-_cost);
+            }
         }
         PlaceCard(_player, _cardId, _positionId);
     }
@@ -1162,38 +1231,45 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    public override void BuyAbilityFromShop(int _abilityId)
+    public override void BuyAbilityFromShop(string _abilityId)
     {
-        AbilityCard _ability = AbilityCardsManagerBase.Instance.RemoveAbilityFromShop(_abilityId);
-        _ability.SetIsMy(FirebaseManager.Instance.PlayerId);
-        MyPlayer.AddOwnedAbility(_abilityId);
-        MyPlayer.AmountOfAbilitiesPlayerCanBuy--;
-        AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
-        
-        if (_abilityId == 1031)
+        AbilityData _ability = AbilityCardsManagerBase.Instance.RemoveAbilityFromShop(_abilityId);
+        if (_ability == null)
         {
             return;
         }
         
-        if (!(_abilityId==1005 && MyPlayer.Actions==1))
+        FirebaseManager.Instance.RoomHandler.BoardData.MyPlayer.AbilitiesInDeck.Add(_ability);
+        ChangeAmountOfAbilitiesICanBuy(-1);
+        AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
+
+        int _abilityIdInt = _ability.CardId;
+        if (_abilityIdInt == 1031)
+        {
+            return;
+        }
+        
+        if (!(_abilityIdInt==1005 && MyPlayer.Actions==1))
         {
             MyPlayer.Actions--;
         }
     }
 
-    public override void BuyAbilityFromHand(int _abilityId)
+    public override void BuyAbilityFromHand(string _abilityId)
     {
-        MyPlayer.RemoveAbilityFromDeck(_abilityId);
+        MyPlayer.RemoveCard(_abilityId);
         MyPlayer.AddOwnedAbility(_abilityId);
-        MyPlayer.AmountOfAbilitiesPlayerCanBuy--;
+        ChangeAmountOfAbilitiesICanBuy(-1);
+
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
-        
-        if (_abilityId == 1031)
+        var _ability = MyPlayer.GetAbility(_abilityId);
+        int _abilityIdInt = _ability.Details.Id;
+        if (_abilityIdInt == 1031)
         {
             return;
         }
         
-        if (!(_abilityId==1005 && MyPlayer.Actions==1))
+        if (!(_abilityIdInt==1005 && MyPlayer.Actions==1))
         {
             MyPlayer.Actions--;
         }
@@ -1588,56 +1664,66 @@ public class GameplayManagerPvp : GameplayManager
 
     public override int StrangeMaterInEconomy()
     {
-        return roomHandler.BoardData.StrangeMaterInEconomy;
+        return boardData.StrangeMaterInEconomy;
     }
 
     public override void ChangeStrangeMaterInEconomy(int _amount)
     {
-        roomHandler.BoardData.StrangeMaterInEconomy += _amount;
-        UpdatedAmountInEconomy?.Invoke();
+        boardData.StrangeMaterInEconomy += _amount;
     }
     
     public override int StrangeMatterCostChange()
     {
-        return roomHandler.BoardData.StrangeMatterCostChange;
+        return boardData.StrangeMatterCostChange;
     }
 
     public override void ChangeStrangeMatterCostChange(int _amount)
     {
-        roomHandler.BoardData.StrangeMatterCostChange += _amount;
-    }
-
-    public override void ChangeLootAmountForMe(int _amount)
-    {
-        if (FirebaseManager.Instance.RoomHandler.IsOwner)
-        {
-            roomHandler.BoardData.LootChanges[0] += _amount;
-        }
-        else
-        {
-            roomHandler.BoardData.LootChanges[1] += _amount;
-        }
+        boardData.StrangeMatterCostChange += _amount;
     }
     
     public override string IdOfCardWithResponseAction()
     {
-        return roomHandler.BoardData.IdOfCardWithResponseAction;
+        return boardData.IdOfCardWithResponseAction;
     }
 
     private void SetIdOfCardWithResponseAction(string _cardId)
     {
-        roomHandler.BoardData.IdOfCardWithResponseAction = _cardId;
+        boardData.IdOfCardWithResponseAction = _cardId;
+    }
+    
+    public override void ChangeLootAmountForMe(int _amount)
+    {
+        boardData.MyPlayer.LootChange += _amount;
+    }
+
+    public override int MyStrangeMatter()
+    {
+        return boardData.MyPlayer.StrangeMatter;
+    }
+
+    public override int OpponentsStrangeMatter()
+    {
+        return boardData.OpponentPlayer.StrangeMatter;
+    }
+    
+    public override void ChangeMyStrangeMatter(int _amount)
+    {
+        boardData.MyPlayer.StrangeMatter += _amount;
     }
     
     public override void ChangeOpponentsStrangeMatter(int _amount)
     {
-        if (roomHandler.IsOwner)
-        {
-            roomHandler.BoardData.StrangeMatter[1] += _amount;
-        }
-        else
-        {
-            roomHandler.BoardData.StrangeMatter[0] += _amount;
-        }
+        boardData.OpponentPlayer.StrangeMatter += _amount;
+    }
+    
+    public override int AmountOfAbilitiesPlayerCanBuy()
+    {
+        return boardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy;
+    }
+
+    public override void ChangeAmountOfAbilitiesICanBuy(int _amount)
+    {
+        boardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy += _amount;
     }
 }

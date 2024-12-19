@@ -12,7 +12,7 @@ public class Revive : AbilityEffect
     {
         MoveToActivationField();
         List<CardBase> _validCards = new List<CardBase>();
-        foreach (var _validCard in GameplayManager.Instance.MyPlayer.GetCardsInDeck(CardType.Minion))
+        foreach (var _validCard in GameplayManager.Instance.MyPlayer.GetAllCardsOfType(CardType.Minion))
         {
             _validCards.Add(_validCard);
         }

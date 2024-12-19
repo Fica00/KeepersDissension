@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -9,21 +10,30 @@ public class EconomyDisplay : MonoBehaviour
     public void Setup(GameplayPlayer _player)
     {
         player = _player;
-        player.UpdatedStrangeMatter += ShowWhiteStrangeMatter;
-        ShowWhiteStrangeMatter();
+    }
+
+    private void OnEnable()
+    {
+        StartCoroutine(ShowWhiteMatterRoutine());
     }
 
     private void OnDisable()
     {
-        if (player==null)
-        {
-            return;
-        }
-        player.UpdatedStrangeMatter -= ShowWhiteStrangeMatter;
+        StopAllCoroutines();
     }
 
-    private void ShowWhiteStrangeMatter()
+    private IEnumerator ShowWhiteMatterRoutine()
     {
-        whiteStrangeMatterDisplay.text = player.StrangeMatter.ToString();
+        while (gameObject.activeSelf)
+        {
+            yield return new WaitForSeconds(1);
+            if (player==null)
+            {
+                continue;
+            }
+            
+            int _matter = player.IsMy ? GameplayManager.Instance.MyStrangeMatter() : GameplayManager.Instance.OpponentsStrangeMatter();
+            whiteStrangeMatterDisplay.text = _matter.ToString();
+        }
     }
 }

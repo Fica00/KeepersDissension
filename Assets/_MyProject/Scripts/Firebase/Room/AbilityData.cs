@@ -12,6 +12,7 @@ public class AbilityData
     public int Cooldown;
     public bool IsActive;
     public List<string> EffectedCards = new();
+    public int CardId;
     
     //helpers
     public bool IsApplied;
