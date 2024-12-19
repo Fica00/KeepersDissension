@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 [Serializable]
 public class RoomGameplayPlayer
@@ -9,13 +10,7 @@ public class RoomGameplayPlayer
     public int StrangeMatter;
     public List<CardData> CardsInDeck = new();
     public List<AbilityData> AbilitiesInDeck = new();
-    public int amountOfAbilitiesPlayerCanBuy = 7;
+    public int AmountOfAbilitiesPlayerCanBuy;
 
-    public bool IsMy => PlayerId == FirebaseManager.Instance.PlayerId;
-
-    public int AmountOfAbilitiesPlayerCanBuy
-    {
-        get => amountOfAbilitiesPlayerCanBuy;
-        set => amountOfAbilitiesPlayerCanBuy = value;
-    }
+    [JsonIgnore] public bool IsMy => PlayerId == FirebaseManager.Instance.PlayerId;
 }

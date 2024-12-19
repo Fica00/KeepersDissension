@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace FirebaseMultiplayer.Room
 {
+    [Serializable]
     public class RoomHandler
     {
         public static Action<RoomPlayer> OnPlayerJoined;
@@ -158,9 +159,10 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
 
-        public void JoinRoom(RoomPlayer _playerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = default)
+        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
+                default)
         {
-            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData), Type = _type, Name = _name });
+            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, gamePlayerData = _gamePlayerData }), Type = _type, Name = _name });
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
