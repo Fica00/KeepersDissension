@@ -19,7 +19,7 @@ namespace FirebaseMultiplayer.Room
 
         private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
         private const string JOIN_ROOM = "https://joinroom-e3mmrpwoya-uc.a.run.app";
-        private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
+        private const string CREATE_ROOM = "https://us-central1-keepersdissension.cloudfunctions.net/createRoom";
 
         private string roomsPath;
         private RoomData roomData;
@@ -187,7 +187,10 @@ namespace FirebaseMultiplayer.Room
             {
                 roomData = _roomData;
                 _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
-            }, _response => { _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response)); });
+            }, _response =>
+            {
+                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+            });
         }
 
         public RoomPlayer GetOpponent()

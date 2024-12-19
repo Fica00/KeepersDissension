@@ -98,6 +98,7 @@ public class WebRequests : MonoBehaviour
         {
             Debug.Log(_uri);
             Debug.Log(_webRequest.error);
+            Debug.Log(_webRequest.downloadHandler.text);
             _onError?.Invoke(_webRequest.error);
         }
 
