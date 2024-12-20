@@ -43,7 +43,7 @@ public class CardsManager : MonoBehaviour
         return allAbilities.Find(_ability => _ability.Details.Id == _id).Details.CanBeGivenToPlayer;
     }
 
-    public Card CreateCard(int _cardId, bool _isMy)
+    public Card CreateCard(int _cardId)
     {
         Card _desiredCard = GetCardData(_cardId);
         Card _cardObject = Instantiate(_desiredCard);

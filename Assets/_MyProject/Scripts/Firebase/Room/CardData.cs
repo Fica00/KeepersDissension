@@ -15,4 +15,6 @@ public class CardData
     public bool CanBeUsed = true;
     public bool CanMove = true;
     public int PercentageOfHealthToRecover=100;
+    public int PlaceId = -1;
+    public CardPlace CardPlace = CardPlace.Deck;
 }

@@ -94,8 +94,6 @@ public class MatchMakingHandler : MonoBehaviour
             PlayerId = FirebaseManager.Instance.Authentication.UserId,
             LootChange = 0,
             StrangeMatter = 0,
-            CardsInDeck = new List<CardData>(),
-            AbilitiesInDeck = new List<AbilityData>(),
             AmountOfAbilitiesPlayerCanBuy = 7
         };
 
@@ -155,8 +153,6 @@ public class MatchMakingHandler : MonoBehaviour
                             PlayerId = FirebaseManager.Instance.Authentication.UserId,
                             LootChange = 0,
                             StrangeMatter = 0,
-                            CardsInDeck = new List<CardData>(),
-                            AbilitiesInDeck = new List<AbilityData>(),
                             AmountOfAbilitiesPlayerCanBuy = 7
                         }
                     },

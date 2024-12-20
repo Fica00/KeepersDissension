@@ -7,7 +7,6 @@ public class GameplayPlayer : MonoBehaviour
 {
     public Action OnStartedTurn;
     public Action OnEndedTurn;
-    public Action UpdatedDeck;
     public Action UpdatedActions;
     
     [SerializeField] private TableSideHandler tableSideHandler;
@@ -53,50 +52,6 @@ public class GameplayPlayer : MonoBehaviour
         factionSo = FactionSO.Get(_factionId);
         tableSideHandler.Setup(this);
         cardsInHandHandler.Setup(this);
-        if (_isMy)
-        {
-            SetupCardsInDeck();
-        }
-    }
-
-    private void SetupCardsInDeck()
-    {
-        Transform _cardsHolder = tableSideHandler.CardsHolder;
-        int _lastIdOfCard = 0;
-        Card _wallCard = default;
-        foreach (var _cardInDeck in CardsManager.Instance.Get(FactionSo))
-        {
-            if (_cardInDeck == null)
-            {
-                continue;
-            }
-
-            Card _card = CardsManager.Instance.CreateCard(_cardInDeck.Details.Id, IsMy);
-            if (_card is Wall)
-            {
-                _wallCard = _card;
-            }
-
-            if (_card.Details.Id > _lastIdOfCard)
-            {
-                _lastIdOfCard = _card.Details.Id;
-            }
-
-            _card.transform.SetParent(_cardsHolder);
-            _card.SetParent(_cardsHolder);
-            _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            GameplayManager.Instance.AddCard(_card.Data,isMy);
-        }
-
-        for (int _i = 0; _i < 30; _i++)
-        {
-            Card _card = CardsManager.Instance.CreateCard(_wallCard.Details.Id, IsMy);
-            _card.Details.Id = 500 + _i;
-            _card.transform.SetParent(_cardsHolder);
-            _card.SetParent(_cardsHolder);
-            _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            GameplayManager.Instance.AddCard(_card.Data,isMy);
-        }
     }
 
     public void NewTurn()
@@ -130,11 +85,6 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        if (!GameplayManager.Instance.ContainsCard(_card.Data,isMy))
-        {
-            GameplayManager.Instance.AddCard(_card.Data,isMy);
-        }
-
         _cardBase.Destroy();
         _cardBase.ReturnFromHand();
         _card.SetHasDied(true);
@@ -147,11 +97,6 @@ public class GameplayPlayer : MonoBehaviour
         if (_card == null)
         {
             return;
-        }
-
-        if (!GameplayManager.Instance.ContainsCard(_card.Data,isMy))
-        {
-            GameplayManager.Instance.AddCard(_card.Data,isMy);
         }
 
         _cardBase.ReturnFromHand();

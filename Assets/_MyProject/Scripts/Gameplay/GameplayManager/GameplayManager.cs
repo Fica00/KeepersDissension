@@ -112,7 +112,6 @@ public class GameplayManager : MonoBehaviour
         doIPlayFirst = IsMyTurn;
         shouldIPlaceStartingWall = !IsMyTurn;
 
-        yield return HandlePlacingLifeForceAndGuardian();
         yield return HandlePlaceRestOfTheCards();
 
         if (shouldIPlaceStartingWall)
@@ -224,12 +223,26 @@ public class GameplayManager : MonoBehaviour
         OnUnchainedGuardian?.Invoke();
     }
 
-    private IEnumerator HandlePlacingLifeForceAndGuardian()
+    private IEnumerator HandlePlaceRestOfTheCards()
     {
-        yield return PlaceLifeForceAndGuardian();
-        yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-        hasOpponentPlacedStartingCards = false;
-        yield return new WaitForSeconds(0.5f);
+        if (IsMyTurn)
+        {
+            yield return PlaceLifeForceAndGuardian();
+            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
+            hasOpponentPlacedStartingCards = false;
+            yield return new WaitForSeconds(0.5f);
+            yield return PlaceRestOfStartingCards();
+            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
+        }
+        else
+        {
+            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
+            yield return PlaceLifeForceAndGuardian();
+            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
+            hasOpponentPlacedStartingCards = false;
+            yield return new WaitForSeconds(0.5f);
+            yield return PlaceRestOfStartingCards();
+        }
     }
     
     private IEnumerator PlaceLifeForceAndGuardian()
@@ -240,20 +253,6 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         PlaceCard(_guardianCard, 18);
         MyPlayer.HideCards();
-    }
-
-    private IEnumerator HandlePlaceRestOfTheCards()
-    {
-        if (IsMyTurn)
-        {
-            yield return PlaceRestOfStartingCards();
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-        }
-        else
-        {
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-            yield return PlaceRestOfStartingCards();
-        }
     }
     
      private IEnumerator PlaceRestOfStartingCards()
@@ -1122,7 +1121,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
     
-    public virtual void AddCard(CardData _cardData, bool _forMe)
+    public virtual void AddCard(CardData _cardData)
     {
         throw new Exception();
     }
@@ -1158,6 +1157,31 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual Card GetCard(string _uniqueId)
+    {
+        throw new Exception();
+    }
+    
+    public virtual CardPlace CardPlace(string _uniqueCardId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetCardPlace(string _uniqueCardId, CardPlace _place)
+    {
+        throw new Exception();
+    }
+
+    public virtual CardPlace CardPlace(CardBase _cardBase)
+    {
+        throw new Exception();
+    }
+
+    public virtual void OpponentCreatedCard(CardData _cardData)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowCardPlaced(string _uniqueId, int _positionId)
     {
         throw new Exception();
     }

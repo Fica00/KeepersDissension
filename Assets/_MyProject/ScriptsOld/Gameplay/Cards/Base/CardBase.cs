@@ -13,14 +13,13 @@ public class CardBase : MonoBehaviour
     [field: SerializeField] public GameObject EffectsHolder { get; private set; }
     public List<CardSpecialAbility> SpecialAbilities => EffectsHolder.GetComponents<CardSpecialAbility>().ToList();
     public CardDisplayBase Display;
-    public CardPlace CardPlace { get; private set; }
     public bool AllowCardEffectOnDeath;
 
     protected Transform Parent;
 
     public void PositionInHand(bool _rotateHorizontally=false)
     {
-        CardPlace = CardPlace.Hand;
+        SetPlace(CardPlace.Hand);
         RotateCard(_rotateHorizontally);
         OnPositionedInHand?.Invoke(this);
     }
@@ -32,14 +31,14 @@ public class CardBase : MonoBehaviour
     
     public void PositionOnTable(TablePlaceHandler _tablePosition)
     {
-        CardPlace = CardPlace.Table;
+        SetPlace(CardPlace.Table);
         MoveToPosition(_tablePosition);
         OnPositionedOnTable?.Invoke(this);
     }
 
     public void ReturnFromHand()
     {
-        CardPlace = CardPlace.Deck;
+        SetPlace(CardPlace.Deck);
         transform.SetParent(Parent);
         ResetPosition();
         Vector3 _desiredRotation = GetIsMy() ? Vector3.one : Vector3.back;
@@ -122,5 +121,17 @@ public class CardBase : MonoBehaviour
     public virtual bool GetIsMy()
     {
         throw new Exception();
+    }
+
+    private void SetPlace(CardPlace _place)
+    {
+        if (this is Card _card)
+        {
+            GameplayManager.Instance.SetCardPlace(_card.UniqueId, _place);
+        }
+        else if (this is AbilityCard _ability)
+        {
+            GameplayManager.Instance.SetCardPlace(_ability.UniqueId, _place);
+        }
     }
 }

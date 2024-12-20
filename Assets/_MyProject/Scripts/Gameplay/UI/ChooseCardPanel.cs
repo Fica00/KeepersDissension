@@ -88,7 +88,9 @@ public class ChooseCardPanel : MonoBehaviour
                 Destroy(_cardHandler);
             }
 
-            if (!(_shownCard.CardPlace == CardPlace.Hand || _shownCard.CardPlace == CardPlace.Graveyard))
+            CardPlace _cardPlace = GameplayManager.Instance.CardPlace(_shownCard);
+
+            if (!(_cardPlace == CardPlace.Hand || _cardPlace == CardPlace.Graveyard))
             {
                 if (_shownCard is AbilityCard _card)
                 {

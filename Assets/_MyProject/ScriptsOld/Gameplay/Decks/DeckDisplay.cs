@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -19,10 +20,7 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        ShowFirstCard();
-        
-        player.UpdatedDeck += ShowFirstCard;
-        GameplayManager.FinishedSetup += ShowFirstCard;
+        StartCoroutine(ShowFirstCard());
     }
 
     private void OnDisable()
@@ -31,8 +29,8 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
         {
             return;
         }
-        player.UpdatedDeck -= ShowFirstCard;
-        GameplayManager.FinishedSetup -= ShowFirstCard;
+        
+        StopAllCoroutines();
     }
 
     public void OnPointerClick(PointerEventData _eventData)
@@ -44,13 +42,18 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
         OnDeckClicked?.Invoke(player,type);
     }
 
-    private void ShowFirstCard()
+    private IEnumerator ShowFirstCard()
     {
-        if (player==null)
+        while (gameObject.activeSelf)
         {
-            return;
+            yield return new WaitForSeconds(5);
+            if (player==null)
+            {
+                continue;
+            }
+            
+            Card _card = GameplayManager.Instance.GetCardOfType(type,player.IsMy);
+            display.sprite = _card==null ? player.FactionSo.CardBackground : _card.Details.Foreground;
         }
-        Card _card = GameplayManager.Instance.GetCardOfType(type,player.IsMy);
-        display.sprite = _card==null ? player.FactionSo.CardBackground : _card.Details.Foreground;
     }
 }

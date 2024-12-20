@@ -18,7 +18,7 @@ public class Portal : AbilityEffect
 
         void OnPlaceSelected(int _selectedPlace)
         {
-            Card _portal = CardsManager.Instance.CreateCard(portalId, true);
+            Card _portal = CardsManager.Instance.CreateCard(portalId);
             GameplayManager.Instance.PlaceCard(_portal, _selectedPlace);
             AddEffectedCard(_portal.UniqueId);;
             if (GetEffectedCards().Count == 2)

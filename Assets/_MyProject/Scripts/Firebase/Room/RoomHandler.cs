@@ -121,6 +121,8 @@ namespace FirebaseMultiplayer.Room
 
             CheckIfPlayerJoined(_data);
             CheckIfPlayerLeft(_data);
+            CheckIfCreatedCard(_data);
+            CheckIfPlacedCard(_data);
             roomData = _data;
         }
 
@@ -163,6 +165,61 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
 
+        private void CheckIfCreatedCard(RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _hasCard = false;
+                foreach (var _existingCard in roomData.BoardData.Cards)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+
+                    _hasCard = true;
+                    break;
+                }
+
+                if (!_hasCard)
+                {
+                    continue;
+                }
+
+                GameplayManager.Instance.OpponentCreatedCard(_card);
+            }
+        }
+        
+        private void CheckIfPlacedCard(RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _hasPlacedCard = false;
+                foreach (var _existingCard in roomData.BoardData.Cards)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+
+                    if (_card.PlaceId == -1)
+                    {
+                        continue;
+                    }
+
+                    _hasPlacedCard = true;
+                    break;
+                }
+
+                if (!_hasPlacedCard)
+                {
+                    continue;
+                }
+
+                GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
+            }
+        }
+        
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
                 default)
         {
@@ -224,6 +281,40 @@ namespace FirebaseMultiplayer.Room
             }
 
             throw new Exception("Can't find opponent");
+        }
+        
+        public RoomPlayer GetOpponent(RoomData _roomData)
+        {
+            foreach (var _player in _roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    continue;
+                }
+
+                return _player;
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+        
+        public RoomPlayer GetMyPlayer(RoomData _roomData)
+        {
+            foreach (var _player in _roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    return _player;
+                }
+
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+        
+        public void UpdateRoomData()
+        {
+            database.Child(RoomPath).SetRawJsonValueAsync(JsonConvert.SerializeObject(roomData));
         }
     }
 }

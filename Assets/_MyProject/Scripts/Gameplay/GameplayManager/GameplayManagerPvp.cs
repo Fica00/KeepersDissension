@@ -46,6 +46,49 @@ public class GameplayManagerPvp : GameplayManager
         RoomPlayer _opponent = roomHandler.GetOpponent();
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.Setup();
+        SetupMyCards(MyPlayer.TableSideHandler, MyPlayer.FactionSo);
+    }
+    
+    private void SetupMyCards(TableSideHandler _tableSideHandler, FactionSO _factionSo)
+    {
+        Card _wallCard = null;
+        foreach (var _cardInDeck in CardsManager.Instance.Get(_factionSo))
+        {
+            if (_cardInDeck == null)
+            {
+                continue;
+            }
+
+            Card _card =  CreateCard(_cardInDeck.Details.Id,_tableSideHandler,FirebaseManager.Instance.PlayerId);
+            if (_card is Wall)
+            {
+                _wallCard = _card;
+            }
+            AddCard(_card.Data);
+        }
+
+        for (int _i = 0; _i < 30; _i++)
+        {
+            Card _card = CreateCard(_wallCard.Details.Id,_tableSideHandler, FirebaseManager.Instance.PlayerId);
+            _card.Details.Id = 500 + _i;
+            _card.Data.CardId = _card.Details.Id;
+            AddCard(_card.Data);
+        }
+    }
+
+    public override void OpponentCreatedCard(CardData _cardData)
+    {
+        CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.Owner);
+    }
+
+    private Card CreateCard(int _cardId,TableSideHandler _tableSideHandler, string _playerId)
+    {
+        Transform _cardsHolder = _tableSideHandler.CardsHolder;
+        Card _card = CardsManager.Instance.CreateCard(_cardId);
+        _card.transform.SetParent(_cardsHolder);
+        _card.SetParent(_cardsHolder);
+        _card.Setup(_playerId);
+        return _card;
     }
 
     protected override bool DecideWhoPlaysFirst()
@@ -107,19 +150,38 @@ public class GameplayManagerPvp : GameplayManager
             _card.Display.Setup(_cardWarrior);
         }
 
-        PlaceCard(MyPlayer, _cardId, _positionId);
+        PlaceCard(_cardId, _positionId);
     }
     
-    private void PlaceCard(GameplayPlayer _player, string _cardId, int _positionId)
+    private void PlaceCard(string _cardId, int _positionId)
     {
-        CardBase _card = GetAllCards().Find(_card => _card.UniqueId == _cardId);
+        CardBase _cardBase = GetAllCards().Find(_card => _card.UniqueId == _cardId);
         
-        if (_card==null)
+        if (_cardBase==null)
         {
             return;
         }
-        
+
+        Card _card = null;
+
+        if (_cardBase is Card _isCard)
+        {
+            _card = _isCard;
+        }
+
+        if (_card == null)
+        {
+            return;
+        }
+        _card.Data.PlaceId = _positionId;
+
         RemoveCard(_cardId,true);
+        ShowCardPlaced(_card.UniqueId, _positionId);
+    }
+
+    public override void ShowCardPlaced(string _uniqueId, int _positionId)
+    {
+        Card _card = GetCard(_uniqueId);
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
         OnPlacedCard?.Invoke(_card);
     }
@@ -132,9 +194,10 @@ public class GameplayManagerPvp : GameplayManager
         {
             return;
         }
-        
-        _player.AbilitiesInDeck.Add(_abilityData);
-        FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Remove(_abilityData);
+
+        _abilityData.Owner = _player.PlayerId;
+        boardData.Abilities.Add(_abilityData);
+        boardData.AvailableAbilities.Remove(_abilityData);
     }
 
     public override void AddAbilityToShop(string _abilityId)
@@ -592,12 +655,7 @@ public class GameplayManagerPvp : GameplayManager
                 
                 if (_defendingCard.My)
                 {
-                    AddCard(_defendingCard.Data,true);
                     PlaceKeeperOnTable(_defendingCard);
-                }
-                else
-                {
-                    AddCard(_defendingCard.Data,false);
                 }
 
                 float _healthToRecover = (_keeper.Details.Stats.Health *_keeper.PercentageOfHealthToRecover)/100;
@@ -979,7 +1037,7 @@ public class GameplayManagerPvp : GameplayManager
                 }
             }
 
-            PlaceCard(_player, _cardId, _positionId);
+            PlaceCard(_cardId, _positionId);
         
             (_cardBase as Card)?.SetHasDied(false);
         }
@@ -1022,7 +1080,7 @@ public class GameplayManagerPvp : GameplayManager
                 ChangeOpponentsStrangeMatter(-_cost);
             }
         }
-        PlaceCard(_player, _cardId, _positionId);
+        PlaceCard(_cardId, _positionId);
     }
 
     public override void TellOpponentSomething(string _text)
@@ -1179,8 +1237,9 @@ public class GameplayManagerPvp : GameplayManager
         {
             return;
         }
-        
-        FirebaseManager.Instance.RoomHandler.BoardData.MyPlayer.AbilitiesInDeck.Add(_ability);
+
+        _ability.Owner = FirebaseManager.Instance.PlayerId;
+        boardData.Abilities.Add(_ability);
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
 
@@ -1673,35 +1732,20 @@ public class GameplayManagerPvp : GameplayManager
         return FindObjectsOfType<Card>().ToList().FindAll(_card => _card.Details.Type == _type && _card.GetIsMy() == _forMe);
     }
     
-    public override void AddCard(CardData _cardData, bool _forMe)
+    public override void AddCard(CardData _cardData)
     {
-        if (_forMe)
-        {
-            boardData.MyPlayer.CardsInDeck.Add(_cardData);
-        }
-        else
-        {
-            boardData.OpponentPlayer.CardsInDeck.Add(_cardData);
-        }
+        boardData.Cards.Add(_cardData);
     }
 
     public override void AddAbility(AbilityData _abilityData, bool _forMe)
     {
-        if (_forMe)
-        {
-            boardData.MyPlayer.AbilitiesInDeck.Add(_abilityData);
-        }
-        else
-        {
-            boardData.OpponentPlayer.AbilitiesInDeck.Add(_abilityData);
-        }
+        boardData.Abilities.Add(_abilityData);
     }
 
     public override void RemoveCard(string _uniqueId, bool _forMe)
     {
         CardData _cardData = null;
-        List<CardData> _cards = _forMe ? boardData.MyPlayer.CardsInDeck : boardData.OpponentPlayer.CardsInDeck;
-        foreach (var _card in _cards)
+        foreach (var _card in boardData.Cards)
         {
             if (_card.UniqueId != _uniqueId)
             {
@@ -1716,7 +1760,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        _cards.Remove(_cardData);
+        boardData.Cards.Remove(_cardData);
     }
 
     public override AbilityCard GetAbility(string _uniqueId)
@@ -1737,8 +1781,7 @@ public class GameplayManagerPvp : GameplayManager
     public override void RemoveAbility(string _uniqueId, bool _forMe)
     {
         AbilityData _cardData = null;
-        List<AbilityData> _cards = _forMe ? boardData.MyPlayer.AbilitiesInDeck : boardData.OpponentPlayer.AbilitiesInDeck;
-        foreach (var _card in _cards)
+        foreach (var _card in boardData.Abilities)
         {
             if (_card.UniqueId != _uniqueId)
             {
@@ -1753,7 +1796,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        _cards.Remove(_cardData);    
+        boardData.Abilities.Remove(_cardData);    
     }
 
     public override Card GetCardOfType(CardType _type, bool _forMe)
@@ -1776,30 +1819,10 @@ public class GameplayManagerPvp : GameplayManager
         return null;
     }
 
-    public override bool ContainsCard(CardData _requestedCard, bool _forMe)
-    {
-        var _cards = _forMe ? boardData.MyPlayer.CardsInDeck : boardData.OpponentPlayer.CardsInDeck;
-        foreach (var _card in _cards)
-        {
-            if (_card.UniqueId != _requestedCard.UniqueId)
-            {
-                continue;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     public override List<AbilityData> GetOwnedAbilities(bool _forMe)
     {
-        if (_forMe)
-        {
-            return boardData.MyPlayer.AbilitiesInDeck;
-        }
-
-        return boardData.OpponentPlayer.AbilitiesInDeck;
+        string _playerId = _forMe ? boardData.MyPlayer.PlayerId : boardData.OpponentPlayer.PlayerId;
+        return boardData.Abilities.FindAll(_ability => _ability.UniqueId == _playerId);
     }
 
     public override Card GetCard(string _uniqueId)
@@ -1815,5 +1838,30 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         return null; 
+    }
+    
+    public override CardPlace CardPlace(string _uniqueCardId)
+    {
+        return GetCard(_uniqueCardId).Data.CardPlace;
+    }
+
+    public override void SetCardPlace(string _uniqueCardId, CardPlace _place)
+    {
+        GetCard(_uniqueCardId).Data.CardPlace = _place;
+    }
+
+    public override CardPlace CardPlace(CardBase _cardBase)
+    {
+        CardPlace _cardPlace = global::CardPlace.Deck;
+        if (_cardBase is Card _cardCard)
+        {
+            _cardPlace = _cardCard.Data.CardPlace;
+        }
+        else if (_cardBase is AbilityCard _ability)
+        {
+            _cardPlace = _ability.Data.CardPlace;
+        }
+
+        return _cardPlace;
     }
 }

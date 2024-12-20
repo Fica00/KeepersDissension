@@ -14,10 +14,11 @@ namespace FirebaseMultiplayer.Room
         public List<RoomGameplayPlayer> PlayersData = new ();
         public List<AbilityData> AbilitiesInShop = new();
         public List<AbilityData> AvailableAbilities = new();
+        public List<CardData> Cards = new();
+        public List<AbilityData> Abilities = new();
         
         [JsonIgnore] public RoomGameplayPlayer MyPlayer => PlayersData.First(_player => _player.IsMy);
         [JsonIgnore] public RoomGameplayPlayer OpponentPlayer => PlayersData.First(_player => !_player.IsMy);
-
         [JsonIgnore] public int AmountOfStartingAbilities => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? 0 : 7;
         [JsonIgnore] public int AmountOfCardsInShop => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? UnityEngine.Resources.LoadAll("Abilities").Length : 3;
         

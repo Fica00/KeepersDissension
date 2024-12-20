@@ -8,11 +8,12 @@ public class AbilityData
     public string Owner;
     public bool IsVetoed;
     public int RemainingCooldown;
-    public int PlaceId;
+    public int PlaceId = -1;
     public int Cooldown;
     public bool IsActive;
     public AbilityCardType Type;
     public List<string> EffectedCards = new();
+    public CardPlace CardPlace = CardPlace.Deck;
     public int CardId;
     
     //helpers
