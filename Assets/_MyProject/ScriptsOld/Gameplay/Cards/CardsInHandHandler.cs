@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -63,8 +64,9 @@ public class CardsInHandHandler : MonoBehaviour
 
    public void ShowAbilities()
    {
-      foreach (var _card in player.GetAbilities())
+      foreach (var _ownedCard in GameplayManager.Instance.GetOwnedAbilities(player.IsMy))
       {
+         var _card = GameplayManager.Instance.GetCard(_ownedCard.UniqueId);
          if (_card.CardPlace== CardPlace.Table)
          {
             continue;
@@ -79,7 +81,7 @@ public class CardsInHandHandler : MonoBehaviour
 
    private void ShowOtherCards(CardType _type)
    {
-      foreach (var _card in player.GetAllCardsOfType(_type))
+      foreach (var _card in GameplayManager.Instance.GetAllCardsOfType(_type,player.IsMy))
       {
          _card.transform.SetParent(cardsHolder);
          _card.PositionInHand(true);
@@ -150,7 +152,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (player.GetAllCardsOfType(CardType.Minion).Contains(_card as Minion))
+      if (GameplayManager.Instance.GetAllCardsOfType(CardType.Minion,player.IsMy).Contains(_card as Minion))
       {
          int _buyPrice = 10 - GameplayManager.Instance.StrangeMatterCostChange();
          if (GameplayManager.Instance.MyStrangeMatter() < _buyPrice&& !GameplayCheats.HasUnlimitedGold)

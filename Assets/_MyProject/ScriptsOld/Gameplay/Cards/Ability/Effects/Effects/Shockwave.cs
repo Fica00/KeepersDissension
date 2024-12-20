@@ -9,7 +9,7 @@ public class Shockwave : AbilityEffect
         MoveToActivationField();
         int _damage = FindObjectsOfType<AbilityCard>().ToList().FindAll(_ability => _ability.My &&_ability.Details
         .Type == AbilityCardType.CrowdControl && _ability.Details.Color == AbilityColor.Red && 
-        GameplayManager.Instance.MyPlayer.OwnedAbilities.Contains(_ability)).Count;
+        GameplayManager.Instance.GetOwnedAbilities(true).ToList().Contains(_ability.Data)).Count;
         
         if (_damage==0)
         {

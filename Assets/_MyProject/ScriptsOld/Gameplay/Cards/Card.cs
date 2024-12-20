@@ -27,7 +27,6 @@ public class Card : CardBase
 
     public void Setup(string _owner)
     {
-        Debug.Log("---- Setting up the card");
         cardData = new CardData
         {
             Owner = _owner,

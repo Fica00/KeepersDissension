@@ -30,7 +30,7 @@ public class DragonKeeper : CardSpecialAbility
             // GameplayManager.Instance.TellOpponentThatIUsedUltimate();
             CanUseAbility = false;
 
-            List<Card> _availableCards = GameplayManager.Instance.MyPlayer.GetAllCardsOfType(CardType.Minion);
+            List<Card> _availableCards = GameplayManager.Instance.GetAllCardsOfType(CardType.Minion,true);
             foreach (var _availableCard in _availableCards.ToList())
             {
                 if (_availableCard.HasDied)

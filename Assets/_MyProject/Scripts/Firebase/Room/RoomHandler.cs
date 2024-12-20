@@ -69,9 +69,8 @@ namespace FirebaseMultiplayer.Room
             }, _ => { Debug.Log(_); });
         }
 
-        public void SubscribeToRoom(RoomData _roomData)
+        public void SubscribeToRoom()
         {
-            roomData = _roomData;
             database.Child(RoomPath).ValueChanged += RoomUpdated;
         }
 

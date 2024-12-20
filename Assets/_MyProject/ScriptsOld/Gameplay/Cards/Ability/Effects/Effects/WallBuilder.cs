@@ -5,7 +5,7 @@ public class WallBuilder : AbilityEffect
         MoveToActivationField();
         RemoveAction();
         OnActivated?.Invoke();
-        CardBase _wall = GameplayManager.Instance.MyPlayer.GetCardOfType(CardType.Wall);
+        CardBase _wall = GameplayManager.Instance.GetCardOfType(CardType.Wall,true);
         if (_wall==null)
         {
             DialogsManager.Instance.ShowOkDialog("You dont have available wall");

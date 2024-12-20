@@ -11,16 +11,7 @@ public class Veto : AbilityEffect
 
     private void OptionSelected(int _optionId)
     {
-        List<AbilityCard> _availableCards;
-        
-        if (_optionId==1)
-        {
-            _availableCards = GameplayManager.Instance.OpponentPlayer.OwnedAbilities.ToList();
-        }
-        else
-        {
-            _availableCards = GameplayManager.Instance.OpponentPlayer.GetAbilities().ToList();
-        }
+        List<AbilityData> _availableCards = GameplayManager.Instance.GetOwnedAbilities(false);
 
         if (_availableCards.Count==0)
         {
@@ -40,7 +31,7 @@ public class Veto : AbilityEffect
         List<CardBase> _cards = new List<CardBase>();
         foreach (var _availableCard in _availableCards)
         {
-            _cards.Add(_availableCard);
+            _cards.Add(GameplayManager.Instance.GetAbility(_availableCard.UniqueId));
         }
         
         ChooseCardPanel.Instance.ShowCards(_cards,VetoCard,_hideCards:_optionId==0);

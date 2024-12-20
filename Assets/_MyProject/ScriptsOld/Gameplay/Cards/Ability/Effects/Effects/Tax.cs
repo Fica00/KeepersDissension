@@ -6,10 +6,10 @@ public class Tax : AbilityEffect
     protected override void ActivateForOwner()
     {
         List<CardBase> _cards = new();
-        List<AbilityCard> _availableCards = GameplayManager.Instance.OpponentPlayer.OwnedAbilities.ToList();
+        List<AbilityData> _availableCards = GameplayManager.Instance.GetOwnedAbilities(false).ToList();
         foreach (var _availableCard in _availableCards.ToList())
         {
-            if (_availableCard.Details.Type==AbilityCardType.CrowdControl)
+            if (_availableCard.Type==AbilityCardType.CrowdControl)
             {
                 continue;
             }
@@ -27,7 +27,7 @@ public class Tax : AbilityEffect
         
         foreach (var _card in _availableCards)
         {
-            _cards.Add(_card);
+            _cards.Add(GameplayManager.Instance.GetAbility(_card.UniqueId));
         }
         
         ChooseCardPanel.Instance.ShowCards(_cards,SetAsTax);

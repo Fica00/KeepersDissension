@@ -33,7 +33,8 @@ public class AbilityCard : CardBase
 
     public void Setup(string _owner, int _cardId)
     {
-        abilityData = new AbilityData { Owner = _owner, IsVetoed = false, Cooldown = Effect.Cooldown, UniqueId = Guid.NewGuid().ToString(), CardId = _cardId};
+        abilityData = new AbilityData { Owner = _owner, IsVetoed = false, Cooldown = Effect.Cooldown, UniqueId = Guid.NewGuid().ToString(), CardId 
+            = _cardId, Type =  Details.Type};
         Display.Setup(this);
     }
 

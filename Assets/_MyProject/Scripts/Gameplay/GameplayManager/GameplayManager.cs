@@ -357,7 +357,7 @@ public class GameplayManager : MonoBehaviour
         {
             return;
         }
-        CardBase _selectedCard = MyPlayer.GetCardOfType(CardType.Wall);
+        CardBase _selectedCard = GetCardOfType(CardType.Wall,true);
         PlaceCard(_selectedCard, _positionId);
     }
 
@@ -1108,6 +1108,56 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void ChangeAmountOfAbilitiesICanBuy(int _amount)
+    {
+        throw new Exception();
+    }
+    
+    public virtual List<Card> GetAllCardsOfType(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCardOfType(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+    
+    public virtual void AddCard(CardData _cardData, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AddAbility(AbilityData _abilityData, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveCard(string _uniqueId, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual AbilityCard GetAbility(string _uniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveAbility(string _uniqueId, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool ContainsCard(CardData _requestedCard, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<AbilityData> GetOwnedAbilities(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCard(string _uniqueId)
     {
         throw new Exception();
     }

@@ -185,6 +185,7 @@ public class MatchMakingHandler : MonoBehaviour
     private void FinishSettingUpMatch()
     {
         searchingForOpponentPanel.Activate();
+        FirebaseManager.Instance.RoomHandler.SubscribeToRoom();
         if (FirebaseManager.Instance.RoomHandler.RoomData.RoomPlayers.Count == 2)
         {
             StartGameplay();

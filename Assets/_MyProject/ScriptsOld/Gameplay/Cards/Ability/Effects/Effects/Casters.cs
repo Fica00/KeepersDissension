@@ -147,29 +147,29 @@ public class Casters : AbilityEffect
         // }
     }
     
-    private List<CardBase> GetAvailableEffects()
-    {
-        List<CardBase> _availableEffects = new();
-        foreach (var _ownedAbility in GameplayManager.Instance.MyPlayer.OwnedAbilities)
-        {
-            if (_ownedAbility.Details.Type != AbilityCardType.CrowdControl)
-            {
-                continue;
-            }
-
-            if (_ownedAbility.GetTablePlace() == null)
-            {
-                continue;
-            }
-
-            if (_ownedAbility.GetTablePlace().Id == -1)
-            {
-                continue;
-            }
-            
-            _availableEffects.Add(_ownedAbility);
-        }
-        return _availableEffects;
-    }
+    // private List<CardBase> GetAvailableEffects()
+    // {
+    //     List<CardBase> _availableEffects = new();
+    //     foreach (var _ownedAbility in GameplayManager.Instance.MyPlayer.OwnedAbilities)
+    //     {
+    //         if (_ownedAbility.Details.Type != AbilityCardType.CrowdControl)
+    //         {
+    //             continue;
+    //         }
+    //
+    //         if (_ownedAbility.GetTablePlace() == null)
+    //         {
+    //             continue;
+    //         }
+    //
+    //         if (_ownedAbility.GetTablePlace().Id == -1)
+    //         {
+    //             continue;
+    //         }
+    //         
+    //         _availableEffects.Add(_ownedAbility);
+    //     }
+    //     return _availableEffects;
+    // }
 
 }

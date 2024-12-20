@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Hyperdrive : AbilityEffect
@@ -81,18 +82,19 @@ public class Hyperdrive : AbilityEffect
     private List<CardBase> GetAvailableEffects()
     {
         List<CardBase> _availableEffects = new();
-        foreach (var _ownedAbility in GameplayManager.Instance.MyPlayer.OwnedAbilities)
+        foreach (var _ownedAbility in GameplayManager.Instance.GetOwnedAbilities(true))
         {
-            if (_ownedAbility.Effect.Cooldown==0)
+            if (_ownedAbility.Cooldown==0)
             {
                 continue;
             }
-            if (_ownedAbility.Details.Type != AbilityCardType.CrowdControl)
+            if (_ownedAbility.Type != AbilityCardType.CrowdControl)
             {
                 continue;
             }
 
-            _availableEffects.Add(_ownedAbility);
+            
+            _availableEffects.Add(FindObjectsOfType<AbilityCard>().First(_card => _card.UniqueId == _ownedAbility.UniqueId));
         }
         return _availableEffects;
     }

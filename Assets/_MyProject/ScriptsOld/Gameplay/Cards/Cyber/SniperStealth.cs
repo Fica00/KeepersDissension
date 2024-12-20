@@ -115,7 +115,7 @@ public class SniperStealth : CardSpecialAbility
                     continue;
                 }
 
-                Card _marker = Player.GetCardOfType(CardType.Marker);
+                Card _marker = GameplayManager.Instance.GetCardOfType(CardType.Marker,Player.IsMy);
                 markers.Add(_marker);
                 if (_marker == null)
                 {
@@ -189,7 +189,7 @@ public class SniperStealth : CardSpecialAbility
                 continue;
             }
 
-            Card _marker = Player.GetCardOfType(CardType.Marker);
+            Card _marker = GameplayManager.Instance.GetCardOfType(CardType.Marker,Player.IsMy);
             markers.Add(_marker);
             if (_marker == null)
             {

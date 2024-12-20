@@ -32,7 +32,7 @@ public class Void : AbilityEffect
 
             _player.Actions--;
             GameplayManager.Instance.TellOpponentSomething("Opponent used Void");
-            Card _marker = _player.GetCardOfType(CardType.Marker);
+            Card _marker = GameplayManager.Instance.GetCardOfType(CardType.Marker,true);
             if (_marker==null)
             {
                 DialogsManager.Instance.ShowOkDialog("You don't have available marker");

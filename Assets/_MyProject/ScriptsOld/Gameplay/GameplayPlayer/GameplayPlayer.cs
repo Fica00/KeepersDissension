@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,26 +9,16 @@ public class GameplayPlayer : MonoBehaviour
     public Action OnEndedTurn;
     public Action UpdatedDeck;
     public Action UpdatedActions;
-    public Action<CardData> OnAddedCard;
-    public Action<AbilityData> OnAddedAbility;
-    public Action<string> OnRemovedCard;
-    public Action<string> OnRemovedAbility;
     
     [SerializeField] private TableSideHandler tableSideHandler;
     [SerializeField] private CardsInHandHandler cardsInHandHandler;
     [SerializeField] private Transform destroyedCardsHolder;
 
+    public TableSideHandler TableSideHandler => tableSideHandler;
+
     private bool isMy;
     private int actions;
     private FactionSO factionSo;
-    private List<AbilityCard> ownedAbilities = new();
-    private List<Card> cardsInDeck = new();
-    private List<AbilityCard> abilitiesInHand = new();
-
-    public List<AbilityCard> OwnedAbilities => ownedAbilities;
-    
-    public TableSideHandler TableSideHandler => tableSideHandler;
-    
     public bool IsMy => isMy;
     
     public FactionSO FactionSo => factionSo;
@@ -63,8 +52,11 @@ public class GameplayPlayer : MonoBehaviour
         isMy = _isMy;
         factionSo = FactionSO.Get(_factionId);
         tableSideHandler.Setup(this);
-        SetupCardsInDeck();
         cardsInHandHandler.Setup(this);
+        if (_isMy)
+        {
+            SetupCardsInDeck();
+        }
     }
 
     private void SetupCardsInDeck()
@@ -93,7 +85,7 @@ public class GameplayPlayer : MonoBehaviour
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            AddNewCard(_card);
+            GameplayManager.Instance.AddCard(_card.Data,isMy);
         }
 
         for (int _i = 0; _i < 30; _i++)
@@ -103,7 +95,7 @@ public class GameplayPlayer : MonoBehaviour
             _card.transform.SetParent(_cardsHolder);
             _card.SetParent(_cardsHolder);
             _card.Setup(IsMy ? FirebaseManager.Instance.PlayerId : FirebaseManager.Instance.OpponentId);
-            AddNewCard(_card);
+            GameplayManager.Instance.AddCard(_card.Data,isMy);
         }
     }
 
@@ -138,9 +130,9 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        if (!ContainsCard(_card))
+        if (!GameplayManager.Instance.ContainsCard(_card.Data,isMy))
         {
-            AddNewCard(_card);
+            GameplayManager.Instance.AddCard(_card.Data,isMy);
         }
 
         _cardBase.Destroy();
@@ -157,9 +149,9 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        if (!ContainsCard(_card))
+        if (!GameplayManager.Instance.ContainsCard(_card.Data,isMy))
         {
-            AddNewCard(_card);
+            GameplayManager.Instance.AddCard(_card.Data,isMy);
         }
 
         _cardBase.ReturnFromHand();
@@ -169,7 +161,6 @@ public class GameplayPlayer : MonoBehaviour
     public void AddOwnedAbility(string _abilityId)
     {
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _abilityId);
-        ownedAbilities.Add(_ability);
         cardsInHandHandler.HideCards();
 
         if (!IsMy)
@@ -190,92 +181,5 @@ public class GameplayPlayer : MonoBehaviour
             yield return new WaitForSeconds(1);
             GameplayManager.Instance.ActivateAbility(_ability.UniqueId);
         }
-    }
-    
-    public void AddNewCard(Card _card)
-    {
-        cardsInDeck.Add(_card);
-        OnAddedCard?.Invoke(_card.Data);
-    }
-    
-    public void AddNewCard(AbilityCard _card)
-    {
-        abilitiesInHand.Add(_card);
-        OnAddedAbility?.Invoke(_card.Data);
-    }
-
-    public void RemoveCard(string _uniqueId)
-    {
-        Card _card = null;
-        foreach (var _cardInDeck in cardsInDeck)
-        {
-            if (_cardInDeck.UniqueId != _uniqueId)
-            {
-                continue;
-            }
-
-            _card = _cardInDeck;
-            break;
-        }
-        
-        if (_card==null)
-        {
-            return;
-        }
-        cardsInDeck.Remove(_card);
-        UpdatedDeck?.Invoke();
-        OnRemovedCard?.Invoke(_card.UniqueId);
-    }
-
-    public void RemoveAbility(string _uniqueId)
-    {
-        AbilityCard _ability = null;
-        foreach (var _abilityInDeck in abilitiesInHand)
-        {
-            if (_abilityInDeck.UniqueId != _uniqueId)
-            {
-                continue;
-            }
-
-            _ability = _abilityInDeck;
-            break;
-        }
-        
-        if (_ability == null)
-        {
-            return;    
-        }
-        abilitiesInHand.Remove(_ability);
-        OnRemovedAbility?.Invoke(_ability.UniqueId);
-    }
-    
-    public bool ContainsCard(Card _card)
-    {
-        return cardsInDeck.Find(_cardInDeck => _cardInDeck.UniqueId == _card.UniqueId);
-    }
-    
-    public List<AbilityCard> GetAbilities()
-    {
-        return abilitiesInHand;
-    }
-
-    public AbilityCard GetAbility(string _uniqueId)
-    {
-        return abilitiesInHand.Find(_ability => _ability.UniqueId == _uniqueId);
-    }
-    
-    public Card GetCardOfType(CardType _type)
-    {
-        return cardsInDeck.Find(_card => _card.Details.Type == _type);
-    }
-    
-    public List<Card> GetAllCardsOfType(CardType _type)
-    {
-        return cardsInDeck.FindAll(_card => _card.Details.Type == _type);
-    }
-    
-    public Card DrawCard(string _id)
-    {
-        return cardsInDeck.Find(_card => _card.UniqueId == _id);
     }
 }

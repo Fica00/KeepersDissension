@@ -11,6 +11,7 @@ public class AbilityData
     public int PlaceId;
     public int Cooldown;
     public bool IsActive;
+    public AbilityCardType Type;
     public List<string> EffectedCards = new();
     public int CardId;
     
