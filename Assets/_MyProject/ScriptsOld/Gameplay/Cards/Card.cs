@@ -27,6 +27,7 @@ public class Card : CardBase
 
     public void Setup(string _owner)
     {
+        Debug.Log("---- Setting up the card");
         cardData = new CardData
         {
             Owner = _owner,
@@ -35,7 +36,12 @@ public class Card : CardBase
             IsVoid = false,
             CanFlyToDodgeAttack = false,
             CanMoveOnWall = false,
-            Stats = new CardStats { Damage = Details.Stats.Damage, Health = Details.Stats.Health, Range = Details.Stats.Range, }
+            Stats = new CardStats { 
+                Damage = Details.Stats.Damage,
+                Health = Details.Stats.Health,
+                Range = Details.Stats.Range,
+                Speed =  Details.Stats.Speed,
+                MaxHealth = Details.Stats.MaxHealth}
         };
 
         Display.Setup(this);

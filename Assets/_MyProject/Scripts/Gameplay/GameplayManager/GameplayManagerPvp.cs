@@ -145,6 +145,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
         
+        Debug.Log("Ending game");
         HasGameEnded = true;
         DataManager.Instance.PlayerData.CurrentRoomId=string.Empty;
         StopAllCoroutines();

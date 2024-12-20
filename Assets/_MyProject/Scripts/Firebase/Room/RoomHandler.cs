@@ -91,27 +91,32 @@ namespace FirebaseMultiplayer.Room
         {
             if (_args == null)
             {
+                Debug.Log("Updated but without args?");
                 return;
             }
 
             if (!_args.Snapshot.Exists)
             {
+                Debug.Log("Updated but snapshot doesn't exist?");
                 return;
             }
 
             if (roomData == null)
             {
+                Debug.Log("Room data is null?");
                 return;
             }
 
             RoomData _data = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
             if (_data == null)
             {
+                Debug.Log("Didn't manage to convert: "+_args.Snapshot.GetRawJsonValue()+" to roomdata");
                 return;
             }
 
             if (_data.RoomPlayers == null)
             {
+                Debug.Log("Players dont exist");
                 return;
             }
 

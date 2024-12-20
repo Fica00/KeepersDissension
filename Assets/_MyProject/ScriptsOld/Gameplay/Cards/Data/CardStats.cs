@@ -1,10 +1,11 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class CardStats
 {
     public int MaxHealth = -1;
-    private int health;
+    [SerializeField] private int health;
 
     public int Range;
     public int Damage;
