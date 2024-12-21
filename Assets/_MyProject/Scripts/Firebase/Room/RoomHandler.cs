@@ -119,18 +119,19 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            CheckIfPlayerJoined(_data);
-            CheckIfPlayerLeft(_data);
-            CheckIfCreatedCard(_data);
-            CheckIfCardMoved(_data);
+            var _currentRoomState = JsonConvert.DeserializeObject<RoomData>(JsonConvert.SerializeObject(roomData));
             roomData = _data;
+            CheckIfPlayerJoined(_currentRoomState,_data);
+            CheckIfPlayerLeft(_currentRoomState,_data);
+            CheckIfCreatedCard(_currentRoomState,_data);
+            CheckIfCardMoved(_currentRoomState,_data);
         }
 
-        private void CheckIfPlayerJoined(RoomData _data)
+        private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
         {
             foreach (var _player in _data.RoomPlayers)
             {
-                if (DoesPlayerExist(_player.Id, roomData.RoomPlayers))
+                if (DoesPlayerExist(_player.Id, _currentRoomData.RoomPlayers))
                 {
                     continue;
                 }
@@ -139,9 +140,9 @@ namespace FirebaseMultiplayer.Room
             }
         }
 
-        private void CheckIfPlayerLeft(RoomData _data)
+        private void CheckIfPlayerLeft(RoomData _currentRoomData,RoomData _data)
         {
-            foreach (var _player in roomData.RoomPlayers)
+            foreach (var _player in _currentRoomData.RoomPlayers)
             {
                 if (DoesPlayerExist(_player.Id, _data.RoomPlayers))
                 {
@@ -165,12 +166,12 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
 
-        private void CheckIfCreatedCard(RoomData _data)
+        private void CheckIfCreatedCard(RoomData _currentRoomData,RoomData _data)
         {
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldSpawnCard = true;
-                foreach (var _existingCard in roomData.BoardData.Cards)
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
                 {
                     if (_card.UniqueId != _existingCard.UniqueId)
                     {
@@ -194,12 +195,12 @@ namespace FirebaseMultiplayer.Room
             }
         }
         
-        private void CheckIfCardMoved(RoomData _data)
+        private void CheckIfCardMoved(RoomData _currentRoomData,RoomData _data)
         {
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldMoveCard = false;
-                foreach (var _existingCard in roomData.BoardData.Cards)
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
                 {
                     if (_existingCard.UniqueId != _card.UniqueId)
                     {
