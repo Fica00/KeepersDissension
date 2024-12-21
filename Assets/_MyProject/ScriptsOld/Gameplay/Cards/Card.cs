@@ -6,28 +6,36 @@ public class Card : CardBase
     public Action UpdatedHealth;
 
     public CardDetails Details;
-    private CardData cardData;
-    public CardData Data => cardData;
 
-    public int Health => cardData.Stats.Health;
-    public int Range => cardData.Stats.Range;
-    public int Damage => cardData.Stats.Damage;
-    public bool IsVoid => cardData.IsVoid;
-    public bool CanMoveOnWall => cardData.CanMoveOnWall;
-    public int Speed => cardData.Stats.Speed;
-    public bool CanFlyToDodgeAttack => cardData.CanFlyToDodgeAttack;
-    public bool CanMove => cardData.CanMove;
-    public bool CanBeUsed => cardData.CanBeUsed;
-    public bool My => cardData.Owner == FirebaseManager.Instance.PlayerId;
-    public CardMovementType MovementType => cardData.MovementType;
-    public bool HasDied => cardData.HasDied;
-    public string UniqueId => cardData.UniqueId;
-    public int PercentageOfHealthToRecover => cardData.PercentageOfHealthToRecover;
+    private string uniqueId;
+    public CardData CardData => FirebaseManager.Instance.RoomHandler.BoardData.Cards.Find(_card => _card.UniqueId == uniqueId);
+
+    public int Health => CardData.Stats.Health;
+    public int Range => CardData.Stats.Range;
+    public int Damage => CardData.Stats.Damage;
+    public bool IsVoid => CardData.IsVoid;
+    public bool CanMoveOnWall => CardData.CanMoveOnWall;
+    public int Speed => CardData.Stats.Speed;
+    public bool CanFlyToDodgeAttack => CardData.CanFlyToDodgeAttack;
+    public bool CanMove => CardData.CanMove;
+    public bool CanBeUsed => CardData.CanBeUsed;
+    public bool My => CardData.Owner == FirebaseManager.Instance.PlayerId;
+    public CardMovementType MovementType => CardData.MovementType;
+    public bool HasDied => CardData.HasDied;
+    public string UniqueId => CardData.UniqueId;
+    public int PercentageOfHealthToRecover => CardData.PercentageOfHealthToRecover;
     
 
-    public void Setup(string _owner)
+    public void Setup(string _uniqueId)
     {
-        cardData = new CardData
+        uniqueId = _uniqueId;
+        Display.Setup(this);
+        Setup();
+    }
+
+    public CardData GenerateCardData(string _owner)
+    {
+        return new CardData
         {
             Owner = _owner,
             UniqueId = Guid.NewGuid().ToString(),
@@ -42,14 +50,11 @@ public class Card : CardBase
                 Speed =  Details.Stats.Speed,
                 MaxHealth = Details.Stats.MaxHealth}
         };
-
-        Display.Setup(this);
-        Setup();
     }
 
-    public void SetData(CardData _data)
+    public void SetUniqueId(string _uniqueCardId)
     {
-        cardData = _data;
+        uniqueId = _uniqueCardId;
     }
 
     public void SetParent(Transform _parent)
@@ -66,7 +71,7 @@ public class Card : CardBase
 
     public void HealFull()
     {
-        float _amount = Details.Stats.Health - cardData.Stats.Health;
+        float _amount = Details.Stats.Health - CardData.Stats.Health;
         ChangeHealth((int)_amount);
         UpdatedHealth?.Invoke();
     }
@@ -74,14 +79,14 @@ public class Card : CardBase
     public void SetHealth(int _amount)
     {
         int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.Health);
-        cardData.Stats.Health = _alteredAmount;
+        CardData.Stats.Health = _alteredAmount;
         UpdatedHealth?.Invoke();
     }
 
     public void ChangeHealth(int _amount)
     {
-        int _newHealth = Math.Clamp(cardData.Stats.Health + _amount, 0, Details.Stats.Health);
-        cardData.Stats.Health = _newHealth;
+        int _newHealth = Math.Clamp(CardData.Stats.Health + _amount, 0, Details.Stats.Health);
+        CardData.Stats.Health = _newHealth;
         UpdatedHealth?.Invoke();
     }
 
@@ -97,88 +102,88 @@ public class Card : CardBase
 
     public void ChangeDamage(int _amount)
     {
-        cardData.Stats.Damage += _amount;
+        CardData.Stats.Damage += _amount;
     }
 
     public void SetDamage(int _amount)
     {
-        cardData.Stats.Damage = _amount;
+        CardData.Stats.Damage = _amount;
     }
 
     public void ChangeRange(int _amount)
     {
-        cardData.Stats.Range += _amount;
+        CardData.Stats.Range += _amount;
     }
     
     public void SetRange(int _amount)
     {
-        cardData.Stats.Range = _amount;
+        CardData.Stats.Range = _amount;
     }
 
     public void ChangeSpeed(int _amount)
     {
-        cardData.Stats.Speed += _amount;
+        CardData.Stats.Speed += _amount;
     }
 
     public void SetSpeed(int _amount)
     {
-        cardData.Stats.Speed = _amount;
+        CardData.Stats.Speed = _amount;
     }
 
     public void SetMaxHealth(int _amount)
     {
-        cardData.Stats.MaxHealth = _amount;
+        CardData.Stats.MaxHealth = _amount;
     }
 
     public void SetCanMoveOnWall(bool _status)
     {
-        cardData.CanMoveOnWall = _status;
+        CardData.CanMoveOnWall = _status;
     }
 
     public void SetCanFlyToDodgeAttack(bool _status)
     {
-        cardData.CanFlyToDodgeAttack = _status;
+        CardData.CanFlyToDodgeAttack = _status;
     }
 
     public void SetIsVoid(bool _status)
     {
-        cardData.IsVoid = _status;
+        CardData.IsVoid = _status;
     }
 
     public void SetCanMove(bool _status)
     {
-        cardData.CanMove = _status;
+        CardData.CanMove = _status;
     }
 
     public void SetCanBeUsed(bool _status)
     {
-        cardData.CanBeUsed = _status;
+        CardData.CanBeUsed = _status;
     }
     
     public void ChangeOwner()
     {
-        cardData.Owner = GetIsMy() ? FirebaseManager.Instance.OpponentId : FirebaseManager.Instance.PlayerId;
+        CardData.Owner = GetIsMy() ? FirebaseManager.Instance.OpponentId : FirebaseManager.Instance.PlayerId;
         SetRotation();
     }
 
     public void SetPercentageOfHealthToRecover(int _amount)
     {
-        cardData.PercentageOfHealthToRecover = _amount;
+        CardData.PercentageOfHealthToRecover = _amount;
     }
 
     public void ChangePercentageOfHealthToRecover(int _amount)
     {
-        cardData.PercentageOfHealthToRecover += _amount;
+        CardData.PercentageOfHealthToRecover += _amount;
     }
 
     public void ChangeMovementType(CardMovementType _movementType)
     {
-        cardData.MovementType = _movementType;
+        CardData.MovementType = _movementType;
     }
 
     public void SetHasDied(bool _status)
     {
-        cardData.HasDied = _status;
+        CardData.HasDied = _status;
     }
     
     public void CopyStats(Card _card)

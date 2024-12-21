@@ -65,35 +65,40 @@ public class GameplayManagerPvp : GameplayManager
                 continue;
             }
 
-            Card _card =  CreateCard(_cardInDeck.Details.Id,_tableSideHandler,_playerId);
+            Card _card =  CreateCard(_cardInDeck.Details.Id,_tableSideHandler, Guid.NewGuid().ToString(), true, _playerId);
             if (_card is Wall)
             {
                 _wallCard = _card;
             }
-            AddCard(_card.Data);
         }
 
         for (int _i = 0; _i < 30; _i++)
         {
-            Card _card = CreateCard(_wallCard.Details.Id,_tableSideHandler, _playerId);
-            _card.Data.CardId = _card.Details.Id;
-            AddCard(_card.Data);
+            CreateCard(_wallCard.Details.Id,_tableSideHandler,Guid.NewGuid().ToString(), true, _playerId);
         }
     }
 
     public override void OpponentCreatedCard(CardData _cardData)
     {
-        var _createdCard = CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.Owner);
-        _createdCard.SetData(_cardData);
+        var _createdCard = CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.UniqueId, false, _cardData.Owner);
+        _createdCard.SetUniqueId(_cardData.UniqueId);
     }
 
-    private Card CreateCard(int _cardId,TableSideHandler _tableSideHandler, string _playerId)
+    private Card CreateCard(int _cardId,TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
     {
         Transform _cardsHolder = _tableSideHandler.CardsHolder;
         Card _card = CardsManager.Instance.CreateCard(_cardId);
         _card.transform.SetParent(_cardsHolder);
         _card.SetParent(_cardsHolder);
-        _card.Setup(_playerId);
+        
+        if (_addCard)
+        {
+            CardData _cardData = _card.GenerateCardData(_owner);
+            _card.SetUniqueId(_cardData.UniqueId);
+            AddCard(_cardData);
+        }
+        
+        _card.Setup(_uniqueId);
         return _card;
     }
 
