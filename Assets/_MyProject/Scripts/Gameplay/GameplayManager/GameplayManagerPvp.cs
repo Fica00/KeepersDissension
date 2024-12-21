@@ -1976,6 +1976,7 @@ public class GameplayManagerPvp : GameplayManager
             Debug.Log("Placing my life force and guardian");
             yield return PlaceLifeForceAndGuardian();
             SetGameplaySubState(GameplaySubState.Player2PlacingLifeForce);
+            yield return new WaitForSeconds(5f);
             RoomUpdater.Instance.ForceUpdate();
             Debug.Log("Waiting for 2 to place his life force and guardian");
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedPlacingStartingLifeForce);
@@ -1986,6 +1987,7 @@ public class GameplayManagerPvp : GameplayManager
             yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
             Debug.Log("Placing my life force and guardian");
             yield return PlaceLifeForceAndGuardian();
+            yield return new WaitForSeconds(5f);
             Debug.Log("Telling player 1 that I placed my guardian and life force");
             SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
             RoomUpdater.Instance.ForceUpdate();
@@ -2013,6 +2015,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             Debug.Log("Placing starting minions");
             yield return PlaceRestOfStartingCards();
+            yield return new WaitForSeconds(5f);
             Debug.Log("Telling player 2 to place his minions");
             SetGameplaySubState(GameplaySubState.Player2SelectMinions);
             RoomUpdater.Instance.ForceUpdate();
@@ -2023,6 +2026,7 @@ public class GameplayManagerPvp : GameplayManager
             Debug.Log("Waiting for opponent to place starting cards");
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.Player2SelectMinions);
             yield return PlaceRestOfStartingCards();
+            yield return new WaitForSeconds(5f);
             Debug.Log("Telling 1. player that I finished with setting up minions");
             SetGameplaySubState(GameplaySubState.FinishedSelectingMinions);
             RoomUpdater.Instance.ForceUpdate();
@@ -2034,7 +2038,6 @@ public class GameplayManagerPvp : GameplayManager
     
      private IEnumerator PlaceRestOfStartingCards()
      {
-         yield return new WaitForSeconds(0.5f); //idk random delay, keep it here
         yield return PlaceKeeper();
         DialogsManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
         yield return RequestCardToBePlaced(14, CardType.Minion);
