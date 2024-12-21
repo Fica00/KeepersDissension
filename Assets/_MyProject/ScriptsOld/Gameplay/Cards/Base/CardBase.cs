@@ -50,6 +50,7 @@ public class CardBase : MonoBehaviour
         RectTransform _rect = GetComponent<RectTransform>();
         transform.SetParent(_tablePosition.transform);
         _rect.pivot = new Vector2(0.5f, 0.5f);
+        Debug.Log("Started moving");
         transform.DOLocalMove(Vector3.zero, 1f);
         transform.DOScale(ScaleOnTable, 1f);
         SetRotation();

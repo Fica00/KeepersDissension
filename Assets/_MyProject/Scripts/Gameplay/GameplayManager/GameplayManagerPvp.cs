@@ -188,6 +188,8 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
+        Debug.Log("Should position card: ",_card.gameObject);
+        Debug.Log("On place: ",TableHandler.GetPlace(_positionId).gameObject);
         OnPlacedCard?.Invoke(_card);
     }
     
