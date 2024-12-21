@@ -79,8 +79,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void OpponentCreatedCard(CardData _cardData)
     {
-        var _createdCard = CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.UniqueId, false, _cardData.Owner);
-        _createdCard.SetUniqueId(_cardData.UniqueId);
+        CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.UniqueId, false, _cardData.Owner);
     }
 
     private Card CreateCard(int _cardId,TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
@@ -93,10 +92,10 @@ public class GameplayManagerPvp : GameplayManager
         if (_addCard)
         {
             CardData _cardData = _card.GenerateCardData(_owner,_uniqueId);
-            _card.SetUniqueId(_cardData.UniqueId);
             AddCard(_cardData);
         }
         
+        _card.SetUniqueId(_uniqueId);
         _card.Setup(_uniqueId);
         return _card;
     }
