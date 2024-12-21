@@ -52,6 +52,7 @@ public class GameplayManagerPvp : GameplayManager
         }
         SetupStartingCards(MyPlayer.TableSideHandler, MyPlayer.FactionSo, FirebaseManager.Instance.PlayerId);
         SetupStartingCards(OpponentPlayer.TableSideHandler, OpponentPlayer.FactionSo, FirebaseManager.Instance.OpponentId);
+        RoomUpdater.Instance.ForceUpdate();
     }
     
     private void SetupStartingCards(TableSideHandler _tableSideHandler, FactionSO _factionSo, string _playerId)
