@@ -32,6 +32,8 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
 
+        private List<string> createdCardsThisUpdate = new ();
+
         public void Init(DatabaseReference _database, string _roomsPath)
         {
             database = _database;
@@ -169,6 +171,7 @@ namespace FirebaseMultiplayer.Room
 
         private void CheckIfCreatedCard(RoomData _data)
         {
+            createdCardsThisUpdate.Clear();
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldSpawnCard = true;
@@ -187,12 +190,14 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldSpawnCard)
                 {
                     GameplayManager.Instance.OpponentCreatedCard(_card);
+                    createdCardsThisUpdate.Add(_card.UniqueId);
                 }
             }
         }
         
         private void CheckIfPlacedCard(RoomData _data)
         {
+            Debug.Log("Checking if I should place the card");
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldPlaceCard = false;
@@ -203,7 +208,7 @@ namespace FirebaseMultiplayer.Room
                         continue;
                     }
                     
-                    if (_existingCard.PlaceId == -100 && _card.PlaceId != -100)
+                    if (createdCardsThisUpdate.Contains(_card.UniqueId))
                     {
                         _shouldPlaceCard = true;
                         break;
