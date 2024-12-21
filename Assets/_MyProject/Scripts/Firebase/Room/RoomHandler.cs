@@ -197,6 +197,7 @@ namespace FirebaseMultiplayer.Room
         {
             foreach (var _card in _data.BoardData.Cards)
             {
+                bool _shouldPlaceCard = true;
                 foreach (var _existingCard in roomData.BoardData.Cards)
                 {
                     if (_card.UniqueId != _existingCard.UniqueId)
@@ -204,17 +205,17 @@ namespace FirebaseMultiplayer.Room
                         continue;
                     }
                     
-                    if (_card.PlaceId == -1)
+                    if (_card.PlaceId == -1 || _existingCard.PlaceId != -1)
                     {
-                        continue;   
-                    }
-
-                    if (_existingCard.PlaceId == -1)
-                    {
-                        Debug.Log("Should try to place card: "+ _card.CardId);
-                        GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
+                        _shouldPlaceCard = false;
                         break;
                     }
+                }
+
+                if (_shouldPlaceCard)
+                {
+                    Debug.Log("Should try to place card: "+ _card.CardId);
+                    GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
                 }
             }
         }

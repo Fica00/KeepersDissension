@@ -47,6 +47,11 @@ public class Card : CardBase
         Setup();
     }
 
+    public void SetData(CardData _data)
+    {
+        cardData = _data;
+    }
+
     public void SetParent(Transform _parent)
     {
         Parent = _parent;
