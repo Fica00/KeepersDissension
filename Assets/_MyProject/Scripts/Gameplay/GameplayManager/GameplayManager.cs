@@ -1131,11 +1131,6 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void RemoveCard(string _uniqueId, bool _forMe)
-    {
-        throw new Exception();
-    }
-
     public virtual AbilityCard GetAbility(string _uniqueId)
     {
         throw new Exception();

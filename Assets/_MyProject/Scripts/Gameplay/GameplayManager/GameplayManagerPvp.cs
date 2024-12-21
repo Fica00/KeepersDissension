@@ -175,8 +175,6 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         _card.Data.PlaceId = _positionId;
-
-        RemoveCard(_cardId,true);
         ShowCardPlaced(_card.UniqueId, _positionId);
     }
 
@@ -1264,7 +1262,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyAbilityFromHand(string _abilityId)
     {
-        RemoveCard(_abilityId,true);
+        boardData.AbilitiesInShop.Remove(boardData.AbilitiesInShop.Find(_ability => _ability.UniqueId == _abilityId));
         MyPlayer.AddOwnedAbility(_abilityId);
         ChangeAmountOfAbilitiesICanBuy(-1);
 
@@ -1747,27 +1745,6 @@ public class GameplayManagerPvp : GameplayManager
     public override void AddAbility(AbilityData _abilityData, bool _forMe)
     {
         boardData.Abilities.Add(_abilityData);
-    }
-
-    public override void RemoveCard(string _uniqueId, bool _forMe)
-    {
-        CardData _cardData = null;
-        foreach (var _card in boardData.Cards)
-        {
-            if (_card.UniqueId != _uniqueId)
-            {
-                continue;                
-            }
-
-            _cardData = _card;
-            break;
-        }
-        if (_cardData ==null)
-        {
-            return;
-        }
-
-        boardData.Cards.Remove(_cardData);
     }
 
     public override AbilityCard GetAbility(string _uniqueId)
