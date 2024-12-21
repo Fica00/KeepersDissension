@@ -187,7 +187,7 @@ namespace FirebaseMultiplayer.Room
                     GameplayManager.Instance.OpponentCreatedCard(_card);
                     if (_card.PlaceId != -100)
                     {
-                        GameplayManager.Instance.ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                        ShowCardMoved(_card.UniqueId, _card.PlaceId);
                     }
                 }
             }
@@ -215,9 +215,20 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldMoveCard)
                 {
                     Debug.Log("Trying to place card with id: "+ _card.UniqueId);
-                    GameplayManager.Instance.ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                    ShowCardMoved(_card.UniqueId, _card.PlaceId);
                 }
             }
+        }
+
+        private void ShowCardMoved(string _uniqueId, int _placeId)
+        {
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId));
+        }
+        
+        private int ConvertOpponentsPosition(int _position)
+        {
+            int _totalAmountOfFields = 64;
+            return _totalAmountOfFields - _position;
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
