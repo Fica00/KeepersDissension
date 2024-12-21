@@ -46,10 +46,15 @@ public class GameplayManagerPvp : GameplayManager
         RoomPlayer _opponent = roomHandler.GetOpponent();
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.Setup();
-        SetupMyCards(MyPlayer.TableSideHandler, MyPlayer.FactionSo);
+        if (roomHandler.IsOwner)
+        {
+            return;
+        }
+        SetupStartingCards(MyPlayer.TableSideHandler, MyPlayer.FactionSo, FirebaseManager.Instance.PlayerId);
+        SetupStartingCards(OpponentPlayer.TableSideHandler, OpponentPlayer.FactionSo, FirebaseManager.Instance.OpponentId);
     }
     
-    private void SetupMyCards(TableSideHandler _tableSideHandler, FactionSO _factionSo)
+    private void SetupStartingCards(TableSideHandler _tableSideHandler, FactionSO _factionSo, string _playerId)
     {
         Card _wallCard = null;
         foreach (var _cardInDeck in CardsManager.Instance.Get(_factionSo))
@@ -59,7 +64,7 @@ public class GameplayManagerPvp : GameplayManager
                 continue;
             }
 
-            Card _card =  CreateCard(_cardInDeck.Details.Id,_tableSideHandler,FirebaseManager.Instance.PlayerId);
+            Card _card =  CreateCard(_cardInDeck.Details.Id,_tableSideHandler,_playerId);
             if (_card is Wall)
             {
                 _wallCard = _card;
@@ -69,7 +74,7 @@ public class GameplayManagerPvp : GameplayManager
 
         for (int _i = 0; _i < 30; _i++)
         {
-            Card _card = CreateCard(_wallCard.Details.Id,_tableSideHandler, FirebaseManager.Instance.PlayerId);
+            Card _card = CreateCard(_wallCard.Details.Id,_tableSideHandler, _playerId);
             _card.Data.CardId = _card.Details.Id;
             AddCard(_card.Data);
         }
