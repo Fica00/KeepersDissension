@@ -122,7 +122,6 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            Debug.Log("Checking for new data");
             CheckIfPlayerJoined(_data);
             CheckIfPlayerLeft(_data);
             CheckIfCreatedCard(_data);
@@ -197,7 +196,10 @@ namespace FirebaseMultiplayer.Room
         
         private void CheckIfPlacedCard(RoomData _data)
         {
-            Debug.Log("Checking if I should place the card");
+            foreach (var _createdCard in createdCardsThisUpdate)
+            {
+                Debug.Log("Created card: "+_createdCard);
+            }
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldPlaceCard = false;
@@ -217,7 +219,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldPlaceCard)
                 {
-                    Debug.Log("Should try to place card: "+ _card.UniqueId);
+                    Debug.Log("Trying to place card with id: "+ _card.UniqueId);
                     GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
                 }
             }
