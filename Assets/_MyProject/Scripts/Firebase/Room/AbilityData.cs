@@ -8,7 +8,7 @@ public class AbilityData
     public string Owner;
     public bool IsVetoed;
     public int RemainingCooldown;
-    public int PlaceId = -1;
+    public int PlaceId = -100;
     public int Cooldown;
     public bool IsActive;
     public AbilityCardType Type;

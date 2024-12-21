@@ -174,6 +174,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             return;
         }
+        
         _card.Data.PlaceId = _positionId;
 
         RemoveCard(_cardId,true);

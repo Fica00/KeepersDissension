@@ -19,17 +19,14 @@ public class RoomUpdater : MonoBehaviour
             
             if (!GameplayManager.Instance.MyTurn)
             {
-                Debug.Log("Not my turn");
                 continue;
             }
 
             if (FirebaseManager.Instance.RoomHandler.RoomData == roomData)
             {
-                Debug.Log("Data is the same");
                 continue;
             }
             
-            Debug.Log("Updating room data");
             roomData = FirebaseManager.Instance.RoomHandler.RoomData;
             FirebaseManager.Instance.RoomHandler.UpdateRoomData();
         }
