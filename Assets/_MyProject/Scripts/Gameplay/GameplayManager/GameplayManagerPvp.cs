@@ -70,7 +70,6 @@ public class GameplayManagerPvp : GameplayManager
         for (int _i = 0; _i < 30; _i++)
         {
             Card _card = CreateCard(_wallCard.Details.Id,_tableSideHandler, FirebaseManager.Instance.PlayerId);
-            _card.Details.Id = 500 + _i;
             _card.Data.CardId = _card.Details.Id;
             AddCard(_card.Data);
         }
