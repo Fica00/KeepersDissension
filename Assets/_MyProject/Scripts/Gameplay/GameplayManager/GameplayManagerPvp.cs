@@ -99,31 +99,6 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override bool DecideWhoPlaysFirst()
     {
-        // RoomPlayer _myPlayer = roomHandler.GetMyPlayer();
-        // RoomPlayer _opponent = roomHandler.GetOpponent();
-        // int _opponentMatchesPlayed =
-        //     Convert.ToInt32(_opponent.MatchesPlayed);
-        // if (_opponentMatchesPlayed < _myPlayer.MatchesPlayed)
-        // {
-        //     return false;
-        // }
-        //
-        // if (_opponentMatchesPlayed > _myPlayer.MatchesPlayed)
-        // {
-        //     return true;
-        // }
-        //
-        // DateTime _opponentDateCreated = _opponent.DateCreated;
-        // if (_opponentDateCreated < _myPlayer.DateCreated)
-        // {
-        //     return false;
-        // }
-        //
-        // if (_opponentDateCreated > _myPlayer.DateCreated)
-        // {
-        //     return true;
-        // }
-
         return roomHandler.IsOwner;
     }
 
@@ -181,6 +156,7 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         _card.Data.PlaceId = _positionId;
+        RoomData.BoardData.Cards.Find(_card => _card.UniqueId == _cardId).PlaceId = _positionId;
         ShowCardPlaced(_card.UniqueId, _positionId);
     }
 
@@ -1981,14 +1957,14 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
-            // Debug.Log("Waiting for 1 player to place life force and guardian");
-            // yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
-            // Debug.Log("Placing my life force and guardian");
-            // yield return PlaceLifeForceAndGuardian();
-            // yield return new WaitForSeconds(5f);
-            // Debug.Log("Telling player 1 that I placed my guardian and life force");
-            // SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
-            // RoomUpdater.Instance.ForceUpdate();
+            Debug.Log("Waiting for 1 player to place life force and guardian");
+            yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
+            Debug.Log("Placing my life force and guardian");
+            yield return PlaceLifeForceAndGuardian();
+            yield return new WaitForSeconds(5f);
+            Debug.Log("Telling player 1 that I placed my guardian and life force");
+            SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
+            RoomUpdater.Instance.ForceUpdate();
         }
 
         
