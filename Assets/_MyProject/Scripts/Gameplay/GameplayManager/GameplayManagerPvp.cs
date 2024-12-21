@@ -1981,14 +1981,14 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
-            Debug.Log("Waiting for 1 player to place life force and guardian");
-            yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
-            Debug.Log("Placing my life force and guardian");
-            yield return PlaceLifeForceAndGuardian();
-            yield return new WaitForSeconds(5f);
-            Debug.Log("Telling player 1 that I placed my guardian and life force");
-            SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
-            RoomUpdater.Instance.ForceUpdate();
+            // Debug.Log("Waiting for 1 player to place life force and guardian");
+            // yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
+            // Debug.Log("Placing my life force and guardian");
+            // yield return PlaceLifeForceAndGuardian();
+            // yield return new WaitForSeconds(5f);
+            // Debug.Log("Telling player 1 that I placed my guardian and life force");
+            // SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
+            // RoomUpdater.Instance.ForceUpdate();
         }
 
         
