@@ -31,7 +31,7 @@ public class MageCardDelivery : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -41,7 +41,7 @@ public class MageCardDelivery : CardSpecialAbility
 
     private void YesUseDeliverAbility()
     {
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         GameplayManager.Instance.SelectPlaceForSpecialAbility(
             TablePlaceHandler.Id,
             1,
@@ -53,7 +53,7 @@ public class MageCardDelivery : CardSpecialAbility
         
         void SelectedSpot(int _id)
         {
-            GameplayManager.Instance.GameState = GameplayState.Playing;
+            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             if (_id==-1)
             {
                 DialogsManager.Instance.ShowOkDialog("No cards found");

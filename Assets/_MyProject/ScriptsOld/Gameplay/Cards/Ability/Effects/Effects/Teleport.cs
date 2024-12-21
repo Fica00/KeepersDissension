@@ -6,8 +6,8 @@ public class Teleport : AbilityEffect
     protected override void ActivateForOwner()
     {
         MoveToActivationField();
-        GameplayState _state = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayState _state = GameplayManager.Instance.GameState();
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         LifeForce _lifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My);
         Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         int _range = 1;
@@ -39,7 +39,7 @@ public class Teleport : AbilityEffect
                             CanCounter = false
                         };
                         GameplayManager.Instance.ExecuteCardAction(_damageSelf);
-                        GameplayManager.Instance.GameState = _state;
+                        GameplayManager.Instance.SetGameState(_state);
                         RemoveAction();
                         OnActivated?.Invoke();
                         return;
@@ -58,7 +58,7 @@ public class Teleport : AbilityEffect
             if (_placeId==-1)
             {
                 DialogsManager.Instance.ShowOkDialog("There are no empty spaces around Life Force");
-                GameplayManager.Instance.GameState = _state;
+                GameplayManager.Instance.SetGameState(_state);
                 RemoveAction();
                 OnActivated?.Invoke();
                 return;
@@ -77,7 +77,7 @@ public class Teleport : AbilityEffect
             };
             
             GameplayManager.Instance.ExecuteCardAction(_teleportAction);
-            GameplayManager.Instance.GameState = _state;
+            GameplayManager.Instance.SetGameState(_state);
             RemoveAction();
             OnActivated?.Invoke();
         }

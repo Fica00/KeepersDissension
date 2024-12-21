@@ -22,6 +22,9 @@ namespace FirebaseMultiplayer.Room
         [JsonIgnore] public int AmountOfStartingAbilities => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? 0 : 7;
         [JsonIgnore] public int AmountOfCardsInShop => FirebaseManager.Instance.RoomHandler.IsTestingRoom ? UnityEngine.Resources.LoadAll("Abilities").Length : 3;
         
+        [JsonIgnore] public int AmountOfActionsPerTurn => 3;
+        [JsonIgnore] public int UnchainingGuardianPrice => 20;
+        
         public int AbilityCardPrice => 5;
 
     }

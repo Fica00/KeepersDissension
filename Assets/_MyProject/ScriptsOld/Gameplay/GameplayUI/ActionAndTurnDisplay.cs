@@ -64,8 +64,9 @@ public class ActionAndTurnDisplay : MonoBehaviour
         {
             return;
         }
-        
-        if (!_isResponseAction && (GameplayManager.Instance.GameState == GameplayState.WaitingForAttackResponse || GameplayManager.Instance.GameState == GameplayState.AttackResponse))
+
+        var _gameState = GameplayManager.Instance.GameState();
+        if (!_isResponseAction && (_gameState == GameplayState.WaitingForAttackResponse || _gameState == GameplayState.AttackResponse))
         {
             return;
         }

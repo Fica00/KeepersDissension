@@ -22,8 +22,8 @@ public class CriticalHit : AbilityEffect
 
     private void ForceKeeperAttack(Card _keeper)
     {
-        GameplayState _state = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayState _state = GameplayManager.Instance.GameState();
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
 
         TablePlaceHandler _keeperTablePlace = _keeper.GetTablePlace();
         GameplayManager.Instance.SelectPlaceForSpecialAbility(_keeperTablePlace.Id,1,PlaceLookFor.Both, _keeper.MovementType,false,LookForCardOwner.Both,Attack,false);
@@ -65,7 +65,7 @@ public class CriticalHit : AbilityEffect
         void Finish()
         {
             Deactivate();
-            GameplayManager.Instance.GameState = _state;
+            GameplayManager.Instance.SetGameState(_state);
             RemoveAction();
             OnActivated?.Invoke();
         }

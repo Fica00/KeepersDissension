@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace FirebaseMultiplayer.Room
 {
@@ -11,8 +12,13 @@ namespace FirebaseMultiplayer.Room
         public RoomType Type;
         public RoomStatus Status;
         public GameplayState GameplayState;
+        public GameplaySubState GameplaySubState;
+        public int CurrentPlayerTurn = 1;
+        public bool HasGameEnded;
         public string Owner;
         public List<RoomPlayer> RoomPlayers;
         public BoardData BoardData = new ();
+
+        [JsonIgnore] public bool IsMyTurn => FirebaseManager.Instance.RoomHandler.IsOwner ? CurrentPlayerTurn == 1 : CurrentPlayerTurn == 2;
     }
 }

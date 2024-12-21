@@ -19,11 +19,8 @@ public class GameplayManager : MonoBehaviour
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
-    public int AmountOfActionsPerTurn;
-    public int UnchainingGuardianPrice;
     
     [HideInInspector] public CardAction LastAction;
-    [HideInInspector] public GameplayState GameState;
     
     [SerializeField] private HealthTracker healthTracker;
 
@@ -36,17 +33,9 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected Sprite forestMarker;
     [SerializeField] protected GameObject bombEffect;
 
-    protected bool IsMyTurn;
-    protected bool HasGameEnded;
-    protected bool Finished;
-    private bool opponentFinished;
-    private bool hasOpponentPlacedStartingCards;
+    protected bool DidIFinishMyTurn;
+    private bool didOpponentFinishHisTurn;
     private bool doIPlayFirst;
-    private bool shouldIPlaceStartingWall;
-
-    public bool MyTurn => IsMyTurn;
-
-    public bool IsSettingUpTable => GameState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
     
     public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     
@@ -80,18 +69,18 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator GameplayRoutine()
     {
-        GameState = GameplayState.WaitingForPlayersToLoad;
+        SetGameState(GameplayState.WaitingForPlayersToLoad);
         yield return new WaitForSeconds(2);
-        GameState = GameplayState.SettingUpTable;
-        Finished = false;
-        opponentFinished = false;
+        SetGameState(GameplayState.SettingUpTable);
+        DidIFinishMyTurn = false;
+        didOpponentFinishHisTurn = false;
 
         yield return NewMatchRoutine();
-        IsMyTurn = doIPlayFirst;
+        SetPlayersTurn(doIPlayFirst);
         healthTracker.Setup();
         ShowGuardianChains();
         
-        while (!HasGameEnded)
+        while (!HasGameEnded())
         {
             yield return WaitUntilTheEndOfTurn();
             yield return new WaitForSeconds(1);
@@ -108,13 +97,15 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator NewMatchRoutine()
     {
-        IsMyTurn = DecideWhoPlaysFirst();
-        doIPlayFirst = IsMyTurn;
-        shouldIPlaceStartingWall = !IsMyTurn;
+        SetPlayersTurn(DecideWhoPlaysFirst());
+        doIPlayFirst = IsMyTurn();
 
-        yield return HandlePlaceRestOfTheCards();
+        SetGameplaySubState(GameplaySubState.Player1PlacingLifeForce);
+        yield return PlaceLifeForceAndGuardianRoutine();
+        SetGameplaySubState(GameplaySubState.Player1SelectMinions);
+        yield return PlaceMinions();
 
-        if (shouldIPlaceStartingWall)
+        if (ShouldIPlaceStartingWall())
         {
             PlaceStartingWall();
         }
@@ -124,9 +115,19 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         if (!doIPlayFirst)
         {
-            GameState = GameplayState.Waiting;
+            SetGameState(GameplayState.Waiting);
         }
         FinishedSetup?.Invoke();
+    }
+    
+    protected virtual IEnumerator PlaceLifeForceAndGuardianRoutine()
+    {
+        throw new Exception();
+    }
+
+    protected virtual IEnumerator PlaceMinions()
+    {
+        throw new Exception();
     }
 
     protected virtual bool DecideWhoPlaysFirst()
@@ -136,30 +137,30 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator WaitUntilTheEndOfTurn()
     {
-        if (IsMyTurn)
+        if (IsMyTurn())
         {
-            Finished = false;
-            GameState = GameplayState.Playing;
+            DidIFinishMyTurn = false;
+            SetGameState(GameplayState.Playing);
             MyPlayer.NewTurn();
             if (MyPlayer.Actions == 0)
             {
-                Finished = true;
-                IsMyTurn = false;
+                DidIFinishMyTurn = true;
+                SetPlayersTurn(false);
             }
-            yield return new WaitUntil(() => Finished);
+            yield return new WaitUntil(() => DidIFinishMyTurn);
             MyPlayer.EndedTurn();
         }
         else
         {
-            opponentFinished = false;
-            GameState = GameplayState.Waiting;
+            didOpponentFinishHisTurn = false;
+            SetGameState( GameplayState.Waiting);
             OpponentPlayer.NewTurn();
             if (OpponentPlayer.Actions == 0)
             {
-                opponentFinished = true;
-                IsMyTurn = true;
+                didOpponentFinishHisTurn = true;
+                SetPlayersTurn(true);
             }
-            yield return new WaitUntil(() => opponentFinished);
+            yield return new WaitUntil(() => didOpponentFinishHisTurn);
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
@@ -180,40 +181,9 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public void TryUnchainGuardian()
+    public virtual void TryUnchainGuardian()
     {
-        if (GameState != GameplayState.Playing)
-        {
-            return;
-        }
-
-        if (!GetMyGuardian().IsChained)
-        {
-            DialogsManager.Instance.ShowOkDialog("Guardian is already unchained");
-            return;
-        }
-
-        if (!CanUseStrangeMatter())
-        {
-            return;
-        }
-
-        int _price = UnchainingGuardianPrice - StrangeMatterCostChange();
-
-        if (MyStrangeMatter() < _price && !GameplayCheats.HasUnlimitedGold)
-        {
-            DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
-            return;
-        }
-
-        DialogsManager.Instance.ShowYesNoDialog($"Spend {_price} to unchain guardian??", () => { YesUnchain(_price); });
-    }
-
-    private void YesUnchain(int _price)
-    {
-        ChangeMyStrangeMatter(-_price);
-        UnchainGuardian();
-        MyPlayer.Actions--;
+        throw new Exception();
     }
 
     public void UnchainGuardian()
@@ -221,121 +191,6 @@ public class GameplayManager : MonoBehaviour
         Guardian _guardian = GetMyGuardian();
         _guardian.Unchain();
         OnUnchainedGuardian?.Invoke();
-    }
-
-    private IEnumerator HandlePlaceRestOfTheCards()
-    {
-        if (IsMyTurn)
-        {
-            yield return PlaceLifeForceAndGuardian();
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-            hasOpponentPlacedStartingCards = false;
-            yield return new WaitForSeconds(0.5f);
-            yield return PlaceRestOfStartingCards();
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-        }
-        else
-        {
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-            yield return PlaceLifeForceAndGuardian();
-            yield return new WaitUntil(() => hasOpponentPlacedStartingCards);
-            hasOpponentPlacedStartingCards = false;
-            yield return new WaitForSeconds(0.5f);
-            yield return PlaceRestOfStartingCards();
-        }
-    }
-    
-    private IEnumerator PlaceLifeForceAndGuardian()
-    {
-        Card _lifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My);
-        Card _guardianCard = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
-        PlaceCard(_lifeForce, 11);
-        yield return new WaitForSeconds(0.4f);
-        PlaceCard(_guardianCard, 18);
-        MyPlayer.HideCards();
-    }
-    
-     private IEnumerator PlaceRestOfStartingCards()
-    {
-        yield return PlaceKeeper();
-        DialogsManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
-        yield return RequestCardToBePlaced(14, CardType.Minion);
-        yield return RequestCardToBePlaced(13, CardType.Minion);
-        yield return RequestCardToBePlaced(12, CardType.Minion);
-        yield return RequestCardToBePlaced(10, CardType.Minion);
-        yield return RequestCardToBePlaced(9, CardType.Minion);
-        yield return RequestCardToBePlaced(8, CardType.Minion);
-        MyPlayer.HideCards();
-
-        IEnumerator PlaceKeeper()
-        {
-            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
-            List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler>
-            {
-                TableHandler.GetPlace(10),
-                TableHandler.GetPlace(12)
-            };
-
-            foreach (var _availablePlace in _availablePlaces)
-            {
-                _availablePlace.SetColor(Color.green);
-            }
-
-            CardTableInteractions.OnPlaceClicked += DoSelectPlace;
-            bool _hasSelectedPlace = false;
-            int _selectedPlaceId = 0;
-
-            yield return new WaitUntil(() => _hasSelectedPlace);
-
-            foreach (var _availablePlace in _availablePlaces)
-            {
-                _availablePlace.SetColor(Color.white);
-            }
-            
-            Card _keeperCard = FindObjectsOfType<Keeper>().ToList().Find(_guardian => _guardian.My);
-            PlaceCard(_keeperCard,_selectedPlaceId);
-
-            void DoSelectPlace(TablePlaceHandler _place)
-            {
-                if (!_availablePlaces.Contains(_place))
-                {
-                    return;
-                }
-
-                CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
-                _selectedPlaceId = _place.Id;
-                _hasSelectedPlace = true;
-            }
-        }
-
-        IEnumerator RequestCardToBePlaced(int _placeId, CardType _type)
-        {
-            bool _hasSelectedCard = false;
-            Card _selectedCard = null;
-
-            TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
-            if (_place.IsOccupied)
-            {
-                yield break;
-            }
-            _place.SetColor(Color.green);
-
-            CardHandInteractions.OnCardClicked += SelectCard;
-            MyPlayer.ShowCards(_type);
-
-            yield return new WaitUntil(() => _hasSelectedCard);
-
-            _place.SetColor(Color.white);
-
-            PlaceCard(_selectedCard, _placeId);
-
-            void SelectCard(CardBase _card)
-            {
-                CardHandInteractions.OnCardClicked -= SelectCard;
-                _selectedCard = (_card as Card);
-                _hasSelectedCard = true;
-            }
-        }
     }
 
     public void PlaceStartingWall()
@@ -1070,17 +925,6 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    private bool CanUseStrangeMatter()
-    {
-        if (IsAbilityActive<Famine>())
-        {
-            DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
-            return false;
-        }
-
-        return true;
-    }
-
     public virtual int MyStrangeMatter()
     {
         throw new Exception();
@@ -1156,7 +1000,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
     
-    public virtual CardPlace CardPlace(string _uniqueCardId)
+    public virtual CardPlace GetCardPlace(string _uniqueCardId)
     {
         throw new Exception();
     }
@@ -1166,7 +1010,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual CardPlace CardPlace(CardBase _cardBase)
+    public virtual CardPlace GetCardPlace(CardBase _cardBase)
     {
         throw new Exception();
     }
@@ -1182,6 +1026,61 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void ShowCardMoved(string _uniqueId, int _positionId)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfActionsPerTurn()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsSettingUpTable()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetGameState(GameplayState _gameState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplayState GameState()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetHasGameEnded(bool _status)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool HasGameEnded()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsMyTurn()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetPlayersTurn(bool _isMyTurn)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool ShouldIPlaceStartingWall()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetGameplaySubState(GameplaySubState _subState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplaySubState GetGameplaySubState()
     {
         throw new Exception();
     }

@@ -1,11 +1,19 @@
+using System;
 using System.Collections;
 using FirebaseMultiplayer.Room;
 using UnityEngine;
 
 public class RoomUpdater : MonoBehaviour
 {
-    private RoomData roomData = new();
+    public static RoomUpdater Instance;
     
+    private RoomData roomData = new();
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         StartCoroutine(UpdateRoomData());
@@ -17,7 +25,7 @@ public class RoomUpdater : MonoBehaviour
         {
             yield return new WaitForSeconds(5);
             
-            if (!GameplayManager.Instance.MyTurn)
+            if (!GameplayManager.Instance.IsMyTurn())
             {
                 continue;
             }
@@ -30,5 +38,10 @@ public class RoomUpdater : MonoBehaviour
             roomData = FirebaseManager.Instance.RoomHandler.RoomData;
             FirebaseManager.Instance.RoomHandler.UpdateRoomData();
         }
+    }
+
+    public void ForceUpdate()
+    {
+        FirebaseManager.Instance.RoomHandler.UpdateRoomData();
     }
 }

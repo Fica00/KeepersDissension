@@ -56,7 +56,7 @@ public class BomberMinefield : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -84,7 +84,7 @@ public class BomberMinefield : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

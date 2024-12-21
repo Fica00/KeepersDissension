@@ -55,7 +55,7 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
         
         int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
         GameplayPlayer _player = _cardBase.GetIsMy() ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
+        if (GameplayManager.Instance.GameState() == GameplayState.UsingSpecialAbility)
         {
             return;
         }

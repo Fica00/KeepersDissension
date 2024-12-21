@@ -56,7 +56,7 @@ public class GameplayPlayer : MonoBehaviour
 
     public void NewTurn()
     {
-        Actions = GameplayManager.Instance.AmountOfActionsPerTurn;
+        Actions = GameplayManager.Instance.AmountOfActionsPerTurn();
         OnStartedTurn?.Invoke();
     }
 

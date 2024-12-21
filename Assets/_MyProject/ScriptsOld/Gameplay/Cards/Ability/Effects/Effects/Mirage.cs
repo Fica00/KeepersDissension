@@ -5,7 +5,7 @@ public class Mirage : AbilityEffect
 {
     protected override void ActivateForOwner()
     {
-        GameplayManager.Instance.GameState = GameplayState.SelectingCardFromTable;
+        GameplayManager.Instance.SetGameState(GameplayState.SelectingCardFromTable);
 
         MoveToActivationField();
         Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
@@ -26,7 +26,7 @@ public class Mirage : AbilityEffect
         if (_availablePlaces.Count==0)
         {
             DialogsManager.Instance.ShowOkDialog("You dont have minion to switch with");
-            GameplayManager.Instance.GameState = GameplayState.Playing;
+            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             RemoveAction();
             OnActivated?.Invoke();
             return;
@@ -67,7 +67,7 @@ public class Mirage : AbilityEffect
                 CanCounter = false
             };
             GameplayManager.Instance.ExecuteCardAction(_switchPosition);
-            GameplayManager.Instance.GameState = GameplayState.Playing;
+            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             RemoveAction();
             OnActivated?.Invoke();
         }

@@ -35,7 +35,7 @@ public class DeckDisplay : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData _eventData)
     {
-        if (GameplayManager.Instance.GameState is not (GameplayState.Playing or GameplayState.Waiting or GameplayState.AttackResponse))
+        if (GameplayManager.Instance.GameState() is not (GameplayState.Playing or GameplayState.Waiting or GameplayState.AttackResponse))
         {
             return;
         }

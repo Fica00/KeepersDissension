@@ -43,7 +43,8 @@ public class ScalerLeapfrog : CardSpecialAbility
             return;
         }
 
-        if (GameplayManager.Instance.GameState != GameplayState.Waiting)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState != GameplayState.Waiting)
         {
             return;
         }

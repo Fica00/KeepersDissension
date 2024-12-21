@@ -39,8 +39,8 @@ public class Revive : AbilityEffect
 
         IEnumerator ActivateRoutine()
         {
-            state = GameplayManager.Instance.GameState;
-            GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+            state = GameplayManager.Instance.GameState();
+            GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
             bool _continue;
             for (int _i = 0; _i < 3; _i++)
             {
@@ -59,7 +59,7 @@ public class Revive : AbilityEffect
                 ChooseCardImagePanel.Instance.Show(_validCards,PlaceMinion,true,true);
                 yield return new WaitUntil(() => _continue);
             }
-            GameplayManager.Instance.GameState = state;
+            GameplayManager.Instance.SetGameState(state);
             RemoveAction();
             OnActivated?.Invoke();
 

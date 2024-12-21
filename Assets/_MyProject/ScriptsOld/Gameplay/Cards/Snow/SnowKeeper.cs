@@ -14,7 +14,7 @@ public class SnowKeeper : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

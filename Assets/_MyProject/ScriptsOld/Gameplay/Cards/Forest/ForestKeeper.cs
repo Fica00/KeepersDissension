@@ -17,7 +17,7 @@ public class ForestKeeper : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

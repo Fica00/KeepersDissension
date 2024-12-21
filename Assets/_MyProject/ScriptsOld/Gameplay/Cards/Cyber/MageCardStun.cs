@@ -32,7 +32,7 @@ public class MageCardStun : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -42,13 +42,13 @@ public class MageCardStun : CardSpecialAbility
 
     private void YesUseStunAbility()
     {
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, range, PlaceLookFor.Occupied,
             Card.MovementType, false, LookForCardOwner.Both, SelectedSpot, _ignoreWalls:true);
 
         void SelectedSpot(int _id)
         {
-            GameplayManager.Instance.GameState = GameplayState.Playing;
+            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             if (_id == -1)
             {
                 DialogsManager.Instance.ShowOkDialog("No enemy cards found");

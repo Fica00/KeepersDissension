@@ -27,7 +27,7 @@ public class SniperStealth : CardSpecialAbility
             return;
         }
 
-        if (!GameplayManager.Instance.MyTurn)
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -252,7 +252,7 @@ public class SniperStealth : CardSpecialAbility
 
         if (GameplayManager.Instance.LastAction.Type== CardActionType.Move)
         {
-            if (!GameplayManager.Instance.MyTurn)
+            if (!GameplayManager.Instance.IsMyTurn())
             {
                 if (CardBase.GetIsMy())
                 {

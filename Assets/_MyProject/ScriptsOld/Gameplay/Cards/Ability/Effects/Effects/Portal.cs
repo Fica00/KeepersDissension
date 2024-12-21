@@ -8,8 +8,8 @@ public class Portal : AbilityEffect
 
     protected override void ActivateForOwner()
     {
-        GameplayState _gameState = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayState _gameState = GameplayManager.Instance.GameState();
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
 
         DialogsManager.Instance.ShowOkDialog("Select place for the portal");
         GameplayManager.Instance.SelectPlaceForSpecialAbility(10, 10, PlaceLookFor.Empty, CardMovementType.EightDirections, false,
@@ -23,7 +23,7 @@ public class Portal : AbilityEffect
             AddEffectedCard(_portal.UniqueId);;
             if (GetEffectedCards().Count == 2)
             {
-                GameplayManager.Instance.GameState = _gameState;
+                GameplayManager.Instance.SetGameState(_gameState);
                 GameplayManager.OnCardMoved += CheckCard;
                 RemoveAction();
                 SetIsActive(true);

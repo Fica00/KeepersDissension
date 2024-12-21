@@ -89,7 +89,8 @@ public class AbilityCard : CardBase
         {
             return false;
         }
-        if (GameplayManager.Instance.GameState != GameplayState.Playing)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState != GameplayState.Playing)
         {
             return false;
         }

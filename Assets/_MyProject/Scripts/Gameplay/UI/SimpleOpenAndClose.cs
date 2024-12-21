@@ -24,7 +24,8 @@ public class SimpleOpenAndClose : MonoBehaviour
 
     private void OpenObject()
     {
-        if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState == GameplayState.UsingSpecialAbility)
         {
             return;
         }

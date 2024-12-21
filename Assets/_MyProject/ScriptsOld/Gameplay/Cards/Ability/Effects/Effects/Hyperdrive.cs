@@ -10,13 +10,13 @@ public class Hyperdrive : AbilityEffect
 
     protected override void ActivateForOwner()
     {
-        gameplayState = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        gameplayState = GameplayManager.Instance.GameState();
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         List<CardBase> _availableEffects = GetAvailableEffects();
         
         if (_availableEffects.Count==0)
         {
-            GameplayManager.Instance.GameState = gameplayState;
+            GameplayManager.Instance.SetGameState(gameplayState);
             RemoveAction();
             OnActivated?.Invoke();
             DialogsManager.Instance.ShowOkDialog("You don't have any available abilities");
@@ -64,7 +64,7 @@ public class Hyperdrive : AbilityEffect
             
             if (_availableEffects.Count==0)
             {
-                GameplayManager.Instance.GameState = gameplayState;
+                GameplayManager.Instance.SetGameState(gameplayState);
                 RemoveAction();
                 OnActivated?.Invoke();
                 DialogsManager.Instance.ShowOkDialog("You don't have anymore available abilities");
@@ -102,7 +102,7 @@ public class Hyperdrive : AbilityEffect
     private void EndAbility()
     {
         MoveToActivationField();
-        GameplayManager.Instance.GameState = gameplayState;
+        GameplayManager.Instance.SetGameState(gameplayState);
         RemoveAction();
         OnActivated?.Invoke();
         abilityCard.Effect.OnActivated -= EndAbility;

@@ -80,8 +80,9 @@ public class CardActionsDisplay : MonoBehaviour
             DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
             return;
         }
-        
-        if (GameplayManager.Instance.GameState != GameplayState.Playing && GameplayManager.Instance.GameState != GameplayState.AttackResponse)
+
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState != GameplayState.Playing && _gameState != GameplayState.AttackResponse)
         {
             return;
         }
@@ -101,7 +102,8 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.GameState != GameplayState.Playing && GameplayManager.Instance.GameState != GameplayState.AttackResponse)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState != GameplayState.Playing && _gameState != GameplayState.AttackResponse)
         {
             return;
         }
@@ -143,7 +145,8 @@ public class CardActionsDisplay : MonoBehaviour
         }
 
         ResetDisplays();
-        if (GameplayManager.Instance.GameState == GameplayState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState == GameplayState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
         {
             int _id = FindObjectsOfType<Card>().ToList().Find(_card =>
                 _card.UniqueId == GameplayManager.Instance.IdOfCardWithResponseAction() && _card.My).GetTablePlace().Id;
@@ -240,7 +243,8 @@ public class CardActionsDisplay : MonoBehaviour
                     return;
                 }
                 
-                if (GameplayManager.Instance.GameState != GameplayState.Playing)
+                var _gameState = GameplayManager.Instance.GameState();
+                if (_gameState != GameplayState.Playing)
                 {
                     return;
                 }

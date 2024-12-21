@@ -31,7 +31,7 @@ public class GameplayManagerPvp : GameplayManager
 
     private void OpponentLeftRoom(RoomPlayer _player)
     {
-        if (HasGameEnded)
+        if (HasGameEnded())
         {
             return;
         }
@@ -123,13 +123,13 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void StopGame(bool _didIWin)
     {
-        if (HasGameEnded)
+        if (HasGameEnded())
         {
             return;
         }
         
         Debug.Log("Ending game");
-        HasGameEnded = true;
+        SetHasGameEnded(true);
         DataManager.Instance.PlayerData.CurrentRoomId=string.Empty;
         StopAllCoroutines();
         GameplayUI.Instance.ShowResult(_didIWin);
@@ -621,7 +621,7 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
 
-            if (GameState is not (GameplayState.Playing or GameplayState.Waiting))
+            if (GameState() is not (GameplayState.Playing or GameplayState.Waiting))
             {
                 return;
             }
@@ -984,16 +984,16 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         CloseAllPanels();
-        if (GameState == GameplayState.WaitingForAttackResponse)
+        if (GameState() == GameplayState.WaitingForAttackResponse)
         {
             return;
         }
 
         TableHandler.ActionsHandler.ClearPossibleActions();
 
-        if (GameState == GameplayState.AttackResponse)
+        if (GameState() == GameplayState.AttackResponse)
         {
-            GameState = GameplayState.Waiting;
+            SetGameState(GameplayState.Waiting);
             MyPlayer.Actions=0;
             GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions == 0? 1:OpponentPlayer.Actions,false,false);
             Debug.Log("Finished response action");
@@ -1001,18 +1001,18 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        if (!IsMyTurn)
+        if (!IsMyTurn())
         {
             return;
         }
 
-        if (GameState != GameplayState.Playing)
+        if (GameState() != GameplayState.Playing)
         {
             return;
         }
 
-        Finished = true;
-        IsMyTurn = false;
+        DidIFinishMyTurn = true;
+        SetPlayersTurn(false);
 
         FirebaseNotificationHandler.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
         AudioManager.Instance.PlaySoundEffect("EndTurn");
@@ -1020,8 +1020,8 @@ public class GameplayManagerPvp : GameplayManager
     
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack=null)
     {
-        GameplayState _gameState = GameState;
-        GameState = GameplayState.BuyingMinion;
+        GameplayState _gameState = GameState(); 
+        SetGameState(GameplayState.BuyingMinion);
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
@@ -1032,7 +1032,7 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 HandleBoughtMinion(_positionId);
-                GameState = _gameState;
+                SetGameState(_gameState);
                 _callBack?.Invoke();
                 if (_cost>0)
                 {
@@ -1064,8 +1064,8 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuildWall(CardBase _cardBase, int _cost)
     {
-        GameplayState _state = GameState;
-        GameState = GameplayState.BuildingWall;
+        GameplayState _state = GameState();
+        SetGameState(GameplayState.BuildingWall);
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
@@ -1076,7 +1076,7 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 HandleBuildWall(_cardBase, _cost, _positionId, _cardId);
-                GameState = _state;
+                SetGameState(_state);
                 if (_cost>0)
                 {
                     MyPlayer.Actions--;
@@ -1117,7 +1117,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         SetIdOfCardWithResponseAction(_cardId);
         MyPlayer.Actions = 1;
-        GameState = GameplayState.AttackResponse;
+        SetGameState(GameplayState.AttackResponse);
         GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true,true);
         DialogsManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
@@ -1590,7 +1590,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
-        GameState = GameplayState.WaitingForAttackResponse;
+        SetGameState(GameplayState.WaitingForAttackResponse);
         GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false,true);
         DialogsManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
@@ -1838,7 +1838,7 @@ public class GameplayManagerPvp : GameplayManager
         return null; 
     }
     
-    public override CardPlace CardPlace(string _uniqueCardId)
+    public override CardPlace GetCardPlace(string _uniqueCardId)
     {
         return GetCard(_uniqueCardId).Data.CardPlace;
     }
@@ -1848,9 +1848,9 @@ public class GameplayManagerPvp : GameplayManager
         GetCard(_uniqueCardId).Data.CardPlace = _place;
     }
 
-    public override CardPlace CardPlace(CardBase _cardBase)
+    public override CardPlace GetCardPlace(CardBase _cardBase)
     {
-        CardPlace _cardPlace = global::CardPlace.Deck;
+        CardPlace _cardPlace = CardPlace.Deck;
         if (_cardBase is Card _cardCard)
         {
             _cardPlace = _cardCard.Data.CardPlace;
@@ -1861,5 +1861,235 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         return _cardPlace;
+    }
+
+    public override void TryUnchainGuardian()
+    {
+        if (GameState() != GameplayState.Playing)
+        {
+            return;
+        }
+
+        if (!GetMyGuardian().IsChained)
+        {
+            DialogsManager.Instance.ShowOkDialog("Guardian is already unchained");
+            return;
+        }
+
+        if (IsAbilityActive<Famine>())
+        {
+            DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
+            return;
+        }
+
+        int _price = boardData.UnchainingGuardianPrice - StrangeMatterCostChange();
+
+        if (MyStrangeMatter() < _price && !GameplayCheats.HasUnlimitedGold)
+        {
+            DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
+            return;
+        }
+
+        DialogsManager.Instance.ShowYesNoDialog($"Spend {_price} to unchain guardian??", () => { YesUnchain(_price); });
+    }
+    
+    private void YesUnchain(int _price)
+    {
+        ChangeMyStrangeMatter(-_price);
+        UnchainGuardian();
+        MyPlayer.Actions--;
+    }
+
+    public override int AmountOfActionsPerTurn()
+    {
+        return boardData.AmountOfActionsPerTurn;
+    }
+
+    public override bool IsSettingUpTable()
+    {
+        return RoomData.GameplayState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
+    }
+    
+    public override void SetGameState(GameplayState _gameState)
+    {
+        RoomData.GameplayState = _gameState;
+    }
+
+    public override GameplayState GameState()
+    {
+        return RoomData.GameplayState;
+    }
+
+    public override void SetHasGameEnded(bool _status)
+    {
+        RoomData.HasGameEnded = _status;
+    }
+
+    public override bool HasGameEnded()
+    {
+        return RoomData.HasGameEnded;
+    }
+    
+    public override bool IsMyTurn()
+    {
+        return RoomData.IsMyTurn;
+    }
+
+    public override void SetPlayersTurn(bool _isMyTurn)
+    {
+        if (roomHandler.IsOwner)
+        {
+            RoomData.CurrentPlayerTurn = _isMyTurn ? 1 : 2;
+        }
+        else
+        {
+            RoomData.CurrentPlayerTurn = _isMyTurn ? 2 : 1;
+        }
+    }
+
+    public override bool ShouldIPlaceStartingWall()
+    {
+        return !IsMyTurn();
+    }
+    
+    public override void SetGameplaySubState(GameplaySubState _subState)
+    {
+        RoomData.GameplaySubState = _subState;
+    }
+
+    public override GameplaySubState GetGameplaySubState()
+    {
+        return RoomData.GameplaySubState;
+    }
+
+    protected override IEnumerator PlaceLifeForceAndGuardianRoutine()
+    {
+        if (IsMyTurn())
+        {
+            yield return PlaceLifeForceAndGuardian();
+            SetGameplaySubState(GameplaySubState.Player2PlacingLifeForce);
+            yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedPlacingStartingLifeForce);
+        }
+        else
+        {
+            yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
+            yield return PlaceLifeForceAndGuardian();
+            SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
+            RoomUpdater.Instance.ForceUpdate();
+        }
+
+        yield return new WaitForSeconds(1);
+    }
+    
+    private IEnumerator PlaceLifeForceAndGuardian()
+    {
+        Card _lifeForce = FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My);
+        Card _guardianCard = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
+        PlaceCard(_lifeForce, 11);
+        yield return new WaitForSeconds(0.4f);
+        PlaceCard(_guardianCard, 18);
+        MyPlayer.HideCards();
+    }
+
+    protected override IEnumerator PlaceMinions()
+    {
+        if (IsMyTurn())
+        {
+            yield return PlaceRestOfStartingCards();
+            yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedSelectingMinions);
+        }
+        else
+        {
+        
+            yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.Player2SelectMinions);
+            yield return PlaceRestOfStartingCards();
+            SetGameplaySubState(GameplaySubState.FinishedSelectingMinions);
+            RoomUpdater.Instance.ForceUpdate();
+        }
+
+        yield return new WaitForSeconds(0.5f);
+    }
+    
+     private IEnumerator PlaceRestOfStartingCards()
+    {
+        yield return PlaceKeeper();
+        DialogsManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+        yield return RequestCardToBePlaced(14, CardType.Minion);
+        yield return RequestCardToBePlaced(13, CardType.Minion);
+        yield return RequestCardToBePlaced(12, CardType.Minion);
+        yield return RequestCardToBePlaced(10, CardType.Minion);
+        yield return RequestCardToBePlaced(9, CardType.Minion);
+        yield return RequestCardToBePlaced(8, CardType.Minion);
+        MyPlayer.HideCards();
+
+        IEnumerator PlaceKeeper()
+        {
+            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
+            List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler>
+            {
+                TableHandler.GetPlace(10),
+                TableHandler.GetPlace(12)
+            };
+
+            foreach (var _availablePlace in _availablePlaces)
+            {
+                _availablePlace.SetColor(Color.green);
+            }
+
+            CardTableInteractions.OnPlaceClicked += DoSelectPlace;
+            bool _hasSelectedPlace = false;
+            int _selectedPlaceId = 0;
+
+            yield return new WaitUntil(() => _hasSelectedPlace);
+
+            foreach (var _availablePlace in _availablePlaces)
+            {
+                _availablePlace.SetColor(Color.white);
+            }
+            
+            Card _keeperCard = FindObjectsOfType<Keeper>().ToList().Find(_guardian => _guardian.My);
+            PlaceCard(_keeperCard,_selectedPlaceId);
+
+            void DoSelectPlace(TablePlaceHandler _place)
+            {
+                if (!_availablePlaces.Contains(_place))
+                {
+                    return;
+                }
+
+                CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                _selectedPlaceId = _place.Id;
+                _hasSelectedPlace = true;
+            }
+        }
+
+        IEnumerator RequestCardToBePlaced(int _placeId, CardType _type)
+        {
+            bool _hasSelectedCard = false;
+            Card _selectedCard = null;
+
+            TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+            if (_place.IsOccupied)
+            {
+                yield break;
+            }
+            _place.SetColor(Color.green);
+
+            CardHandInteractions.OnCardClicked += SelectCard;
+            MyPlayer.ShowCards(_type);
+
+            yield return new WaitUntil(() => _hasSelectedCard);
+
+            _place.SetColor(Color.white);
+
+            PlaceCard(_selectedCard, _placeId);
+
+            void SelectCard(CardBase _card)
+            {
+                CardHandInteractions.OnCardClicked -= SelectCard;
+                _selectedCard = (_card as Card);
+                _hasSelectedCard = true;
+            }
+        }
     }
 }

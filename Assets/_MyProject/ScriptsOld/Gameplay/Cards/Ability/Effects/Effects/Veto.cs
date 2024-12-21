@@ -26,8 +26,8 @@ public class Veto : AbilityEffect
             return;
         }
         
-        GameplayState _state = GameplayManager.Instance.GameState;
-        GameplayManager.Instance.GameState = GameplayState.UsingSpecialAbility;
+        GameplayState _state = GameplayManager.Instance.GameState();
+        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         List<CardBase> _cards = new List<CardBase>();
         foreach (var _availableCard in _availableCards)
         {
@@ -40,7 +40,7 @@ public class Veto : AbilityEffect
         {
             SetIsActive(true);
             AddEffectedCard((_card as AbilityCard)?.UniqueId);
-            GameplayManager.Instance.GameState = _state;
+            GameplayManager.Instance.SetGameState(_state);
             RemoveAction();
             OnActivated?.Invoke();
             _card.RotateToBeVertical();

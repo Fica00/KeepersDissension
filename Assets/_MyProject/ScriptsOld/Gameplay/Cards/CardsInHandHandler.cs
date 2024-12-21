@@ -45,9 +45,10 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      closeButton.gameObject.SetActive(GameplayManager.Instance.GameState == GameplayState.Playing ||
-                                       GameplayManager.Instance.GameState == GameplayState.Waiting ||
-                                       GameplayManager.Instance.GameState == GameplayState.AttackResponse);
+      var _gameState = GameplayManager.Instance.GameState();
+      closeButton.gameObject.SetActive(_gameState == GameplayState.Playing ||
+                                       _gameState == GameplayState.Waiting ||
+                                       _gameState == GameplayState.AttackResponse);
 
       ClearShownCards();
       backGround.SetActive(true);
@@ -67,7 +68,7 @@ public class CardsInHandHandler : MonoBehaviour
       foreach (var _ownedCard in GameplayManager.Instance.GetOwnedAbilities(player.IsMy))
       {
          var _card = GameplayManager.Instance.GetCard(_ownedCard.UniqueId);
-         CardPlace _cardPlace = GameplayManager.Instance.CardPlace(_card);
+         CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
          if (_cardPlace== CardPlace.Table)
          {
             continue;
@@ -103,7 +104,7 @@ public class CardsInHandHandler : MonoBehaviour
             Destroy(_cardHandInteractions);
          }
 
-         CardPlace _cardPlace = GameplayManager.Instance.CardPlace(_card);
+         CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
          if (!(_cardPlace == CardPlace.Hand || _cardPlace == CardPlace.Graveyard))
          {
             continue;
@@ -122,7 +123,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
       
-      CardPlace _cardPlace = GameplayManager.Instance.CardPlace(_card);
+      CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
       if (_cardPlace == CardPlace.Table)
       {
          return;
@@ -137,8 +138,9 @@ public class CardsInHandHandler : MonoBehaviour
       {
          return;
       }
-      
-      if (GameplayManager.Instance.GameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+
+      var _gameState = GameplayManager.Instance.GameState();
+      if (_gameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
       {
          return;
       }
@@ -180,7 +182,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      CardPlace _cardPlace = GameplayManager.Instance.CardPlace(_card);
+      CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
       if (_cardPlace == CardPlace.Table)
       {
          return;
@@ -203,7 +205,8 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (GameplayManager.Instance.GameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+      var _gameState = GameplayManager.Instance.GameState();
+      if (_gameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
       {
          return;
       }

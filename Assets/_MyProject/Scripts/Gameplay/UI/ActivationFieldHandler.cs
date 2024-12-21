@@ -89,7 +89,8 @@ public class ActivationFieldHandler : MonoBehaviour
     
     private void CheckCard(CardBase _cardBase)
     {
-        if (GameplayManager.Instance.GameState!=GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+        var _gameState = GameplayManager.Instance.GameState();
+        if (_gameState!=GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
         {
             return;
         }

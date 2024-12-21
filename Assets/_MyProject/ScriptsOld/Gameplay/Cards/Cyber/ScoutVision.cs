@@ -47,7 +47,7 @@ public class ScoutVision : CardSpecialAbility
             return;
         }
 
-        CardPlace _cardPlace = GameplayManager.Instance.CardPlace(Card);
+        CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(Card);
         if (_cardPlace != CardPlace.Table)
         {
             return;
