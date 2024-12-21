@@ -7,7 +7,7 @@ public class Card : CardBase
 
     public CardDetails Details;
     private CardData cardData;
-    public CardData Data;
+    public CardData Data => cardData;
 
     public int Health => cardData.Stats.Health;
     public int Range => cardData.Stats.Range;

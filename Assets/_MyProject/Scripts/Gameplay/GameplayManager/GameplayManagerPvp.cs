@@ -181,6 +181,12 @@ public class GameplayManagerPvp : GameplayManager
     public override void ShowCardPlaced(string _uniqueId, int _positionId)
     {
         Card _card = GetCard(_uniqueId);
+        if (_card == null)
+        {
+            Debug.Log($"Didn't manage to find card with id {_uniqueId}");
+            return;
+        }
+        
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
         OnPlacedCard?.Invoke(_card);
     }
