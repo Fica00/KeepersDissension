@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using FirebaseMultiplayer.Room;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class RoomUpdater : MonoBehaviour
@@ -42,6 +43,7 @@ public class RoomUpdater : MonoBehaviour
 
     public void ForceUpdate()
     {
+        Debug.Log("Force updating data: "+ JsonConvert.SerializeObject(FirebaseManager.Instance.RoomHandler.RoomData));
         FirebaseManager.Instance.RoomHandler.UpdateRoomData();
     }
 }
