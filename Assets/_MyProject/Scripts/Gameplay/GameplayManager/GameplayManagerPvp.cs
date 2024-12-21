@@ -8,14 +8,13 @@ using FirebaseMultiplayer.Room;
 
 public class GameplayManagerPvp : GameplayManager
 {
-    private RoomHandler roomHandler;
-    private RoomData RoomData => roomHandler.RoomData;
-    private BoardData boardData => roomHandler.RoomData.BoardData;
+    private RoomHandler RoomHandler => FirebaseManager.Instance.RoomHandler;
+    private RoomData RoomData => RoomHandler.RoomData;
+    private BoardData BoardData => RoomData.BoardData;
 
     protected override void Awake()
     {
         base.Awake();
-        roomHandler = FirebaseManager.Instance.RoomHandler;
         DataManager.Instance.PlayerData.CurrentRoomId = RoomData.Id;
     }
 
@@ -43,10 +42,10 @@ public class GameplayManagerPvp : GameplayManager
     protected override void SetupTable()
     {
         MyPlayer.Setup(DataManager.Instance.PlayerData.FactionId, true);
-        RoomPlayer _opponent = roomHandler.GetOpponent();
+        RoomPlayer _opponent = RoomHandler.GetOpponent();
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.Setup();
-        if (!roomHandler.IsOwner)
+        if (!RoomHandler.IsOwner)
         {
             return;
         }
@@ -93,7 +92,7 @@ public class GameplayManagerPvp : GameplayManager
         
         if (_addCard)
         {
-            CardData _cardData = _card.GenerateCardData(_owner);
+            CardData _cardData = _card.GenerateCardData(_owner,_uniqueId);
             _card.SetUniqueId(_cardData.UniqueId);
             AddCard(_cardData);
         }
@@ -104,7 +103,7 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override bool DecideWhoPlaysFirst()
     {
-        return roomHandler.IsOwner;
+        return RoomHandler.IsOwner;
     }
 
     public override void StopGame(bool _didIWin)
@@ -202,8 +201,8 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         _abilityData.Owner = _player.PlayerId;
-        boardData.Abilities.Add(_abilityData);
-        boardData.AvailableAbilities.Remove(_abilityData);
+        BoardData.Abilities.Add(_abilityData);
+        BoardData.AvailableAbilities.Remove(_abilityData);
     }
 
     public override void AddAbilityToShop(string _abilityId)
@@ -840,12 +839,12 @@ public class GameplayManagerPvp : GameplayManager
         
     private int LootChangeForRoomOwner()
     {
-        return roomHandler.IsOwner ? boardData.MyPlayer.LootChange : boardData.OpponentPlayer.LootChange;
+        return RoomHandler.IsOwner ? BoardData.MyPlayer.LootChange : BoardData.OpponentPlayer.LootChange;
     }
 
     private int LootChangeForOther()
     {
-        return roomHandler.IsOwner ? boardData.OpponentPlayer.LootChange : boardData.MyPlayer.LootChange;
+        return RoomHandler.IsOwner ? BoardData.OpponentPlayer.LootChange : BoardData.MyPlayer.LootChange;
     }
 
     private IEnumerator GetPlaceOnTable(Action<int> _callBack, bool _wholeTable = false)
@@ -1001,7 +1000,7 @@ public class GameplayManagerPvp : GameplayManager
         DidIFinishMyTurn = true;
         SetPlayersTurn(false);
 
-        FirebaseNotificationHandler.Instance.SendNotificationToUser(roomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
+        FirebaseNotificationHandler.Instance.SendNotificationToUser(RoomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
         AudioManager.Instance.PlaySoundEffect("EndTurn");
     }
     
@@ -1245,7 +1244,7 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         _ability.Owner = FirebaseManager.Instance.PlayerId;
-        boardData.Abilities.Add(_ability);
+        BoardData.Abilities.Add(_ability);
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
 
@@ -1263,7 +1262,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyAbilityFromHand(string _abilityId)
     {
-        boardData.AbilitiesInShop.Remove(boardData.AbilitiesInShop.Find(_ability => _ability.UniqueId == _abilityId));
+        BoardData.AbilitiesInShop.Remove(BoardData.AbilitiesInShop.Find(_ability => _ability.UniqueId == _abilityId));
         MyPlayer.AddOwnedAbility(_abilityId);
         ChangeAmountOfAbilitiesICanBuy(-1);
 
@@ -1670,67 +1669,67 @@ public class GameplayManagerPvp : GameplayManager
 
     public override int StrangeMaterInEconomy()
     {
-        return boardData.StrangeMaterInEconomy;
+        return BoardData.StrangeMaterInEconomy;
     }
 
     public override void ChangeStrangeMaterInEconomy(int _amount)
     {
-        boardData.StrangeMaterInEconomy += _amount;
+        BoardData.StrangeMaterInEconomy += _amount;
     }
     
     public override int StrangeMatterCostChange()
     {
-        return boardData.StrangeMatterCostChange;
+        return BoardData.StrangeMatterCostChange;
     }
 
     public override void ChangeStrangeMatterCostChange(int _amount)
     {
-        boardData.StrangeMatterCostChange += _amount;
+        BoardData.StrangeMatterCostChange += _amount;
     }
     
     public override string IdOfCardWithResponseAction()
     {
-        return boardData.IdOfCardWithResponseAction;
+        return BoardData.IdOfCardWithResponseAction;
     }
 
     private void SetIdOfCardWithResponseAction(string _cardId)
     {
-        boardData.IdOfCardWithResponseAction = _cardId;
+        BoardData.IdOfCardWithResponseAction = _cardId;
     }
     
     public override void ChangeLootAmountForMe(int _amount)
     {
-        boardData.MyPlayer.LootChange += _amount;
+        BoardData.MyPlayer.LootChange += _amount;
     }
 
     public override int MyStrangeMatter()
     {
-        return boardData.MyPlayer.StrangeMatter;
+        return BoardData.MyPlayer.StrangeMatter;
     }
 
     public override int OpponentsStrangeMatter()
     {
-        return boardData.OpponentPlayer.StrangeMatter;
+        return BoardData.OpponentPlayer.StrangeMatter;
     }
     
     public override void ChangeMyStrangeMatter(int _amount)
     {
-        boardData.MyPlayer.StrangeMatter += _amount;
+        BoardData.MyPlayer.StrangeMatter += _amount;
     }
     
     public override void ChangeOpponentsStrangeMatter(int _amount)
     {
-        boardData.OpponentPlayer.StrangeMatter += _amount;
+        BoardData.OpponentPlayer.StrangeMatter += _amount;
     }
     
     public override int AmountOfAbilitiesPlayerCanBuy()
     {
-        return boardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy;
+        return BoardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy;
     }
 
     public override void ChangeAmountOfAbilitiesICanBuy(int _amount)
     {
-        boardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy += _amount;
+        BoardData.MyPlayer.AmountOfAbilitiesPlayerCanBuy += _amount;
     }
     
     public override List<Card> GetAllCardsOfType(CardType _type, bool _forMe)
@@ -1740,12 +1739,13 @@ public class GameplayManagerPvp : GameplayManager
     
     public override void AddCard(CardData _cardData)
     {
-        boardData.Cards.Add(_cardData);
+        Debug.Log("Adding card: "+_cardData.UniqueId);
+        BoardData.Cards.Add(_cardData);
     }
 
     public override void AddAbility(AbilityData _abilityData, bool _forMe)
     {
-        boardData.Abilities.Add(_abilityData);
+        BoardData.Abilities.Add(_abilityData);
     }
 
     public override AbilityCard GetAbility(string _uniqueId)
@@ -1766,7 +1766,7 @@ public class GameplayManagerPvp : GameplayManager
     public override void RemoveAbility(string _uniqueId, bool _forMe)
     {
         AbilityData _cardData = null;
-        foreach (var _card in boardData.Abilities)
+        foreach (var _card in BoardData.Abilities)
         {
             if (_card.UniqueId != _uniqueId)
             {
@@ -1781,7 +1781,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        boardData.Abilities.Remove(_cardData);    
+        BoardData.Abilities.Remove(_cardData);    
     }
 
     public override Card GetCardOfType(CardType _type, bool _forMe)
@@ -1806,8 +1806,8 @@ public class GameplayManagerPvp : GameplayManager
 
     public override List<AbilityData> GetOwnedAbilities(bool _forMe)
     {
-        string _playerId = _forMe ? boardData.MyPlayer.PlayerId : boardData.OpponentPlayer.PlayerId;
-        return boardData.Abilities.FindAll(_ability => _ability.UniqueId == _playerId);
+        string _playerId = _forMe ? BoardData.MyPlayer.PlayerId : BoardData.OpponentPlayer.PlayerId;
+        return BoardData.Abilities.FindAll(_ability => _ability.UniqueId == _playerId);
     }
 
     public override Card GetCard(string _uniqueId)
@@ -1869,7 +1869,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        int _price = boardData.UnchainingGuardianPrice - StrangeMatterCostChange();
+        int _price = BoardData.UnchainingGuardianPrice - StrangeMatterCostChange();
 
         if (MyStrangeMatter() < _price && !GameplayCheats.HasUnlimitedGold)
         {
@@ -1889,7 +1889,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override int AmountOfActionsPerTurn()
     {
-        return boardData.AmountOfActionsPerTurn;
+        return BoardData.AmountOfActionsPerTurn;
     }
 
     public override bool IsSettingUpTable()
@@ -1924,7 +1924,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void SetPlayersTurn(bool _isMyTurn)
     {
-        if (roomHandler.IsOwner)
+        if (RoomHandler.IsOwner)
         {
             RoomData.CurrentPlayerTurn = _isMyTurn ? 1 : 2;
         }

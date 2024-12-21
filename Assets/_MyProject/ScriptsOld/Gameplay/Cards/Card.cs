@@ -9,7 +9,6 @@ public class Card : CardBase
 
     private string uniqueId;
     public CardData CardData => FirebaseManager.Instance.RoomHandler.BoardData.Cards.Find(_card => _card.UniqueId == uniqueId);
-
     public int Health => CardData.Stats.Health;
     public int Range => CardData.Stats.Range;
     public int Damage => CardData.Stats.Damage;
@@ -28,17 +27,18 @@ public class Card : CardBase
 
     public void Setup(string _uniqueId)
     {
+        Debug.Log("Setting up card with id: "+_uniqueId);
         uniqueId = _uniqueId;
         Display.Setup(this);
         Setup();
     }
 
-    public CardData GenerateCardData(string _owner)
+    public CardData GenerateCardData(string _owner, string _uniqueId)
     {
         return new CardData
         {
             Owner = _owner,
-            UniqueId = Guid.NewGuid().ToString(),
+            UniqueId = _uniqueId,
             CardId = Details.Id,
             IsVoid = false,
             CanFlyToDodgeAttack = false,
