@@ -46,7 +46,7 @@ public class GameplayManagerPvp : GameplayManager
         RoomPlayer _opponent = roomHandler.GetOpponent();
         OpponentPlayer.Setup(_opponent.FactionId,false);
         GameplayUI.Instance.Setup();
-        if (roomHandler.IsOwner)
+        if (!roomHandler.IsOwner)
         {
             return;
         }
@@ -99,30 +99,30 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override bool DecideWhoPlaysFirst()
     {
-        RoomPlayer _myPlayer = roomHandler.GetMyPlayer();
-        RoomPlayer _opponent = roomHandler.GetOpponent();
-        int _opponentMatchesPlayed =
-            Convert.ToInt32(_opponent.MatchesPlayed);
-        if (_opponentMatchesPlayed < _myPlayer.MatchesPlayed)
-        {
-            return false;
-        }
-
-        if (_opponentMatchesPlayed > _myPlayer.MatchesPlayed)
-        {
-            return true;
-        }
-
-        DateTime _opponentDateCreated = _opponent.DateCreated;
-        if (_opponentDateCreated < _myPlayer.DateCreated)
-        {
-            return false;
-        }
-
-        if (_opponentDateCreated > _myPlayer.DateCreated)
-        {
-            return true;
-        }
+        // RoomPlayer _myPlayer = roomHandler.GetMyPlayer();
+        // RoomPlayer _opponent = roomHandler.GetOpponent();
+        // int _opponentMatchesPlayed =
+        //     Convert.ToInt32(_opponent.MatchesPlayed);
+        // if (_opponentMatchesPlayed < _myPlayer.MatchesPlayed)
+        // {
+        //     return false;
+        // }
+        //
+        // if (_opponentMatchesPlayed > _myPlayer.MatchesPlayed)
+        // {
+        //     return true;
+        // }
+        //
+        // DateTime _opponentDateCreated = _opponent.DateCreated;
+        // if (_opponentDateCreated < _myPlayer.DateCreated)
+        // {
+        //     return false;
+        // }
+        //
+        // if (_opponentDateCreated > _myPlayer.DateCreated)
+        // {
+        //     return true;
+        // }
 
         return roomHandler.IsOwner;
     }
