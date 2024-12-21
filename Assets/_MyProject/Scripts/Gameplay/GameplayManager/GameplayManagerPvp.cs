@@ -1976,8 +1976,6 @@ public class GameplayManagerPvp : GameplayManager
             Debug.Log("Placing my life force and guardian");
             yield return PlaceLifeForceAndGuardian();
             SetGameplaySubState(GameplaySubState.Player2PlacingLifeForce);
-            yield return new WaitForSeconds(5f);
-            RoomUpdater.Instance.ForceUpdate();
             Debug.Log("Waiting for 2 to place his life force and guardian");
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedPlacingStartingLifeForce);
         }
@@ -2015,10 +2013,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             Debug.Log("Placing starting minions");
             yield return PlaceRestOfStartingCards();
-            yield return new WaitForSeconds(5f);
-            Debug.Log("Telling player 2 to place his minions");
             SetGameplaySubState(GameplaySubState.Player2SelectMinions);
-            RoomUpdater.Instance.ForceUpdate();
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedSelectingMinions);
         }
         else
