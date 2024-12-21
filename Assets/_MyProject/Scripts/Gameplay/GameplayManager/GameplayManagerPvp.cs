@@ -1970,20 +1970,29 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override IEnumerator PlaceLifeForceAndGuardianRoutine()
     {
+        Debug.Log("Is my turn: "+ IsMyTurn());
         if (IsMyTurn())
         {
+            Debug.Log("Placing my life force and guardian");
             yield return PlaceLifeForceAndGuardian();
             SetGameplaySubState(GameplaySubState.Player2PlacingLifeForce);
+            RoomUpdater.Instance.ForceUpdate();
+            Debug.Log("Waiting for 2 to place his life force and guardian");
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedPlacingStartingLifeForce);
         }
         else
         {
+            Debug.Log("Waiting for 1 player to place life force and guardian");
             yield return new WaitUntil(() => GetGameplaySubState() ==GameplaySubState.Player2PlacingLifeForce);
+            Debug.Log("Placing my life force and guardian");
             yield return PlaceLifeForceAndGuardian();
+            Debug.Log("Telling player 1 that I placed my guardian and life force");
             SetGameplaySubState(GameplaySubState.FinishedPlacingStartingLifeForce);
             RoomUpdater.Instance.ForceUpdate();
         }
 
+        
+        Debug.Log("Finished with placing starting life force and guardian");
         yield return new WaitForSeconds(1);
     }
     
@@ -1999,25 +2008,33 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override IEnumerator PlaceMinions()
     {
+        Debug.Log("Is my turn inside place minions: "+IsMyTurn());
         if (IsMyTurn())
         {
+            Debug.Log("Placing starting minions");
             yield return PlaceRestOfStartingCards();
+            Debug.Log("Telling player 2 to place his minions");
+            SetGameplaySubState(GameplaySubState.Player2SelectMinions);
+            RoomUpdater.Instance.ForceUpdate();
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedSelectingMinions);
         }
         else
         {
-        
+            Debug.Log("Waiting for opponent to place starting cards");
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.Player2SelectMinions);
             yield return PlaceRestOfStartingCards();
+            Debug.Log("Telling 1. player that I finished with setting up minions");
             SetGameplaySubState(GameplaySubState.FinishedSelectingMinions);
             RoomUpdater.Instance.ForceUpdate();
         }
 
         yield return new WaitForSeconds(0.5f);
+        Debug.Log("Finished with setting up the table");
     }
     
      private IEnumerator PlaceRestOfStartingCards()
-    {
+     {
+         yield return new WaitForSeconds(0.5f); //idk random delay, keep it here
         yield return PlaceKeeper();
         DialogsManager.Instance.ShowOkBigDialog("Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
         yield return RequestCardToBePlaced(14, CardType.Minion);
