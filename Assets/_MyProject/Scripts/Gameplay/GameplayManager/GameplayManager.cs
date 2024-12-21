@@ -100,9 +100,7 @@ public class GameplayManager : MonoBehaviour
         SetPlayersTurn(DecideWhoPlaysFirst());
         doIPlayFirst = IsMyTurn();
 
-        SetGameplaySubState(GameplaySubState.Player1PlacingLifeForce);
         yield return PlaceLifeForceAndGuardianRoutine();
-        SetGameplaySubState(GameplaySubState.Player1SelectMinions);
         yield return PlaceMinions();
 
         if (ShouldIPlaceStartingWall())
