@@ -79,7 +79,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         var _createdCard = CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.Owner);
         _createdCard.SetData(_cardData);
-        Debug.Log(_createdCard.name, _createdCard);
     }
 
     private Card CreateCard(int _cardId,TableSideHandler _tableSideHandler, string _playerId)
