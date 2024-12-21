@@ -188,11 +188,23 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         _card.PositionOnTable(TableHandler.GetPlace(_positionId));
-        Debug.Log("Should position card: ",_card.gameObject);
-        Debug.Log("On place: ",TableHandler.GetPlace(_positionId).gameObject);
         OnPlacedCard?.Invoke(_card);
     }
-    
+
+    public override void ShowCardMoved(string _uniqueId, int _positionId)
+    {
+        Card _card = GetCard(_uniqueId);
+        if (_card == null)
+        {
+            Debug.Log($"Didn't manage to find card with id {_uniqueId}");
+            return;
+        }
+
+        var _destination = TableHandler.GetPlace(_positionId);
+        
+        _card.MoveToPosition(_destination);
+    }
+
     public override void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
     {
         var _player = _isMyPlayer ? FirebaseManager.Instance.RoomHandler.BoardData.MyPlayer : FirebaseManager.Instance.RoomHandler.BoardData.OpponentPlayer;
@@ -263,7 +275,7 @@ public class GameplayManagerPvp : GameplayManager
             }
         }
 
-        _movingCard.MoveToPosition(_destination);
+        ShowCardMoved(_movingCard.UniqueId, _destination.Id);
         OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId, _action.DidTeleport);
         PlayMovingSoundEffect(_movingCard);
     }

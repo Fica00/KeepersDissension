@@ -58,7 +58,6 @@ public class Initialization : MonoBehaviour
 
     private void LoadAppropriateScene()
     {
-        Debug.Log(FirebaseManager.Instance.Authentication.UserId);
         DeviceIdHandler.Instance.Setup();
         SceneManager.LoadMainMenu();
     }

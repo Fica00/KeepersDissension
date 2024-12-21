@@ -32,8 +32,6 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
 
-        private List<string> createdCardsThisUpdate = new ();
-
         public void Init(DatabaseReference _database, string _roomsPath)
         {
             database = _database;
@@ -109,7 +107,6 @@ namespace FirebaseMultiplayer.Room
             }
 
             RoomData _data = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
-            Debug.Log("Got data: "+_args.Snapshot.GetRawJsonValue());
             if (_data == null)
             {
                 Debug.Log("Didn't manage to convert: "+_args.Snapshot.GetRawJsonValue()+" to roomdata");
@@ -125,7 +122,7 @@ namespace FirebaseMultiplayer.Room
             CheckIfPlayerJoined(_data);
             CheckIfPlayerLeft(_data);
             CheckIfCreatedCard(_data);
-            CheckIfPlacedCard(_data);
+            CheckIfCardMoved(_data);
             roomData = _data;
         }
 
@@ -170,7 +167,6 @@ namespace FirebaseMultiplayer.Room
 
         private void CheckIfCreatedCard(RoomData _data)
         {
-            createdCardsThisUpdate.Clear();
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldSpawnCard = true;
@@ -189,20 +185,15 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldSpawnCard)
                 {
                     GameplayManager.Instance.OpponentCreatedCard(_card);
-                    createdCardsThisUpdate.Add(_card.UniqueId);
                 }
             }
         }
         
-        private void CheckIfPlacedCard(RoomData _data)
+        private void CheckIfCardMoved(RoomData _data)
         {
-            foreach (var _createdCard in createdCardsThisUpdate)
-            {
-                Debug.Log("Created card: "+_createdCard);
-            }
             foreach (var _card in _data.BoardData.Cards)
             {
-                bool _shouldPlaceCard = false;
+                bool _shouldMoveCard = false;
                 foreach (var _existingCard in roomData.BoardData.Cards)
                 {
                     if (_existingCard.UniqueId != _card.UniqueId)
@@ -210,17 +201,17 @@ namespace FirebaseMultiplayer.Room
                         continue;
                     }
                     
-                    if (createdCardsThisUpdate.Contains(_card.UniqueId))
+                    if (_card.PlaceId != _existingCard.PlaceId)
                     {
-                        _shouldPlaceCard = true;
+                        _shouldMoveCard = true;
                         break;
                     }
                 }
 
-                if (_shouldPlaceCard)
+                if (_shouldMoveCard)
                 {
                     Debug.Log("Trying to place card with id: "+ _card.UniqueId);
-                    GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
+                    GameplayManager.Instance.ShowCardMoved(_card.UniqueId, _card.PlaceId);
                 }
             }
         }
