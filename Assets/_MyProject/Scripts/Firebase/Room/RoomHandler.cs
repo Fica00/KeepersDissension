@@ -178,13 +178,16 @@ namespace FirebaseMultiplayer.Room
                     {
                         continue;
                     }
-
+                    
+                    Debug.Log("Card with unique id is already created: "+_card.UniqueId, GameplayManager.Instance.GetCard(_card.UniqueId));
                     _shouldSpawnCard = false;
                     break;
                 }
 
+
                 if (_shouldSpawnCard)
                 {
+                    Debug.Log("Should create card: "+_card.UniqueId);
                     GameplayManager.Instance.OpponentCreatedCard(_card);
                 }
             }
@@ -194,33 +197,25 @@ namespace FirebaseMultiplayer.Room
         {
             foreach (var _card in _data.BoardData.Cards)
             {
-                bool _shouldPlaceCard = false;
                 foreach (var _existingCard in roomData.BoardData.Cards)
                 {
                     if (_card.UniqueId != _existingCard.UniqueId)
                     {
                         continue;
                     }
-
-                    if (_existingCard.PlaceId != -1)
+                    
+                    if (_card.PlaceId == -1)
                     {
-                        continue;
+                        continue;   
                     }
 
-                    if (_card.PlaceId != -1)
+                    if (_existingCard.PlaceId == -1)
                     {
-                        
+                        Debug.Log("Should try to place card: "+ _card.CardId);
+                        GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
+                        break;
                     }
-
-                    _shouldPlaceCard = true;
-                    break;
                 }
-
-                if (_shouldPlaceCard)
-                {
-                    GameplayManager.Instance.ShowCardPlaced(_card.UniqueId, _card.PlaceId);
-                }
-
             }
         }
         
