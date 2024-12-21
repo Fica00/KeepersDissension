@@ -160,7 +160,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
         
-        _card.Data.PlaceId = _positionId;
+        _card.CardData.PlaceId = _positionId;
         RoomData.BoardData.Cards.Find(_card => _card.UniqueId == _cardId).PlaceId = _positionId;
         ShowCardPlaced(_card.UniqueId, _positionId);
     }
@@ -1827,12 +1827,12 @@ public class GameplayManagerPvp : GameplayManager
     
     public override CardPlace GetCardPlace(string _uniqueCardId)
     {
-        return GetCard(_uniqueCardId).Data.CardPlace;
+        return GetCard(_uniqueCardId).CardData.CardPlace;
     }
 
     public override void SetCardPlace(string _uniqueCardId, CardPlace _place)
     {
-        GetCard(_uniqueCardId).Data.CardPlace = _place;
+        GetCard(_uniqueCardId).CardData.CardPlace = _place;
     }
 
     public override CardPlace GetCardPlace(CardBase _cardBase)
@@ -1840,7 +1840,7 @@ public class GameplayManagerPvp : GameplayManager
         CardPlace _cardPlace = CardPlace.Deck;
         if (_cardBase is Card _cardCard)
         {
-            _cardPlace = _cardCard.Data.CardPlace;
+            _cardPlace = _cardCard.CardData.CardPlace;
         }
         else if (_cardBase is AbilityCard _ability)
         {
