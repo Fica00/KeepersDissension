@@ -242,7 +242,7 @@ public class GameplayManagerPvp : GameplayManager
                 SniperStealth.ReturnDiscoveryCardTo = _action.StartingPlaceId;
                 CardBase _cardBase = _destination.GetCardNoWall();
                 GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
-                _markerOwner.DestroyCard(_cardBase);
+                _markerOwner.DestroyCard(_cardBase as Card);
             }
         }
 
@@ -291,7 +291,7 @@ public class GameplayManagerPvp : GameplayManager
             SniperStealth.ReturnDiscoveryCardTo = _action.StartingPlaceId;
             CardBase _cardBase = _destination.GetCardNoWall();
             GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
-            _markerOwner.DestroyCard(_cardBase);
+            _markerOwner.DestroyCard(_cardBase as Card);
         }
 
         _movingCard.MoveToPosition(_destination);
@@ -307,8 +307,6 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        GameplayPlayer _attackingPlayer = _attackingCard.My ? MyPlayer : OpponentPlayer;
-
         AudioManager.Instance.PlaySoundEffect("Attack");
 
         if (_attackingCard == _defendingCard)
@@ -317,11 +315,28 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        BoardData.AttackAnimation = new AttackAnimation
+        {
+            AttackerId = _attackingCard.UniqueId, DefenderId = _defendingCard.UniqueId, Id = Guid.NewGuid().ToString()
+        };
+
+
+        AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId, () =>
+        {
+            ResolveEndOfAttack(_attackingCard, _defendingCard);
+        });
+    }
+
+    public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    {
+        Card _attackingCard = GetCard(_attackerId);
+        Card _defendingCard = GetCard(_defenderId);
+        
         _attackingCard.transform.DOMove(_defendingCard.transform.position, 0.5f).OnComplete(() =>
         {
             _attackingCard.transform.DOLocalMove(Vector3.zero, 0.5f).SetDelay(0.2f).OnComplete(() =>
             {
-                ResolveEndOfAttack(_attackingCard, _defendingCard);
+                _callBack?.Invoke();
             });
         });
     }
@@ -1905,5 +1920,11 @@ public class GameplayManagerPvp : GameplayManager
         {
             BoardData.OpponentPlayer.ActionsLeft = _amount;
         }
+    }
+
+    public override void ShowCardAsDead(string _uniqueId)
+    {
+        Card _card = GetCard(_uniqueId);
+        _card.PositionAsDead();
     }
 }

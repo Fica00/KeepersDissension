@@ -1086,4 +1086,14 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void ShowCardAsDead(string _uniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    {
+        throw new Exception();
+    }
 }

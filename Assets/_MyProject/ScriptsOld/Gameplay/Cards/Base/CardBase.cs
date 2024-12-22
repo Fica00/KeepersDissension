@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CardBase : MonoBehaviour
 {
@@ -39,6 +40,10 @@ public class CardBase : MonoBehaviour
     public void ReturnFromHand()
     {
         SetPlace(CardPlace.Deck);
+    }
+
+    public void PositionAsDead()
+    {
         transform.SetParent(Parent);
         ResetPosition();
         Vector3 _desiredRotation = GetIsMy() ? Vector3.one : Vector3.back;

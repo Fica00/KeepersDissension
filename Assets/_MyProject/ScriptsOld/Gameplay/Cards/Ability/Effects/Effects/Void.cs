@@ -100,8 +100,8 @@ public class Void : AbilityEffect
         }
 
         GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
-        var _effectedCardBase = GetEffectedCards()[0];
-        _player.DestroyCard(_effectedCardBase);
+        var _effectedCardBase = GameplayManager.Instance.GetAbility(EffectedCards[0]);
+        _player.DestroyAbility(_effectedCardBase);
         GameplayManager.OnCardMoved -= CheckMovedCard;
         RemoveEffectedCard(_effectedCardBase.UniqueId);
         SetIsActive(false);

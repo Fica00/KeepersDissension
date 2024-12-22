@@ -61,24 +61,30 @@ public class GameplayPlayer : MonoBehaviour
         cardsInHandHandler.HideCards();
     }
 
-    public void DestroyCard(CardBase _cardBase)
+    public void DestroyCard(Card _cardBase)
     {
         StartCoroutine(DestroyRoutine(_cardBase));
     }
-
-    private IEnumerator DestroyRoutine(CardBase _cardBase)
+    
+    private IEnumerator DestroyRoutine(Card _card)
     {
         yield return null;
-        Card _card = ((Card)_cardBase);
 
         if (_card == null)
         {
             yield break;
         }
 
-        _cardBase.Destroy();
-        _cardBase.ReturnFromHand();
+        _card.Destroy();
+        _card.ReturnFromHand();
         _card.SetHasDied(true);
+        _card.PositionAsDead();
+    }
+
+    public void DestroyAbility(CardBase _ability)
+    {
+        _ability.Destroy();
+        _ability.ReturnFromHand();
     }
 
     public void DestroyWithoutNotify(CardBase _cardBase)

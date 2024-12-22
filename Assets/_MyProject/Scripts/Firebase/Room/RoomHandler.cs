@@ -132,6 +132,8 @@ namespace FirebaseMultiplayer.Room
             CheckIfPlayerLeft(_currentRoomState,_data);
             CheckIfCreatedCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
+            CheckForAttackAnimation(_currentRoomState,_data);
+            CheckIfCardDied(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -224,6 +226,58 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldMoveCard)
                 {
                     ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                }
+            }
+        }
+        
+        private void CheckForAttackAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.AttackAnimation == null)
+            {
+               return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.AttackAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.AttackAnimation.Id == _currentRoomData.BoardData.AttackAnimation.Id)
+            {
+                return;
+            }
+
+            var _animationData = _data.BoardData.AttackAnimation;
+            GameplayManager.Instance.AnimateAttack(_animationData.AttackerId,_animationData.DefenderId);
+        }
+        
+        private void CheckIfCardDied(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _didCardDie = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+
+                    if (!_card.HasDied)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.HasDied != _existingCard.HasDied)
+                    {
+                        _didCardDie = true;
+                        break;
+                    }
+                }
+
+                if (_didCardDie)
+                {
+                    GameplayManager.Instance.ShowCardAsDead(_card.UniqueId);
                 }
             }
         }

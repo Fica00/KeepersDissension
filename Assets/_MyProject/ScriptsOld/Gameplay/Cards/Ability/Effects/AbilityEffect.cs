@@ -233,4 +233,6 @@ public class AbilityEffect : MonoBehaviour
 
         return _effectedCards;
     }
+
+    protected List<string> EffectedCards => AbilityCard.EffectedCards;
 }
