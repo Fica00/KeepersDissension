@@ -120,6 +120,13 @@ namespace FirebaseMultiplayer.Room
             }
 
             var _currentRoomState = JsonConvert.DeserializeObject<RoomData>(JsonConvert.SerializeObject(roomData));
+
+            if (_currentRoomState == roomData)
+            {
+                Debug.Log("Data is the same");
+                return;
+            }
+            
             roomData = _data;
             CheckIfPlayerJoined(_currentRoomState,_data);
             CheckIfPlayerLeft(_currentRoomState,_data);

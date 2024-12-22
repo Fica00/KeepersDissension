@@ -2136,7 +2136,8 @@ public class GameplayManagerPvp : GameplayManager
      
      public override int AmountOfActions(bool _forMe)
      {
-         return _forMe ? BoardData.MyPlayer.ActionsLeft : BoardData.OpponentPlayer.ActionsLeft;
+         int _actions = _forMe ? BoardData.MyPlayer.ActionsLeft : BoardData.OpponentPlayer.ActionsLeft;
+         return _actions;
      }
 
      public override void SetAmountOfActions(int _amount, bool _forMe)
@@ -2149,7 +2150,7 @@ public class GameplayManagerPvp : GameplayManager
          {
              _amount = 5;
          }
-
+         
          if (_forMe)
          {
              BoardData.MyPlayer.ActionsLeft = _amount;
