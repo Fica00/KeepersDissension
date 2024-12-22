@@ -63,22 +63,15 @@ public class GameplayPlayer : MonoBehaviour
 
     public void DestroyCard(Card _cardBase)
     {
-        StartCoroutine(DestroyRoutine(_cardBase));
-    }
-    
-    private IEnumerator DestroyRoutine(Card _card)
-    {
-        yield return null;
-
-        if (_card == null)
+        if (_cardBase == null)
         {
-            yield break;
+            return;
         }
 
-        _card.Destroy();
-        _card.ReturnFromHand();
-        _card.SetHasDied(true);
-        _card.PositionAsDead();
+        _cardBase.Destroy();
+        _cardBase.ReturnFromHand();
+        _cardBase.SetHasDied(true);
+        _cardBase.PositionAsDead();
     }
 
     public void DestroyAbility(CardBase _ability)

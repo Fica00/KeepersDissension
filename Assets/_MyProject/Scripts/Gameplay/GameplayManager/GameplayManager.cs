@@ -216,30 +216,23 @@ public class GameplayManager : MonoBehaviour
         switch (_action.Type)
         {
             case CardActionType.Attack:
-                ExecuteAttack(_action);
+                ExecuteAttack(_action,FinishActionExecution);
                 MyPlayer.Actions--;
                 break;
             case CardActionType.Move:
-                ExecuteMove(_action);
+                ExecuteMove(_action,FinishActionExecution);
                 MyPlayer.Actions--;
                 break;
             case CardActionType.SwitchPlace:
-                ExecuteSwitchPlace(_action);
+                ExecuteSwitchPlace(_action,FinishActionExecution);
                 MyPlayer.Actions-=2;
                 break;
             case CardActionType.MoveAbility:
-                ExecuteMoveAbility(_action);
+                ExecuteMoveAbility(_action,FinishActionExecution);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-
-        if (MyPlayer.Actions<=0)
-        {
-            return;
-        }
-        
-        RoomUpdater.Instance.ForceUpdate();
 
         IEnumerator ClosePanelRoutine()
         {
@@ -248,22 +241,32 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    protected virtual void ExecuteAttack(CardAction _action)
+    private void FinishActionExecution()
+    {
+        if (MyPlayer.Actions<=0)
+        {
+            return;
+        }
+        
+        RoomUpdater.Instance.ForceUpdate();
+    }
+
+    protected virtual void ExecuteAttack(CardAction _action, Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteMove(CardAction _action)
+    protected virtual void ExecuteMove(CardAction _action,Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteSwitchPlace(CardAction _action)
+    protected virtual void ExecuteSwitchPlace(CardAction _action,Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteMoveAbility(CardAction _action)
+    protected virtual void ExecuteMoveAbility(CardAction _action,Action _callBack)
     {
         throw new Exception();
     }
@@ -1093,6 +1096,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AnimateStrangeMatter(int _amount, bool _forMe, Vector3 _startingPosition)
     {
         throw new Exception();
     }

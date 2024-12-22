@@ -219,13 +219,14 @@ public class GameplayManagerPvp : GameplayManager
         FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
     }
 
-    protected override void ExecuteMove(CardAction _action)
+    protected override void ExecuteMove(CardAction _action, Action _callBack)
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
         Card _movingCard = GetCard(_action.FirstCardId);
 
         if (_movingCard == null)
         {
+            _callBack?.Invoke();
             return;
         }
 
@@ -252,9 +253,10 @@ public class GameplayManagerPvp : GameplayManager
 
         OnCardMoved?.Invoke(_movingCard, _action.StartingPlaceId, _action.FinishingPlaceId, _action.DidTeleport);
         PlayMovingSoundEffect(_movingCard);
+        _callBack?.Invoke();
     }
 
-    protected override void ExecuteSwitchPlace(CardAction _action)
+    protected override void ExecuteSwitchPlace(CardAction _action, Action _callBack)
     {
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
@@ -264,6 +266,7 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_firstCard == null || _secondCard == null)
         {
+            _callBack?.Invoke();
             return;
         }
 
@@ -274,15 +277,17 @@ public class GameplayManagerPvp : GameplayManager
         ShowCardMoved(_secondCard.UniqueId, _startingDestination.Id);
 
         OnSwitchedPlace?.Invoke(_firstCard, _secondCard);
+        _callBack?.Invoke();
     }
 
-    protected override void ExecuteMoveAbility(CardAction _action)
+    protected override void ExecuteMoveAbility(CardAction _action, Action _callBack)
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
         CardBase _movingCard = GetCard(_action.FirstCardId);
 
         if (_movingCard == null)
         {
+            _callBack?.Invoke();
             return;
         }
 
@@ -295,15 +300,17 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         _movingCard.MoveToPosition(_destination);
+        _callBack?.Invoke();
     }
 
-    protected override void ExecuteAttack(CardAction _action)
+    protected override void ExecuteAttack(CardAction _action,Action _callBack)
     {
         Card _attackingCard = GetCard(_action.FirstCardId);
         Card _defendingCard = GetCard(_action.SecondCardId);
 
         if (_attackingCard == null || _defendingCard == null)
         {
+            _callBack?.Invoke();
             return;
         }
 
@@ -312,6 +319,7 @@ public class GameplayManagerPvp : GameplayManager
         if (_attackingCard == _defendingCard)
         {
             ResolveEndOfAttack(_attackingCard, _defendingCard);
+            _callBack?.Invoke();
             return;
         }
 
@@ -324,6 +332,7 @@ public class GameplayManagerPvp : GameplayManager
         AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId, () =>
         {
             ResolveEndOfAttack(_attackingCard, _defendingCard);
+            _callBack?.Invoke();
         });
     }
 
@@ -345,6 +354,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         int _damage = _attackingCard.Damage;
         _defendingCard.ChangeHealth(-_damage);
+        var _defendingPosition = _defendingCard.transform.position;
 
         OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
         CheckForResponseAction(_attackingCard, _defendingCard);
@@ -357,7 +367,7 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
 
-            HandleLoot(_attackingCard, _defendingCard);
+            HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
         }
     }
 
@@ -474,11 +484,10 @@ public class GameplayManagerPvp : GameplayManager
         return false;
     }
 
-    private void HandleLoot(Card _attackingCard, Card _defendingCard)
+    private void HandleLoot(Card _attackingCard, Card _defendingCard,Vector3 _defendingPosition)
     {
         int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
         bool _didIAttack = _attackingCard.GetIsMy();
-        Vector3 _position = _defendingCard.transform.position;
         int _amount = _additionalMatter;
         if (_defendingCard is Minion)
         {
@@ -495,7 +504,7 @@ public class GameplayManagerPvp : GameplayManager
             _amount += 5;
         }
 
-        AddStrangeMatter(_amount, _didIAttack, _position);
+        AddStrangeMatter(_amount, _didIAttack, _defendingPosition);
     }
 
     private void AddStrangeMatter(int _amount, bool _forMe, Vector3 _positionOfDefendingCard)
@@ -509,14 +518,23 @@ public class GameplayManagerPvp : GameplayManager
             BoardData.OpponentPlayer.StrangeMatter += _amount;
         }
 
-        ShowAddedStrangeMatter(_amount, _forMe, _positionOfDefendingCard);
+        AnimateStrangeMatter(_amount, _forMe, _positionOfDefendingCard);
+        BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
+        {
+            Id = Guid.NewGuid().ToString(),
+            Amount = _amount,
+            ForMe = _forMe,
+            X = _positionOfDefendingCard.x,
+            Y = _positionOfDefendingCard.y,
+            Z = _positionOfDefendingCard.z
+        };
     }
 
-    public void ShowAddedStrangeMatter(int _amount, bool _forMe, Vector3 _positionOfDefendingCard)
+    public override void AnimateStrangeMatter(int _amount, bool _forMe, Vector3 _startingPosition)
     {
         for (int _i = 0; _i < _amount; _i++)
         {
-            EconomyPanelHandler.Instance.ShowBoughtMatter(_forMe, _positionOfDefendingCard);
+            EconomyPanelHandler.Instance.ShowBoughtMatter(_forMe, _startingPosition);
         }
     }
 

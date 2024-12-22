@@ -134,6 +134,7 @@ namespace FirebaseMultiplayer.Room
             CheckIfCardMoved(_currentRoomState,_data);
             CheckForAttackAnimation(_currentRoomState,_data);
             CheckIfCardDied(_currentRoomState,_data);
+            CheckForStrangeMatterAnimation(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -282,6 +283,28 @@ namespace FirebaseMultiplayer.Room
                     GameplayManager.Instance.ShowCardAsDead(_card.UniqueId);
                 }
             }
+        }
+        
+        private void CheckForStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.StrangeMatterAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.StrangeMatterAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.StrangeMatterAnimation.Id == _currentRoomData.BoardData.StrangeMatterAnimation.Id)
+            {
+                return;
+            }
+            
+            Debug.Log("Detected animation");
+            var _animationData = _data.BoardData.StrangeMatterAnimation;
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,_animationData.PositionOfDefendingCard);
         }
 
         private void ShowCardMoved(string _uniqueId, int _placeId)

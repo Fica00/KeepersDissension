@@ -28,6 +28,7 @@ namespace FirebaseMultiplayer.Room
         public int AbilityCardPrice => 5;
 
         public AttackAnimation AttackAnimation = new();
+        public StrangeMatterAnimation StrangeMatterAnimation = new();
 
     }
 }
