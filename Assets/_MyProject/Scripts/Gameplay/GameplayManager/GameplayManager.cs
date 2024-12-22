@@ -89,7 +89,6 @@ public class GameplayManager : MonoBehaviour
             SetGameState(GameplayState.Waiting);
         }
         
-        Debug.Log("Current game state: "+ Instance.GameState());
         while (!HasGameEnded())
         {
             yield return WaitUntilTheEndOfTurn();
@@ -1078,6 +1077,16 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual Card GetCardOfTypeNotPlaced(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfActions(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetAmountOfActions(int _amount, bool _forMe)
     {
         throw new Exception();
     }

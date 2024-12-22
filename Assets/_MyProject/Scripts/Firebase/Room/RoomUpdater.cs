@@ -20,6 +20,7 @@ public class RoomUpdater : MonoBehaviour
 
     private IEnumerator UpdateRoomData()
     {
+        yield break;
         while (gameObject.activeSelf)
         {
             yield return new WaitForSeconds(5);

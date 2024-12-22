@@ -8,6 +8,7 @@ public class RoomGameplayPlayer
     public int LootChange;
     public int StrangeMatter;
     public int AmountOfAbilitiesPlayerCanBuy;
+    public int ActionsLeft;
 
     [JsonIgnore] public bool IsMy => PlayerId == FirebaseManager.Instance.PlayerId;
 }

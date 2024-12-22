@@ -16,7 +16,6 @@ public class GameplayPlayer : MonoBehaviour
     public TableSideHandler TableSideHandler => tableSideHandler;
 
     private bool isMy;
-    private int actions;
     private FactionSO factionSo;
     public bool IsMy => isMy;
     
@@ -24,24 +23,10 @@ public class GameplayPlayer : MonoBehaviour
 
     public int Actions
     {
-        get => actions;
+        get => GameplayManager.Instance.AmountOfActions(IsMy);
         set
         {
-            if (actions > value && IsMy && GameplayCheats.UnlimitedActions)
-            {
-                return;
-            }
-
-            actions = value;
-            if (actions < 0)
-            {
-                actions = 0;
-            }
-            else if (actions > 5)
-            {
-                actions = 5;
-            }
-
+            GameplayManager.Instance.SetAmountOfActions(value, IsMy);
             UpdatedActions?.Invoke();
         }
     }

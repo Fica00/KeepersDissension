@@ -67,7 +67,6 @@ public class TableActionsHandler : MonoBehaviour
 
     public void ShowPossibleActions(GameplayPlayer _player, TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
-        Debug.Log("trying to show possible actions");
         player = _player;
         ClearPossibleActions();
 

@@ -260,9 +260,11 @@ public class GameplayManagerPvp : GameplayManager
             }
         }
 
+        _movingCard.CardData.PlaceId = _destination.Id;
         ShowCardMoved(_movingCard.UniqueId, _destination.Id);
         OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId, _action.DidTeleport);
         PlayMovingSoundEffect(_movingCard);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     protected override void ExecuteSwitchPlace(CardAction _action)
@@ -2130,5 +2132,31 @@ public class GameplayManagerPvp : GameplayManager
          }
 
          return null;
+     }
+     
+     public override int AmountOfActions(bool _forMe)
+     {
+         return _forMe ? BoardData.MyPlayer.ActionsLeft : BoardData.OpponentPlayer.ActionsLeft;
+     }
+
+     public override void SetAmountOfActions(int _amount, bool _forMe)
+     {
+         if (_amount < 0)
+         {
+             _amount = 0;
+         }
+         else if (_amount > 5)
+         {
+             _amount = 5;
+         }
+
+         if (_forMe)
+         {
+             BoardData.MyPlayer.ActionsLeft = _amount;
+         }
+         else
+         {
+             BoardData.OpponentPlayer.ActionsLeft = _amount;
+         }
      }
 }
