@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,88 +11,58 @@ public class ActionAndTurnDisplay : MonoBehaviour
     [SerializeField] private Color myColor;
     [SerializeField] private Color opponentColor;
     [SerializeField] private Sprite[] actionDisplays;
-    private GameplayPlayer myPlayer;
-    private GameplayPlayer opponentPlayer;
     
-    public void Setup(GameplayPlayer _myPlayer, GameplayPlayer _opponentPlayer)
+    public void Setup()
     {
-        myPlayer = _myPlayer;
-        opponentPlayer = _opponentPlayer;
-        myPlayer.UpdatedActions += ShowMyAction;
-        opponentPlayer.UpdatedActions += ShowOpponentsAction;
         actionsDisplay.enabled = true;
-        if(FirebaseManager.Instance.RoomHandler.IsOwner)
-        {
-            ShowMyAction();
-        }
-        else
-        {
-            ShowOpponentsAction();
-        }
+        StartCoroutine(ShowActionRoutine());
     }
 
     private void OnDisable()
     {
-        if (myPlayer!=null)
-        {
-            myPlayer.UpdatedActions -= ShowMyAction;
-        }
-
-        if (opponentPlayer!=null)
-        {
-            opponentPlayer.UpdatedActions -= ShowOpponentsAction;
-        }
+        StopAllCoroutines();
     }
 
-    private void ShowMyAction()
+    private IEnumerator ShowActionRoutine()
     {
-        ShowAction(myPlayer.Actions,true);
-    }
-
-    private void ShowOpponentsAction()
-    {
-        ShowAction(opponentPlayer.Actions,false);
-    }
-
-    public void ForceChange(int _actionAmount, bool _my, bool _isResponseAction)
-    {
-        ShowAction(_actionAmount,_my,_isResponseAction);
-    }
-
-    public void ShowAction(int _number, bool _my,bool _isResponseAction=false)
-    {
-        if (_number==0)
-        {
-            return;
-        }
-
         string _text;
         Color _color;
-        if (_my)
+        int _number;
+        while (gameObject.activeSelf)
         {
-            _text = "Your turn";
-            _color = myColor;
-        }
-        else
-        {
-            _text = "Opponent's turn";
-            _color = opponentColor;
-        }
+            bool _isResponseAction = GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.AttackResponse;
+            if (GameplayManager.Instance.IsMyTurn())
+            {
+                _number = GameplayManager.Instance.AmountOfActions(true);
+                _text = "Your turn";
+                if (_isResponseAction)
+                {
+                    _text = "Your response";
+                }
+                _color = myColor;
+            }
+            else
+            {
+                _number = GameplayManager.Instance.AmountOfActions(false);
+                _text = "Opponent's turn";
+                if (_isResponseAction)
+                {
+                    _text = "Opponents response";
+                }
+                _color = Color.magenta;
+            }
 
-        if (_isResponseAction)
-        {
-            _color = Color.magenta;
-            _text = _my ? "Your response" : "Opponents response";
-        }
+            if (_isResponseAction)
+            {
+                _color = opponentColor;
+            }
         
-        actionsDisplay.color = _color;
-        turnDisplay.text = _text;
-        actionAmountDisplay.text = _number.ToString();
-        
-        if (actionDisplays.Length-1<_number-1)
-        {
-            return;
+            actionsDisplay.color = _color;
+            turnDisplay.text = _text;
+            actionAmountDisplay.text = _number.ToString();
+            actionsDisplay.sprite = actionDisplays[_number - 1];
+
+            yield return new WaitForSeconds(1);
         }
-        actionsDisplay.sprite = actionDisplays[_number - 1];
     }
 }

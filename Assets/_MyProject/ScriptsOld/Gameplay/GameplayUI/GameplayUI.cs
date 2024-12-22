@@ -14,7 +14,6 @@ public class GameplayUI : MonoBehaviour
     [SerializeField] private ActionAndTurnDisplay actionAndTurnDisplay;
     [SerializeField] private StrangeMatterTracker strangeMatterTracker;
     [SerializeField] private SettingsPanel settingsPanel;
-    public ActionAndTurnDisplay ActionAndTurnDisplay => actionAndTurnDisplay;
 
     private void Awake()
     {
@@ -82,14 +81,9 @@ public class GameplayUI : MonoBehaviour
         botBackground.sprite = GameplayManager.Instance.MyPlayer.FactionSo.Board;
     }
 
-    public void ForceActionUpdate(int _amountOfAction, bool _my, bool _isResponseAction)
-    {
-        actionAndTurnDisplay.ForceChange(_amountOfAction,_my,_isResponseAction);
-    }
-    
     private void SetupActionAndTurnDisplay()
     {
-        actionAndTurnDisplay.Setup(GameplayManager.Instance.MyPlayer,GameplayManager.Instance.OpponentPlayer);
+        actionAndTurnDisplay.Setup();
         strangeMatterTracker.Setup();
     }
 

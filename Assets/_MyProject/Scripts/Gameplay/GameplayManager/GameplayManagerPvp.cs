@@ -1074,7 +1074,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         SetIdOfCardWithResponseAction(_cardId);
         MyPlayer.Actions = 1;
-        GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true,true);
         DialogsManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
 
@@ -1546,7 +1545,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
-        GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false,true);
         DialogsManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
 
