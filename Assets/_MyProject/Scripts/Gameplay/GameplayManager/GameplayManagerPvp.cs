@@ -959,13 +959,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void EndTurn()
     {
-        if (IsAbilityActive<Casters>())
-        {
-            return;
-        }
-        
         CloseAllPanels();
-
         TableHandler.ActionsHandler.ClearPossibleActions();
 
         if (!IsMyTurn())
@@ -978,6 +972,7 @@ public class GameplayManagerPvp : GameplayManager
 
         FirebaseNotificationHandler.Instance.SendNotificationToUser(RoomHandler.GetOpponent().Id, "Your turn!", "Come back to game!");
         AudioManager.Instance.PlaySoundEffect("EndTurn");
+        RoomUpdater.Instance.ForceUpdate();
     }
     
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack=null)

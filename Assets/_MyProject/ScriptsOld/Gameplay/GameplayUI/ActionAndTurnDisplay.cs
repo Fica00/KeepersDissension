@@ -49,12 +49,12 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 {
                     _text = "Opponents response";
                 }
-                _color = Color.magenta;
+                _color = opponentColor;
             }
 
             if (_isResponseAction)
             {
-                _color = opponentColor;
+                _color = Color.magenta;
             }
 
             if (_number==0)
