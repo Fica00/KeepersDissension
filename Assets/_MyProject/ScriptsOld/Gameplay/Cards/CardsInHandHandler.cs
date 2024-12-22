@@ -83,7 +83,7 @@ public class CardsInHandHandler : MonoBehaviour
 
    private void ShowOtherCards(CardType _type)
    {
-      foreach (var _card in GameplayManager.Instance.GetAllCardsOfType(_type,player.IsMy))
+      foreach (var _card in GameplayManager.Instance.GetAllCardsOfType(_type,player.IsMy).FindAll(_card => _card.CardData.CardPlace == CardPlace.Deck))
       {
          _card.transform.SetParent(cardsHolder);
          _card.PositionInHand(true);
@@ -91,7 +91,6 @@ public class CardsInHandHandler : MonoBehaviour
          _card.transform.localScale = sizeOfCards;
          shownCards.Add(_card);
       }
-
    }
 
    private void ClearShownCards()
