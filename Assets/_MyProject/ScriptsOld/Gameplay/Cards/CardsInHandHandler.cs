@@ -121,6 +121,11 @@ public class CardsInHandHandler : MonoBehaviour
       {
          return;
       }
+
+      if (GameplayManager.Instance.GetGameplaySubState() < GameplaySubState.FinishedPlacingStartingLifeForce)
+      {
+         return;
+      }
       
       CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
       if (_cardPlace == CardPlace.Table)
