@@ -246,7 +246,8 @@ namespace FirebaseMultiplayer.Room
             {
                 return;
             }
-
+            
+            Debug.Log("Detected animation");
             var _animationData = _data.BoardData.AttackAnimation;
             GameplayManager.Instance.AnimateAttack(_animationData.AttackerId,_animationData.DefenderId);
         }
@@ -277,6 +278,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_didCardDie)
                 {
+                    Debug.Log("Detected that card died: "+_card.UniqueId);
                     GameplayManager.Instance.ShowCardAsDead(_card.UniqueId);
                 }
             }

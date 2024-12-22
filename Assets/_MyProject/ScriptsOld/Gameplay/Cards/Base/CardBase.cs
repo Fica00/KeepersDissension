@@ -40,6 +40,7 @@ public class CardBase : MonoBehaviour
     public void ReturnFromHand()
     {
         SetPlace(CardPlace.Deck);
+        PositionAsDead();
     }
 
     public void PositionAsDead()
