@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 [Serializable]
 public class CardData
@@ -17,4 +18,6 @@ public class CardData
     public int PercentageOfHealthToRecover=100;
     public int PlaceId = -100;
     public CardPlace CardPlace = CardPlace.Deck;
+
+    [JsonIgnore] public bool IsMy => Owner == FirebaseManager.Instance.PlayerId;
 }

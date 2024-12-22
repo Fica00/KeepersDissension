@@ -2082,4 +2082,54 @@ public class GameplayManagerPvp : GameplayManager
             }
         }
     }
+
+     public override void PlaceStartingWall()
+     {
+         PlaceStartingWall(29);
+         PlaceStartingWall(30);
+         PlaceStartingWall(31);
+         PlaceStartingWall(32);
+         PlaceStartingWall(33);
+         PlaceStartingWall(34);
+         PlaceStartingWall(35);
+         RoomUpdater.Instance.ForceUpdate();
+     }
+     
+     private void PlaceStartingWall(int _positionId)
+     {
+         TablePlaceHandler _tablePlaceHandler = TableHandler.GetPlace(_positionId);
+         if (_tablePlaceHandler.IsOccupied)
+         {
+             return;
+         }
+         CardBase _selectedCard = GetCardOfType(CardType.Wall,true);
+         PlaceCard(_selectedCard, _positionId);
+     }
+     
+     public override Card GetCardOfTypeNotPlaced(CardType _type, bool _forMe)
+     {
+         foreach (var _cardData in BoardData.Cards)
+         {
+             if (_cardData.IsMy != _forMe)
+             {
+                 continue;
+             }
+
+             if (_cardData.PlaceId != -100)
+             {
+                 continue;
+             }
+
+             Card _card = GetCard(_cardData.UniqueId);
+
+             if (_card.Details.Type != _type)
+             {
+                 continue;
+             }
+
+             return _card;
+         }
+
+         return null;
+     }
 }

@@ -191,26 +191,9 @@ public class GameplayManager : MonoBehaviour
         OnUnchainedGuardian?.Invoke();
     }
 
-    public void PlaceStartingWall()
+    public virtual void PlaceStartingWall()
     {
-        PlaceStartingWall(29);
-        PlaceStartingWall(30);
-        PlaceStartingWall(31);
-        PlaceStartingWall(32);
-        PlaceStartingWall(33);
-        PlaceStartingWall(34);
-        PlaceStartingWall(35);
-    }
-    
-    private void PlaceStartingWall(int _positionId)
-    {
-        TablePlaceHandler _tablePlaceHandler = TableHandler.GetPlace(_positionId);
-        if (_tablePlaceHandler.IsOccupied)
-        {
-            return;
-        }
-        CardBase _selectedCard = GetCardOfType(CardType.Wall,true);
-        PlaceCard(_selectedCard, _positionId);
+        throw new Exception();
     }
 
     public virtual void PlaceCard(CardBase _card, int _positionId)
@@ -1079,6 +1062,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual GameplaySubState GetGameplaySubState()
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCardOfTypeNotPlaced(CardType _type, bool _forMe)
     {
         throw new Exception();
     }

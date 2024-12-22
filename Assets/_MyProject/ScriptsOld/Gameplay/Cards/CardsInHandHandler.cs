@@ -122,7 +122,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (GameplayManager.Instance.GetGameplaySubState() < GameplaySubState.FinishedPlacingStartingLifeForce)
+      if (GameplayManager.Instance.GetGameplaySubState() < GameplaySubState.FinishedSelectingMinions)
       {
          return;
       }
