@@ -215,19 +215,28 @@ public class GameplayManager : MonoBehaviour
         switch (_action.Type)
         {
             case CardActionType.Attack:
-                ExecuteAttack(_action,FinishActionExecution);
-                MyPlayer.Actions--;
+                ExecuteAttack(_action, () =>
+                {
+                    FinishActionExecution(1);
+                });
                 break;
             case CardActionType.Move:
-                ExecuteMove(_action,FinishActionExecution);
-                MyPlayer.Actions--;
+                ExecuteMove(_action, () =>
+                {
+                    FinishActionExecution(1);
+                });
                 break;
             case CardActionType.SwitchPlace:
-                ExecuteSwitchPlace(_action,FinishActionExecution);
-                MyPlayer.Actions-=2;
+                ExecuteSwitchPlace(_action, () =>
+                {
+                    FinishActionExecution(2);
+                });
                 break;
             case CardActionType.MoveAbility:
-                ExecuteMoveAbility(_action,FinishActionExecution);
+                ExecuteMoveAbility(_action, () =>
+                {
+                    FinishActionExecution(0);
+                });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -240,8 +249,10 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    private void FinishActionExecution()
+    private void FinishActionExecution(int _actionCost)
     {
+        MyPlayer.Actions-=_actionCost;
+
         if (MyPlayer.Actions<=0)
         {
             return;
