@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Globalization;
 using System.Linq;
 using DG.Tweening;
 using TMPro;
@@ -9,11 +8,10 @@ using UnityEngine;
 public class Guardian: Card
 {
     public Action OnUnchained;
-    public CardStats GainStatsOnUnchaining; //add those stats to current stats
+    public CardStats GainStatsOnUnchaining;
     [SerializeField] private TextMeshProUGUI healthDisplay;
     [SerializeField] private LineRenderer chain;
     private GameplayPlayer player;
-
 
     public bool IsChained { get; set; } = true;
 
@@ -41,8 +39,7 @@ public class Guardian: Card
     
     protected override void Setup()
     {
-        UpdatedHealth += ShowHealth;
-        ShowHealth();
+        StartCoroutine(ShowHealth());
         chain.gameObject.SetActive(false);
     }
 
@@ -56,7 +53,7 @@ public class Guardian: Card
 
     private void OnDisable()
     {
-        UpdatedHealth -= ShowHealth;
+        StopAllCoroutines();
         if (player!=null)
         {
             player.OnEndedTurn -= AddSpeed;
@@ -97,18 +94,24 @@ public class Guardian: Card
         SetSpeed(2);
     }
 
-    private void ShowHealth()
+    private IEnumerator ShowHealth()
     {
-        if (Health<=0)
+        while (gameObject.activeSelf)
         {
-            healthDisplay.text = 0.ToString();
-            if (GameplayManager.Instance.IsAbilityActive<Risk>())
+            healthDisplay.text = Health.ToString();
+            
+            if (Health<=0)
             {
-                GameplayManager.Instance.StopGame(!My);
+                healthDisplay.text = 0.ToString();
+                if (GameplayManager.Instance.IsAbilityActive<Risk>())
+                {
+                    GameplayManager.Instance.StopGame(!My);
+                    yield break;
+                }
             }
-            return;
+
+            yield return new WaitForSeconds(1);
         }
-        healthDisplay.text = Health.ToString();
     }
 
     public void ShowChain()

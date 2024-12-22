@@ -70,7 +70,6 @@ public class TableActionsHandler : MonoBehaviour
 
         if (!_card.IsWarrior())
         {
-            Debug.Log("card is not a warrior");
             CardActionsDisplay.Instance.Close();
             return;
         }
@@ -78,7 +77,6 @@ public class TableActionsHandler : MonoBehaviour
         int _placeId = _clickedPlace.Id;
 
         CardMovementType _movementType = _card.MovementType;
-        Debug.Log("Movement type: "+_movementType);
         switch (_type)
         {
             case CardActionType.Attack:

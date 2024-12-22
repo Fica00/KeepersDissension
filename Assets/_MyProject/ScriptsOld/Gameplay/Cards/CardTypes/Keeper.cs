@@ -1,4 +1,4 @@
-using System.Globalization;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -9,9 +9,7 @@ public class Keeper: Card
     
     protected override void Setup()
     {
-        UpdatedHealth += ShowHealth;
-
-        ShowHealth();
+        StartCoroutine(ShowHealth());
         GameplayPlayer _player = My ? GameplayManager.Instance.MyPlayer: GameplayManager.Instance.OpponentPlayer;
         if (_player.FactionSo.Id==0)
         {
@@ -48,14 +46,18 @@ public class Keeper: Card
 
     private void OnDisable()
     {
-        UpdatedHealth -= ShowHealth;
+        StopAllCoroutines();
         OnPositionedOnTable -= ShowUI;
         OnPositionedInHand -= HideUI;
     }
 
-    private void ShowHealth()
+    private IEnumerator ShowHealth()
     {
-        healthDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
+        while (gameObject.activeSelf)
+        {
+            healthDisplay.text = Health.ToString();
+            yield return new WaitForSeconds(1);
+        }
     }
 
     private void ShowUI(CardBase _card)

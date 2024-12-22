@@ -107,7 +107,6 @@ public class GameplayManager : MonoBehaviour
 
         if (ShouldIPlaceStartingWall())
         {
-            Debug.Log("I am placing starting wall");
             PlaceStartingWall();
         }
 
