@@ -244,6 +244,7 @@ public class GameplayManager : MonoBehaviour
         }
 
         MyPlayer.Actions--;
+        RoomUpdater.Instance.ForceUpdate();
 
         IEnumerator ClosePanelRoutine()
         {

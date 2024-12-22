@@ -264,7 +264,6 @@ public class GameplayManagerPvp : GameplayManager
         ShowCardMoved(_movingCard.UniqueId, _destination.Id);
         OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId, _action.DidTeleport);
         PlayMovingSoundEffect(_movingCard);
-        RoomUpdater.Instance.ForceUpdate();
     }
 
     protected override void ExecuteSwitchPlace(CardAction _action)
