@@ -184,6 +184,10 @@ public class Card : CardBase
     public void SetHasDied(bool _status)
     {
         CardData.HasDied = _status;
+        if (CardData.HasDied)
+        {
+            CardData.PlaceId = -100;
+        }
     }
     
     public void CopyStats(Card _card)
