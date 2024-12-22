@@ -7,7 +7,6 @@ public class TableActionsHandler : MonoBehaviour
 {
     private TableHandler tableHandler;
     private List<CardAction> possibleActions = new();
-    private GameplayPlayer player;
 
     private void OnEnable()
     {
@@ -79,7 +78,7 @@ public class TableActionsHandler : MonoBehaviour
         int _placeId = _clickedPlace.Id;
 
         CardMovementType _movementType = _card.MovementType;
-        
+        Debug.Log("Movement type: "+_movementType);
         switch (_type)
         {
             case CardActionType.Attack:
@@ -88,11 +87,10 @@ public class TableActionsHandler : MonoBehaviour
                 AddAttackAction(_attackablePlaces, _card);
                 break;
             case CardActionType.Move:
-                
                 int _movingSpace = _card.Speed != 0 ? _card.Speed : 1;
                 var _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _movingSpace);
                 AddSwitchActions(_movablePlaces, _card, _movingSpace);
-                AddRamAbility(_movablePlaces, _card);
+                // AddRamAbility(_movablePlaces, _card);
                 AddMovementActions(_card, _movingSpace);
                 break;
             default:
@@ -166,7 +164,7 @@ public class TableActionsHandler : MonoBehaviour
                 continue;
             }
 
-            if (player.Actions < _actionCost)
+            if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
                 continue;
             }
@@ -275,12 +273,10 @@ public class TableActionsHandler : MonoBehaviour
     private void ProcessMovement(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
     {
         int _actionCost = 1;
-        if (_remainingSpeed <= 0 || _processedPlaces.Contains(_currentPlace))
+        if (_remainingSpeed <= 0 || !_processedPlaces.Add(_currentPlace))
         {
             return;
         }
-
-        _processedPlaces.Add(_currentPlace);
 
         List<TablePlaceHandler> _neighborPlaces = tableHandler.GetPlacesAround(_currentPlace.Id, _warriorCard.MovementType, 1);
 
@@ -305,6 +301,7 @@ public class TableActionsHandler : MonoBehaviour
             int _movementCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
             if (_remainingSpeed >= _movementCost && !_skip)
             {
+                Debug.Log("Adding possible action: ", _placeAround.gameObject);
                 possibleActions.Add(new CardAction()
                 {
                     FirstCardId = _warriorCard.UniqueId, FinishingPlaceId = _placeAround.Id, Type = CardActionType.Move, Cost = _actionCost,
@@ -442,12 +439,12 @@ public class TableActionsHandler : MonoBehaviour
                         continue;
                     }
 
-                    if (player.Actions < _actionCost)
+                    if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
                     {
                         continue;
                     }
                 }
-                else if (player.Actions < _actionCost)
+                else if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
                 {
                     continue;
                 }
@@ -579,7 +576,7 @@ public class TableActionsHandler : MonoBehaviour
                 continue;
             }
 
-            if (player.Actions < _actionCost)
+            if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
                 continue;
             }

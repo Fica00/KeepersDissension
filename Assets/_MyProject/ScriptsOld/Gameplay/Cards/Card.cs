@@ -42,6 +42,7 @@ public class Card : CardBase
             IsVoid = false,
             CanFlyToDodgeAttack = false,
             CanMoveOnWall = false,
+            MovementType = CardMovementType.FourDirections,
             Stats = new CardStats { 
                 Damage = Details.Stats.Damage,
                 Health = Details.Stats.Health,

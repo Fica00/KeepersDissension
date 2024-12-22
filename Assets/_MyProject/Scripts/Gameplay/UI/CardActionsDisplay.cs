@@ -107,7 +107,8 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Attack);
+        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType
+        .Attack);
     }
 
     private void Flip()
