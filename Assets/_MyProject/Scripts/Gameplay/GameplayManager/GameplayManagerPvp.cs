@@ -2102,7 +2102,7 @@ public class GameplayManagerPvp : GameplayManager
          {
              return;
          }
-         CardBase _selectedCard = GetCardOfType(CardType.Wall,true);
+         Card _selectedCard = GetCardOfTypeNotPlaced(CardType.Wall,true);
          PlaceCard(_selectedCard, _positionId);
      }
      
