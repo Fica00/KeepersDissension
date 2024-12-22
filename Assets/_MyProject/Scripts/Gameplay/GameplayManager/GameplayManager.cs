@@ -79,11 +79,17 @@ public class GameplayManager : MonoBehaviour
         SetPlayersTurn(doIPlayFirst);
         healthTracker.Setup();
         ShowGuardianChains();
+        
         if (IsMyTurn())
         {
             SetGameState(GameplayState.Playing);
         }
+        else
+        {
+            SetGameState(GameplayState.Waiting);
+        }
         
+        Debug.Log("Current game state: "+ Instance.GameState());
         while (!HasGameEnded())
         {
             yield return WaitUntilTheEndOfTurn();
@@ -109,6 +115,7 @@ public class GameplayManager : MonoBehaviour
 
         if (ShouldIPlaceStartingWall())
         {
+            Debug.Log("I am placing starting wall");
             PlaceStartingWall();
         }
 
