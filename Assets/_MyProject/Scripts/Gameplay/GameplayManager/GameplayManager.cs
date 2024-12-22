@@ -1100,7 +1100,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void AnimateStrangeMatter(int _amount, bool _forMe, Vector3 _startingPosition)
+    public virtual void AnimateStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
         throw new Exception();
     }

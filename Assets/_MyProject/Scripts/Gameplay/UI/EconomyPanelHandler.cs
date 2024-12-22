@@ -64,15 +64,10 @@ public class EconomyPanelHandler : MonoBehaviour
         {
             _economyDisplay.transform.position = _position;
         }
+        
         _economyDisplay.transform.DOMove(_target.position, 1f).OnComplete(() =>
         {
             Destroy(_economyDisplay.gameObject);
-            if (!_didIBuy)
-            {
-                return;
-            }
-            
-            GameplayManager.Instance.ChangeMyStrangeMatter(1);
         });
     }
 }

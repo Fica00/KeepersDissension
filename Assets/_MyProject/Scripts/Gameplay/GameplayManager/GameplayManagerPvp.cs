@@ -358,7 +358,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         int _damage = _attackingCard.Damage;
         _defendingCard.ChangeHealth(-_damage);
-        var _defendingPosition = _defendingCard.transform.position;
+        var _defendingPosition = _defendingCard.GetTablePlace().Id;
 
         OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
         CheckForResponseAction(_attackingCard, _defendingCard);
@@ -488,7 +488,7 @@ public class GameplayManagerPvp : GameplayManager
         return false;
     }
 
-    private void HandleLoot(Card _attackingCard, Card _defendingCard,Vector3 _defendingPosition)
+    private void HandleLoot(Card _attackingCard, Card _defendingCard,int _placeOfDefendingCard)
     {
         int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
         bool _didIAttack = _attackingCard.GetIsMy();
@@ -508,10 +508,10 @@ public class GameplayManagerPvp : GameplayManager
             _amount += 5;
         }
 
-        AddStrangeMatter(_amount, _didIAttack, _defendingPosition);
+        AddStrangeMatter(_amount, _didIAttack, _placeOfDefendingCard);
     }
 
-    private void AddStrangeMatter(int _amount, bool _forMe, Vector3 _positionOfDefendingCard)
+    private void AddStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
         if (_forMe)
         {
@@ -522,20 +522,19 @@ public class GameplayManagerPvp : GameplayManager
             BoardData.OpponentPlayer.StrangeMatter += _amount;
         }
 
-        AnimateStrangeMatter(_amount, _forMe, _positionOfDefendingCard);
+        AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
         BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
         {
             Id = Guid.NewGuid().ToString(),
             Amount = _amount,
             ForMe = _forMe,
-            X = _positionOfDefendingCard.x,
-            Y = _positionOfDefendingCard.y,
-            Z = _positionOfDefendingCard.z
+            PositionId = _placeOfDefendingCard,
         };
     }
 
-    public override void AnimateStrangeMatter(int _amount, bool _forMe, Vector3 _startingPosition)
+    public override void AnimateStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
+        var _startingPosition = TableHandler.GetPlace(_placeOfDefendingCard).transform.position;
         for (int _i = 0; _i < _amount; _i++)
         {
             EconomyPanelHandler.Instance.ShowBoughtMatter(_forMe, _startingPosition);

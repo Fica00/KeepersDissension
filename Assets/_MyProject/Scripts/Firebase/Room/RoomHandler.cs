@@ -304,7 +304,7 @@ namespace FirebaseMultiplayer.Room
             
             Debug.Log("Detected animation");
             var _animationData = _data.BoardData.StrangeMatterAnimation;
-            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,_animationData.PositionOfDefendingCard);
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,_animationData.PositionId);
         }
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
