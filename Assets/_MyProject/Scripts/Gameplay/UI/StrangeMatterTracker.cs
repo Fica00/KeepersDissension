@@ -41,11 +41,6 @@ public class StrangeMatterTracker : MonoBehaviour
 
     private void BuyStrangeMatter()
     {
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState == GameplayState.UsingSpecialAbility)
-        {
-            return;
-        }
         economyPanel.Show();
     }
 }

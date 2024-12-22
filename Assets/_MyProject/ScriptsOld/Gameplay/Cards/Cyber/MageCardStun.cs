@@ -42,13 +42,11 @@ public class MageCardStun : CardSpecialAbility
 
     private void YesUseStunAbility()
     {
-        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, range, PlaceLookFor.Occupied,
             Card.MovementType, false, LookForCardOwner.Both, SelectedSpot, _ignoreWalls:true);
 
         void SelectedSpot(int _id)
         {
-            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             if (_id == -1)
             {
                 DialogsManager.Instance.ShowOkDialog("No enemy cards found");

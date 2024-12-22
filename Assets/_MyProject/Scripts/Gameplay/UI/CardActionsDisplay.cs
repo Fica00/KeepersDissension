@@ -81,12 +81,11 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState != GameplayState.Playing && _gameState != GameplayState.AttackResponse)
+        if (!GameplayManager.Instance.IsMyTurn() && GameplayManager.Instance.GetGameplaySubState() != GameplaySubState.AttackResponse)
         {
-            Debug.Log("Current game state: "+_gameState);
             return;
         }
+        
         actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType.Move);
     }
 
@@ -103,8 +102,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState != GameplayState.Playing && _gameState != GameplayState.AttackResponse)
+        if (!GameplayManager.Instance.IsMyTurn() && GameplayManager.Instance.GetGameplaySubState() != GameplaySubState.AttackResponse)
         {
             return;
         }
@@ -146,8 +144,7 @@ public class CardActionsDisplay : MonoBehaviour
         }
 
         ResetDisplays();
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState == GameplayState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
         {
             int _id = FindObjectsOfType<Card>().ToList().Find(_card =>
                 _card.UniqueId == GameplayManager.Instance.IdOfCardWithResponseAction() && _card.My).GetTablePlace().Id;
@@ -244,11 +241,11 @@ public class CardActionsDisplay : MonoBehaviour
                     return;
                 }
                 
-                var _gameState = GameplayManager.Instance.GameState();
-                if (_gameState != GameplayState.Playing)
+                if (!GameplayManager.Instance.IsMyTurn())
                 {
                     return;
                 }
+                
                 _cardAbility.UseAbility();
                 ShowAbilities();
             });

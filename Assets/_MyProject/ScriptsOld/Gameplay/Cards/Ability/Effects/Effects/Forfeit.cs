@@ -6,7 +6,6 @@ public class Forfeit : AbilityEffect
     protected override void ActivateForOwner()
     {
         MoveToActivationField();
-        GameplayManager.Instance.SetGameState(GameplayState.SelectingCardFromTable);
         List<Minion> _minions = GameplayManager.Instance.GetAllMinions().FindAll(_minion => _minion.My);
         List<TablePlaceHandler> _availablePlaces = new();
         foreach (var _minion in _minions)
@@ -22,7 +21,6 @@ public class Forfeit : AbilityEffect
         if (_availablePlaces.Count==0)
         {
             DialogsManager.Instance.ShowOkDialog("You dont have minion to sacrifice");
-            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             RemoveAction();
             OnActivated?.Invoke();
             return;
@@ -65,7 +63,6 @@ public class Forfeit : AbilityEffect
             };
             GameplayManager.Instance.ExecuteCardAction(_attackAction);
             GameplayManager.Instance.ChangeMyStrangeMatter(2);
-            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             RemoveAction();
             OnActivated?.Invoke();
         }

@@ -65,12 +65,6 @@ public class ActionAndTurnDisplay : MonoBehaviour
             return;
         }
 
-        var _gameState = GameplayManager.Instance.GameState();
-        if (!_isResponseAction && (_gameState == GameplayState.WaitingForAttackResponse || _gameState == GameplayState.AttackResponse))
-        {
-            return;
-        }
-        
         string _text;
         Color _color;
         if (_my)

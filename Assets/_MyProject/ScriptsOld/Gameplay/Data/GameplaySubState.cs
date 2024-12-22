@@ -10,4 +10,5 @@ public enum GameplaySubState
     Player1SelectMinions = 4,
     Player2SelectMinions = 5,
     FinishedSelectingMinions = 6,
+    AttackResponse=7
 }

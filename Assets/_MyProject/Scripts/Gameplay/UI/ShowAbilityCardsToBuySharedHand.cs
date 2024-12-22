@@ -23,12 +23,6 @@ public class ShowAbilityCardsToBuySharedHand : MonoBehaviour
 
     private void ShowAbilities()
     {
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState == GameplayState.UsingSpecialAbility)
-        {
-            return;
-        }
-        
         if (GameplayManager.Instance.IsSettingUpTable())
         {
             return;

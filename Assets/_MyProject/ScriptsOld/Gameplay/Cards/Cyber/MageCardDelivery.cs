@@ -41,7 +41,6 @@ public class MageCardDelivery : CardSpecialAbility
 
     private void YesUseDeliverAbility()
     {
-        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         GameplayManager.Instance.SelectPlaceForSpecialAbility(
             TablePlaceHandler.Id,
             1,
@@ -53,7 +52,6 @@ public class MageCardDelivery : CardSpecialAbility
         
         void SelectedSpot(int _id)
         {
-            GameplayManager.Instance.SetGameState(GameplayState.Playing);
             if (_id==-1)
             {
                 DialogsManager.Instance.ShowOkDialog("No cards found");

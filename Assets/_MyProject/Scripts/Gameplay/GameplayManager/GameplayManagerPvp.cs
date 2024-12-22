@@ -607,11 +607,6 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
 
-            if (GameState() is not (GameplayState.Playing or GameplayState.Waiting))
-            {
-                return;
-            }
-
             if (!(_defendingCard.Health > 0) || _attackingCard.My == _defendingCard.My)
             {
                 return;
@@ -970,29 +965,10 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         CloseAllPanels();
-        if (GameState() == GameplayState.WaitingForAttackResponse)
-        {
-            return;
-        }
 
         TableHandler.ActionsHandler.ClearPossibleActions();
 
-        if (GameState() == GameplayState.AttackResponse)
-        {
-            SetGameState(GameplayState.Waiting);
-            MyPlayer.Actions=0;
-            GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions == 0? 1:OpponentPlayer.Actions,false,false);
-            Debug.Log("Finished response action");
-            AudioManager.Instance.PlaySoundEffect("EndTurn");
-            return;
-        }
-
         if (!IsMyTurn())
-        {
-            return;
-        }
-
-        if (GameState() != GameplayState.Playing)
         {
             return;
         }
@@ -1007,7 +983,6 @@ public class GameplayManagerPvp : GameplayManager
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack=null)
     {
         GameplayState _gameState = GameState(); 
-        SetGameState(GameplayState.BuyingMinion);
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
@@ -1018,7 +993,6 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 HandleBoughtMinion(_positionId);
-                SetGameState(_gameState);
                 _callBack?.Invoke();
                 if (_cost>0)
                 {
@@ -1050,8 +1024,6 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuildWall(CardBase _cardBase, int _cost)
     {
-        GameplayState _state = GameState();
-        SetGameState(GameplayState.BuildingWall);
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
@@ -1062,7 +1034,6 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 HandleBuildWall(_cardBase, _cost, _positionId, _cardId);
-                SetGameState(_state);
                 if (_cost>0)
                 {
                     MyPlayer.Actions--;
@@ -1103,7 +1074,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         SetIdOfCardWithResponseAction(_cardId);
         MyPlayer.Actions = 1;
-        SetGameState(GameplayState.AttackResponse);
         GameplayUI.Instance.ForceActionUpdate(MyPlayer.Actions, true,true);
         DialogsManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
@@ -1576,7 +1546,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         TableHandler.ActionsHandler.ClearPossibleActions();
         OpponentPlayer.Actions = 1;
-        SetGameState(GameplayState.WaitingForAttackResponse);
         GameplayUI.Instance.ForceActionUpdate(OpponentPlayer.Actions, false,true);
         DialogsManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
@@ -1851,7 +1820,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void TryUnchainGuardian()
     {
-        if (GameState() != GameplayState.Playing)
+        if (!IsMyTurn())
         {
             return;
         }
@@ -1896,7 +1865,7 @@ public class GameplayManagerPvp : GameplayManager
         return RoomData.GameplayState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
     }
     
-    public override void SetGameState(GameplayState _gameState)
+    public override void SetGameState2(GameplayState _gameState)
     {
         RoomData.GameplayState = _gameState;
     }

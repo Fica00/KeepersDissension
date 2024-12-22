@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ScalerLeapfrog : CardSpecialAbility
 {
-    //nothing to do here
 
     private void OnEnable()
     {
@@ -43,8 +42,7 @@ public class ScalerLeapfrog : CardSpecialAbility
             return;
         }
 
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState != GameplayState.Waiting)
+        if (GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

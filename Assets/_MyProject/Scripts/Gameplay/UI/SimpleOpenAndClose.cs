@@ -24,11 +24,6 @@ public class SimpleOpenAndClose : MonoBehaviour
 
     private void OpenObject()
     {
-        var _gameState = GameplayManager.Instance.GameState();
-        if (_gameState == GameplayState.UsingSpecialAbility)
-        {
-            return;
-        }
         object1.transform.localScale = Vector3.zero;
         object2.transform.localScale = Vector3.one;
         var _actions = object2.GetComponent<ElipsisActionsController>();

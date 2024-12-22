@@ -6,17 +6,14 @@ using UnityEngine;
 public class Hyperdrive : AbilityEffect
 {
     private AbilityCard abilityCard;
-    private GameplayState gameplayState;
 
     protected override void ActivateForOwner()
     {
-        gameplayState = GameplayManager.Instance.GameState();
-        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
+       
         List<CardBase> _availableEffects = GetAvailableEffects();
         
         if (_availableEffects.Count==0)
         {
-            GameplayManager.Instance.SetGameState(gameplayState);
             RemoveAction();
             OnActivated?.Invoke();
             DialogsManager.Instance.ShowOkDialog("You don't have any available abilities");
@@ -64,7 +61,6 @@ public class Hyperdrive : AbilityEffect
             
             if (_availableEffects.Count==0)
             {
-                GameplayManager.Instance.SetGameState(gameplayState);
                 RemoveAction();
                 OnActivated?.Invoke();
                 DialogsManager.Instance.ShowOkDialog("You don't have anymore available abilities");
@@ -102,7 +98,6 @@ public class Hyperdrive : AbilityEffect
     private void EndAbility()
     {
         MoveToActivationField();
-        GameplayManager.Instance.SetGameState(gameplayState);
         RemoveAction();
         OnActivated?.Invoke();
         abilityCard.Effect.OnActivated -= EndAbility;

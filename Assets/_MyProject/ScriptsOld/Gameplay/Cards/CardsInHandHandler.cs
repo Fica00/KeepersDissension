@@ -45,10 +45,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      var _gameState = GameplayManager.Instance.GameState();
-      closeButton.gameObject.SetActive(_gameState == GameplayState.Playing ||
-                                       _gameState == GameplayState.Waiting ||
-                                       _gameState == GameplayState.AttackResponse);
+      closeButton.gameObject.SetActive(GameplayManager.Instance.GameState() == GameplayState.Gameplay);
 
       ClearShownCards();
       backGround.SetActive(true);
@@ -143,8 +140,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      var _gameState = GameplayManager.Instance.GameState();
-      if (_gameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+      if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
       {
          return;
       }
@@ -210,7 +206,7 @@ public class CardsInHandHandler : MonoBehaviour
       }
 
       var _gameState = GameplayManager.Instance.GameState();
-      if (_gameState != GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+      if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
       {
          return;
       }

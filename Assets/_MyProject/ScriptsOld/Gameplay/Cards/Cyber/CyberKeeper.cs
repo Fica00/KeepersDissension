@@ -27,8 +27,6 @@ public class CyberKeeper : CardSpecialAbility
 
         void Use()
         {
-            // GameplayManager.Instance.TellOpponentThatIUsedUltimate();
-            GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
             GameplayManager.Instance.SelectPlaceForSpecialAbility(
                 TablePlaceHandler.Id,
                 Card.Range,
@@ -40,7 +38,6 @@ public class CyberKeeper : CardSpecialAbility
 
             void SelectedSpot(int _id)
             {
-                GameplayManager.Instance.SetGameState(GameplayState.Playing);
                 if (_id == -1)
                 {
                     Player.Actions--;

@@ -4,13 +4,8 @@ using UnityEngine;
 
 public class Sprint : AbilityEffect
 {
-    private GameplayState state;
-
     protected override void ActivateForOwner()
     {
-        state = GameplayManager.Instance.GameState();
-        GameplayManager.Instance.SetGameState(GameplayState.SelectingCardFromTable);
-
         MoveToActivationField();
         List<Minion> _cards = GameplayManager.Instance.GetAllMinions().FindAll(_minion => _minion.My).ToList();
         List<TablePlaceHandler> _availablePlaces = new();
@@ -32,7 +27,6 @@ public class Sprint : AbilityEffect
         if (_availablePlaces.Count == 0)
         {
             DialogsManager.Instance.ShowOkDialog("You dont have minion on which this ability can be applied to");
-            GameplayManager.Instance.SetGameState(state);
             RemoveAction();
             OnActivated?.Invoke();
             return;
@@ -63,7 +57,6 @@ public class Sprint : AbilityEffect
             var _card = _clickedPlace.GetCardNoWall();
             _card.ChangeSpeed(3);
             AddEffectedCard(_card.UniqueId);
-            GameplayManager.Instance.SetGameState(state);
             GameplayManager.OnCardMoved += RemoveEffect;
             GameplayManager.OnCardAttacked += RemoveEffect;
             GameplayManager.OnPlacedCard += RemoveEffect;

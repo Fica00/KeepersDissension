@@ -23,7 +23,6 @@ public class Shockwave : AbilityEffect
         int _opponentStrangeMatter = GameplayManager.Instance.OpponentsStrangeMatter();
         
         GameplayState _state = GameplayManager.Instance.GameState();
-        GameplayManager.Instance.SetGameState(GameplayState.UsingSpecialAbility);
         
         foreach (var _card in FindObjectsOfType<Card>().ToList())
         {
@@ -63,7 +62,6 @@ public class Shockwave : AbilityEffect
             _gameplayInstance.ChangeMyStrangeMatter(_gameplayInstance.MyStrangeMatter() - 
                                                     _myStrangeMatter);
             _gameplayInstance.ChangeOpponentsStrangeMatter(_gameplayInstance.OpponentsStrangeMatter()-_opponentStrangeMatter);
-            GameplayManager.Instance.SetGameState(_state);
             RemoveAction();
             OnActivated?.Invoke();
         }

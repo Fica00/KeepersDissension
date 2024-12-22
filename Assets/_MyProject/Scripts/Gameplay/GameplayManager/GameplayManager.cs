@@ -69,9 +69,9 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator GameplayRoutine()
     {
-        SetGameState(GameplayState.WaitingForPlayersToLoad);
+        SetGameState2(GameplayState.WaitingForPlayersToLoad);
         yield return new WaitForSeconds(2);
-        SetGameState(GameplayState.SettingUpTable);
+        SetGameState2(GameplayState.SettingUpTable);
         DidIFinishMyTurn = false;
         didOpponentFinishHisTurn = false;
 
@@ -80,14 +80,7 @@ public class GameplayManager : MonoBehaviour
         healthTracker.Setup();
         ShowGuardianChains();
         
-        if (IsMyTurn())
-        {
-            SetGameState(GameplayState.Playing);
-        }
-        else
-        {
-            SetGameState(GameplayState.Waiting);
-        }
+        SetGameState2(GameplayState.Gameplay);
         
         while (!HasGameEnded())
         {
@@ -121,10 +114,7 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         AbilityCardsManagerBase.Instance.Setup();
         yield return new WaitForSeconds(1f);
-        if (!doIPlayFirst)
-        {
-            SetGameState(GameplayState.Waiting);
-        }
+
         FinishedSetup?.Invoke();
     }
     
@@ -148,7 +138,6 @@ public class GameplayManager : MonoBehaviour
         if (IsMyTurn())
         {
             DidIFinishMyTurn = false;
-            SetGameState(GameplayState.Playing);
             MyPlayer.NewTurn();
             if (MyPlayer.Actions == 0)
             {
@@ -161,7 +150,6 @@ public class GameplayManager : MonoBehaviour
         else
         {
             didOpponentFinishHisTurn = false;
-            SetGameState( GameplayState.Waiting);
             OpponentPlayer.NewTurn();
             if (OpponentPlayer.Actions == 0)
             {
@@ -1032,7 +1020,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void SetGameState(GameplayState _gameState)
+    public virtual void SetGameState2(GameplayState _gameState)
     {
         throw new Exception();
     }
