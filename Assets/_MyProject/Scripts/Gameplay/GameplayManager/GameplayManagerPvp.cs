@@ -217,27 +217,9 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override void ExecuteMove(CardAction _action)
     {
-        TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
-        Card _movingCard = null;
+        Card _movingCard = GetCard(_action.FirstCardId);
         
-        foreach (var _possibleCard in _startingDestination.GetCards())
-        {
-            Card _card = _possibleCard as Card;
-            if (_card==null)
-            {
-                continue;
-            }
-
-            if (_action.FirstCardId != _card.UniqueId)
-            {
-                continue;
-            }
-            
-            _movingCard = _card;
-            break;
-        }
-
         if (_movingCard==null)
         {
             return;
@@ -293,25 +275,7 @@ public class GameplayManagerPvp : GameplayManager
     protected override void ExecuteMoveAbility(CardAction _action)
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
-        TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
-        CardBase _movingCard = null;
-       
-        foreach (var _possibleCard in _startingDestination.GetCards())
-        {
-            AbilityCard _card = _possibleCard as AbilityCard;
-            if (_card==null)
-            {
-                continue;
-            }
-
-            if (_action.FirstCardId != _card.UniqueId)
-            {
-                continue;
-            }
-            
-            _movingCard = _possibleCard;
-            break;
-        }
+        CardBase _movingCard = GetCard(_action.FirstCardId);
 
         if (_movingCard==null)
         {
