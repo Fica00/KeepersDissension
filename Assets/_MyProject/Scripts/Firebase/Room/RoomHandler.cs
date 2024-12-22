@@ -132,7 +132,13 @@ namespace FirebaseMultiplayer.Room
             CheckIfPlayerLeft(_currentRoomState,_data);
             CheckIfCreatedCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
-            CheckIfTurnChanged(_currentRoomState, _data);
+            bool _didTurnUpdate = CheckIfTurnChanged(_currentRoomState, _data);
+
+
+            if (_didTurnUpdate)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -240,17 +246,21 @@ namespace FirebaseMultiplayer.Room
             return _totalAmountOfFields - _position;
         }
 
-        private void CheckIfTurnChanged(RoomData _currentRoomData,RoomData _data)
+        private bool CheckIfTurnChanged(RoomData _currentRoomData,RoomData _data)
         {
             if (_currentRoomData.CurrentPlayerTurn == _data.CurrentPlayerTurn)
             {
-                return;
+                return false;
             }
 
-            if (_data.IsMyTurn)
+            if (!_data.IsMyTurn)
             {
-                GameplayManager.Instance.SetAmountOfActions(3, true);
+
+                return false;
             }
+            
+            GameplayManager.Instance.SetAmountOfActions(3, true);
+            return true;
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
