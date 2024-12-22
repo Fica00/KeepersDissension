@@ -404,6 +404,10 @@ public class TableActionsHandler : MonoBehaviour
     private void AddSwitchActions(List<TablePlaceHandler> _movablePlaces, Card _card, int _speed)
     {
         int _actionCost = 2;
+        if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
+        {
+            return;
+        }
 
         foreach (var _placeAround in _movablePlaces)
         {
@@ -431,24 +435,17 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
 
-                if (_card.Speed != 0)
+                if (_card.Speed == 0)
                 {
-                    if (_speed < CalculatePathCost(_card.GetTablePlace(), _placeAround, _card.MovementType, 2, CardActionType.SwitchPlace))
-                    {
-                        continue;
-                    }
-
-                    if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
-                else if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
+                
+                int _speedCost = CalculatePathCost(_card.GetTablePlace(), _placeAround, _card.MovementType, 2, CardActionType.SwitchPlace) - 1;
+                if (_speed < _speedCost)
                 {
                     continue;
                 }
 
-                Debug.Log("Adding possible action: ", _placeAround.gameObject);
                 possibleActions.Add(new CardAction
                 {
                     FirstCardId = _card.UniqueId,

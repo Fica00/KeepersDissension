@@ -261,7 +261,9 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         _movingCard.CardData.PlaceId = _destination.Id;
+        
         ShowCardMoved(_movingCard.UniqueId, _destination.Id);
+        
         OnCardMoved?.Invoke(_movingCard,_action.StartingPlaceId,_action.FinishingPlaceId, _action.DidTeleport);
         PlayMovingSoundEffect(_movingCard);
     }
@@ -271,52 +273,20 @@ public class GameplayManagerPvp : GameplayManager
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
 
-        List<CardBase> _firstCards = _startingDestination.GetCards();
-        List<CardBase> _secondCards = _destination.GetCards();
-        CardBase _firstCard = null;
-        CardBase _secondCard = null;
-
-        foreach (var _cardBase in _firstCards)
-        {
-            Card _card = _cardBase as Card;
-            if (_card==null)
-            {
-                continue;
-            }
-
-            if (_card.UniqueId != _action.FirstCardId)
-            {
-                continue;
-            }
-            
-            _firstCard = _card;
-            break;
-        }
-        
-        foreach (var _cardBase in _secondCards)
-        {
-            Card _card = _cardBase as Card;
-            if (_card == null)
-            {
-                continue;
-            }
-
-            if (_card.UniqueId != _action.SecondCardId)
-            {
-                continue;
-            }
-            
-            _secondCard = _card;
-            break;
-        }
+        Card _firstCard = GetCard(_action.FirstCardId);
+        Card _secondCard = GetCard(_action.SecondCardId);
 
         if (_firstCard == null || _secondCard == null)
         {
             return;
         }
         
-        _firstCard.MoveToPosition(_destination);
-        _secondCard.MoveToPosition(_startingDestination);
+        _firstCard.CardData.PlaceId = _destination.Id;
+        _secondCard.CardData.PlaceId = _startingDestination.Id;
+        
+        ShowCardMoved(_firstCard.UniqueId, _destination.Id);
+        ShowCardMoved(_secondCard.UniqueId, _startingDestination.Id);
+        
         OnSwitchedPlace?.Invoke(_firstCard,_secondCard);
     }
 
