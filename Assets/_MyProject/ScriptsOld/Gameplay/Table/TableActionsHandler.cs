@@ -301,7 +301,6 @@ public class TableActionsHandler : MonoBehaviour
             int _movementCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
             if (_remainingSpeed >= _movementCost && !_skip)
             {
-                Debug.Log("Adding possible action: ", _placeAround.gameObject);
                 possibleActions.Add(new CardAction()
                 {
                     FirstCardId = _warriorCard.UniqueId, FinishingPlaceId = _placeAround.Id, Type = CardActionType.Move, Cost = _actionCost,
@@ -449,6 +448,7 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
 
+                Debug.Log("Adding possible action: ", _placeAround.gameObject);
                 possibleActions.Add(new CardAction
                 {
                     FirstCardId = _card.UniqueId,

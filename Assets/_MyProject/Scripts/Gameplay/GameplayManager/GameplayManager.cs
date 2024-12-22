@@ -217,12 +217,15 @@ public class GameplayManager : MonoBehaviour
         {
             case CardActionType.Attack:
                 ExecuteAttack(_action);
+                MyPlayer.Actions--;
                 break;
             case CardActionType.Move:
                 ExecuteMove(_action);
+                MyPlayer.Actions--;
                 break;
             case CardActionType.SwitchPlace:
                 ExecuteSwitchPlace(_action);
+                MyPlayer.Actions-=2;
                 break;
             case CardActionType.MoveAbility:
                 ExecuteMoveAbility(_action);
@@ -231,7 +234,6 @@ public class GameplayManager : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
 
-        MyPlayer.Actions--;
         RoomUpdater.Instance.ForceUpdate();
 
         IEnumerator ClosePanelRoutine()
