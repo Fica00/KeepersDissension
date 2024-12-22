@@ -1738,7 +1738,6 @@ public class GameplayManagerPvp : GameplayManager
     
     public override void AddCard(CardData _cardData)
     {
-        Debug.Log("Adding card: "+_cardData.UniqueId);
         BoardData.Cards.Add(_cardData);
     }
 

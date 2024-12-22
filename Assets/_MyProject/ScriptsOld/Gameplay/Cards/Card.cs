@@ -27,7 +27,6 @@ public class Card : CardBase
 
     public void Setup(string _uniqueId)
     {
-        Debug.Log("Setting up card with id: "+_uniqueId);
         uniqueId = _uniqueId;
         Display.Setup(this);
         Setup();

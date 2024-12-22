@@ -67,11 +67,13 @@ public class TableActionsHandler : MonoBehaviour
 
     public void ShowPossibleActions(GameplayPlayer _player, TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
+        Debug.Log("trying to show possible actions");
         player = _player;
         ClearPossibleActions();
 
         if (!_card.IsWarrior())
         {
+            Debug.Log("card is not a warrior");
             CardActionsDisplay.Instance.Close();
             return;
         }
@@ -82,7 +84,6 @@ public class TableActionsHandler : MonoBehaviour
         int _range = _card.Speed != 0 ? _card.Speed : 1;
         List<TablePlaceHandler> _movablePlaces;
         _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
-        // List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType,GetRange(_card),true);
         if (_card.Range != 1 && _type == CardActionType.Attack)
         {
             _range = _card.Range;
@@ -361,7 +362,6 @@ public class TableActionsHandler : MonoBehaviour
             }
         }
     }
-
 
     private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, bool _dontAddIfItIsAWall = false)
     {

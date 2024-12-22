@@ -79,6 +79,10 @@ public class GameplayManager : MonoBehaviour
         SetPlayersTurn(doIPlayFirst);
         healthTracker.Setup();
         ShowGuardianChains();
+        if (IsMyTurn())
+        {
+            SetGameState(GameplayState.Playing);
+        }
         
         while (!HasGameEnded())
         {

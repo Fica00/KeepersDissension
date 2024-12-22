@@ -84,6 +84,7 @@ public class CardActionsDisplay : MonoBehaviour
         var _gameState = GameplayManager.Instance.GameState();
         if (_gameState != GameplayState.Playing && _gameState != GameplayState.AttackResponse)
         {
+            Debug.Log("Current game state: "+_gameState);
             return;
         }
         actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType.Move);

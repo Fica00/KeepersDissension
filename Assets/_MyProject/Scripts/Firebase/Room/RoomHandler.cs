@@ -216,7 +216,6 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldMoveCard)
                 {
-                    Debug.Log("Trying to place card with id: "+ _card.UniqueId);
                     ShowCardMoved(_card.UniqueId, _card.PlaceId);
                 }
             }
