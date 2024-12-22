@@ -65,9 +65,8 @@ public class TableActionsHandler : MonoBehaviour
         return true;
     }
 
-    public void ShowPossibleActions(GameplayPlayer _player, TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
+    public void ShowPossibleActions(TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
-        player = _player;
         ClearPossibleActions();
 
         if (!_card.IsWarrior())
@@ -80,38 +79,21 @@ public class TableActionsHandler : MonoBehaviour
         int _placeId = _clickedPlace.Id;
 
         CardMovementType _movementType = _card.MovementType;
-        int _range = _card.Speed != 0 ? _card.Speed : 1;
-        List<TablePlaceHandler> _movablePlaces;
-        _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _range);
-        if (_card.Range != 1 && _type == CardActionType.Attack)
-        {
-            _range = _card.Range;
-        }
-
-        List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _range, true, true);
+        
         switch (_type)
         {
             case CardActionType.Attack:
+                int _attackingRange = _card.Range != 1 ? _card.Range : 1;
+                List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _attackingRange, true, true);
                 AddAttackAction(_attackablePlaces, _card);
                 break;
             case CardActionType.Move:
-                int _movingRange = _range;
-                if (GameplayManager.Instance.IsAbilityActive<SlowDown>())
-                {
-                    SlowDown _slowDown = FindObjectOfType<SlowDown>();
-                    if (!_slowDown.CanMoveCard(_card))
-                    {
-                        DialogsManager.Instance.ShowOkDialog("Movement is blocked by SlowDown ability");
-                        ClearPossibleActions();
-                        return;
-                    }
-
-                    _movingRange = 1;
-                }
-
-                AddSwitchActions(_movablePlaces, _card, _range);
+                
+                int _movingSpace = _card.Speed != 0 ? _card.Speed : 1;
+                var _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _movingSpace);
+                AddSwitchActions(_movablePlaces, _card, _movingSpace);
                 AddRamAbility(_movablePlaces, _card);
-                AddMovementActions(_card, _movingRange);
+                AddMovementActions(_card, _movingSpace);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(_type), _type, null);
@@ -309,11 +291,12 @@ public class TableActionsHandler : MonoBehaviour
             {
                 _skip = true;
 
-                if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
-                {
-                    _skip = false;
-                }
-                else if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
+                // if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
+                // {
+                //     _skip = false;
+                // }
+                // else 
+                if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
                 {
                     _skip = false;
                 }
@@ -334,15 +317,16 @@ public class TableActionsHandler : MonoBehaviour
 
             if (_skip)
             {
-                AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+                // AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
             }
+            
             else if (_placeAround.ContainsWall)
             {
                 foreach (var _ability in _warriorCard.SpecialAbilities)
                 {
                     if (_ability is ScalerLeapfrog)
                     {
-                        AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+                        // AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
                     }
                 }
             }

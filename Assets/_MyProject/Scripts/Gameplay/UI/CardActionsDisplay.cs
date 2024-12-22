@@ -86,7 +86,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType.Move);
+        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Move);
     }
 
     private void UseAttackAction()
@@ -107,8 +107,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType
-        .Attack);
+        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Attack);
     }
 
     private void Flip()
