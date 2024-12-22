@@ -187,6 +187,10 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         var _destination = TableHandler.GetPlace(_positionId);
+        if (_destination==null)
+        {
+            return;
+        }
 
         _card.MoveToPosition(_destination);
     }
