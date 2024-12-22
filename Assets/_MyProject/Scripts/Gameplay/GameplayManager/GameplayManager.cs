@@ -234,6 +234,11 @@ public class GameplayManager : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
 
+        if (MyPlayer.Actions<=0)
+        {
+            return;
+        }
+        
         RoomUpdater.Instance.ForceUpdate();
 
         IEnumerator ClosePanelRoutine()
