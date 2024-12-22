@@ -56,6 +56,12 @@ public class ActionAndTurnDisplay : MonoBehaviour
             {
                 _color = opponentColor;
             }
+
+            if (_number==0)
+            {
+                yield return new WaitForSeconds(1);
+                continue;
+            }
         
             actionsDisplay.color = _color;
             turnDisplay.text = _text;
