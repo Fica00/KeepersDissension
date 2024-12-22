@@ -17,7 +17,7 @@ namespace FirebaseMultiplayer.Room
 
         private DatabaseReference database;
 
-        private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
+        private const string LEAVE_ROOM = "https://us-central1-keepersdissension.cloudfunctions.net/leaveRoom";
         private const string JOIN_ROOM = "https://joinroom-e3mmrpwoya-uc.a.run.app";
         private const string CREATE_ROOM = "https://us-central1-keepersdissension.cloudfunctions.net/createRoom";
 
