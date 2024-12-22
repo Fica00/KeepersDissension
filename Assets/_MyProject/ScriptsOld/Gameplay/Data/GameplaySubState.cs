@@ -9,5 +9,5 @@ public enum GameplaySubState
     FinishedPlacingStartingLifeForce = 3,
     Player1SelectMinions = 4,
     Player2SelectMinions = 5,
-    FinishedSelectingMinions = 5,
+    FinishedSelectingMinions = 6,
 }
