@@ -136,6 +136,7 @@ namespace FirebaseMultiplayer.Room
             CheckIfCardDied(_currentRoomState,_data);
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
             CheckForSoundAnimation(_currentRoomState,_data);
+            CheckForBombAnimation(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -301,7 +302,6 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             
-            Debug.Log("Detected animation");
             var _animationData = _data.BoardData.StrangeMatterAnimation;
             GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
         }
@@ -334,9 +334,29 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             
-            Debug.Log("Detected animation");
             var _animationData = _data.BoardData.SoundAnimation;
             GameplayManager.Instance.AnimateSoundEffect(_animationData.Key,_animationData.CardId);
+        }        
+        
+        private void CheckForBombAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.BombAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.BombAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.BombAnimation.Id == _currentRoomData.BoardData.BombAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.BombAnimation;
+            GameplayManager.Instance.ShowBombAnimation(_animationData.PlaceId);
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
@@ -353,7 +373,6 @@ namespace FirebaseMultiplayer.Room
                 _callBack?.Invoke(_responseData);
             }, _response =>
             {
-                Debug.Log(_response);
                 NewJoinRoom _data = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
                 _callBack?.Invoke(_data);
             }, _includeHeader: false);

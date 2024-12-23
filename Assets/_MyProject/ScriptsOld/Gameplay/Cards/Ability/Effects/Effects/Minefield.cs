@@ -15,7 +15,7 @@ public class Minefield : AbilityEffect
         _bomberMinefield.IsBaseCardsEffect = false;
         _bomberMinefield.Setup(false,sprite);
         _bomberMinefield.OnActivated += Finish;
-        _bomberMinefield.UseAbilityFree();
+        // _bomberMinefield.UseAbilityFree();
         _player.OnEndedTurn += RemoveEffect;
     }
 

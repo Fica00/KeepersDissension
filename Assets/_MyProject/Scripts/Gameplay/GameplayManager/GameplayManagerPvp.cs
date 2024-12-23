@@ -409,30 +409,24 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (!(_defendingCard.IsWarrior() || _defendingCard is Wall or Marker))
         {
-            Debug.Log("11111111");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard.Health > 0)
         {
-            Debug.Log("22222");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard is Keeper _keeper)
         {
-            Debug.Log("33333");
             
-            Debug.Log($"{_keeper.Details.Stats.Health} * {_keeper.PercentageOfHealthToRecover} / 100");
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
-            Debug.Log("Healing keeper for: "+_heal);
-
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
             _lifeForce.ChangeHealth(-_heal);
             
@@ -440,11 +434,8 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
-            Debug.Log("4444");
             GameplayPlayer _defendingPlayer = _defendingCard.My ? MyPlayer : OpponentPlayer;
-            Debug.Log("Defending player:"+_defendingCard.name, _defendingPlayer.gameObject);
             _defendingPlayer.DestroyCard(_defendingCard);
-            Debug.Log("Got here");
             _callBack?.Invoke(true);
         }
 
@@ -891,91 +882,26 @@ public class GameplayManagerPvp : GameplayManager
         OnFoundBombMarker?.Invoke(_cardBase);
     }
 
-    public override void BombExploded(int _placeId, bool _includeCenter = true)
+    public override void BombExploded(int _placeId, string _cardId)
     {
-        StartCoroutine(BombExplodedRoutine());
-
-        IEnumerator BombExplodedRoutine()
-        {
-            yield return new WaitForSeconds(0.3f);
-            HandleBombExploded(_placeId, _includeCenter);
-        }
+        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = _placeId };
+        BoardData.BombAnimation = _animation;
+        ShowBombAnimation(_placeId);
     }
 
-    private void HandleBombExploded(int _placeId, bool _includeCenter)
+    public override void ShowBombAnimation(int _placeId)
     {
-        SpawnBombEffect(_placeId);
-        List<TablePlaceHandler> _availablePlaces =
-            TableHandler.GetPlacesAround(_placeId, CardMovementType.EightDirections, _includeCenter: _includeCenter);
-
-        foreach (var _availablePlace in _availablePlaces)
-        {
-            if (!_availablePlace.IsOccupied)
-            {
-                continue;
-            }
-
-            List<CardBase> _cardsOnPlace = _availablePlace.GetCards();
-            int _amountOfCardsOnPlace = +_cardsOnPlace.Count;
-            foreach (var _cardOnPlace in _cardsOnPlace)
-            {
-                if (_cardOnPlace is not Card _card)
-                {
-                    continue;
-                }
-
-                if (_amountOfCardsOnPlace > 1)
-                {
-                    bool _isScaler = false;
-                    foreach (var _ability in _card.SpecialAbilities)
-                    {
-                        if (_ability is ScalerScale)
-                        {
-                            _isScaler = true;
-                            break;
-                        }
-                    }
-
-                    if (_isScaler)
-                    {
-                        continue;
-                    }
-                }
-
-                CardAction _action = new CardAction
-                {
-                    FirstCardId = _card.UniqueId,
-                    SecondCardId = _card.UniqueId,
-                    StartingPlaceId = _availablePlace.Id,
-                    FinishingPlaceId = _availablePlace.Id,
-                    Type = CardActionType.Attack,
-                    Cost = 0,
-                    CanTransferLoot = false,
-                    Damage = 3,
-                    CanCounter = false,
-                    DiedByBomb = true
-                };
-
-                ExecuteCardAction(_action);
-            }
-        }
-
-        TableHandler.ActionsHandler.ClearPossibleActions();
+        StartCoroutine(ShowBombEffect(_placeId));
     }
-
-    private void SpawnBombEffect(int _placeId)
+    
+    private IEnumerator ShowBombEffect(int _placeId)
     {
-        StartCoroutine(ShowBombEffect());
-
-        IEnumerator ShowBombEffect()
-        {
-            TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
-            GameObject _bombEffect = Instantiate(bombEffect, GameplayUI.Instance.transform);
-            yield return null;
-            _bombEffect.transform.position = _tablePlace.transform.position;
-            yield return new WaitForSeconds(2);
-            Destroy(_bombEffect);
-        }
+        TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
+        GameObject _bombEffect = Instantiate(bombEffect, GameplayUI.Instance.transform);
+        yield return null;
+        _bombEffect.transform.position=_tablePlace.transform.position;
+        yield return new WaitForSeconds(2);
+        Destroy(_bombEffect);
     }
 
     public override void ActivateAbility(string _cardId)

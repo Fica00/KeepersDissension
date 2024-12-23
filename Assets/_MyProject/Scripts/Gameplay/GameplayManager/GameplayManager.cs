@@ -42,7 +42,6 @@ public class GameplayManager : MonoBehaviour
     protected virtual void Awake()
     {
         Instance = this;
-        BomberMinefield.BombMarkers = new List<CardBase>();
     }
 
     private void Start()
@@ -410,9 +409,14 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BombExploded(int _placeId, bool _includeCenter=true)
+    public virtual void BombExploded(int _placeId, string _cardId)
     {
         throw new NotImplementedException();
+    }
+
+    public virtual void ShowBombAnimation(int _placeId)
+    {
+        throw new Exception();
     }
 
     public virtual void ActivateAbility(string _cardId)
