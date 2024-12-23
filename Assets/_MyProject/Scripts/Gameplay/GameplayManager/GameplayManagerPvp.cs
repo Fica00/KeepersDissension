@@ -5,6 +5,7 @@ using DG.Tweening;
 using UnityEngine;
 using System.Linq;
 using FirebaseMultiplayer.Room;
+using Newtonsoft.Json;
 
 public class GameplayManagerPvp : GameplayManager
 {
@@ -309,14 +310,21 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override void ExecuteAttack(CardAction _action,Action _callBack)
     {
+        Debug.Log("Executing attack");
         Card _attackingCard = GetCard(_action.FirstCardId);
         Card _defendingCard = GetCard(_action.SecondCardId);
 
         if (_attackingCard == null || _defendingCard == null)
         {
+            Debug.Log("One of them is null");
+            Debug.Log(_attackingCard);
+            Debug.Log(_defendingCard);
             _callBack?.Invoke();
             return;
         }
+        
+        Debug.Log("Attacker",_attackingCard.gameObject);
+        Debug.Log("Defender",_defendingCard.gameObject);
 
         AudioManager.Instance.PlaySoundEffect("Attack");
 
@@ -403,18 +411,21 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (!(_defendingCard.IsWarrior() || _defendingCard is Wall or Marker))
         {
+            Debug.Log("11111111");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard.Health > 0)
         {
+            Debug.Log("22222");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard is Keeper _keeper)
         {
+            Debug.Log("33333");
             PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
 
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
@@ -426,6 +437,7 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
+            Debug.Log("4444");
             GameplayPlayer _defendingPlayer = _defendingCard.My ? MyPlayer : OpponentPlayer;
             _defendingPlayer.DestroyCard(_defendingCard);
             _callBack?.Invoke(true);
@@ -439,28 +451,49 @@ public class GameplayManagerPvp : GameplayManager
 
     private void PlaceKeeperOnTable(CardBase _card, Action _callBack)
     {
-        List<int> _placesNearLifeForce = new List<int>()
-        {
-            10,
-            12,
-            18,
-            17,
-            19,
-            9,
-            13,
-            19,
-            16,
-            23,
-            24,
-            25,
-            26,
-            27
-        };
+        List<int> _placesNearLifeForce;
 
-        if (!_card.GetIsMy())
+        if (_card.GetIsMy())
         {
-            _placesNearLifeForce.Reverse();
+            _placesNearLifeForce = new List<int>()
+            {
+                10,
+                12,
+                18,
+                17,
+                19,
+                9,
+                13,
+                19,
+                16,
+                23,
+                24,
+                25,
+                26,
+                27
+            };
         }
+        else
+        {
+            _placesNearLifeForce = new List<int>()
+            {
+                54,
+                52,
+                46,
+                47,
+                45,
+                55,
+                51,
+                45,
+                48,
+                41,
+                40,
+                39,
+                38,
+                37
+            };
+        }
+
 
         foreach (var _placeNear in _placesNearLifeForce)
         {

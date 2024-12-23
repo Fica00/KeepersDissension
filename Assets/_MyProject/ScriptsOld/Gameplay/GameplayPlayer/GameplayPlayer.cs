@@ -65,6 +65,7 @@ public class GameplayPlayer : MonoBehaviour
     {
         if (_cardBase == null)
         {
+            Debug.Log(666666);
             return;
         }
 
