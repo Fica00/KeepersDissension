@@ -789,11 +789,9 @@ public class GameplayManagerPvp : GameplayManager
             {
                 return;
             }
-            else
-            {
-                SetGameplaySubState(GameplaySubState.Playing);
-                return;
-            }
+
+            SetGameplaySubState(GameplaySubState.Playing);
+            return;
         }
 
         DidIFinishMyTurn = true;
@@ -1986,5 +1984,15 @@ public class GameplayManagerPvp : GameplayManager
     public override bool IsResponseAction()
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
+    }
+
+    public override bool ShouldProcessAction()
+    {
+        if (IsResponseAction())
+        {
+            return IsMyResponseAction();
+        }
+
+        return IsMyTurn();
     }
 }

@@ -81,7 +81,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsMyResponseAction())
+        if (!GameplayManager.Instance.ShouldProcessAction())
         {
             return;
         }
@@ -102,7 +102,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsMyResponseAction())
+        if (!GameplayManager.Instance.ShouldProcessAction())
         {
             return;
         }
@@ -138,6 +138,11 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
+        if (!GameplayManager.Instance.ShouldProcessAction())
+        {
+            return;
+        }
+        
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
@@ -146,8 +151,7 @@ public class CardActionsDisplay : MonoBehaviour
         ResetDisplays();
         if (GameplayManager.Instance.IsMyResponseAction() && !GameplayManager.Instance.IsKeeperResponseAction)
         {
-            int _id = FindObjectsOfType<Card>().ToList().Find(_card =>
-                _card.UniqueId == GameplayManager.Instance.IdOfCardWithResponseAction() && _card.My).GetTablePlace().Id;
+            int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
             if (_id != _placeId)
             {
                 _placeId = _id;

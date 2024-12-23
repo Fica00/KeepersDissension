@@ -1151,4 +1151,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool ShouldProcessAction()
+    {
+        throw new Exception();
+    }
 }
