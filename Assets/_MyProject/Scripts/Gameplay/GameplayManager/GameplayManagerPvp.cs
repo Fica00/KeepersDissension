@@ -245,7 +245,6 @@ public class GameplayManagerPvp : GameplayManager
             Card _marker = _destination.GetMarker();
             if (!_marker.IsVoid)
             {
-                SniperStealth.ReturnDiscoveryCardTo = _action.StartingPlaceId;
                 CardBase _cardBase = _destination.GetCardNoWall();
                 GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
                 _markerOwner.DestroyCard(_cardBase as Card);
@@ -298,7 +297,6 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_destination.ContainsMarker)
         {
-            SniperStealth.ReturnDiscoveryCardTo = _action.StartingPlaceId;
             CardBase _cardBase = _destination.GetCardNoWall();
             GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
             _markerOwner.DestroyCard(_cardBase as Card);

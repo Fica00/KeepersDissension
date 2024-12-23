@@ -41,19 +41,6 @@ public class TableActionsHandler : MonoBehaviour
             }
         }
 
-        if (_placeId == 0)
-        {
-            TablePlaceHandler _tablePlace = tableHandler.GetPlace(0);
-            Card _cardAtStealth = _tablePlace.GetCardNoWall();
-            if (_cardAtStealth)
-            {
-                DialogsManager.Instance.ShowYesNoDialog("To interact with card in stealth, you have to leave stealth, continue??", YesLeaveStealth,
-                    ClearPossibleActions);
-            }
-
-            return false;
-        }
-
         if (_isCardInSelectedActions)
         {
             CheckForAction(tableHandler.GetPlace(_placeId));
@@ -223,20 +210,7 @@ public class TableActionsHandler : MonoBehaviour
         }
     }
 
-    private void YesLeaveStealth()
-    {
-        TablePlaceHandler _stealthPlace = tableHandler.GetPlace(0);
-        foreach (var _specialAbility in _stealthPlace.GetCardNoWall().SpecialAbilities)
-        {
-            if (_specialAbility is SniperStealth _sniper)
-            {
-                _sniper.LeaveStealth();
-                break;
-            }
-        }
-
-        ClearPossibleActions();
-    }
+    
 
     public void ClearPossibleActions()
     {
