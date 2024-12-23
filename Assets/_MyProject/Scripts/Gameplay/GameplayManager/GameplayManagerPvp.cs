@@ -308,22 +308,17 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override void ExecuteAttack(CardAction _action,Action _callBack)
     {
-        Debug.Log("Executing attack");
         Card _attackingCard = GetCard(_action.FirstCardId);
         Card _defendingCard = GetCard(_action.SecondCardId);
 
         if (_attackingCard == null || _defendingCard == null)
         {
-            Debug.Log("One of them is null");
             Debug.Log(_attackingCard);
             Debug.Log(_defendingCard);
             _callBack?.Invoke();
             return;
         }
         
-        Debug.Log("Attacker",_attackingCard.gameObject);
-        Debug.Log("Defender",_defendingCard.gameObject);
-
         AudioManager.Instance.PlaySoundEffect("Attack");
 
         if (_attackingCard == _defendingCard)

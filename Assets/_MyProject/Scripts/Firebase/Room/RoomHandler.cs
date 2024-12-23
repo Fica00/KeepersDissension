@@ -96,7 +96,6 @@ namespace FirebaseMultiplayer.Room
 
             if (!_args.Snapshot.Exists)
             {
-                Debug.Log("Updated but snapshot doesn't exist?");
                 return;
             }
 
