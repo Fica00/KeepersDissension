@@ -322,8 +322,7 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_attackingCard == _defendingCard)
         {
-            ResolveEndOfAttack(_attackingCard, _defendingCard);
-            _callBack?.Invoke();
+            ResolveEndOfAttack(_attackingCard, _defendingCard,_callBack);
             return;
         }
 
@@ -335,8 +334,7 @@ public class GameplayManagerPvp : GameplayManager
 
         AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId, () =>
         {
-            ResolveEndOfAttack(_attackingCard, _defendingCard);
-            _callBack?.Invoke();
+            ResolveEndOfAttack(_attackingCard, _defendingCard,_callBack);
         });
     }
 
@@ -354,7 +352,7 @@ public class GameplayManagerPvp : GameplayManager
         });
     }
 
-    private void ResolveEndOfAttack(Card _attackingCard, Card _defendingCard)
+    private void ResolveEndOfAttack(Card _attackingCard, Card _defendingCard, Action _callBack)
     {
         int _damage = _attackingCard.Damage;
         _defendingCard.ChangeHealth(-_damage);
@@ -362,16 +360,22 @@ public class GameplayManagerPvp : GameplayManager
 
         OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
         CheckForResponseAction(_attackingCard, _defendingCard);
-        bool _didDie = CheckIfDefenderIsDestroyed(_defendingCard);
-        if (_didDie)
-        {
-            if (_defendingCard is LifeForce)
-            {
-                StopGame(!_defendingCard.My);
-                return;
-            }
+        CheckIfDefenderIsDestroyed(_defendingCard,FinishResolve);
 
-            HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
+        void FinishResolve(bool _didDie)
+        {
+            if (_didDie)
+            {
+                if (_defendingCard is LifeForce)
+                {
+                    StopGame(!_defendingCard.My);
+                    return;
+                }
+
+                HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
+            }
+            
+            _callBack?.Invoke();
         }
     }
 
@@ -395,24 +399,23 @@ public class GameplayManagerPvp : GameplayManager
 
     }
 
-    private bool CheckIfDefenderIsDestroyed(Card _defendingCard)
+    private void CheckIfDefenderIsDestroyed(Card _defendingCard, Action<bool> _callBack)
     {
         if (!(_defendingCard.IsWarrior() || _defendingCard is Wall or Marker))
         {
-            return false;
+            _callBack?.Invoke(false);
+            return;
         }
 
         if (_defendingCard.Health > 0)
         {
-            return false;
+            _callBack?.Invoke(false);
+            return;
         }
 
         if (_defendingCard is Keeper _keeper)
         {
-            if (_defendingCard.My)
-            {
-                PlaceKeeperOnTable(_defendingCard);
-            }
+            PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
 
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
@@ -425,12 +428,16 @@ public class GameplayManagerPvp : GameplayManager
         {
             GameplayPlayer _defendingPlayer = _defendingCard.My ? MyPlayer : OpponentPlayer;
             _defendingPlayer.DestroyCard(_defendingCard);
+            _callBack?.Invoke(true);
         }
 
-        return true;
+        void FinishPlaceKeeper()
+        {
+            _callBack?.Invoke(true);
+        }
     }
 
-    private void PlaceKeeperOnTable(CardBase _card)
+    private void PlaceKeeperOnTable(CardBase _card, Action _callBack)
     {
         List<int> _placesNearLifeForce = new List<int>()
         {
@@ -450,21 +457,40 @@ public class GameplayManagerPvp : GameplayManager
             27
         };
 
+        if (!_card.GetIsMy())
+        {
+            _placesNearLifeForce.Reverse();
+        }
+
         foreach (var _placeNear in _placesNearLifeForce)
         {
             if (TryPlaceKeeper(_placeNear))
             {
-                ReplaceKeeper(_card, _placeNear);
+                ReplaceKeeper(_card, _placeNear,_callBack);
                 return;
             }
         }
 
-        for (int _i = 8; _i < 57; _i++)
+        if (_card.GetIsMy())
         {
-            if (TryPlaceKeeper(_i))
+            for (int _i = 8; _i < 57; _i++)
             {
-                ReplaceKeeper(_card, _i);
-                return;
+                if (TryPlaceKeeper(_i))
+                {
+                    ReplaceKeeper(_card, _i,_callBack);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            for (int _i = 57; _i > 8; _i--)
+            {
+                if (TryPlaceKeeper(_i))
+                {
+                    ReplaceKeeper(_card, _i,_callBack);
+                    return;
+                }
             }
         }
     }
@@ -695,40 +721,10 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    private void ReplaceKeeper(CardBase _card, int _placeId)
+    private void ReplaceKeeper(CardBase _card, int _placeId, Action _callBack)
     {
-        StartCoroutine(ReplaceRoutine());
-
-        IEnumerator ReplaceRoutine()
-        {
-            yield return new WaitForSeconds(0.5f);
-            PlaceCard(_card, _placeId);
-            if (IsAbilityActive<Comrade>())
-            {
-                List<CardBase> _cards = GetAllCardsOfType(CardType.Minion, true).Cast<CardBase>().ToList();
-                if (_cards.Count == 0)
-                {
-                    yield break;
-                }
-
-                ChooseCardPanel.Instance.ShowCards(_cards, PlaceMinion);
-            }
-
-            void PlaceMinion(CardBase _minion)
-            {
-                StartCoroutine(ChoosePlaceForMinion(_minion));
-            }
-
-            IEnumerator ChoosePlaceForMinion(CardBase _selectedMinion)
-            {
-                yield return StartCoroutine(GetPlaceOnTable(FinishPlaceMinion));
-
-                void FinishPlaceMinion(int _positionId)
-                {
-                    PlaceCard(_selectedMinion, _positionId);
-                }
-            }
-        }
+        PlaceCard(_card, _placeId);
+        _callBack?.Invoke();
     }
 
     public override void EndTurn()
