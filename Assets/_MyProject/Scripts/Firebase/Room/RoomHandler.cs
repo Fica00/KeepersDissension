@@ -381,8 +381,24 @@ namespace FirebaseMultiplayer.Room
             var _animationData = _data.BoardData.BoughtStrangeMatterAnimation;
             GameplayManager.Instance.ShowBoughtMatter(IsOwner && _animationData.DidOwnerBuy);
         }        
+        
         private void CheckForUnchain(RoomData _currentRoomData,RoomData _data)
         {
+            if (_data.BoardData == null)
+            {
+                return;
+            }
+
+            if (_data.BoardData.MyPlayer == null)
+            {
+                return;
+            }
+            
+            if (_data.BoardData.OpponentPlayer == null)
+            {
+                return;
+            }
+            
             if (_data.BoardData.MyPlayer.DidUnchainGuardian && _data.BoardData.MyPlayer.DidUnchainGuardian != _currentRoomData.BoardData.MyPlayer.DidUnchainGuardian)
             {
                 GameplayManager.Instance.ShowGuardianUnchained(true);
