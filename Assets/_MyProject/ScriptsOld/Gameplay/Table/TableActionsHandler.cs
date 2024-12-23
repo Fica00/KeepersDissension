@@ -151,7 +151,10 @@ public class TableActionsHandler : MonoBehaviour
 
             if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
-                continue;
+                if (!GameplayManager.Instance.IsMyResponseAction())
+                {
+                    continue;
+                }
             }
 
             possibleActions.Add(new CardAction()
@@ -547,7 +550,10 @@ public class TableActionsHandler : MonoBehaviour
 
             if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
-                continue;
+                if (!GameplayManager.Instance.IsMyResponseAction())
+                {
+                    continue;
+                }
             }
 
             
