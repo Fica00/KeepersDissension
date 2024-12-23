@@ -180,7 +180,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void UnchainGuardian(int _price)
+    public virtual void UnchainGuardian(int _price, bool _reduceAction)
     {
         throw new Exception();
     }
