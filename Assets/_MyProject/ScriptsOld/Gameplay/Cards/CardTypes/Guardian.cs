@@ -17,6 +17,12 @@ public class Guardian: Card
 
     public void ShowUnchain()
     {
+        if (My)
+        {
+            player = GameplayManager.Instance.MyPlayer;
+            player.OnEndedTurn += AddSpeed;
+        }
+        
         RectTransform _cardBaseTransform = Display.GetComponent<RectTransform>();
         Vector3 _startingScale = _cardBaseTransform.localScale;
         _cardBaseTransform.DOScale(new Vector3(_startingScale.x,0,_startingScale.z), 0.5f).OnComplete(() =>
@@ -25,14 +31,9 @@ public class Guardian: Card
             Display.ChangeSprite(Details.Background);
         });
         chain.gameObject.SetActive(false);
-        OnUnchained?.Invoke();
-        AddSpeed();
         
-        if (My)
-        {
-            player = GameplayManager.Instance.MyPlayer;
-            player.OnEndedTurn += AddSpeed;
-        }
+        SetSpeed(2);
+        OnUnchained?.Invoke();
     }
     
     
@@ -84,7 +85,7 @@ public class Guardian: Card
         AddSpeed();
     }
     
-    public void AddSpeed()
+    private void AddSpeed()
     {
         if (IsChained)
         {

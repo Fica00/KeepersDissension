@@ -1915,9 +1915,9 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void UnchainGuardian(int _price, bool _reduceAction)
     {
-        ShowGuardianUnchained(true);
         BoardData.MyPlayer.DidUnchainGuardian = true;
         ChangeMyStrangeMatter(-_price);
+        ShowGuardianUnchained(true);
         if (_reduceAction)
         {
             MyPlayer.Actions--;
