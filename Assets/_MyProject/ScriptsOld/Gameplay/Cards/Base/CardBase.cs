@@ -108,20 +108,26 @@ public class CardBase : MonoBehaviour
 
     public void Destroy()
     {
+        Debug.Log("llllllllllllll");
         OnGotDestroyed?.Invoke(this);
         Card _card = GetComponent<Card>();
         if (_card == null)
         {
+            Debug.Log("mmmmmmmmmmmm");
             return;
         }
         
+            Debug.Log("nnnnnnnnnnn");
         if (name.ToLower().Contains("wall"))
         {
+            Debug.Log("oooooooooooooo");
             if (_card.Details.Faction.IsSnow)
             {
+            Debug.Log("pppppppppppppp");
                 GameplayManager.Instance.PlayAudioOnBoth("IceWallBraking",_card);
             }
         }
+            Debug.Log("qqqqqqqqqq");
     }
 
     public virtual bool GetIsMy()
