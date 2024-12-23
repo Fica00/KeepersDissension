@@ -388,13 +388,28 @@ namespace FirebaseMultiplayer.Room
             {
                 return;
             }
+            
+            if (_currentRoomData.BoardData == null)
+            {
+                return;
+            }
 
             if (_data.BoardData.MyPlayer == null)
             {
                 return;
             }
             
+            if (_currentRoomData.BoardData.MyPlayer == null)
+            {
+                return;
+            }
+            
             if (_data.BoardData.OpponentPlayer == null)
+            {
+                return;
+            }
+            
+            if (_currentRoomData.BoardData.OpponentPlayer == null)
             {
                 return;
             }
