@@ -778,7 +778,8 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
     {
-        GameplayState _gameState = GameState();
+        Debug.Log("Buying minion: "+_cost);
+        
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
