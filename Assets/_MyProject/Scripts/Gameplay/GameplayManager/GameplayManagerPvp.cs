@@ -778,11 +778,6 @@ public class GameplayManagerPvp : GameplayManager
         CloseAllPanels();
         TableHandler.ActionsHandler.ClearPossibleActions();
 
-        if (!IsMyTurn())
-        {
-            return;
-        }
-
         if (IsResponseAction())
         {
             if (!IsMyResponseAction())
@@ -791,6 +786,11 @@ public class GameplayManagerPvp : GameplayManager
             }
 
             SetGameplaySubState(GameplaySubState.Playing);
+            return;
+        }
+        
+        if (!IsMyTurn())
+        {
             return;
         }
 
