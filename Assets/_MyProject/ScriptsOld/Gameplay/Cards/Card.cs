@@ -80,13 +80,16 @@ public class Card : CardBase
     {
         int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.Health);
         CardData.Stats.Health = _alteredAmount;
+        Debug.Log("Setting health: "+CardData.Stats.Health, gameObject);
         UpdatedHealth?.Invoke();
     }
 
     public void ChangeHealth(int _amount)
     {
+        Debug.Log("Changing health",gameObject);
         int _newHealth = Math.Clamp(CardData.Stats.Health + _amount, 0, Details.Stats.Health);
         CardData.Stats.Health = _newHealth;
+        Debug.Log("New health: "+_newHealth);
         UpdatedHealth?.Invoke();
     }
 

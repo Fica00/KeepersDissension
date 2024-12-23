@@ -69,10 +69,15 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
+        Debug.Log("aaaaaa");
         _cardBase.Destroy();
+        Debug.Log("bbbbb");
         _cardBase.ReturnFromHand();
+        Debug.Log("cccccc");
         _cardBase.SetHasDied(true);
+        Debug.Log("ddddddd");
         _cardBase.PositionAsDead();
+        Debug.Log("eeeeee");
     }
 
     public void DestroyAbility(CardBase _ability)

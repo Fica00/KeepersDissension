@@ -443,7 +443,9 @@ public class GameplayManagerPvp : GameplayManager
         {
             Debug.Log("4444");
             GameplayPlayer _defendingPlayer = _defendingCard.My ? MyPlayer : OpponentPlayer;
+            Debug.Log("Defending player:"+_defendingCard.name, _defendingPlayer.gameObject);
             _defendingPlayer.DestroyCard(_defendingCard);
+            Debug.Log("Got here");
             _callBack?.Invoke(true);
         }
 
