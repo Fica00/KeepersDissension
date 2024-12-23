@@ -778,8 +778,6 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
     {
-        Debug.Log("Buying minion: "+_cost);
-        
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
@@ -790,32 +788,24 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 HandleBoughtMinion(_positionId);
-                _callBack?.Invoke();
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
                 }
+
+                if (MyPlayer.Actions>0)
+                {
+                    RoomUpdater.Instance.ForceUpdate();
+                }
+                _callBack?.Invoke();
             }
         }
 
         void HandleBoughtMinion(int _positionId)
         {
-            GameplayPlayer _player = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
-            if (_player.IsMy)
-            {
-                if (_cardBase.GetIsMy())
-                {
-                    ChangeMyStrangeMatter(-_cost);
-                }
-                else
-                {
-                    ChangeOpponentsStrangeMatter(-_cost);
-                }
-            }
-
-            PlaceCard(_cardId, _positionId);
-
+            ChangeMyStrangeMatter(-_cost);
             (_cardBase as Card)?.SetHasDied(false);
+            PlaceCard(_cardId, _positionId);
         }
     }
 
