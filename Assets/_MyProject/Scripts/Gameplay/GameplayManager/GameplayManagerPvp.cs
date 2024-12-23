@@ -820,31 +820,20 @@ public class GameplayManagerPvp : GameplayManager
 
             void FinishRevive(int _positionId)
             {
-                HandleBuildWall(_cardBase, _cost, _positionId, _cardId);
+                ChangeMyStrangeMatter(-_cost);
+                PlaceCard(_cardId, _positionId);
+                
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
                 }
+                
+                if (MyPlayer.Actions>0)
+                {
+                    RoomUpdater.Instance.ForceUpdate();
+                }
             }
         }
-    }
-
-    private void HandleBuildWall(CardBase _cardBase, int _cost, int _positionId, string _cardId)
-    {
-        GameplayPlayer _player = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
-        if (_player.IsMy)
-        {
-            if (_player.IsMy)
-            {
-                ChangeMyStrangeMatter(-_cost);
-            }
-            else
-            {
-                ChangeOpponentsStrangeMatter(-_cost);
-            }
-        }
-
-        PlaceCard(_cardId, _positionId);
     }
 
     public override void TellOpponentSomething(string _text)
