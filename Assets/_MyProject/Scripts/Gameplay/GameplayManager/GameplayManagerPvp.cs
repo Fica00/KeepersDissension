@@ -1201,7 +1201,7 @@ public class GameplayManagerPvp : GameplayManager
             new BoughtStrangeMatterAnimation { Id = Guid.NewGuid().ToString(), DidOwnerBuy = RoomHandler.IsOwner };
 
         MyPlayer.Actions--;
-
+        ShowBoughtMatter(true);
         if (MyPlayer.Actions > 0)
         {
             RoomUpdater.Instance.ForceUpdate();
