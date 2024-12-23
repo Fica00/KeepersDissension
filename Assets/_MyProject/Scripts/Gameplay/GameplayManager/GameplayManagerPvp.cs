@@ -786,6 +786,7 @@ public class GameplayManagerPvp : GameplayManager
             }
 
             SetGameplaySubState(GameplaySubState.Playing);
+            RoomUpdater.Instance.ForceUpdate();
             return;
         }
         
