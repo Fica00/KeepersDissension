@@ -1114,4 +1114,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void AnimateSoundEffect(string _key, string _cardUniqueId)
+    {
+        
+    }
 }

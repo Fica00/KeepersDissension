@@ -135,6 +135,7 @@ namespace FirebaseMultiplayer.Room
             CheckForAttackAnimation(_currentRoomState,_data);
             CheckIfCardDied(_currentRoomState,_data);
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
+            CheckForSoundAnimation(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -314,6 +315,28 @@ namespace FirebaseMultiplayer.Room
         {
             int _totalAmountOfFields = 64;
             return _totalAmountOfFields - _position;
+        }
+        
+        private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.SoundAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.SoundAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.SoundAnimation.Id == _currentRoomData.BoardData.SoundAnimation.Id)
+            {
+                return;
+            }
+            
+            Debug.Log("Detected animation");
+            var _animationData = _data.BoardData.SoundAnimation;
+            GameplayManager.Instance.AnimateSoundEffect(_animationData.Key,_animationData.CardId);
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 

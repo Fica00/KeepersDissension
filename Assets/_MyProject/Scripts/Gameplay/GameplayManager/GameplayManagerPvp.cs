@@ -428,12 +428,16 @@ public class GameplayManagerPvp : GameplayManager
             Debug.Log("33333");
             PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
 
+            Debug.Log($"{_keeper.Details.Stats.Health} * {_keeper.PercentageOfHealthToRecover} / 100");
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
-            _defendingCard.ChangeHealth(-_heal);
+            Debug.Log("Healing keeper for: "+_heal);
+
+            var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
+            _lifeForce.ChangeHealth(-_heal);
         }
         else
         {
@@ -1337,6 +1341,13 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        BoardData.SoundAnimation = new SoundAnimation { Id = Guid.NewGuid().ToString(), Key = _key, CardId = _card.UniqueId };
+        AnimateSoundEffect(BoardData.SoundAnimation.Key, BoardData.SoundAnimation.Id);
+    }
+
+    public override void AnimateSoundEffect(string _key, string _cardUniqueId)
+    {
+        Card _card = GetCard(_cardUniqueId);
         if (_card != null)
         {
             _card.Display.ShowWhiteBox();
