@@ -1623,9 +1623,7 @@ public class GameplayManagerPvp : GameplayManager
 
     private void YesUnchain(int _price)
     {
-        ChangeMyStrangeMatter(-_price);
-        UnchainGuardian();
-        MyPlayer.Actions--;
+        UnchainGuardian(_price);
     }
 
     public override int AmountOfActionsPerTurn()
@@ -1913,5 +1911,29 @@ public class GameplayManagerPvp : GameplayManager
         DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
         StopAllCoroutines();
         GameplayUI.Instance.ShowResult(_winner == FirebaseManager.Instance.PlayerId);
+    }
+
+    public override void UnchainGuardian(int _price)
+    {
+        ShowGuardianUnchained(true);
+        BoardData.MyPlayer.DidUnchainGuardian = true;
+        ChangeMyStrangeMatter(-_price);
+        MyPlayer.Actions--;
+        OnUnchainedGuardian?.Invoke();
+        if (MyPlayer.Actions>0)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
+    }
+
+    public override void ShowGuardianUnchained(bool _didIUnchain)
+    {
+        Guardian _guardian = _didIUnchain ? GetMyGuardian() : GetOpponentGuardian();
+        _guardian.ShowUnchain();
+    }
+
+    public override bool DidUnchainGuardian(bool _forMe)
+    {
+        return _forMe ? BoardData.MyPlayer.DidUnchainGuardian : BoardData.OpponentPlayer.DidUnchainGuardian;
     }
 }

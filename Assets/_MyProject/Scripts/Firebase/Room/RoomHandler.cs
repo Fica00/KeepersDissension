@@ -137,6 +137,7 @@ namespace FirebaseMultiplayer.Room
             CheckForSoundAnimation(_currentRoomState,_data);
             CheckForBombAnimation(_currentRoomState,_data);
             CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
+            CheckForUnchain(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
         }
 
@@ -379,6 +380,18 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.BoughtStrangeMatterAnimation;
             GameplayManager.Instance.ShowBoughtMatter(IsOwner && _animationData.DidOwnerBuy);
+        }        
+        private void CheckForUnchain(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.MyPlayer.DidUnchainGuardian && _data.BoardData.MyPlayer.DidUnchainGuardian != _currentRoomData.BoardData.MyPlayer.DidUnchainGuardian)
+            {
+                GameplayManager.Instance.ShowGuardianUnchained(true);
+            }
+            
+            if (_data.BoardData.OpponentPlayer.DidUnchainGuardian && _data.BoardData.OpponentPlayer.DidUnchainGuardian != _currentRoomData.BoardData.OpponentPlayer.DidUnchainGuardian)
+            {
+                GameplayManager.Instance.ShowGuardianUnchained(false);
+            }
         }        
         
         private void CheckForGameEnd(RoomData _currentRoomData,RoomData _data)

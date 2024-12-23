@@ -180,11 +180,9 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public void UnchainGuardian()
+    public virtual void UnchainGuardian(int _price)
     {
-        Guardian _guardian = GetMyGuardian();
-        _guardian.Unchain();
-        OnUnchainedGuardian?.Invoke();
+        throw new Exception();
     }
 
     public virtual void PlaceStartingWall()
@@ -1130,6 +1128,16 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void ShowGameEnded(string _winner)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool DidUnchainGuardian(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowGuardianUnchained(bool _didIUnchain)
     {
         throw new Exception();
     }

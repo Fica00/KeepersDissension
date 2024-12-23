@@ -13,16 +13,10 @@ public class Guardian: Card
     [SerializeField] private LineRenderer chain;
     private GameplayPlayer player;
 
-    public bool IsChained { get; set; } = true;
+    public bool IsChained => !GameplayManager.Instance.DidUnchainGuardian(GetIsMy());
 
-    public void Unchain()
+    public void ShowUnchain()
     {
-        player = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        IsChained = false;
-        ChangeDamage(GainStatsOnUnchaining.Damage);
-        ChangeHealth(GainStatsOnUnchaining.Health);
-        ChangeRange(GainStatsOnUnchaining.Range);
-
         RectTransform _cardBaseTransform = Display.GetComponent<RectTransform>();
         Vector3 _startingScale = _cardBaseTransform.localScale;
         _cardBaseTransform.DOScale(new Vector3(_startingScale.x,0,_startingScale.z), 0.5f).OnComplete(() =>
@@ -32,8 +26,13 @@ public class Guardian: Card
         });
         chain.gameObject.SetActive(false);
         OnUnchained?.Invoke();
-        player.OnEndedTurn += AddSpeed;
         AddSpeed();
+        
+        if (My)
+        {
+            player = GameplayManager.Instance.MyPlayer;
+            player.OnEndedTurn += AddSpeed;
+        }
     }
     
     
@@ -85,7 +84,7 @@ public class Guardian: Card
         AddSpeed();
     }
     
-    private void AddSpeed()
+    public void AddSpeed()
     {
         if (IsChained)
         {
