@@ -129,6 +129,10 @@ namespace FirebaseMultiplayer.Room
             roomData = _data;
             CheckIfPlayerJoined(_currentRoomState,_data);
             CheckIfPlayerLeft(_currentRoomState,_data);
+            if (!SceneManager.IsGameplayScene)
+            {
+                return;
+            }
             CheckIfCreatedCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
             CheckForAttackAnimation(_currentRoomState,_data);
