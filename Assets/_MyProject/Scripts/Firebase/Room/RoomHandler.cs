@@ -137,6 +137,7 @@ namespace FirebaseMultiplayer.Room
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
             CheckForSoundAnimation(_currentRoomState,_data);
             CheckForBombAnimation(_currentRoomState,_data);
+            CheckForGameEnd(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -357,6 +358,25 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.BombAnimation;
             GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
+        }
+        private void CheckForGameEnd(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.HasGameEnded == false)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.Winner))
+            {
+                return;
+            }
+
+            if (_currentRoomData.Winner == _data.Winner)
+            {
+                return;
+            }
+
+            GameplayManager.Instance.ShowGameEnded(_data.Winner);
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
