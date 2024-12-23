@@ -1141,4 +1141,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool IsMyResponseAction()
+    {
+        throw new Exception();
+    }
 }

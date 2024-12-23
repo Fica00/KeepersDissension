@@ -30,7 +30,7 @@ public class ActionAndTurnDisplay : MonoBehaviour
         int _number;
         while (gameObject.activeSelf)
         {
-            bool _isResponseAction = GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.AttackResponse;
+            bool _isResponseAction = GameplayManager.Instance.GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
             if (GameplayManager.Instance.IsMyTurn())
             {
                 _number = GameplayManager.Instance.AmountOfActions(true);

@@ -1939,4 +1939,11 @@ public class GameplayManagerPvp : GameplayManager
     {
         return _forMe ? BoardData.MyPlayer.DidUnchainGuardian : BoardData.OpponentPlayer.DidUnchainGuardian;
     }
+
+    public override bool IsMyResponseAction()
+    {
+        return RoomHandler.IsOwner
+            ? GetGameplaySubState() == GameplaySubState.Player1ResponseAction
+            : GetGameplaySubState() == GameplaySubState.Player2ResponseAction;
+    }
 }
