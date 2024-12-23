@@ -356,7 +356,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(_animationData.PlaceId);
+            GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 

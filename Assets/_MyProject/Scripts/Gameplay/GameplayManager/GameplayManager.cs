@@ -162,10 +162,10 @@ public class GameplayManager : MonoBehaviour
 
     public void Resign()
     {
-        StopGame(false);
+        EndGame(false);
     }
 
-    public virtual void StopGame(bool _didIWin)
+    public virtual void EndGame(bool _didIWin)
     {
         throw new NotImplementedException();
     }
@@ -1054,7 +1054,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void SetHasGameEnded(bool _status)
+    public virtual void SetHasGameEnded(bool _status, string _winner)
     {
         throw new Exception();
     }
@@ -1121,6 +1121,11 @@ public class GameplayManager : MonoBehaviour
 
     public virtual void AnimateSoundEffect(string _key, string _cardUniqueId)
     {
-        
+        throw new Exception();
+    }
+
+    public virtual void ShowGameEnded(string _winner)
+    {
+        throw new Exception();
     }
 }

@@ -37,7 +37,7 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         DialogsManager.Instance.ShowOkDialog("Opponent resigned");
-        StopGame(true);
+        EndGame(true);
     }
 
     protected override void SetupTable()
@@ -107,7 +107,7 @@ public class GameplayManagerPvp : GameplayManager
         return RoomHandler.IsOwner;
     }
 
-    public override void StopGame(bool _didIWin)
+    public override void EndGame(bool _didIWin)
     {
         if (HasGameEnded())
         {
@@ -115,10 +115,10 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         Debug.Log("Ending game");
-        SetHasGameEnded(true);
-        DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
-        StopAllCoroutines();
-        GameplayUI.Instance.ShowResult(_didIWin);
+        var _winner = _didIWin ? BoardData.MyPlayer.PlayerId : BoardData.OpponentPlayer.PlayerId;
+        SetHasGameEnded(true,_winner);
+        ShowGameEnded(_winner);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     public override void PlaceCard(CardBase _card, int _positionId)
@@ -374,7 +374,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (_defendingCard is LifeForce)
                 {
-                    StopGame(!_defendingCard.My);
+                    EndGame(!_defendingCard.My);
                     return;
                 }
 
@@ -1657,9 +1657,10 @@ public class GameplayManagerPvp : GameplayManager
         return RoomData.GameplayState;
     }
 
-    public override void SetHasGameEnded(bool _status)
+    public override void SetHasGameEnded(bool _status, string _winner)
     {
         RoomData.HasGameEnded = _status;
+        RoomData.Winner = _winner;
     }
 
     public override bool HasGameEnded()
@@ -1914,5 +1915,12 @@ public class GameplayManagerPvp : GameplayManager
     {
         Card _card = GetCard(_uniqueId);
         _card.PositionAsDead();
+    }
+
+    public override void ShowGameEnded(string _winner)
+    {
+        DataManager.Instance.PlayerData.CurrentRoomId = string.Empty;
+        StopAllCoroutines();
+        GameplayUI.Instance.ShowResult(_winner == FirebaseManager.Instance.PlayerId);
     }
 }

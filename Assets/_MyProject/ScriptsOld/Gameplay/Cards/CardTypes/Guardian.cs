@@ -105,7 +105,7 @@ public class Guardian: Card
                 healthDisplay.text = 0.ToString();
                 if (GameplayManager.Instance.IsAbilityActive<Risk>())
                 {
-                    GameplayManager.Instance.StopGame(!My);
+                    GameplayManager.Instance.EndGame(!My);
                     yield break;
                 }
             }

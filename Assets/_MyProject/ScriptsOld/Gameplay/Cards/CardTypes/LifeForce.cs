@@ -26,7 +26,7 @@ public class LifeForce : Card
         lifeForceDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
         if (Health==0 && !GameplayManager.Instance.IsAbilityActive<Risk>())
         {
-            GameplayManager.Instance.StopGame(!player.IsMy);
+            GameplayManager.Instance.EndGame(!player.IsMy);
         }
     }
 

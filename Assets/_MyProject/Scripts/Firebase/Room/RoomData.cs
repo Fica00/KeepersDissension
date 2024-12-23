@@ -15,6 +15,7 @@ namespace FirebaseMultiplayer.Room
         public GameplaySubState GameplaySubState;
         public int CurrentPlayerTurn = 1;
         public bool HasGameEnded;
+        public string Winner;
         public string Owner;
         public List<RoomPlayer> RoomPlayers;
         public BoardData BoardData = new ();
