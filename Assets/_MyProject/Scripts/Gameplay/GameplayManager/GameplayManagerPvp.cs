@@ -1194,10 +1194,13 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyMatter()
     {
-        MyPlayer.Actions--;
-        ChangeStrangeMaterInEconomy(-1);
+        int _amount = 1;
+        ChangeMyStrangeMatter(_amount);
+        ChangeStrangeMaterInEconomy(-_amount);
         BoardData.BoughtStrangeMatterAnimation =
             new BoughtStrangeMatterAnimation { Id = Guid.NewGuid().ToString(), DidOwnerBuy = RoomHandler.IsOwner };
+
+        MyPlayer.Actions--;
 
         if (MyPlayer.Actions > 0)
         {
