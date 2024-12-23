@@ -433,7 +433,7 @@ public class GameplayManagerPvp : GameplayManager
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             OnKeeperDied?.Invoke(_keeper);
-            _defendingCard.ChangeHealth(_heal);
+            _defendingCard.SetHealth(_heal);
             Debug.Log("Healing keeper for: "+_heal);
 
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
