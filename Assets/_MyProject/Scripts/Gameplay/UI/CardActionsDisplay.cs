@@ -136,7 +136,7 @@ public class CardActionsDisplay : MonoBehaviour
         }
     }
     
-    public void Show(int _placeId, GameplayPlayer _player)
+    public void Show(int _placeId)
     {
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {

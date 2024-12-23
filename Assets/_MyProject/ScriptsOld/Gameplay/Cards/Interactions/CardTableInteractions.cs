@@ -54,8 +54,7 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
         }
         
         int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
-        GameplayPlayer _player = _cardBase.GetIsMy() ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        CardActionsDisplay.Instance.Show(_placeId, _player);
+        CardActionsDisplay.Instance.Show(_placeId);
     }
 
     private void OnLongPress()

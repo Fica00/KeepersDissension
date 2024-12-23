@@ -68,9 +68,9 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator GameplayRoutine()
     {
-        SetGameState2(GameplayState.WaitingForPlayersToLoad);
+        SetGameState(GameplayState.WaitingForPlayersToLoad);
         yield return new WaitForSeconds(2);
-        SetGameState2(GameplayState.SettingUpTable);
+        SetGameState(GameplayState.SettingUpTable);
         DidIFinishMyTurn = false;
         didOpponentFinishHisTurn = false;
 
@@ -79,7 +79,7 @@ public class GameplayManager : MonoBehaviour
         healthTracker.Setup();
         ShowGuardianChains();
         
-        SetGameState2(GameplayState.Gameplay);
+        SetGameState(GameplayState.Gameplay);
         
         while (!HasGameEnded())
         {
@@ -1047,7 +1047,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void SetGameState2(GameplayState _gameState)
+    public virtual void SetGameState(GameplayState _gameState)
     {
         throw new Exception();
     }
@@ -1143,6 +1143,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual bool IsMyResponseAction()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsResponseAction()
     {
         throw new Exception();
     }

@@ -392,12 +392,34 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        SetResponseAction(false, _defendingCard.UniqueId);
+        SetResponseAction(_defendingCard.My && RoomHandler.IsOwner, _defendingCard.UniqueId);
     }
 
     private void SetResponseAction(bool _forMe, string _uniqueCardId)
     {
-
+        BoardData.IdOfCardWithResponseAction = _uniqueCardId;
+        if (_forMe)
+        {
+            if (RoomHandler.IsOwner)
+            {
+                SetGameplaySubState(GameplaySubState.Player1ResponseAction);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player2ResponseAction);
+            }
+        }
+        else
+        {
+            if (RoomHandler.IsOwner)
+            {
+                SetGameplaySubState(GameplaySubState.Player2ResponseAction);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player1ResponseAction);
+            }
+        }
     }
 
     private void CheckIfDefenderIsDestroyed(Card _defendingCard, Action<bool> _callBack)
@@ -759,6 +781,19 @@ public class GameplayManagerPvp : GameplayManager
         if (!IsMyTurn())
         {
             return;
+        }
+
+        if (IsResponseAction())
+        {
+            if (!IsMyResponseAction())
+            {
+                return;
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Playing);
+                return;
+            }
         }
 
         DidIFinishMyTurn = true;
@@ -1636,7 +1671,7 @@ public class GameplayManagerPvp : GameplayManager
         return RoomData.GameplayState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
     }
 
-    public override void SetGameState2(GameplayState _gameState)
+    public override void SetGameState(GameplayState _gameState)
     {
         RoomData.GameplayState = _gameState;
     }
@@ -1738,6 +1773,7 @@ public class GameplayManagerPvp : GameplayManager
             RoomUpdater.Instance.ForceUpdate();
         }
 
+        SetGameplaySubState(GameplaySubState.Playing);
         yield return new WaitForSeconds(1f);
     }
 
@@ -1945,5 +1981,10 @@ public class GameplayManagerPvp : GameplayManager
         return RoomHandler.IsOwner
             ? GetGameplaySubState() == GameplaySubState.Player1ResponseAction
             : GetGameplaySubState() == GameplaySubState.Player2ResponseAction;
+    }
+
+    public override bool IsResponseAction()
+    {
+        return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
 }

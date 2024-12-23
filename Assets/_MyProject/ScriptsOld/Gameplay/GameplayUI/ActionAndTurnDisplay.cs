@@ -30,30 +30,22 @@ public class ActionAndTurnDisplay : MonoBehaviour
         int _number;
         while (gameObject.activeSelf)
         {
-            bool _isResponseAction = GameplayManager.Instance.GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
             if (GameplayManager.Instance.IsMyTurn())
             {
                 _number = GameplayManager.Instance.AmountOfActions(true);
                 _text = "Your turn";
-                if (_isResponseAction)
-                {
-                    _text = "Your response";
-                }
                 _color = myColor;
             }
             else
             {
                 _number = GameplayManager.Instance.AmountOfActions(false);
                 _text = "Opponent's turn";
-                if (_isResponseAction)
-                {
-                    _text = "Opponents response";
-                }
                 _color = opponentColor;
             }
 
-            if (_isResponseAction)
+            if (GameplayManager.Instance.IsResponseAction())
             {
+                _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
                 _color = Color.magenta;
             }
 
