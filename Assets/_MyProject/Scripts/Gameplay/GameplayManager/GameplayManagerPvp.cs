@@ -426,8 +426,7 @@ public class GameplayManagerPvp : GameplayManager
         if (_defendingCard is Keeper _keeper)
         {
             Debug.Log("33333");
-            PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
-
+            
             Debug.Log($"{_keeper.Details.Stats.Health} * {_keeper.PercentageOfHealthToRecover} / 100");
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
@@ -438,6 +437,8 @@ public class GameplayManagerPvp : GameplayManager
 
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
             _lifeForce.ChangeHealth(-_heal);
+            
+            PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
         }
         else
         {
