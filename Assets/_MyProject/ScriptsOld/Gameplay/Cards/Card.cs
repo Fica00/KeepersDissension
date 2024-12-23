@@ -9,15 +9,7 @@ public class Card : CardBase
 
     private string uniqueId;
     public CardData CardData => FirebaseManager.Instance.RoomHandler.BoardData.Cards.Find(_card => _card.UniqueId == uniqueId);
-    public int Health
-    {
-        get
-        {
-            Debug.Log("getting health: "+CardData.Stats.Health);
-            return CardData.Stats.Health;
-        }
-    }
-
+    public int Health=> CardData.Stats.Health;
     public int Range => CardData.Stats.Range;
     public int Damage => CardData.Stats.Damage;
     public bool IsVoid => CardData.IsVoid;
