@@ -137,6 +137,7 @@ namespace FirebaseMultiplayer.Room
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
             CheckForSoundAnimation(_currentRoomState,_data);
             CheckForBombAnimation(_currentRoomState,_data);
+            CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
         }
 
@@ -359,6 +360,28 @@ namespace FirebaseMultiplayer.Room
             var _animationData = _data.BoardData.BombAnimation;
             GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
         }
+        
+        private void CheckForBoughtStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.BoughtStrangeMatterAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.BoughtStrangeMatterAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.BoughtStrangeMatterAnimation.Id == _currentRoomData.BoardData.BoughtStrangeMatterAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.BoughtStrangeMatterAnimation;
+            GameplayManager.Instance.ShowBoughtMatter(IsOwner && _animationData.DidOwnerBuy);
+        }        
+        
         private void CheckForGameEnd(RoomData _currentRoomData,RoomData _data)
         {
             if (_data.HasGameEnded == false)

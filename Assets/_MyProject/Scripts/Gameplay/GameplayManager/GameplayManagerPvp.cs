@@ -1194,9 +1194,22 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyMatter()
     {
-        EconomyPanelHandler.Instance.ShowBoughtMatter(true);
+        MyPlayer.Actions--;
+        ChangeStrangeMaterInEconomy(-1);
+        BoardData.BoughtStrangeMatterAnimation =
+            new BoughtStrangeMatterAnimation { Id = Guid.NewGuid().ToString(), DidOwnerBuy = RoomHandler.IsOwner };
+
+        if (MyPlayer.Actions > 0)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
     }
 
+    public override void ShowBoughtMatter(bool _didIBuy)
+    {
+        EconomyPanelHandler.Instance.ShowBoughtMatter(true);
+    }
+    
     public override void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
     {
         Card _bomber = FindObjectsOfType<Card>().ToList().Find(_card => _card.Details.Id == _cardId && _card.My == _isMy);

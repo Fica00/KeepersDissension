@@ -464,6 +464,11 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
+    public virtual void ShowBoughtMatter(bool _didIBuy)
+    {
+        throw new Exception();
+    }
+
     public virtual void MarkMarkerAsBomb(string _cardId)
     {
         throw new Exception();
