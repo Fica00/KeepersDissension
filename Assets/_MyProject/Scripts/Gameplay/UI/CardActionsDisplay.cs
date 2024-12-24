@@ -169,7 +169,7 @@ public class CardActionsDisplay : MonoBehaviour
                 if (_id != _placeId)
                 {
                     _placeId = _id;
-                    if (FindObjectOfType<OkDialog>() == null)
+                    if (FindObjectOfType<YesNoDialog>() == null)
                     {
                         DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
                     }
