@@ -360,7 +360,7 @@ public class GameplayManagerPvp : GameplayManager
         var _defendingPosition = _defendingCard.GetTablePlace().Id;
 
         OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
-        CheckForResponseAction(_attackingCard, _defendingCard);
+        bool _didGiveResponseAction = CheckForResponseAction(_attackingCard, _defendingCard);
         CheckIfDefenderIsDestroyed(_defendingCard,FinishResolve);
 
         void FinishResolve(bool _didDie)
@@ -377,32 +377,42 @@ public class GameplayManagerPvp : GameplayManager
             }
             
             _callBack?.Invoke();
+            if (_didGiveResponseAction && MyPlayer.Actions==0)
+            {
+                Debug.Log("Forcing an update because response was given but");
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
     }
 
-    private void CheckForResponseAction(Card _attackingCard, Card _defendingCard)
+    private bool CheckForResponseAction(Card _attackingCard, Card _defendingCard)
     {
         if (_defendingCard.My == _attackingCard.My)
         {
-            return;
+            Debug.Log(1111);
+            return false;
         }
 
         if (_defendingCard.Health <= 0)
         {
-            return;
+            Debug.Log(2222);
+            return false;
         }
 
         if (!_defendingCard.IsWarrior())
         {
-            return;
+            Debug.Log(3333);
+            return false;
         }
 
         if (IsMyResponseAction2())
         {
-            return;
+            Debug.Log(44444);
+            return false;
         }
 
         SetResponseAction(_defendingCard.My && RoomHandler.IsOwner, _defendingCard.UniqueId);
+        return true;
     }
 
     private void SetResponseAction(bool _forMe, string _uniqueCardId)
@@ -412,10 +422,12 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (RoomHandler.IsOwner)
             {
+                Debug.Log("Giving response action to player 1");
                 SetGameplaySubState(GameplaySubState.Player1ResponseAction);
             }
             else
             {
+                Debug.Log("Giving response action to player 2");
                 SetGameplaySubState(GameplaySubState.Player2ResponseAction);
             }
         }
@@ -423,10 +435,12 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (RoomHandler.IsOwner)
             {
+                Debug.Log("Giving response action to player 2");
                 SetGameplaySubState(GameplaySubState.Player2ResponseAction);
             }
             else
             {
+                Debug.Log("Giving response action to player 1");
                 SetGameplaySubState(GameplaySubState.Player1ResponseAction);
             }
         }
@@ -884,13 +898,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         Card _card = GetAllMinions().Find(_card => _card.UniqueId == _cardId);
         _card.ChangeOwner();
-    }
-
-    private void ForceResponseAction(string _cardId)
-    {
-        SetIdOfCardWithResponseAction(_cardId);
-        MyPlayer.Actions = 1;
-        DialogsManager.Instance.ShowOkDialog("Your warrior survived attack, you get 1 response action");
     }
 
     public override void MarkMarkerAsBomb(string _cardId)
