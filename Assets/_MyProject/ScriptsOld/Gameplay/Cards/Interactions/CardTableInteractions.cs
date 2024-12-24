@@ -45,7 +45,6 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
 
     private void SingleClick()
     {
-        OnPlaceClicked?.Invoke(TablePlaceHandler);
         CardBase _cardBase = CardBase;
         if (_cardBase==null)
         {
@@ -55,6 +54,7 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
         
         int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
         CardActionsDisplay.Instance.Show(_placeId);
+        OnPlaceClicked?.Invoke(TablePlaceHandler);
     }
 
     private void OnLongPress()

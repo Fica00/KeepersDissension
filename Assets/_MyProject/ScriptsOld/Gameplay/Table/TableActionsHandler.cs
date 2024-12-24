@@ -22,6 +22,7 @@ public class TableActionsHandler : MonoBehaviour
 
     private void ClearPossibleActions(TablePlaceHandler _clickedPlace)
     {
+        Debug.Log("Clearing possible actions");
         ClearPossibleActions();
     }
 
@@ -33,21 +34,27 @@ public class TableActionsHandler : MonoBehaviour
     public bool ContinueWithShowingPossibleActions(int _placeId)
     {
         bool _isCardInSelectedActions = false;
+        Debug.Log(possibleActions.Count);
         foreach (var _action in possibleActions)
         {
+            Debug.Log($"{_action.FinishingPlaceId} == {_placeId}");
             if (_action.FinishingPlaceId == _placeId)
             {
                 _isCardInSelectedActions = true;
             }
         }
+        
+        Debug.Log("Is card in selected actions: "+_isCardInSelectedActions);
 
         if (_isCardInSelectedActions)
         {
             CheckForAction(tableHandler.GetPlace(_placeId));
             ClearPossibleActions();
+            Debug.Log("aaaaaaa");
             return false;
         }
 
+            Debug.Log("bbbb");
         return true;
     }
 

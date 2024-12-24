@@ -158,9 +158,11 @@ public class CardActionsDisplay : MonoBehaviour
         
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
+            Debug.Log("ccccccc");
             return;
         }
 
+            Debug.Log("dddddd");
         if (GameplayManager.Instance.IsResponseAction2())
         {
             if (!GameplayManager.Instance.IsKeeperResponseAction2)
