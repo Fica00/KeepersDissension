@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -46,8 +48,10 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
 
     private void SingleClick()
     {
-        var _possibleActions = GameplayManager.Instance.TableHandler.ActionsHandler.PossibleActions.ToList();
+        var _possibleActions = JsonConvert.DeserializeObject<List<CardAction>>(JsonConvert.SerializeObject(GameplayManager.Instance.TableHandler.ActionsHandler.PossibleActions));
+        Debug.Log(_possibleActions.Count);
         OnPlaceClicked?.Invoke(TablePlaceHandler);
+        Debug.Log(_possibleActions.Count);
         CardBase _cardBase = CardBase;
         if (_cardBase==null)
         {

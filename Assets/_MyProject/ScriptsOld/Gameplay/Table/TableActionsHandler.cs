@@ -34,6 +34,8 @@ public class TableActionsHandler : MonoBehaviour
     public bool ContinueWithShowingPossibleActions(int _placeId, List<CardAction> _possibleActions)
     {
         bool _isCardInSelectedActions = false;
+        
+        Debug.Log(_possibleActions.Count);
         foreach (var _action in _possibleActions)
         {
             if (_action.FinishingPlaceId == _placeId)
