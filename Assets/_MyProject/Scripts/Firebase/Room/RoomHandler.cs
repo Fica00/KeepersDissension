@@ -143,6 +143,7 @@ namespace FirebaseMultiplayer.Room
             CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
             CheckForUnchain(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
+            ShouldEndTurn(_currentRoomState,_data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -310,6 +311,45 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.StrangeMatterAnimation;
             GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
+        }
+        
+        private void ShouldEndTurn(RoomData _currentRoomData,RoomData _data)
+        {
+            bool _shouldEndTurn = false;
+            if (IsOwner)
+            {
+                if (_currentRoomData.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_data.GameplaySubState == GameplaySubState.Playing)
+                    {
+                        if (_data.BoardData.MyPlayer.ActionsLeft == 0)
+                        {
+                            _shouldEndTurn = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (_currentRoomData.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_data.GameplaySubState == GameplaySubState.Playing)
+                    {
+                        if (_data.BoardData.MyPlayer.ActionsLeft == 0)
+                        {
+                            _shouldEndTurn = true;
+                        }
+                    }
+                }
+            }
+
+            if (!_shouldEndTurn)
+            {
+                return;
+            }
+            
+            Debug.Log("Should end turn detected");
+            GameplayManager.Instance.EndTurn();
         }
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
