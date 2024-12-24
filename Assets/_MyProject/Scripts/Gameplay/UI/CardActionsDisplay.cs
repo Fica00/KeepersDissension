@@ -142,7 +142,7 @@ public class CardActionsDisplay : MonoBehaviour
         }
     }
     
-    public void Show(int _placeId, List<CardAction> _possibleActions)
+    public void Show(int _placeId)
     {
         if (GameplayManager.Instance.IsResponseAction2())
         {
@@ -156,7 +156,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId,_possibleActions))
+        if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
         }
@@ -169,7 +169,10 @@ public class CardActionsDisplay : MonoBehaviour
                 if (_id != _placeId)
                 {
                     _placeId = _id;
-                    DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                    if (FindObjectOfType<OkDialog>() == null)
+                    {
+                        DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                    }
                 }
             }
         }

@@ -48,10 +48,7 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
 
     private void SingleClick()
     {
-        var _possibleActions = JsonConvert.DeserializeObject<List<CardAction>>(JsonConvert.SerializeObject(GameplayManager.Instance.TableHandler.ActionsHandler.PossibleActions));
-        Debug.Log(_possibleActions.Count);
         OnPlaceClicked?.Invoke(TablePlaceHandler);
-        Debug.Log(_possibleActions.Count);
         CardBase _cardBase = CardBase;
         if (_cardBase==null)
         {
@@ -60,7 +57,7 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
         }
         
         int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
-        CardActionsDisplay.Instance.Show(_placeId,_possibleActions);
+        CardActionsDisplay.Instance.Show(_placeId);
     }
 
     private void OnLongPress()

@@ -7,7 +7,6 @@ public class TableActionsHandler : MonoBehaviour
 {
     private TableHandler tableHandler;
     private List<CardAction> possibleActions = new();
-    public List<CardAction> PossibleActions => possibleActions;
 
     private void OnEnable()
     {
@@ -31,12 +30,10 @@ public class TableActionsHandler : MonoBehaviour
         tableHandler = GameplayManager.Instance.TableHandler;
     }
 
-    public bool ContinueWithShowingPossibleActions(int _placeId, List<CardAction> _possibleActions)
+    public bool ContinueWithShowingPossibleActions(int _placeId)
     {
         bool _isCardInSelectedActions = false;
-        
-        Debug.Log(_possibleActions.Count);
-        foreach (var _action in _possibleActions)
+        foreach (var _action in possibleActions)
         {
             if (_action.FinishingPlaceId == _placeId)
             {
@@ -46,7 +43,6 @@ public class TableActionsHandler : MonoBehaviour
         
         if (_isCardInSelectedActions)
         {
-            possibleActions = _possibleActions;
             CheckForAction(tableHandler.GetPlace(_placeId));
             ClearPossibleActions();
             return false;
