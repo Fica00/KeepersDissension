@@ -10,14 +10,21 @@ public class TableActionsHandler : MonoBehaviour
 
     private void OnEnable()
     {
+        TablePlaceHandler.OnPlaceClicked += TryToShow;
         TablePlaceHandler.OnPlaceClicked += CheckForAction;
         TablePlaceHandler.OnPlaceClicked += ClearPossibleActions;
     }
 
     private void OnDisable()
     {
+        TablePlaceHandler.OnPlaceClicked -= TryToShow;
         TablePlaceHandler.OnPlaceClicked -= CheckForAction;
         TablePlaceHandler.OnPlaceClicked -= ClearPossibleActions;
+    }
+
+    private void TryToShow(TablePlaceHandler _clickedPlace)
+    {
+        FindObjectOfType<CardActionsDisplay>().Show(_clickedPlace.Id);
     }
 
     private void ClearPossibleActions(TablePlaceHandler _clickedPlace)

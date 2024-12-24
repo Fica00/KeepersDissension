@@ -45,15 +45,6 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
 
     private void SingleClick()
     {
-        CardBase _cardBase = CardBase;
-        if (_cardBase==null)
-        {
-            CardActionsDisplay.Instance.Close();
-            return;
-        }
-        
-        int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
-        CardActionsDisplay.Instance.Show(_placeId);
         OnPlaceClicked?.Invoke(TablePlaceHandler);
     }
 
