@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -45,7 +46,17 @@ public class CardTableInteractions : MonoBehaviour, IPointerClickHandler, IPoint
 
     private void SingleClick()
     {
+        var _possibleActions = GameplayManager.Instance.TableHandler.ActionsHandler.PossibleActions.ToList();
         OnPlaceClicked?.Invoke(TablePlaceHandler);
+        CardBase _cardBase = CardBase;
+        if (_cardBase==null)
+        {
+            CardActionsDisplay.Instance.Close();
+            return;
+        }
+        
+        int _placeId = _cardBase.GetComponentInParent<TablePlaceHandler>().Id;
+        CardActionsDisplay.Instance.Show(_placeId,_possibleActions);
     }
 
     private void OnLongPress()

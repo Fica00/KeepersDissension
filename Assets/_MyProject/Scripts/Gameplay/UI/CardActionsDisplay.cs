@@ -142,7 +142,7 @@ public class CardActionsDisplay : MonoBehaviour
         }
     }
     
-    public void Show(int _placeId)
+    public void Show(int _placeId, List<CardAction> _possibleActions)
     {
         if (GameplayManager.Instance.IsResponseAction2())
         {
@@ -156,13 +156,11 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
+        if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId,_possibleActions))
         {
-            Debug.Log("ccccccc");
             return;
         }
 
-            Debug.Log("dddddd");
         if (GameplayManager.Instance.IsResponseAction2())
         {
             if (!GameplayManager.Instance.IsKeeperResponseAction2)

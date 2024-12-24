@@ -7,29 +7,22 @@ public class TableActionsHandler : MonoBehaviour
 {
     private TableHandler tableHandler;
     private List<CardAction> possibleActions = new();
+    public List<CardAction> PossibleActions => possibleActions;
 
     private void OnEnable()
     {
-        TablePlaceHandler.OnPlaceClicked += TryToShow;
         TablePlaceHandler.OnPlaceClicked += CheckForAction;
         TablePlaceHandler.OnPlaceClicked += ClearPossibleActions;
     }
 
     private void OnDisable()
     {
-        TablePlaceHandler.OnPlaceClicked -= TryToShow;
         TablePlaceHandler.OnPlaceClicked -= CheckForAction;
         TablePlaceHandler.OnPlaceClicked -= ClearPossibleActions;
     }
 
-    private void TryToShow(TablePlaceHandler _clickedPlace)
-    {
-        FindObjectOfType<CardActionsDisplay>().Show(_clickedPlace.Id);
-    }
-
     private void ClearPossibleActions(TablePlaceHandler _clickedPlace)
     {
-        Debug.Log("Clearing possible actions");
         ClearPossibleActions();
     }
 
@@ -38,30 +31,25 @@ public class TableActionsHandler : MonoBehaviour
         tableHandler = GameplayManager.Instance.TableHandler;
     }
 
-    public bool ContinueWithShowingPossibleActions(int _placeId)
+    public bool ContinueWithShowingPossibleActions(int _placeId, List<CardAction> _possibleActions)
     {
         bool _isCardInSelectedActions = false;
-        Debug.Log(possibleActions.Count);
-        foreach (var _action in possibleActions)
+        foreach (var _action in _possibleActions)
         {
-            Debug.Log($"{_action.FinishingPlaceId} == {_placeId}");
             if (_action.FinishingPlaceId == _placeId)
             {
                 _isCardInSelectedActions = true;
             }
         }
         
-        Debug.Log("Is card in selected actions: "+_isCardInSelectedActions);
-
         if (_isCardInSelectedActions)
         {
+            possibleActions = _possibleActions;
             CheckForAction(tableHandler.GetPlace(_placeId));
             ClearPossibleActions();
-            Debug.Log("aaaaaaa");
             return false;
         }
 
-            Debug.Log("bbbb");
         return true;
     }
 
