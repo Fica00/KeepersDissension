@@ -70,8 +70,6 @@ public class WebRequests : MonoBehaviour
             Debug.Log(_webRequest.error);
             _onError?.Invoke(_webRequest.error);
         }
-
-        _webRequest.Dispose();
     }
 
     private IEnumerator PostRoutine(string _uri, string _jsonData, Action<string> _onSuccess, Action<string> _onError, bool _includeHeader = true)
@@ -100,12 +98,12 @@ public class WebRequests : MonoBehaviour
         {
             Debug.Log(_uri);
             Debug.Log(_webRequest.error);
+            Debug.Log(_webRequest.downloadHandler.text);
             _onError?.Invoke(_webRequest.error);
         }
 
         _webRequest.uploadHandler.Dispose();
         _webRequest.downloadHandler.Dispose();
-        _webRequest.Dispose();
     }
 
     private IEnumerator PutRoutine(string _uri, string _jsonData, Action<string> _onSuccess, Action<string> _onError)
@@ -134,7 +132,6 @@ public class WebRequests : MonoBehaviour
 
         _webRequest.uploadHandler.Dispose();
         _webRequest.downloadHandler.Dispose();
-        _webRequest.Dispose();
     }
 
     private IEnumerator PatchRoutine(string _uri, string _jsonData, Action<string> _onSuccess, Action<string> _onError)
@@ -165,7 +162,6 @@ public class WebRequests : MonoBehaviour
 
         _webRequest.uploadHandler.Dispose();
         _webRequest.downloadHandler.Dispose();
-        _webRequest.Dispose();
     }
     
     private IEnumerator DeleteRoutine(string _uri, Action<string> _onSuccess, Action<string> _onError)
@@ -190,6 +186,5 @@ public class WebRequests : MonoBehaviour
         }
 
         _webRequest.downloadHandler.Dispose();
-        _webRequest.Dispose();
     }
 }

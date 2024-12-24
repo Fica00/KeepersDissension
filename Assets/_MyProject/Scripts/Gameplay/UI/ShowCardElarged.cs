@@ -19,7 +19,8 @@ public class ShowCardElarged : MonoBehaviour
     private bool isShowingFrontSide;
     private Sprite frontImage;
     private Sprite backImage;
-    private CardBase shownCard;
+    private bool isSelectedCardGuardian;
+    private bool isGuardianChained;
     
     private void OnEnable()
     {
@@ -41,13 +42,55 @@ public class ShowCardElarged : MonoBehaviour
         closeButton.onClick.RemoveListener(Close);
     }
 
+    private void Show(AbilityData _abilityData)
+    {
+        if (_abilityData == null)
+        {
+            return;
+        }
+        
+        isSelectedCardGuardian = false;
+        isGuardianChained = false;
+        isShowingFrontSide = true;
+        
+        cardDisplay.gameObject.SetActive(false);
+        abilityDisplay.gameObject.SetActive(true);
+        if (isShowingFrontSide)
+        {
+            abilityDisplay.transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        
+        float _screenWidth = Screen.width;
+        float _screenHeight = Screen.height;
+
+        float _targetSize = Mathf.Min(_screenWidth, _screenHeight) * 0.9f;
+
+        RectTransform _rectTransform = abilityDisplay.GetComponent<RectTransform>();
+        Sprite _sprite = CardsManager.Instance.GetAbilityImage(_abilityData.CardId);
+        float _aspectRatio = _sprite.rect.width / _sprite.rect.height;
+        _rectTransform.sizeDelta = new Vector2(_targetSize, _targetSize / _aspectRatio);
+        frontImage = _sprite;
+        backImage = CardsManager.Instance.GetAbilityBackground(_abilityData.CardId);
+        abilityDisplay.sprite = frontImage;
+        
+        animationHolder.transform.localScale=Vector3.zero;
+        animationHolder.transform.DOScale(Vector3.one, 0.5f);
+        holder.SetActive(true);
+        OnShowed?.Invoke();
+    }
+
     private void Show(CardBase _card)
     {
         if (_card==null)
         {
             return;
         }
-        
+
+        isSelectedCardGuardian = _card is Guardian;
+        if (isSelectedCardGuardian)
+        {
+            isGuardianChained = (_card as Guardian).IsChained;
+        }
         isShowingFrontSide = true;
 
         TablePlaceHandler _tablePlace = _card.GetTablePlace();
@@ -71,7 +114,6 @@ public class ShowCardElarged : MonoBehaviour
 
     private void ShowSelectedCard(CardBase _card)
     {
-        shownCard = _card;
         if (_card is Card)
         {
             ShowCard(_card as Card);
@@ -110,14 +152,14 @@ public class ShowCardElarged : MonoBehaviour
             abilityDisplay.transform.eulerAngles = new Vector3(0, 0, 0);
         }
         
-        float screenWidth = Screen.width;
-        float screenHeight = Screen.height;
+        float _screenWidth = Screen.width;
+        float _screenHeight = Screen.height;
 
-        float targetSize = Mathf.Min(screenWidth, screenHeight) * 0.9f;
+        float _targetSize = Mathf.Min(_screenWidth, _screenHeight) * 0.9f;
 
-        RectTransform rectTransform = abilityDisplay.GetComponent<RectTransform>();
-        float aspectRatio = _abilityCard.Details.Foreground.rect.width / _abilityCard.Details.Foreground.rect.height;
-        rectTransform.sizeDelta = new Vector2(targetSize, targetSize / aspectRatio);
+        RectTransform _rectTransform = abilityDisplay.GetComponent<RectTransform>();
+        float _aspectRatio = _abilityCard.Details.Foreground.rect.width / _abilityCard.Details.Foreground.rect.height;
+        _rectTransform.sizeDelta = new Vector2(_targetSize, _targetSize / _aspectRatio);
         frontImage = _abilityCard.Details.Foreground;
         backImage = _abilityCard.Details.Background;
         abilityDisplay.sprite = frontImage;
@@ -125,10 +167,11 @@ public class ShowCardElarged : MonoBehaviour
 
     private void Flip()
     {
-        if (shownCard is Card _card && _card is Guardian _guardian && !_guardian.IsChained)
+        if (isShowingFrontSide && !isGuardianChained)
         {
             return;
         }
+        
         RectTransform _cardBaseTransform = cardDisplay.GetComponent<RectTransform>();
         _cardBaseTransform.DOScale(new Vector3(1,0,1), 0.5f).OnComplete(() =>
         {

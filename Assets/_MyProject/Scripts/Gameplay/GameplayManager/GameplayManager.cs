@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GameplayActions;
 using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
@@ -10,23 +9,21 @@ public class GameplayManager : MonoBehaviour
     public static Action<CardBase, int, int, bool> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
-    public static Action<CardBase, CardBase> OnGonnaSwitchPlace;
     public static Action<CardBase> OnPlacedCard;
     public static Action<Keeper> OnKeeperDied;
     public static GameplayManager Instance;
     public static Action FinishedSetup;
-    public static Action<CardBase> OnActivatedAbility;
     public static Action<CardBase> OnFoundBombMarker;
     public static Action OnUnchainedGuardian;
+    
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
-    public int AmountOfActionsPerTurn;
-    public int UnchainingGuardianPrice;
-    public int AmountOfAbilitiesPlayerCanBuy;
-    public StrangeMatter WhiteStrangeMatter;
-    [HideInInspector] public int StrangeMatterCostChange;
-    [HideInInspector] public bool ShouldIPlaceStartingWall;
+    
+    [HideInInspector] public CardAction LastAction;
+    
+    [SerializeField] private HealthTracker healthTracker;
+
     [SerializeField] protected List<SimpleOpenAndClose> simplePanels;
     [SerializeField] protected List<ArrowPanel> arrowPanels;
     [SerializeField] protected Sprite voidMarker;
@@ -36,48 +33,21 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected Sprite forestMarker;
     [SerializeField] protected GameObject bombEffect;
 
-    protected bool IsMyTurn;
-    protected bool HasGameEnded;
-    protected bool Finished;
-    protected bool OpponentFinished;
-    protected bool HasOpponentPlacedStartingCards;
+    protected bool DidIFinishMyTurn;
+    private bool didOpponentFinishHisTurn;
     private bool doIPlayFirst;
-
-    protected StrangeMatterTracker strangeMatterTracker;
-
-    public bool UsingVisionToDestroyMarkers;
-    protected ActionData lastAction;
-
-    public bool IsSettingUpTable =>
-        GameState is GameplayState.SettingUpTable or GameplayState.WaitingForPlayersToLoad;
-
-    [HideInInspector] public CardAction LastAction;
-    [HideInInspector] public GameplayState GameState;
-    [SerializeField] protected HealthTracker healthTracker;
-
-    public int[]
-        LootChanges = { 0, 0 }; //add those changes when loot for killing is given, index 0 is for master client
-
-    [HideInInspector] public int IdOfCardWithResponseAction;
-    public bool IsKeeperResponseAction => IdOfCardWithResponseAction == 10 || IdOfCardWithResponseAction == 60;
-
-    public bool MyTurn => IsMyTurn;
-
-    public bool IsExecutingOldActions;
     
-
+    public bool IsKeeperResponseAction2 =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    
     protected virtual void Awake()
     {
         Instance = this;
-        strangeMatterTracker = FindObjectOfType<StrangeMatterTracker>();
-        BomberMinefield.BombMarkers = new List<CardBase>();
     }
 
     private void Start()
     {
         SetupTable();
         MyPlayer.UpdatedActions += TryEndTurn;
-        DataManager.Instance.PlayerData.PlayMusic = DataManager.Instance.PlayerData.PlayMusic; 
         StartCoroutine(GameplayRoutine());
     }
 
@@ -98,54 +68,43 @@ public class GameplayManager : MonoBehaviour
 
     private IEnumerator GameplayRoutine()
     {
-        GameState = GameplayState.WaitingForPlayersToLoad;
-        yield return new WaitForSeconds(2); //just in case, wait a bit for players to load correctly
-        GameState = GameplayState.SettingUpTable;
-        int _round = 0;
-        Finished = false;
-        OpponentFinished = false;
+        SetGameState(GameplayState.WaitingForPlayersToLoad);
+        yield return new WaitForSeconds(2);
+        SetGameState(GameplayState.SettingUpTable);
+        DidIFinishMyTurn = false;
+        didOpponentFinishHisTurn = false;
 
-        if (FirebaseManager.Instance.RoomHandler.ExecuteOldActionsFirst)
-        {
-            Debug.Log("Starting executing old actions");
-            yield return ExecuteOldActions();
-            yield return new WaitForSeconds(2);
-            IsMyTurn = lastAction.IsMine;
-            Debug.Log("Finished executing old actions, is last action mine? "+lastAction.IsMine);
-            BlockaderCard.IgnoreSending = true;
-            healthTracker.Setup();
-            LastPreparation();
-            FinishedSetup?.Invoke();
-        }
-        else
-        {
-            yield return NewMatchRoutine();
-            IsMyTurn = doIPlayFirst;
-            healthTracker.Setup();
-            LastPreparation();
-        }
+        yield return NewMatchRoutine();
+        SetPlayersTurn(doIPlayFirst);
+        healthTracker.Setup();
+        ShowGuardianChains();
         
+        SetGameState(GameplayState.Gameplay);
         
-        while (!HasGameEnded)
+        while (!HasGameEnded())
         {
-            yield return WaitUntilTheEndOfTurn(); //first players turn
-            yield return new WaitForSeconds(1); //sync up
-            yield return WaitUntilTheEndOfTurn(); //second players turn
-            yield return new WaitForSeconds(1); //sync up
-            _round++;
+            yield return WaitUntilTheEndOfTurn();
+            yield return new WaitForSeconds(1);
+            yield return WaitUntilTheEndOfTurn();
+            yield return new WaitForSeconds(1);
         }
+    }
+
+    private void ShowGuardianChains()
+    {
+        GetMyGuardian().ShowChain();
+        GetOpponentGuardian().ShowChain();
     }
 
     private IEnumerator NewMatchRoutine()
     {
-        IsMyTurn = DecideWhoPlaysFirst();
-        doIPlayFirst = IsMyTurn;
-        ShouldIPlaceStartingWall = !IsMyTurn;
+        SetPlayersTurn(DecideWhoPlaysFirst());
+        doIPlayFirst = IsMyTurn();
 
-        yield return HandlePlacingLifeForceAndGuardian();
-        yield return HandlePlaceRestOfTheCards();
+        yield return PlaceLifeForceAndGuardianRoutine();
+        yield return PlaceMinions();
 
-        if (ShouldIPlaceStartingWall)
+        if (ShouldIPlaceStartingWall())
         {
             PlaceStartingWall();
         }
@@ -153,19 +112,16 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         AbilityCardsManagerBase.Instance.Setup();
         yield return new WaitForSeconds(1f);
-        FinishedSetup?.Invoke();
-        if (!doIPlayFirst)
-        {
-            GameState = GameplayState.Waiting;
-        }
-    }
 
-    protected virtual IEnumerator ExecuteOldActions()
+        FinishedSetup?.Invoke();
+    }
+    
+    protected virtual IEnumerator PlaceLifeForceAndGuardianRoutine()
     {
         throw new Exception();
     }
 
-    protected virtual void LastPreparation()
+    protected virtual IEnumerator PlaceMinions()
     {
         throw new Exception();
     }
@@ -175,195 +131,305 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    protected virtual IEnumerator WaitUntilTheEndOfTurn()
+    private IEnumerator WaitUntilTheEndOfTurn()
     {
-        throw new NotImplementedException();
-    }
-
-    public virtual void Resign()
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void StopGame(bool _didIWin)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void EndTurn(bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void TryUnchainGuardian()
-    {
-        if (GameState != GameplayState.Playing)
+        if (IsMyTurn())
         {
-            return;
+            DidIFinishMyTurn = false;
+            MyPlayer.NewTurn();
+            if (MyPlayer.Actions == 0)
+            {
+                DidIFinishMyTurn = true;
+                SetPlayersTurn(false);
+            }
+            yield return new WaitUntil(() => DidIFinishMyTurn);
+            MyPlayer.EndedTurn();
         }
-
-        if (!FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My).IsChained)
+        else
         {
-            DialogsManager.Instance.ShowOkDialog("Guardian is already unchained");
-            return;
+            didOpponentFinishHisTurn = false;
+            OpponentPlayer.NewTurn();
+            if (OpponentPlayer.Actions == 0)
+            {
+                didOpponentFinishHisTurn = true;
+                SetPlayersTurn(true);
+            }
+            yield return new WaitUntil(() => didOpponentFinishHisTurn);
+            OpponentPlayer.EndedTurn();
         }
-
-        int _price = UnchainingGuardianPrice - StrangeMatterCostChange;
-        if (Famine.IsActive)
-        {
-            DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
-            return;
-        }
-
-        if (MyPlayer.StrangeMatter < _price && !GameplayCheats.HasUnlimitedGold)
-        {
-            DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
-            return;
-        }
-
-        DialogsManager.Instance.ShowYesNoDialog($"Spend {_price} to unchain guardian??", () => { YesUnchain(_price); });
+        CloseAllPanels();
     }
 
-    private void YesUnchain(int _price)
+    public void Resign()
     {
-        MyPlayer.RemoveStrangeMatter(_price);
-        UnchainGuardian();
-        MyPlayer.Actions--;
+        EndGame(false);
     }
 
-    public virtual void UnchainGuardian(bool _tellRoom = true)
+    public virtual void EndGame(bool _didIWin)
     {
         throw new NotImplementedException();
     }
 
-    protected virtual IEnumerator HandlePlacingLifeForceAndGuardian()
+    public virtual void EndTurn()
     {
         throw new NotImplementedException();
     }
 
-    protected virtual IEnumerator HandlePlaceRestOfTheCards()
+    public virtual void TryUnchainGuardian()
     {
-        throw new NotImplementedException();
+        throw new Exception();
+    }
+
+    public virtual void UnchainGuardian(int _price, bool _reduceAction)
+    {
+        throw new Exception();
     }
 
     public virtual void PlaceStartingWall()
     {
-        throw new NotImplementedException();
+        throw new Exception();
     }
 
-    public virtual void PlaceCard(CardBase _card, int _positionId, bool _dontCheckIfPlayerHasIt = false, bool _tellRoom=true)
+    public virtual void PlaceCard(CardBase _card, int _positionId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToPlayer(bool _isMyPlayer, int _abilityId, bool _tellRoom=true)
+    public virtual void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToShop(int _abilityId,bool _tellRoom=true)
+    public virtual void AddAbilityToShop(string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ExecuteCardAction(CardAction _action, bool _tellOpponent = true)
+    public void ExecuteCardAction(CardAction _action)
     {
-        throw new NotImplementedException();
+        StartCoroutine(ClosePanelRoutine());
+        LastAction = _action;
+        switch (_action.Type)
+        {
+            case CardActionType.Attack:
+                ExecuteAttack(_action, () =>
+                {
+                    FinishActionExecution(1);
+                });
+                break;
+            case CardActionType.Move:
+                ExecuteMove(_action, () =>
+                {
+                    FinishActionExecution(1);
+                });
+                break;
+            case CardActionType.SwitchPlace:
+                ExecuteSwitchPlace(_action, () =>
+                {
+                    FinishActionExecution(2);
+                });
+                break;
+            case CardActionType.MoveAbility:
+                ExecuteMoveAbility(_action, () =>
+                {
+                    FinishActionExecution(0);
+                });
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        IEnumerator ClosePanelRoutine()
+        {
+            yield return new WaitForSeconds(.01f);
+            CardActionsDisplay.Instance.Close();
+        }
+    }
+
+    private void FinishActionExecution(int _actionCost)
+    {
+        Debug.Log("Finished with action");
+        MyPlayer.Actions-=_actionCost;
+
+        if (MyPlayer.Actions<=0)
+        {
+            Debug.Log("Not updating because player has 0 actions");
+            return;
+        }
+        
+        RoomUpdater.Instance.ForceUpdate();
+    }
+
+    protected virtual void ExecuteAttack(CardAction _action, Action _callBack)
+    {
+        throw new Exception();
     }
     
-    public virtual void SpawnBombEffect(int _placeId)
+    protected virtual void ExecuteMove(CardAction _action,Action _callBack)
+    {
+        throw new Exception();
+    }
+    
+    protected virtual void ExecuteSwitchPlace(CardAction _action,Action _callBack)
+    {
+        throw new Exception();
+    }
+    
+    protected virtual void ExecuteMoveAbility(CardAction _action,Action _callBack)
+    {
+        throw new Exception();
+    }
+    
+    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void TakeLoot(bool _tellRoom=true)
+    public virtual void BuildWall(CardBase _cardBase, int _cost)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ForceUpdatePlayerActions(bool _tellRoom=true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null,bool _placeMinion=true, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuildWall(CardBase _cardBase, int _cost, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void ManageBlockaderAbility(bool _status, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace,
+    public void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace,
         CardMovementType _movementType, bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack,
         bool _ignoreMarkers = true, bool _ignoreWalls=false)
     {
-        throw new NotImplementedException();
+       TableHandler.ActionsHandler.ClearPossibleActions();
+        List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition, _movementType, _range, _includeSelf);
+            foreach (var _availablePlace in _availablePlaces.ToList())
+            {
+                bool _isOccupied = _availablePlace.IsOccupied;
+
+                if (_lookForPlace == PlaceLookFor.Empty && _isOccupied)
+                {
+                    if (_includeSelf)
+                    {
+                        if (_startingPosition != _availablePlace.Id)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            continue;
+                        }
+                    }
+                    else if (!(_availablePlace.ContainsMarker && _ignoreMarkers))
+                    {
+                        _availablePlaces.Remove(_availablePlace);
+                        continue;
+                    }
+                }
+
+                if (_lookForPlace == PlaceLookFor.Occupied && !_isOccupied)
+                {
+                    _availablePlaces.Remove(_availablePlace);
+                    continue;
+                }
+
+                if (!_includeSelf && _startingPosition == _availablePlace.Id)
+                {
+                    _availablePlaces.Remove(_availablePlace);
+                    continue;
+                }
+
+                if (_lookForPlace == PlaceLookFor.Occupied)
+                {
+                    List<CardBase> _cardsAtPlace = _availablePlace.GetCards();
+                    foreach (var _cardAtPlace in _cardsAtPlace)
+                    {
+                        if (_cardAtPlace.GetIsMy() && _lookFor == LookForCardOwner.Enemy)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            break;
+                        }
+
+                        if (!_cardAtPlace.GetIsMy() && _lookFor == LookForCardOwner.My)
+                        {
+                            _availablePlaces.Remove(_availablePlace);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            StartCoroutine(SelectPlace(_availablePlaces, _ignoreWalls, _callBack));
+    }
+    
+    protected IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack)
+    {
+        foreach (var _availablePlace in _availablePlaces.ToList())
+        {
+            if (_availablePlace.ContainsWall && _ignoreWalls)
+            {
+                _availablePlaces.Remove(_availablePlace);
+            }
+        }
+
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            _availablePlace.SetColor(Color.green);
+        }
+
+        if (_availablePlaces.Count == 0)
+        {
+            _callBack?.Invoke(-1);
+            yield break;
+        }
+
+        CardTableInteractions.OnPlaceClicked += DoSelectPlace;
+        bool _hasSelectedPlace = false;
+        int _selectedPlaceId = 0;
+
+        yield return new WaitUntil(() => _hasSelectedPlace);
+
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            _availablePlace.SetColor(Color.white);
+        }
+
+        _callBack?.Invoke(_selectedPlaceId);
+
+        void DoSelectPlace(TablePlaceHandler _place)
+        {
+            if (!_availablePlaces.Contains(_place))
+            {
+                return;
+            }
+
+            CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+            _selectedPlaceId = _place.Id;
+            _hasSelectedPlace = true;
+        }
     }
 
-    public virtual void ChangeOwnerOfCard(int _placeId, bool _tellRoom = true)
+    public virtual void ChangeOwnerOfCard(string _placeId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void OpponentCardDiedInMyPosition(int _cardId, bool _tellRoom = true)
+    public virtual void TellOpponentSomething(string _key)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeMovementForCard(int _placeId, bool _status, bool _tellRoom = true)
+    public virtual void BombExploded(int _placeId, string _cardId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void TellOpponentSomething(string _key, bool _tellRoom = true)
+    public virtual void ShowBombAnimation(int _placeId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ActivateAbility(string _cardId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ChangeCanFlyToDodge(int _cardId, bool _status,bool _isCardMy,  bool _tellRoom = true)
+    public virtual void BuyAbilityFromShop(string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ForceResponseAction(int _cardId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void TryDestroyMarkers(List<int> _places, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BombExploded(int _placeId, bool _includeCenter=true, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void HandleSnowUltimate(bool _status, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void ActivateAbility(int _cardId, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuyAbilityFromShop(int _abilityId, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuyAbilityFromHand(int _abilityId, bool _tellRoom = true)
+    public virtual void BuyAbilityFromHand(string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -378,72 +444,32 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void ManageBombExplosion(bool _state, bool _tellRoom = true)
+    public virtual void PlaceAbilityOnTable(string _abilityId)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public virtual void PlaceAbilityOnTable(string _abilityId, int _placeId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void ManageChangeOrgAttack(int _amount, bool _tellRoom = true)
+    public virtual void ReturnAbilityFromActivationField(string _abilityId)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void PlaceAbilityOnTable(int _abilityId)
+    public virtual void BuyMatter()
     {
         throw new NotImplementedException();
     }
 
-    public virtual void PlaceAbilityOnTable(int _abilityId, int _placeId, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void ReturnAbilityFromActivationField(int _abilityId, bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuyMatter( bool _tellRoom = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void FinishedReductionAction(bool _tellRoom = true)
+    public virtual void ShowBoughtMatter(bool _didIBuy)
     {
         throw new Exception();
     }
 
-    public virtual void CheckForBombInMarkers(List<int> _markers, Action<List<int>> _callBack, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void MarkMarkerAsBomb(int _placeId, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void TellOpponentToRemoveStrangeMatter(int _amount, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void VetoCard(AbilityCard _card, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void TellOpponentToPlaceFirstCardCasters(bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void OpponentPlacedFirstAbilityForCasters(bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void FinishCasters(bool _tellRoom = true)
+    public virtual void MarkMarkerAsBomb(string _cardId)
     {
         throw new Exception();
     }
@@ -461,32 +487,17 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    public virtual void UpdateHealth(int _cardId, bool _isMine, int _health, bool _tellRoom = true)
+    public virtual void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
     {
         throw new Exception();
     }
 
-    public virtual void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy, bool _tellRoom = true)
+    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false)
     {
         throw new Exception();
     }
 
-    public virtual void TellOpponentToUseStealth(int _cardId, int _stealthFromPlace, int _placeMinionsFrom, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void RequestResponseAction(int _cardId, bool _tellRoom = true)
-    {
-        throw new Exception();
-    }
-
-    public virtual void PlayAudioOnBoth(string _key, CardBase _card, bool _tellRoom = true)
+    public virtual void PlayAudioOnBoth(string _key, CardBase _card)
     {
         throw new Exception();
     }
@@ -567,7 +578,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _blockader && _blockader.name.ToLower().Contains("blockader"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -599,7 +610,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _mage && _mage.name.ToLower().Contains("mage"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -629,7 +640,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _orge && _orge.name.ToLower().Contains("org"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -663,7 +674,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _scout && _scout.name.ToLower().Contains("scout"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -697,7 +708,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _sniper && _sniper.name.ToLower().Contains("sniper"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -733,7 +744,7 @@ public class GameplayManager : MonoBehaviour
         }
         else if (_card is Minion _scaler && _scaler.name.ToLower().Contains("scaler"))
         {
-            if (!_card.My)
+            if (!_card.GetIsMy())
             {
                 return;
             }
@@ -777,23 +788,370 @@ public class GameplayManager : MonoBehaviour
         return _keys[_randomNumber];
     }
 
-    public virtual void TellOpponentThatIUsedUltimate(bool _tellRoom = true)
+    public Keeper GetMyKeeper()
+    {
+        return FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
+    }
+    
+    public Keeper GetOpponentKeeper()
+    {
+        return FindObjectsOfType<Keeper>().ToList().Find(_keeper => !_keeper.My);
+    }    
+    
+    public Guardian GetOpponentGuardian()
+    {
+        return FindObjectsOfType<Guardian>().ToList().Find(_guardian => !_guardian.My);
+    }    
+    
+    public Guardian GetMyGuardian()
+    {
+        return FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
+    }
+
+    public LifeForce GetMyLifeForce()
+    {
+        return FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => _lifeForce.My);
+    }
+
+    public LifeForce GetOpponentsLifeForce()
+    {
+        return FindObjectsOfType<LifeForce>().ToList().Find(_lifeForce => !_lifeForce.My);
+    }
+
+    public bool IsCardVetoed(string _uniqueCardId)
+    {
+        var _vetoCard = FindObjectOfType<Veto>();
+        if (_vetoCard==null)
+        {
+            return false;
+        }
+
+        if (!_vetoCard.IsActive)
+        {
+            return false;
+        }
+
+        return _vetoCard.IsEffected(_uniqueCardId);
+    }
+    
+    public bool IsCardTaxed(string _uniqueId)
+    {
+        var _taxedCard = FindObjectOfType<Tax>();
+        if (_taxedCard == null)
+        {
+            return false;
+        }
+
+        if (!_taxedCard.IsActive)
+        {
+            return false;
+        }
+        
+        return _taxedCard.IsEffected(_uniqueId);
+    }
+    
+    protected void FinishEffect<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as AbilityEffect;
+        if (_ability == null)
+        {
+            return;
+        }
+
+        _ability.TryToCancel();
+    }
+    
+    public bool IsAbilityActiveForMe<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as AbilityEffect;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive && _ability.IsMy;
+    }
+
+    public bool IsAbilityActiveForOpponent<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as AbilityEffect;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive && !_ability.IsMy;
+    }
+
+    public bool IsAbilityActive<T>() where T : MonoBehaviour
+    {
+        var _ability = FindObjectOfType<T>() as AbilityEffect;
+        if (_ability == null)
+        {
+            return false;
+        }
+
+        return _ability.IsActive;
+    }
+
+    public virtual void ChangeLootAmountForMe(int _amount)
+    {
+        throw new Exception();
+    }
+    
+    public List<Card> GetAllCards()
+    {
+        return FindObjectsOfType<Card>().ToList();
+    }
+
+    public List<Minion> GetAllMinions()
+    {
+        return FindObjectsOfType<Minion>().ToList();
+    }
+
+    public virtual int StrangeMaterInEconomy()
     {
         throw new Exception();
     }
 
-    public virtual void SetTaxCard(int _id)
+    public virtual void ChangeStrangeMaterInEconomy(int _amount)
     {
         throw new Exception();
     }
 
-    public virtual void ActivatedTaxedCard()
+    public virtual int StrangeMatterCostChange()
     {
         throw new Exception();
     }
 
-    public virtual void TellOpponentToUpdateMyStrangeMatter()
+    public virtual void ChangeStrangeMatterCostChange(int _amount)
     {
         throw new Exception();
     }
+
+    public virtual string IdOfCardWithResponseAction()
+    {
+        throw new Exception();
+    }
+
+    public virtual int MyStrangeMatter()
+    {
+        throw new Exception();
+    }
+
+    public virtual int OpponentsStrangeMatter()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChangeMyStrangeMatter(int _amount)
+    {
+        throw new Exception();
+    }
+    
+    public virtual void ChangeOpponentsStrangeMatter(int _amount)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfAbilitiesPlayerCanBuy()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChangeAmountOfAbilitiesICanBuy(int _amount)
+    {
+        throw new Exception();
+    }
+    
+    public virtual List<Card> GetAllCardsOfType(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCardOfType(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+    
+    public virtual void AddCard(CardData _cardData)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AddAbility(AbilityData _abilityData, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual AbilityCard GetAbility(string _uniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveAbility(string _uniqueId, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool ContainsCard(CardData _requestedCard, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<AbilityData> GetOwnedAbilities(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCard(string _uniqueId)
+    {
+        throw new Exception();
+    }
+    
+    public virtual CardPlace GetCardPlace(string _uniqueCardId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetCardPlace(string _uniqueCardId, CardPlace _place)
+    {
+        throw new Exception();
+    }
+
+    public virtual CardPlace GetCardPlace(CardBase _cardBase)
+    {
+        throw new Exception();
+    }
+
+    public virtual void OpponentCreatedCard(CardData _cardData)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowCardPlaced(string _uniqueId, int _positionId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowCardMoved(string _uniqueId, int _positionId)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfActionsPerTurn()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsSettingUpTable()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetGameState(GameplayState _gameState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplayState GameState()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetHasGameEnded(bool _status, string _winner)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool HasGameEnded()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsMyTurn()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetPlayersTurn(bool _isMyTurn)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool ShouldIPlaceStartingWall()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetGameplaySubState(GameplaySubState _subState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplaySubState GetGameplaySubState()
+    {
+        throw new Exception();
+    }
+
+    public virtual Card GetCardOfTypeNotPlaced(CardType _type, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfActions(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void SetAmountOfActions(int _amount, bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowCardAsDead(string _uniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AnimateStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AnimateSoundEffect(string _key, string _cardUniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowGameEnded(string _winner)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool DidUnchainGuardian(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowGuardianUnchained(bool _didIUnchain)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsMyResponseAction2()
+    {
+        throw new Exception();
+    }
+    
+    public virtual bool IsResponseAction2()
+    {
+        throw new Exception();
+    }
+    
 }

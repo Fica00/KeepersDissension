@@ -1111,7 +1111,6 @@ MonoBehaviour:
   tableSideHandler: {fileID: 4164949550210649625}
   cardsInHandHandler: {fileID: 4164949550210649623}
   destroyedCardsHolder: {fileID: 2137751947}
-  AmountOfAbilitiesPlayerCanBuy: 0
 --- !u!4 &114929505
 Transform:
   m_ObjectHideFlags: 0
@@ -3240,7 +3239,6 @@ MonoBehaviour:
   tableSideHandler: {fileID: 6560435641058386071}
   cardsInHandHandler: {fileID: 6560435641058386070}
   destroyedCardsHolder: {fileID: 2137751947}
-  AmountOfAbilitiesPlayerCanBuy: 0
 --- !u!4 &389635582
 Transform:
   m_ObjectHideFlags: 0
@@ -4919,13 +4917,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fcf9989e8f7cc444912e20c5615cf78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityCardPrice: 5
-  amountOfStartingAbilities: 7
   arrowPanel: {fileID: 493734893}
   abilityShopDisplayPrefab: {fileID: 4460485098416715022, guid: f7423f92dd5923e46a46a6c51612fe1f,
     type: 3}
   abilityShopDisplayHolder: {fileID: 1293477663}
-  amountOfCardsInShop: 3
 --- !u!1 &674888751
 GameObject:
   m_ObjectHideFlags: 0
@@ -9733,6 +9728,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1241439616}
   - component: {fileID: 1241439617}
+  - component: {fileID: 1241439618}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -9772,12 +9768,24 @@ MonoBehaviour:
   TableHandler: {fileID: 1231806644}
   AmountOfActionsPerTurn: 3
   UnchainingGuardianPrice: 20
-  AmountOfAbilitiesPlayerCanBuy: 7
-  WhiteStrangeMatter:
-    amountInEconomy: 20
-    Value: 1
-  StrangeMatterCostChange: 0
-  ShouldIPlaceStartingWall: 0
+  LastAction:
+    StartingPlaceId: 0
+    FirstCardId: -1
+    FinishingPlaceId: 0
+    SecondCardId: -1
+    Type: 0
+    Cost: 0
+    CanTransferLoot: 1
+    Damage: -1
+    CanCounter: 1
+    GiveLoot: 0
+    CanBeBlocked: 1
+    ResetSpeed: 0
+    DidTeleport: 0
+    DiedByBomb: 0
+    AllowCardEffectOnDeath: 1
+  GameState: 0
+  healthTracker: {fileID: 1497496152}
   simplePanels:
   - {fileID: 89120723}
   - {fileID: 201309828}
@@ -9792,30 +9800,18 @@ MonoBehaviour:
   forestMarker: {fileID: 21300000, guid: 3d53ff9b6f102204ba1c18318ce257f9, type: 3}
   bombEffect: {fileID: 6507998695647225779, guid: e8f5e9da827f53e45b38c76ed387acc0,
     type: 3}
-  UsingVisionToDestroyMarkers: 0
-  LastAction:
-    StartingPlaceId: 0
-    FirstCardId: -1
-    FinishingPlaceId: 0
-    SecondCardId: -1
-    Type: 0
-    Cost: 0
-    IsMy: 0
-    CanTransferLoot: 1
-    Damage: -1
-    CanCounter: 1
-    GiveLoot: 0
-    CanBeBlocked: 1
-    ResetSpeed: 0
-    DidTeleport: 0
-    DiedByBomb: 0
-    AllowCardEffectOnDeath: 1
-  GameState: 0
-  healthTracker: {fileID: 1497496152}
-  LootChanges: 0000000000000000
-  IdOfCardWithResponseAction: 0
-  IsExecutingOldActions: 0
-  inputBlocker: {fileID: 507386139}
+--- !u!114 &1241439618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1241439615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae88c7cfa205d984293ceb9bde26f466, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1246050847
 GameObject:
   m_ObjectHideFlags: 0
@@ -17225,7 +17221,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25.774994, y: 0}
+  m_AnchoredPosition: {x: 25.775024, y: 0}
   m_SizeDelta: {x: -48.526, y: 71.323}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1591591194
@@ -35885,7 +35881,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9556584
+      value: -9609710
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
@@ -38334,8 +38330,6 @@ MonoBehaviour:
     type: 3}
   myAbilitiesHolder: {fileID: 9134411866582569075}
   effectAbilitiesHolder: {fileID: 9134411867035175917}
-  effectPrefab: {fileID: 3274696049146928248, guid: 74cd9e6e16404d945bb5089dad640eb7,
-    type: 3}
   effectsHolder: {fileID: 9134411867299447959}
   unchainButton: {fileID: 9134411865874565311}
   xDisplay: {fileID: 9134411866867083621}

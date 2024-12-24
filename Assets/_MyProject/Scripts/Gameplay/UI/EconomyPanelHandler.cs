@@ -29,30 +29,6 @@ public class EconomyPanelHandler : MonoBehaviour
         arrowPanel.OnOpened -= Show;
     }
 
-    private void Show()
-    {
-        ClearShowObjects();
-        
-        for (int _i = 0; _i < GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy; _i++)
-        {
-            EconomyStrangeMatterDisplay _matter = Instantiate(matterPrefab, matterHolder);
-            _matter.Setup();
-            shownObjects.Add(_matter.gameObject);
-        }
-        
-        holder.SetActive(true);
-    }
-
-    private void ClearShowObjects()
-    {
-        foreach (var _shownObject in shownObjects)
-        {
-            Destroy(_shownObject);
-        }
-        
-        shownObjects.Clear();
-    }
-
     public void ShowBoughtMatter(bool _didIBuy, Vector3 _position = default)
     {
         Show();
@@ -64,16 +40,34 @@ public class EconomyPanelHandler : MonoBehaviour
         {
             _economyDisplay.transform.position = _position;
         }
+        
         _economyDisplay.transform.DOMove(_target.position, 1f).OnComplete(() =>
         {
             Destroy(_economyDisplay.gameObject);
-            if (!_didIBuy)
-            {
-                return;
-            }
-            
-            GameplayPlayer _player = GameplayManager.Instance.MyPlayer;
-            _player.StrangeMatter++;
         });
+    }
+    
+    private void Show()
+    {
+        ClearShowObjects();
+        
+        for (int _i = 0; _i < GameplayManager.Instance.StrangeMaterInEconomy(); _i++)
+        {
+            EconomyStrangeMatterDisplay _matter = Instantiate(matterPrefab, matterHolder);
+            _matter.Setup();
+            shownObjects.Add(_matter.gameObject);
+        }
+        
+        holder.SetActive(true);
+    }
+    
+    private void ClearShowObjects()
+    {
+        foreach (var _shownObject in shownObjects)
+        {
+            Destroy(_shownObject);
+        }
+        
+        shownObjects.Clear();
     }
 }

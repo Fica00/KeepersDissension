@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,17 +22,11 @@ public class ShowAbilityCardsToBuyHand : MonoBehaviour
 
     private void ShowAbilities()
     {
-        if (GameplayManager.Instance.GameState == GameplayState.UsingSpecialAbility)
+        if (GameplayManager.Instance.IsSettingUpTable())
         {
             return;
         }
-        
-        if (GameplayManager.Instance.IsSettingUpTable)
-        {
-            return;
-        }
-        GameplayPlayer _player = FindObjectsOfType<GameplayPlayer>().ToList().Find(_player => _player.IsMy);
-        _player.ShowCards(CardType.Ability);
+        GameplayManager.Instance.MyPlayer.ShowCards(CardType.Ability);
     }
 
 }

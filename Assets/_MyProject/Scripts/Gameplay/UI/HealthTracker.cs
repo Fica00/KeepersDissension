@@ -23,24 +23,19 @@ public class HealthTracker : MonoBehaviour
     
     public void Setup()
     {
-        List<Guardian> _guardians = FindObjectsOfType<Guardian>().ToList();
-        myGuardian = _guardians.Find(_guardian => _guardian.My);
-        opponentGuardian = _guardians.Find(_guardian => !_guardian.My);
+        myGuardian = GameplayManager.Instance.GetMyGuardian();
+        opponentGuardian = GameplayManager.Instance.GetOpponentGuardian();
+        myKeeper = GameplayManager.Instance.GetMyKeeper();
+        opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
+        myLifeForce = GameplayManager.Instance.GetMyLifeForce();
+        opponentLifeForce = GameplayManager.Instance.GetOpponentsLifeForce();
 
-        List<Keeper> _keepers = FindObjectsOfType<Keeper>().ToList();
-        myKeeper = _keepers.Find(_keeper => _keeper.My);
-        opponentKeeper = _keepers.Find(_keeper => !_keeper.My);
-
-        List<LifeForce> _lifeForces = FindObjectsOfType<LifeForce>().ToList();
-        myLifeForce = _lifeForces.Find(_lifeForce => _lifeForce.My);
-        opponentLifeForce = _lifeForces.Find(_lifeForce => !_lifeForce.My);
-
-        myGuardian.Stats.UpdatedHealth += ShowMyGuardianHealth;
-        opponentGuardian.Stats.UpdatedHealth += ShowOpponentGuardianHealth;
-        myKeeper.Stats.UpdatedHealth += ShowMyKeeperHealth;
-        opponentKeeper.Stats.UpdatedHealth += ShowOpponentKeeperHealth;
-        myLifeForce.Stats.UpdatedHealth += ShowMyLifeForceHealth;
-        opponentLifeForce.Stats.UpdatedHealth += ShowOpponentLifeForceHealth;
+        myGuardian.UpdatedHealth += ShowMyGuardianHealth;
+        opponentGuardian.UpdatedHealth += ShowOpponentGuardianHealth;
+        myKeeper.UpdatedHealth += ShowMyKeeperHealth;
+        opponentKeeper.UpdatedHealth += ShowOpponentKeeperHealth;
+        myLifeForce.UpdatedHealth += ShowMyLifeForceHealth;
+        opponentLifeForce.UpdatedHealth += ShowOpponentLifeForceHealth;
     }
 
     private void OnDisable()
@@ -49,42 +44,42 @@ public class HealthTracker : MonoBehaviour
         {
             return;
         }
-        myGuardian.Stats.UpdatedHealth -= ShowMyGuardianHealth;
-        opponentGuardian.Stats.UpdatedHealth += ShowOpponentGuardianHealth;
-        myKeeper.Stats.UpdatedHealth -= ShowMyKeeperHealth;
-        opponentKeeper.Stats.UpdatedHealth -= ShowOpponentKeeperHealth;
-        myLifeForce.Stats.UpdatedHealth -= ShowMyLifeForceHealth;
-        opponentLifeForce.Stats.UpdatedHealth -= ShowOpponentLifeForceHealth;
+        myGuardian.UpdatedHealth -= ShowMyGuardianHealth;
+        opponentGuardian.UpdatedHealth += ShowOpponentGuardianHealth;
+        myKeeper.UpdatedHealth -= ShowMyKeeperHealth;
+        opponentKeeper.UpdatedHealth -= ShowOpponentKeeperHealth;
+        myLifeForce.UpdatedHealth -= ShowMyLifeForceHealth;
+        opponentLifeForce.UpdatedHealth -= ShowOpponentLifeForceHealth;
     }
 
     private void ShowMyGuardianHealth()
     {
-        myGuardianHealth.text = myGuardian.Stats.Health.ToString();
+        myGuardianHealth.text = myGuardian.Health.ToString();
     }
 
     private void ShowOpponentGuardianHealth()
     {
-        opponentGuardianHealth.text = opponentGuardian.Stats.Health.ToString();
+        opponentGuardianHealth.text = opponentGuardian.Health.ToString();
     }
 
     private void ShowMyKeeperHealth()
     {
-        myKeeperHealth.text = myKeeper.Stats.Health.ToString();
+        myKeeperHealth.text = myKeeper.Health.ToString();
     }
 
     private void ShowOpponentKeeperHealth()
     {
-        opponentKeeperHealth.text = opponentKeeper.Stats.Health.ToString();
+        opponentKeeperHealth.text = opponentKeeper.Health.ToString();
     }
 
     private void ShowMyLifeForceHealth()
     {
-        myLifeForceHealth.text = myLifeForce.Stats.Health.ToString();
+        myLifeForceHealth.text = myLifeForce.Health.ToString();
     }
 
     private void ShowOpponentLifeForceHealth()
     {
-        opponentLifeForceHealth.text = opponentLifeForce.Stats.Health.ToString();
+        opponentLifeForceHealth.text = opponentLifeForce.Health.ToString();
     }
 
     private void Update()

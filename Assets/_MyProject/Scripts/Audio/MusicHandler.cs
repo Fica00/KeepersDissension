@@ -8,7 +8,6 @@ public class MusicHandler : MonoBehaviour
     [SerializeField] private Image image;
     [SerializeField] private Button button;
 
-
     private void OnEnable()
     {
         button.onClick.AddListener(Toggle);

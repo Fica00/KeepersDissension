@@ -12,7 +12,7 @@ public class ChooseCardPanel : MonoBehaviour
     [SerializeField] private Transform cardsHolder;
     [SerializeField] private Button cancelButton;
     
-    private Vector3 sizeOfCards = new Vector3(2, 2, 1);
+    private Vector3 sizeOfCards = new(2, 2, 1);
     private List<CardBase> shownCards = new ();
     private Action<CardBase> callBack;
     private Dictionary<CardBase, TablePlaceHandler> cardsDict = new();
@@ -88,12 +88,14 @@ public class ChooseCardPanel : MonoBehaviour
                 Destroy(_cardHandler);
             }
 
-            if (!(_shownCard.CardPlace == CardPlace.Hand || _shownCard.CardPlace == CardPlace.Graveyard))
+            CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_shownCard);
+
+            if (!(_cardPlace == CardPlace.Hand || _cardPlace == CardPlace.Graveyard))
             {
                 if (_shownCard is AbilityCard _card)
                 {
                     var _place = cardsDict[_card];
-                    GameplayManager.Instance.PlaceAbilityOnTable(_card.Details.Id,_place.Id,false);
+                    GameplayManager.Instance.PlaceAbilityOnTable(_card.UniqueId,_place.Id);
                     continue;
                 }
             }

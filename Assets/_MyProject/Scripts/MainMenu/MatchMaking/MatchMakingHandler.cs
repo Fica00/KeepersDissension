@@ -84,12 +84,20 @@ public class MatchMakingHandler : MonoBehaviour
         {
             Id = FirebaseManager.Instance.Authentication.UserId,
             FactionId = DataManager.Instance.PlayerData.FactionId,
-            DateCrated = DataManager.Instance.PlayerData.DateCreated,
+            DateCreated = DataManager.Instance.PlayerData.DateCreated,
             MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed,
             Name = DataManager.Instance.PlayerData.Name
         };
 
-        FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData, MatchModeToRoomType(mode), HandleJoinRoom, _name: _name);
+        RoomGameplayPlayer _gameplayPLayer = new()
+        {
+            PlayerId = FirebaseManager.Instance.Authentication.UserId,
+            LootChange = 0,
+            StrangeMatter = 0,
+            AmountOfAbilitiesPlayerCanBuy = 7
+        };
+
+        FirebaseManager.Instance.RoomHandler.JoinRoom(_playerData,_gameplayPLayer, MatchModeToRoomType(mode), HandleJoinRoom, _name: _name);
     }
 
     RoomType MatchModeToRoomType(MatchMode _mode)
@@ -107,7 +115,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandleJoinRoom(JoinRoom _response)
+    private void HandleJoinRoom(NewJoinRoom _response)
     {
         if (_response.Success)
         {
@@ -121,6 +129,7 @@ public class MatchMakingHandler : MonoBehaviour
                 Id = Guid.NewGuid().ToString(),
                 Type = _response.Type,
                 Status = RoomStatus.SearchingForOpponent,
+                GameplayState = GameplayState.WaitingForPlayersToLoad,
                 Owner = FirebaseManager.Instance.Authentication.UserId,
                 RoomPlayers = new List<RoomPlayer>
                 {
@@ -128,9 +137,27 @@ public class MatchMakingHandler : MonoBehaviour
                     {
                         Id = FirebaseManager.Instance.Authentication.UserId,
                         FactionId = DataManager.Instance.PlayerData.FactionId,
-                        DateCrated = DataManager.Instance.PlayerData.DateCreated,
+                        DateCreated = DataManager.Instance.PlayerData.DateCreated,
                         MatchesPlayed = DataManager.Instance.PlayerData.MatchesPlayed
                     }
+                },
+                BoardData = new BoardData
+                {
+                    StrangeMaterInEconomy = 20,
+                    StrangeMatterCostChange = 0,
+                    IdOfCardWithResponseAction = string.Empty,
+                    PlayersData = new List<RoomGameplayPlayer>()
+                    {
+                        new ()
+                        {
+                            PlayerId = FirebaseManager.Instance.Authentication.UserId,
+                            LootChange = 0,
+                            StrangeMatter = 0,
+                            AmountOfAbilitiesPlayerCanBuy = 7
+                        }
+                    },
+                    AbilitiesInShop = new List<AbilityData>(),
+                    AvailableAbilities = new List<AbilityData>()
                 }
             };
 
@@ -139,7 +166,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandeCreateRoom(CreateRoom _response)
+    private void HandeCreateRoom(NewCreateRoom _response)
     {
         if (_response.Success)
         {
@@ -170,7 +197,6 @@ public class MatchMakingHandler : MonoBehaviour
     {
         StartGameplay();
     }
-
 
     private void StartGameplay()
     {

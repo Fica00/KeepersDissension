@@ -17,7 +17,6 @@ public class SplashAnimation : MonoBehaviour
         {
             splashImage.DOFade(0f, fadeDuration).SetEase(Ease.Linear). OnComplete(() =>
             {
-                //finishedAnimation
                 foreach (var _objectToDeactivate in objectsToDeactivate)
                 {
                     _objectToDeactivate.gameObject.SetActive(false);

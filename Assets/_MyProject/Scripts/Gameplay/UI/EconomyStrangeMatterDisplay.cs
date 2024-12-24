@@ -23,32 +23,43 @@ public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
     
     private void BuyWhiteStrangeMatter()
     {
-        if (GameplayManager.Instance.GameState!= GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
 
-        if (Famine.IsActive)
+        if (GameplayManager.Instance.IsAbilityActive<Famine>())
         {
             DialogsManager.Instance.ShowOkDialog("Using strange matter is forbidden by Famine ability");
             return;
         }
         if (GameplayManager.Instance.MyPlayer.Actions==0)
         {
-            DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
-            return;
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
+                return;   
+            }
         }
 
-        if (GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy==0)
+        if (GameplayManager.Instance.StrangeMaterInEconomy()==0)
         {
             DialogsManager.Instance.ShowOkDialog("There is no more white strange matter in the economy reserves");
             return;
         }
-
-        GameplayManager.Instance.MyPlayer.Actions--;
-        GameplayManager.Instance.WhiteStrangeMatter.AmountInEconomy--;
+        
         GameplayManager.Instance.BuyMatter();
-        GameplayManager.Instance.ForceUpdatePlayerActions();
     }
-
 }

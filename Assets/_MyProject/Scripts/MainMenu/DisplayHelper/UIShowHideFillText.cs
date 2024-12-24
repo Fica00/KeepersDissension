@@ -8,7 +8,7 @@ namespace DisplayHelper
     {
         public override void Show()
         {
-            Image _image = gameObject.GetComponent<Image>();
+            Image _image = GetComponent<Image>();
             if (_image ==null)
             {
                 transform.localScale = Vector3.one;
@@ -21,7 +21,7 @@ namespace DisplayHelper
         
         public override void Hide()
         {
-            Image _image = gameObject.GetComponent<Image>();
+            Image _image = GetComponent<Image>();
             if (_image ==null)
             {
                 transform.localScale = Vector3.zero;

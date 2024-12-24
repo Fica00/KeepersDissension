@@ -36,7 +36,7 @@ public class PreviewFactionPanel : MonoBehaviour
 
     private void ShowZoomedCard(Card _card)
     {
-        Card _cardToShow = CardsManager.Instance.CreateCard(_card.Details.Id,true);
+        Card _cardToShow = CardsManager.Instance.CreateCard(_card.Details.Id);
         zoomedCard.Setup(_cardToShow);
         zoomedCardHolder.SetActive(true);
     }

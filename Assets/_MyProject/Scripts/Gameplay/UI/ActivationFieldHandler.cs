@@ -11,7 +11,7 @@ public class ActivationFieldHandler : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Transform cardsHolder;
     
-    private Vector3 sizeOfCards = new Vector3(2, 2, 1);
+    private Vector3 sizeOfCards = new (2, 2, 1);
     private List<CardBase> shownCards = new ();
     private int placeId;
 
@@ -89,7 +89,20 @@ public class ActivationFieldHandler : MonoBehaviour
     
     private void CheckCard(CardBase _cardBase)
     {
-        if (GameplayManager.Instance.GameState!=GameplayState.Playing && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                return;
+            }
+        }
+        
+        if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -99,7 +112,7 @@ public class ActivationFieldHandler : MonoBehaviour
             return;
         }
         
-        if (Subdued.IsActive && GameplayCheats.CheckForCD)
+        if (GameplayManager.Instance.IsAbilityActive<Subdued>() && GameplayCheats.CheckForCd)
         {
             DialogsManager.Instance.ShowOkDialog("Activation of the ability is blocked by Subdued ability");
             return;
@@ -116,10 +129,10 @@ public class ActivationFieldHandler : MonoBehaviour
             _indexOfCard++;
         }
 
-        AbilityEffect _effect = (_cardBase as AbilityCard)?.GetEffect();
+        AbilityEffect _effect = (_cardBase as AbilityCard)?.Effect;
         int _amountOfCardsOnTop = shownCards.Count - _indexOfCard;
         bool _canReturn = _effect.Cooldown <= _amountOfCardsOnTop;
-        if (!GameplayCheats.CheckForCD)
+        if (!GameplayCheats.CheckForCd)
         {
             _canReturn = true;
         }
@@ -140,7 +153,7 @@ public class ActivationFieldHandler : MonoBehaviour
             _cardBase.transform.SetParent(null);
             _cardBase.PositionInHand();
             Close();
-            GameplayManager.Instance.ReturnAbilityFromActivationField(((AbilityCard)_cardBase).Details.Id);
+            GameplayManager.Instance.ReturnAbilityFromActivationField(((AbilityCard)_cardBase).UniqueId);
         }
         else
         {

@@ -81,7 +81,7 @@ public class AuthenticationHandler : MonoBehaviour
    private void HandleRegister(SignInResult _result, string _name)
    {
       if (!_result.IsSuccessful)
-      {        
+      {  
          ShowRegister();
          DialogsManager.Instance.ShowOkDialog("Email already in use");
          return;
@@ -163,7 +163,6 @@ public class AuthenticationHandler : MonoBehaviour
 
       if (_user.IsEmailVerified || credentials.IsAnonymous)
       {
-         Debug.Log("Email is verified!");
          emailVerifyCallback?.Invoke();
          yield break;
       }
