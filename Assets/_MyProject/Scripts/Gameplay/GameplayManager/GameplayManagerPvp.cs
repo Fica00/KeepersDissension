@@ -397,6 +397,11 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        if (IsMyResponseAction2())
+        {
+            return;
+        }
+
         SetResponseAction(_defendingCard.My && RoomHandler.IsOwner, _defendingCard.UniqueId);
     }
 
@@ -431,14 +436,12 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (!(_defendingCard.IsWarrior() || _defendingCard is Wall or Marker))
         {
-            Debug.Log("Should not check for this card");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard.Health > 0)
         {
-            Debug.Log("Card didn't die");
             _callBack?.Invoke(false);
             return;
         }
