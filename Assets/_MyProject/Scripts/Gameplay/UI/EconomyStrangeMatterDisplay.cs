@@ -23,7 +23,19 @@ public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
     
     private void BuyWhiteStrangeMatter()
     {
-        if (!GameplayManager.Instance.ShouldProcessAction())
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

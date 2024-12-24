@@ -80,10 +80,13 @@ public class CardActionsDisplay : MonoBehaviour
             DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
             return;
         }
-
-        if (!GameplayManager.Instance.ShouldProcessAction())
+        
+        if (GameplayManager.Instance.IsResponseAction2())
         {
-            return;
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
         }
         
         actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Move);
@@ -102,9 +105,12 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (!GameplayManager.Instance.ShouldProcessAction())
+        if (GameplayManager.Instance.IsResponseAction2())
         {
-            return;
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
         }
         
         actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType
@@ -138,7 +144,24 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        if (!GameplayManager.Instance.ShouldProcessAction())
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
+                if (_id != _placeId)
+                {
+                    _placeId = _id;
+                    DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                }
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -149,15 +172,6 @@ public class CardActionsDisplay : MonoBehaviour
         }
 
         ResetDisplays();
-        if (GameplayManager.Instance.IsMyResponseAction() && !GameplayManager.Instance.IsKeeperResponseAction)
-        {
-            int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
-            if (_id != _placeId)
-            {
-                _placeId = _id;
-                DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
-            }
-        }
         
         selectedPlace = tableHandler.GetPlace(_placeId);
         selectedCard = selectedPlace.GetCardNoWall();

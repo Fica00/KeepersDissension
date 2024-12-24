@@ -778,9 +778,9 @@ public class GameplayManagerPvp : GameplayManager
         CloseAllPanels();
         TableHandler.ActionsHandler.ClearPossibleActions();
 
-        if (IsResponseAction())
+        if (IsResponseAction2())
         {
-            if (!IsMyResponseAction())
+            if (!IsMyResponseAction2())
             {
                 return;
             }
@@ -1975,25 +1975,15 @@ public class GameplayManagerPvp : GameplayManager
         return _forMe ? BoardData.MyPlayer.DidUnchainGuardian : BoardData.OpponentPlayer.DidUnchainGuardian;
     }
 
-    public override bool IsMyResponseAction()
+    public override bool IsMyResponseAction2()
     {
         return RoomHandler.IsOwner
             ? GetGameplaySubState() == GameplaySubState.Player1ResponseAction
             : GetGameplaySubState() == GameplaySubState.Player2ResponseAction;
     }
-
-    public override bool IsResponseAction()
+    
+    public override bool IsResponseAction2()
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
-    }
-
-    public override bool ShouldProcessAction()
-    {
-        if (IsResponseAction())
-        {
-            return IsMyResponseAction();
-        }
-
-        return IsMyTurn();
     }
 }

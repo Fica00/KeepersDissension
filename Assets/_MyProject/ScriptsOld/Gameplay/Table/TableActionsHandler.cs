@@ -151,7 +151,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
-                if (!GameplayManager.Instance.IsMyResponseAction())
+                if (!GameplayManager.Instance.IsMyResponseAction2())
                 {
                     continue;
                 }
@@ -550,7 +550,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (GameplayManager.Instance.MyPlayer.Actions < _actionCost)
             {
-                if (!GameplayManager.Instance.IsMyResponseAction())
+                if (!GameplayManager.Instance.IsMyResponseAction2())
                 {
                     continue;
                 }

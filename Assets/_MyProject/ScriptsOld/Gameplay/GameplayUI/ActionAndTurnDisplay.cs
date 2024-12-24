@@ -43,11 +43,10 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _color = opponentColor;
             }
 
-            if (GameplayManager.Instance.IsResponseAction())
+            if (GameplayManager.Instance.IsResponseAction2())
             {
-                _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
+                _text = GameplayManager.Instance.IsMyResponseAction2() ? "Your response" : "Opponents response";
                 _color = Color.magenta;
-                _number = 1;
             }
 
             if (_number==0)

@@ -61,7 +61,19 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             return;
         }
 
-        if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
@@ -122,7 +134,19 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             return;
         }
 
-        if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction2())
+            {
+                return;
+            }
+
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

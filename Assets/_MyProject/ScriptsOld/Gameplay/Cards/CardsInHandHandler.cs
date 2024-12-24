@@ -140,11 +140,22 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
+      if (GameplayManager.Instance.IsResponseAction2())
+      {
+         if (!GameplayManager.Instance.IsMyResponseAction2())
+         {
+            return;
+         }
+
+         if (!GameplayManager.Instance.IsKeeperResponseAction2)
+         {
+            return;
+         }
+      }
+      else if (!GameplayManager.Instance.IsMyTurn())
       {
          return;
       }
-      
       
       if (GameplayManager.Instance.IsAbilityActive<Famine>())
       {
@@ -205,8 +216,19 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      var _gameState = GameplayManager.Instance.GameState();
-      if (!GameplayManager.Instance.IsMyTurn() && !GameplayManager.Instance.IsKeeperResponseAction)
+      if (GameplayManager.Instance.IsResponseAction2())
+      {
+         if (!GameplayManager.Instance.IsMyResponseAction2())
+         {
+            return;
+         }
+
+         if (!GameplayManager.Instance.IsKeeperResponseAction2)
+         {
+            return;
+         }
+      }
+      else if (!GameplayManager.Instance.IsMyTurn())
       {
          return;
       }
