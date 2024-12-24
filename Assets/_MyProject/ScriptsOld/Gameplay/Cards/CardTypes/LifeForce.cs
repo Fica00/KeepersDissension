@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using UnityEngine;
 using TMPro;
@@ -12,21 +13,25 @@ public class LifeForce : Card
     protected override void Setup()
     {
         player = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
-        UpdatedHealth += ShowHealth;
-        ShowHealth();
+        StartCoroutine(ShowHealth());
     }
 
     private void OnDisable()
     {
-        UpdatedHealth += ShowHealth;
+        StopAllCoroutines();
     }
 
-    private void ShowHealth()
+    private IEnumerator ShowHealth()
     {
-        lifeForceDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
-        if (Health==0 && !GameplayManager.Instance.IsAbilityActive<Risk>())
+        while (true)
         {
-            GameplayManager.Instance.EndGame(!player.IsMy);
+            yield return new WaitForSeconds(1);
+            lifeForceDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
+            if (Health==0 && !GameplayManager.Instance.IsAbilityActive<Risk>())
+            {
+                GameplayManager.Instance.EndGame(!player.IsMy);
+                yield break;
+            }
         }
     }
 
