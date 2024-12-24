@@ -392,6 +392,11 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        if (!_defendingCard.IsWarrior())
+        {
+            return;
+        }
+
         SetResponseAction(_defendingCard.My && RoomHandler.IsOwner, _defendingCard.UniqueId);
     }
 
@@ -426,12 +431,14 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (!(_defendingCard.IsWarrior() || _defendingCard is Wall or Marker))
         {
+            Debug.Log("Should not check for this card");
             _callBack?.Invoke(false);
             return;
         }
 
         if (_defendingCard.Health > 0)
         {
+            Debug.Log("Card didn't die");
             _callBack?.Invoke(false);
             return;
         }
@@ -1306,13 +1313,6 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         AudioManager.Instance.PlaySoundEffect(_key);
-    }
-
-    private void OpponentGotResponseAction()
-    {
-        TableHandler.ActionsHandler.ClearPossibleActions();
-        OpponentPlayer.Actions = 1;
-        DialogsManager.Instance.ShowOkDialog("Opponents warrior survived, he gets 1 response action");
     }
 
     private void UseDelivery(string _defendingCardId, int _startingPlace)
