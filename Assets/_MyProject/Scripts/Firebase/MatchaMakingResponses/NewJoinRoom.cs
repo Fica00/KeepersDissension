@@ -13,6 +13,6 @@ namespace FirebaseGameplay.Responses
         public RoomType Type;
         public string Name;
         public RoomData Room;
-        public string GameVersion => Application.version;
+        public string GameVersion  => Application.version;
     }
 }

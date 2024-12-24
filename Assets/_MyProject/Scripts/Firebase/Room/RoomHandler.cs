@@ -492,7 +492,8 @@ namespace FirebaseMultiplayer.Room
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
                 default)
         {
-            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, gamePlayerData = _gamePlayerData }), Type = _type, Name = _name });
+            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, 
+                gamePlayerData = _gamePlayerData }), Type = _type, Name = _name,  GameVersion = Application.version });
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
@@ -510,7 +511,7 @@ namespace FirebaseMultiplayer.Room
 
         public void CreateRoom(RoomData _roomData, Action<NewCreateRoom> _callBack)
         {
-            string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData) });
+            string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData),GameVersion = Application.version });
 
             WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
