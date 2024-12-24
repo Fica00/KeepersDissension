@@ -150,16 +150,6 @@ public class CardActionsDisplay : MonoBehaviour
             {
                 return;
             }
-
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
-            {
-                int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
-                if (_id != _placeId)
-                {
-                    _placeId = _id;
-                    DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
-                }
-            }
         }
         else if (!GameplayManager.Instance.IsMyTurn())
         {
@@ -169,6 +159,19 @@ public class CardActionsDisplay : MonoBehaviour
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
+        }
+
+        if (GameplayManager.Instance.IsResponseAction2())
+        {
+            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            {
+                int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
+                if (_id != _placeId)
+                {
+                    _placeId = _id;
+                    DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                }
+            }
         }
 
         ResetDisplays();
