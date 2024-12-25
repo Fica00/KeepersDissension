@@ -188,10 +188,6 @@ public class Card : CardBase
         }
     }
     
-    public void CopyStats(Card _card)
-    {
-        
-    }
     
     public override bool GetIsMy()
     {
