@@ -32,7 +32,6 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected GameObject bombEffect;
 
     protected bool DidIFinishMyTurn;
-    private bool didOpponentFinishHisTurn;
     private bool doIPlayFirst;
     
     public bool IsKeeperResponseAction2 =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
@@ -70,7 +69,6 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(2);
         SetGameState(GameplayState.SettingUpTable);
         DidIFinishMyTurn = false;
-        didOpponentFinishHisTurn = false;
 
         yield return NewMatchRoutine();
         SetPlayersTurn(doIPlayFirst);
@@ -82,9 +80,7 @@ public class GameplayManager : MonoBehaviour
         while (!HasGameEnded())
         {
             yield return WaitUntilTheEndOfTurn();
-            yield return new WaitForSeconds(1);
             yield return WaitUntilTheEndOfTurn();
-            yield return new WaitForSeconds(1);
         }
     }
 
@@ -145,14 +141,8 @@ public class GameplayManager : MonoBehaviour
         }
         else
         {
-            didOpponentFinishHisTurn = false;
             OpponentPlayer.NewTurn();
-            if (OpponentPlayer.Actions == 0)
-            {
-                didOpponentFinishHisTurn = true;
-                SetPlayersTurn(true);
-            }
-            yield return new WaitUntil(() => didOpponentFinishHisTurn);
+            yield return new WaitUntil(() => OpponentPlayer.Actions == 0);
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
@@ -1139,5 +1129,4 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
-    
 }
