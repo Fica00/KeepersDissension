@@ -224,7 +224,7 @@ public class GameplayManagerPvp : GameplayManager
         FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
     }
 
-    protected override void ExecuteMove(CardAction _action, Action _callBack)
+    public override void ExecuteMove(CardAction _action, Action _callBack)
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
         Card _movingCard = GetCard(_action.FirstCardId);
@@ -235,9 +235,10 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        if (_action.ResetSpeed)
+        if (!_movingCard.CheckCanMove())
         {
-            _movingCard.SetSpeed(0);
+            _callBack?.Invoke();
+            return;
         }
 
         if (_destination.ContainsMarker)
@@ -255,7 +256,7 @@ public class GameplayManagerPvp : GameplayManager
 
         ShowCardMoved(_movingCard.UniqueId, _destination.Id);
 
-        OnCardMoved?.Invoke(_movingCard, _action.StartingPlaceId, _action.FinishingPlaceId, _action.DidTeleport);
+        OnCardMoved?.Invoke(_movingCard, _action.StartingPlaceId, _action.FinishingPlaceId);
         PlayMovingSoundEffect(_movingCard);
         _callBack?.Invoke();
     }
@@ -356,6 +357,15 @@ public class GameplayManagerPvp : GameplayManager
     private void ResolveEndOfAttack(Card _attackingCard, Card _defendingCard, Action _callBack)
     {
         int _damage = _attackingCard.Damage;
+
+        if (_defendingCard.HasBlockaderAbility())
+        {
+            if (_defendingCard.TryToUseBlockaderAbility())
+            {
+                _damage--;
+            }   
+        }
+        
         _defendingCard.ChangeHealth(-_damage);
         var _defendingPosition = _defendingCard.GetTablePlace().Id;
 
@@ -1006,119 +1016,6 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    public override int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100, bool _tryToMoveSelf = false)
-    {
-        Card _pushedCard = TableHandler.GetPlace(_endingPlace).GetCard();
-
-        if (_pushedCard == null)
-        {
-            return -1;
-        }
-
-        if (!_pushedCard.IsWarrior())
-        {
-            return -1;
-        }
-
-        if (UnityEngine.Random.Range(0, 100) > _chanceForPush)
-        {
-            return -1;
-        }
-
-        TablePlaceHandler _pushedCardPlace = _pushedCard.GetTablePlace();
-        Vector2 _indexInFrontOfPushedCard = TableHandler.GetFrontIndex(_startingPlace, _pushedCardPlace.Id);
-        TablePlaceHandler _placeInFrontOfPushedCard = TableHandler.GetPlace(_indexInFrontOfPushedCard);
-        if (_placeInFrontOfPushedCard == null)
-        {
-            StartCoroutine(DamagePushedCard(true));
-            return -1;
-        }
-
-        if (_placeInFrontOfPushedCard.IsAbility)
-        {
-            StartCoroutine(DamagePushedCard(true));
-            return -1;
-        }
-
-        if (_placeInFrontOfPushedCard.GetCard() == null)
-        {
-            CardBase _pushedCardBase = _pushedCardPlace.GetCard();
-            CardAction _moveCardInFront = new CardAction
-            {
-                FirstCardId = ((Card)_pushedCardBase).UniqueId,
-                StartingPlaceId = _pushedCardPlace.Id,
-                FinishingPlaceId = _placeInFrontOfPushedCard.Id,
-                Type = CardActionType.Move,
-                Cost = 0,
-                CanTransferLoot = false,
-                Damage = -1,
-                CanCounter = false,
-                ResetSpeed = true
-            };
-
-            ExecuteCardAction(_moveCardInFront);
-            return _pushedCardPlace.Id;
-        }
-
-        StartCoroutine(DamagePushedCard(true));
-        return -1;
-
-        IEnumerator DamagePushedCard(bool _shouldMoveSelf)
-        {
-            yield return new WaitForSeconds(0.5f);
-            CardAction _damage = new CardAction()
-            {
-                FirstCardId = TableHandler.GetPlace(_endingPlace).GetCard().UniqueId,
-                SecondCardId = _pushedCardPlace.GetCard().UniqueId,
-                StartingPlaceId = _endingPlace,
-                FinishingPlaceId = _pushedCardPlace.Id,
-                Type = CardActionType.Attack,
-                Cost = 0,
-                CanTransferLoot = false,
-                Damage = 1,
-                CanCounter = false,
-            };
-
-            ExecuteCardAction(_damage);
-            if (_shouldMoveSelf && _tryToMoveSelf)
-            {
-                var _attackedCard = TableHandler.GetPlace(_endingPlace).GetCard();
-                if (_attackedCard != null)
-                {
-                    if (_attackedCard.Health != 0)
-                    {
-                        yield break;
-                    }
-                }
-
-                var _myCardTable = TableHandler.GetPlace(_startingPlace).GetCard();
-                if (_myCardTable == null)
-                {
-                    yield break;
-                }
-
-                if (_myCardTable.Health == 0)
-                {
-                    yield break;
-                }
-
-                CardAction _moveSelf = new CardAction()
-                {
-                    FirstCardId = _myCardTable.UniqueId,
-                    StartingPlaceId = _myCardTable.GetTablePlace().Id,
-                    FinishingPlaceId = _endingPlace,
-                    Type = CardActionType.Move,
-                    Cost = 0,
-                    CanTransferLoot = false,
-                    Damage = -1,
-                    CanCounter = false,
-                };
-
-                ExecuteCardAction(_moveSelf);
-            }
-        }
-    }
-
     public override void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetCardNoWall();
@@ -1162,10 +1059,7 @@ public class GameplayManagerPvp : GameplayManager
                 FinishingPlaceId = _placeBehindOfPushedCard.Id,
                 Type = CardActionType.Move,
                 Cost = 0,
-                CanTransferLoot = false,
                 Damage = -1,
-                CanCounter = false,
-                ResetSpeed = true
             };
 
             ExecuteCardAction(_moveCardInFront);
@@ -1186,9 +1080,7 @@ public class GameplayManagerPvp : GameplayManager
                 FinishingPlaceId = _pushedCardPlace.Id,
                 Type = CardActionType.Attack,
                 Cost = 0,
-                CanTransferLoot = false,
                 Damage = 1,
-                CanCounter = false,
             };
 
             ExecuteCardAction(_damage);
@@ -1444,9 +1336,7 @@ public class GameplayManagerPvp : GameplayManager
                 FinishingPlaceId = _index,
                 Type = CardActionType.Move,
                 Cost = 0,
-                CanTransferLoot = false,
                 Damage = -1,
-                CanCounter = false
             };
             ExecuteCardAction(_actionMove);
         }
@@ -1995,5 +1885,12 @@ public class GameplayManagerPvp : GameplayManager
     public override bool IsResponseAction2()
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
+    }
+    
+    public override void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
+    {
+        Card _card = GetCard(_uniqueId);
+        _card.ChangeHealth(-_damage);
+        CheckIfDefenderIsDestroyed(_card,_callBack);
     }
 }

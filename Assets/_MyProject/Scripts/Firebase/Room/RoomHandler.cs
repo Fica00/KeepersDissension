@@ -489,7 +489,7 @@ namespace FirebaseMultiplayer.Room
             GameplayManager.Instance.ShowGameEnded(_data.Winner);
         }
         
-        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
+        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 
                 default)
         {
             string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, 
@@ -497,29 +497,29 @@ namespace FirebaseMultiplayer.Room
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
-                NewJoinRoom _responseData = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 roomData = _responseData.Room;
                 _responseData.Name = _name;
                 _responseData.Type = _type;
                 _callBack?.Invoke(_responseData);
             }, _response =>
             {
-                NewJoinRoom _data = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _data = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 _callBack?.Invoke(_data);
             }, _includeHeader: false);
         }
 
-        public void CreateRoom(RoomData _roomData, Action<NewCreateRoom> _callBack)
+        public void CreateRoom(RoomData _roomData, Action<CreateRoom> _callBack)
         {
             string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData),GameVersion = Application.version });
 
             WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
                 roomData = _roomData;
-                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
             }, _response =>
             {
-                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
             });
         }
 

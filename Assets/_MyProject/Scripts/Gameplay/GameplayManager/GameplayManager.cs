@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-    public static Action<CardBase, int, int, bool> OnCardMoved;
+    public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
     public static Action<CardBase> OnPlacedCard;
@@ -19,8 +19,6 @@ public class GameplayManager : MonoBehaviour
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
-    
-    [HideInInspector] public CardAction LastAction;
     
     [SerializeField] private HealthTracker healthTracker;
 
@@ -208,31 +206,30 @@ public class GameplayManager : MonoBehaviour
     public void ExecuteCardAction(CardAction _action)
     {
         StartCoroutine(ClosePanelRoutine());
-        LastAction = _action;
         switch (_action.Type)
         {
             case CardActionType.Attack:
                 ExecuteAttack(_action, () =>
                 {
-                    FinishActionExecution(1);
+                    FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.Move:
                 ExecuteMove(_action, () =>
                 {
-                    FinishActionExecution(1);
+                    FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.SwitchPlace:
                 ExecuteSwitchPlace(_action, () =>
                 {
-                    FinishActionExecution(2);
+                    FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.MoveAbility:
                 ExecuteMoveAbility(_action, () =>
                 {
-                    FinishActionExecution(0);
+                    FinishActionExecution(_action);
                 });
                 break;
             default:
@@ -246,10 +243,10 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    private void FinishActionExecution(int _actionCost)
+    private void FinishActionExecution(CardAction _action)
     {
         Debug.Log("Finished with action");
-        MyPlayer.Actions-=_actionCost;
+        MyPlayer.Actions-=_action.Cost;
 
         if (MyPlayer.Actions<=0)
         {
@@ -265,7 +262,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
     
-    protected virtual void ExecuteMove(CardAction _action,Action _callBack)
+    public virtual void ExecuteMove(CardAction _action,Action _callBack)
     {
         throw new Exception();
     }
@@ -430,11 +427,6 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void BuyAbilityFromHand(string _abilityId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100, bool _tryToMoveSelf = false)
     {
         throw new NotImplementedException();
     }
@@ -1150,6 +1142,11 @@ public class GameplayManager : MonoBehaviour
     }
     
     public virtual bool IsResponseAction2()
+    {
+        throw new Exception();
+    }
+
+    public virtual void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
     {
         throw new Exception();
     }

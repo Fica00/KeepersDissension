@@ -115,7 +115,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandleJoinRoom(NewJoinRoom _response)
+    private void HandleJoinRoom(JoinRoom _response)
     {
         if (_response.Success)
         {
@@ -166,7 +166,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandeCreateRoom(NewCreateRoom _response)
+    private void HandeCreateRoom(CreateRoom _response)
     {
         if (_response.Success)
         {
