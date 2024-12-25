@@ -513,6 +513,26 @@ public class GameplayManagerPvp : GameplayManager
 
         if (!_defendingCard.IsWarrior())
         {
+            if (_defendingCard is Marker _marker)
+            {
+                //check if scaler ability is on same place:
+                TablePlaceHandler _place = _marker.GetTablePlace();
+                foreach (var _cardOnPlace in _place.GetCards())
+                {
+                    if (_cardOnPlace is not Card _card)
+                    {
+                        continue;
+                    }
+
+                    if (!_card.HasScaler())
+                    {
+                        continue;
+                    }
+
+                    SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
+                    return true;
+                }
+            }
             return false;
         }
 

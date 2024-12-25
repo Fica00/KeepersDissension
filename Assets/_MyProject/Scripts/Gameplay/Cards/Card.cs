@@ -243,6 +243,17 @@ public class Card : CardBase
         }
 
         return true;
+    }    
+    
+    public bool HasScaler()
+    {
+        ScalerScale _scale = EffectsHolder.GetComponent<ScalerScale>();
+        if (_scale== null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public bool TryToUseBlockaderAbility()

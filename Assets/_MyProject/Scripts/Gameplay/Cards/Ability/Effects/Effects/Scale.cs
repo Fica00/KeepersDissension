@@ -1,3 +1,5 @@
+
 public class Scale : AbilityEffect
 {
+   
 }
