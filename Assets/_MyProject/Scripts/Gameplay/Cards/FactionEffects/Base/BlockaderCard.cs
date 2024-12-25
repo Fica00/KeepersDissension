@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class BlockaderCard : CardSpecialAbility
 {
     public bool CanBlock => Card.CardData.WarriorAbilityData.CanBlock;
@@ -24,6 +26,7 @@ public class BlockaderCard : CardSpecialAbility
 
     private void ResetCanBlock()
     {
+        Debug.Log("Reseting");
          SetCanBlock(true);
     }
 

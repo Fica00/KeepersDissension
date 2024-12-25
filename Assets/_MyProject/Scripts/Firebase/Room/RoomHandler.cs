@@ -145,6 +145,7 @@ namespace FirebaseMultiplayer.Room
             CheckForGameEnd(_currentRoomState,_data);
             CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
+            CheckIfOpponentEndedTurn(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -380,8 +381,38 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             
-            Debug.Log("Should end turn detected");
             GameplayManager.Instance.EndTurn();
+        }
+        private void CheckIfOpponentEndedTurn(RoomData _currentRoomData,RoomData _data)
+        {
+            bool _didOpponentEndTurn = false;
+            if (IsOwner)
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 2)
+                {
+                    if (_data.CurrentPlayerTurn == 1)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+            else
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 1)
+                {
+                    if (_data.CurrentPlayerTurn == 2)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+
+            if (!_didOpponentEndTurn)
+            {
+                return;
+            }
+
+            GameplayManager.Instance.DidOpponentFinish = true;
         }
 
         private void ShowCardMoved(string _uniqueId, int _placeId)

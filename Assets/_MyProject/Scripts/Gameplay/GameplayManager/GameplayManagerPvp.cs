@@ -513,7 +513,6 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_defendingCard.Health <= 0)
         {
-            Debug.Log("Defending card is lower or equal to 0");
             return false;
         }
 
@@ -530,8 +529,6 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_defendingCard is Wall _wall)
         {
-            Debug.Log("It is a wall");
-            //check if scaler ability is on same place:
             TablePlaceHandler _place = _wall.GetTablePlace();
             foreach (var _cardOnPlace in _place.GetCards())
             {
@@ -550,13 +547,11 @@ public class GameplayManagerPvp : GameplayManager
                     continue;
                 }
 
-                Debug.Log("Found a card with it on wall");
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
                 return true;
             }
         }
             
-        Debug.Log("Not a wall");
         return false;
     }
 
