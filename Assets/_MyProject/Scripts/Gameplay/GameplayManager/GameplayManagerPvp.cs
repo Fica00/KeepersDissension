@@ -5,6 +5,7 @@ using DG.Tweening;
 using UnityEngine;
 using System.Linq;
 using FirebaseMultiplayer.Room;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 public class GameplayManagerPvp : GameplayManager
@@ -334,42 +335,148 @@ public class GameplayManagerPvp : GameplayManager
 
     private void ResolveEndOfAttack(Card _attackingCard, Card _defendingCard, Action _callBack)
     {
-        int _damage = _attackingCard.Damage;
-
-        if (_defendingCard.HasBlockaderAbility())
-        {
-            if (_defendingCard.TryToUseBlockaderAbility())
-            {
-                _damage--;
-            }   
-        }
+        StartCoroutine(ResolveEndOfAttackRoutine());
         
-        _defendingCard.ChangeHealth(-_damage);
-        var _defendingPosition = _defendingCard.GetTablePlace().Id;
-
-        OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
-        bool _didGiveResponseAction = CheckForResponseAction(_attackingCard, _defendingCard);
-        CheckIfDefenderIsDestroyed(_defendingCard,FinishResolve);
-
-        void FinishResolve(bool _didDie)
+        IEnumerator ResolveEndOfAttackRoutine()
         {
-            if (_didDie)
-            {
-                if (_defendingCard is LifeForce)
-                {
-                    EndGame(!_defendingCard.My);
-                    return;
-                }
+            int _damage = _attackingCard.Damage;
+            bool _canGetResponse = true;
+            bool _waitForSomething;
 
-                HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
+            if (_defendingCard.HasBlockaderAbility())
+            {
+                if (_defendingCard.TryToUseBlockaderAbility())
+                {
+                    _damage--;
+                }   
+            }
+
+            if (_defendingCard.HasDelivery)
+            {
+                _waitForSomething = false;
+                UseDelivery(_defendingCard.UniqueId, _defendingCard.GetTablePlace().Id,ContinueWithExecution);
+                yield return new WaitUntil(() => _waitForSomething);
+                _defendingCard.ChangeDelivery(false);
+                _damage = 0;
+                _canGetResponse = false;
+            }
+        
+            _defendingCard.ChangeHealth(-_damage);
+            var _defendingPosition = _defendingCard.GetTablePlace().Id;
+
+            OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
+            bool _didGiveResponseAction = false;
+            if (_canGetResponse)
+            {
+                _didGiveResponseAction = CheckForResponseAction(_attackingCard, _defendingCard);
+            }
+            CheckIfDefenderIsDestroyed(_defendingCard,FinishResolve);
+
+            void ContinueWithExecution()
+            {
+                _waitForSomething = true;
             }
             
-            _callBack?.Invoke();
-            if (_didGiveResponseAction && MyPlayer.Actions==0)
+            void FinishResolve(bool _didDie)
             {
-                Debug.Log("Forcing an update because response was given but");
-                RoomUpdater.Instance.ForceUpdate();
+                if (_didDie)
+                {
+                    if (_defendingCard is LifeForce)
+                    {
+                        EndGame(!_defendingCard.My);
+                        return;
+                    }
+
+                    HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
+                }
+            
+                _callBack?.Invoke();
+                if (_didGiveResponseAction && MyPlayer.Actions==0)
+                {
+                    Debug.Log("Forcing an update because response was given but");
+                    RoomUpdater.Instance.ForceUpdate();
+                }
             }
+        }
+    }
+    
+    private void UseDelivery(string _defendingCardId, int _startingPlace, Action _callBack)
+    {
+        List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces();
+        if (_emptyPlaces.Count==0)
+        {
+            _callBack?.Invoke();
+            return;
+        }
+        
+        if (_emptyPlaces.Count==1)
+        {
+            ExecuteMove(_startingPlace,_emptyPlaces[0].Id,_defendingCardId, _callBack);
+        }
+        else
+        {
+            StartCoroutine(SelectPlace(_emptyPlaces, true, DoPlaceDeliveryCard));
+        }
+        
+        void DoPlaceDeliveryCard(int _placeId)
+        { 
+            ExecuteMove(_startingPlace,_placeId,_defendingCardId, _callBack);
+        }
+    }
+
+    private List<TablePlaceHandler> GetDeliveryPlaces()
+    {
+        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>(){8,9,10,11,12,13,14});
+        if (_emptyPlaces.Count != 0)
+        {
+            return _emptyPlaces;
+        }
+        
+        _emptyPlaces = GetEmptyPlaces(new List<int>(){12,10,19,18,17});
+        if (_emptyPlaces.Count != 0)
+        {
+            return _emptyPlaces;
+        }
+        
+        _emptyPlaces = GetEmptyPlaces(new List<int>(){13,20,27,26,25,24,23,16,9});
+        if (_emptyPlaces.Count != 0)
+        {
+            return _emptyPlaces;
+        }
+        
+        _emptyPlaces = GetEmptyPlaces(new List<int>(){14,21,28,27,26,25,24,23,22,15,8});
+        if (_emptyPlaces.Count != 0)
+        {
+            return _emptyPlaces;
+        }
+        
+        for (int _i = 8; _i < 57; _i++)
+        {
+            TablePlaceHandler _place = TableHandler.GetPlace(_i);
+            if (_place.IsOccupied)
+            {
+                continue;
+            }
+
+            _emptyPlaces.Add(_place);
+        }
+
+        return _emptyPlaces;
+        
+        List<TablePlaceHandler> GetEmptyPlaces(List<int> _placeIds)
+        {
+            List<TablePlaceHandler> _places = new List<TablePlaceHandler>();
+            foreach (var _placeId in _placeIds)
+            {
+                TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+                if (_place.IsOccupied)
+                {
+                    continue;
+                }
+                _places.Add(_place);
+            }
+
+            return _places;
         }
     }
 
@@ -1185,131 +1292,6 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         AudioManager.Instance.PlaySoundEffect(_key);
-    }
-
-    private void UseDelivery(string _defendingCardId, int _startingPlace)
-    {
-        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>()
-        {
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14
-        });
-        if (_emptyPlaces.Count == 0)
-        {
-            _emptyPlaces = GetEmptyPlaces(new List<int>()
-            {
-                12,
-                10,
-                19,
-                18,
-                17
-            });
-            if (_emptyPlaces.Count == 0)
-            {
-                _emptyPlaces = GetEmptyPlaces(new List<int>()
-                {
-                    13,
-                    20,
-                    27,
-                    26,
-                    25,
-                    24,
-                    23,
-                    16,
-                    9
-                });
-                if (_emptyPlaces.Count == 0)
-                {
-                    _emptyPlaces = GetEmptyPlaces(new List<int>()
-                    {
-                        14,
-                        21,
-                        28,
-                        27,
-                        26,
-                        25,
-                        24,
-                        23,
-                        22,
-                        15,
-                        8
-                    });
-                    if (_emptyPlaces.Count == 0)
-                    {
-                        for (int _i = 8; _i < 57; _i++)
-                        {
-                            if (PlaceAnywhere(_i, _defendingCardId, _startingPlace))
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (_emptyPlaces.Count == 1)
-        {
-            DoPlace(_emptyPlaces[0].Id, _defendingCardId, _startingPlace);
-        }
-        else
-        {
-            StartCoroutine(SelectPlace(_emptyPlaces, true, DoPlaceOnTable));
-        }
-
-
-        List<TablePlaceHandler> GetEmptyPlaces(List<int> _places)
-        {
-            List<TablePlaceHandler> _emptyPlaces2 = new List<TablePlaceHandler>();
-            foreach (var _placeId in _places)
-            {
-                TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
-                if (_place.IsOccupied)
-                {
-                    continue;
-                }
-
-                _emptyPlaces2.Add(_place);
-            }
-
-            return _emptyPlaces2;
-        }
-
-        bool PlaceAnywhere(int _index, string _defendingCardId2, int _startingPlace2)
-        {
-            TablePlaceHandler _place = TableHandler.GetPlace(_index);
-            if (_place.IsOccupied)
-            {
-                return false;
-            }
-
-            DoPlace(_index, _defendingCardId2, _startingPlace2);
-            return true;
-        }
-
-        void DoPlaceOnTable(int _placeId)
-        {
-            DoPlace(_placeId, _defendingCardId, _startingPlace);
-        }
-
-        void DoPlace(int _index, string _defendingCardId3, int _startingPlace3)
-        {
-            CardAction _actionMove = new CardAction
-            {
-                FirstCardId = _defendingCardId3,
-                StartingPlaceId = _startingPlace3,
-                FinishingPlaceId = _index,
-                Type = CardActionType.Move,
-                Cost = 0,
-                Damage = -1,
-            };
-            ExecuteCardAction(_actionMove);
-        }
     }
 
     public override int StrangeMaterInEconomy()

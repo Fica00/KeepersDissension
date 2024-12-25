@@ -265,5 +265,10 @@ public class Card : CardBase
     {
         return !CardData.IsStunned && CanBeUsed;
     }
+
+    public void ChangeDelivery(bool _status)
+    {
+        CardData.HasDelivery = _status;
+    }
     
 }
