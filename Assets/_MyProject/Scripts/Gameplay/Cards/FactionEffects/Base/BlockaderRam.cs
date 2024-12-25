@@ -5,7 +5,6 @@ public class BlockaderRam : CardSpecialAbility
 {
     public void TryAndPush(string _firstCardId, string _secondCardId)
     {
-        Debug.Log("11111111111");
         TryToPlaySoundEffect();
         int _secondCardsPlace = GameplayManager.Instance.GetCard(_secondCardId).GetTablePlace().Id;
 
@@ -21,8 +20,10 @@ public class BlockaderRam : CardSpecialAbility
         {
             GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>
             {
-                if (_didKillCard)
+                if (!_didKillCard)
                 {
+                    ClearActions();
+                    ReduceActions();
                     return;
                 }
 
@@ -87,6 +88,7 @@ public class BlockaderRam : CardSpecialAbility
             return false;
         }
 
+        Debug.Log(_placeInFront.Id, _placeInFront.gameObject);
         return true;
     }
 
@@ -108,12 +110,16 @@ public class BlockaderRam : CardSpecialAbility
     
     private void HandleMoveOutcome(Action _callBack)
     {
+        ReduceActions();
+        _callBack?.Invoke();
+    }
+
+    private void ReduceActions()
+    {
         GameplayManager.Instance.MyPlayer.Actions--;
         if (GameplayManager.Instance.MyPlayer.Actions > 0)
         {
             RoomUpdater.Instance.ForceUpdate();
         }
-
-        _callBack?.Invoke();
     }
 }
