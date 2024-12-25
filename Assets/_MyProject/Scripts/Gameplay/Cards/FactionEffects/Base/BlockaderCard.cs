@@ -1,15 +1,25 @@
 public class BlockaderCard : CardSpecialAbility
 {
     public bool CanBlock => Card.CardData.WarriorAbilityData.CanBlock;
+    private GameplayPlayer player;
     
     private void Start()
     {
-        Player.OnStartedTurn += ResetCanBlock;
+        if (!Player.IsMy)
+        {
+            return;
+        }
+        player = Player;
+        player.OnStartedTurn += ResetCanBlock;
     }
 
     private void OnDisable()
     {
-        Player.OnStartedTurn -= ResetCanBlock;
+        if (player==null)
+        {
+            return;
+        }
+        player.OnStartedTurn -= ResetCanBlock;
     }
 
     private void ResetCanBlock()

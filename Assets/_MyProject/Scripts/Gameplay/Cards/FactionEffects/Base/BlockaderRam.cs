@@ -1,19 +1,29 @@
+using System;
+
 public class BlockaderRam : CardSpecialAbility
 {
     public void TryAndPush(string _firstCardId, string _secondCardId)
     {
         TryToPlaySoundEffect();
+        int _secondCardsPlace = GameplayManager.Instance.GetCard(_secondCardId).GetTablePlace().Id;
+
         if (CanPushCard(_firstCardId, _secondCardId))
         {
-            PushCard(_secondCardId);
-            TryToMoveSelf();
+            PushCard(_firstCardId, _secondCardId,
+                () => { TryToMoveSelf(_firstCardId, _secondCardsPlace, () => { GameplayManager.Instance.MyPlayer.Actions--; }); });
         }
         else
         {
-            GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, TryToMoveSelf);
+            GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>
+            {
+                if (_didKillCard)
+                {
+                    return;
+                }
+
+                TryToMoveSelf(_firstCardId, _secondCardsPlace, () => { GameplayManager.Instance.MyPlayer.Actions--; });
+            });
         }
-        
-        GameplayManager.Instance.MyPlayer.Actions--;
     }
 
     private void TryToPlaySoundEffect()
@@ -41,12 +51,12 @@ public class BlockaderRam : CardSpecialAbility
     private bool CanPushCard(string _firstCardId, string _secondCardId)
     {
         Card _secondCard = GameplayManager.Instance.GetCard(_secondCardId);
-        
+
         if (!_secondCard.CheckCanMove())
         {
             return false;
         }
-        
+
         int _firstCardPlace = GameplayManager.Instance.GetCard(_firstCardId).GetTablePlace().Id;
         int _secondCardPlace = _secondCard.GetTablePlace().Id;
 
@@ -66,28 +76,34 @@ public class BlockaderRam : CardSpecialAbility
         {
             return false;
         }
-        
+
         return true;
     }
 
-    private void PushCard(string _cardId)
+    private void PushCard(string _firstCardId, string _secondCardId, Action _callBack)
     {
-        Card _secondCard = GameplayManager.Instance.GetCard(_cardId);
-        // GameplayManager.Instance.ExecuteMove();
+        Card _secondCard = GameplayManager.Instance.GetCard(_secondCardId);
+        int _firstCardPlace = GameplayManager.Instance.GetCard(_firstCardId).GetTablePlace().Id;
+        int _secondCardPlace = _secondCard.GetTablePlace().Id;
+
+        TablePlaceHandler _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_firstCardPlace, _secondCardPlace);
+        GameplayManager.Instance.ExecuteMove(_secondCardPlace, _placeInFront.Id, _secondCardId, () => { HandleMoveOutcome(_callBack); });
     }
 
-    private void TryToMoveSelf(bool _didDestroyCard)
+    private void HandleMoveOutcome(Action _callBack)
     {
-        if (!_didDestroyCard)
+        GameplayManager.Instance.MyPlayer.Actions--;
+        if (GameplayManager.Instance.MyPlayer.Actions > 0)
         {
-            return;
+            RoomUpdater.Instance.ForceUpdate();
         }
 
-        TryToMoveSelf();
+        _callBack?.Invoke();
     }
 
-    private void TryToMoveSelf()
+    private void TryToMoveSelf(string _cardId, int _newPlaceId, Action _callBack)
     {
-        
+        int _currentPlaceId = GameplayManager.Instance.GetCard(_cardId).GetTablePlace().Id;
+        GameplayManager.Instance.ExecuteMove(_currentPlaceId, _newPlaceId, _cardId, () => { HandleMoveOutcome(_callBack); });
     }
 }
