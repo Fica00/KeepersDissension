@@ -1,8 +1,7 @@
 public class ScalerScale : CardSpecialAbility
 {
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
         Card.CardData.CanMoveOnWall = true;
     }
 }
