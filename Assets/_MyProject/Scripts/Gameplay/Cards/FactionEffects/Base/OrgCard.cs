@@ -90,12 +90,12 @@ public class OrgCard : CardSpecialAbility
                 continue;
             }
 
-            if (!_cardOnPlace.IsWarrior())
+            if (!_cardOnPlace.IsAttackable())
             {
                 continue;
             }
 
-            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage,null);
+            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage, _ => { GameplayManager.Instance.HideCardActions();});
         }
     }
 }
