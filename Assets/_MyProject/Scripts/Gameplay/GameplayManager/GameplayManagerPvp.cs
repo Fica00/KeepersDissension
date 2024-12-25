@@ -371,7 +371,7 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         SetGameplaySubState(GameplaySubState.Player1DeliveryReposition);
                     }
-                    
+                    RoomUpdater.Instance.ForceUpdate();
                     yield return new WaitUntil(() => GetGameplaySubState() == _currentState);
                 }
                 _defendingCard.ChangeDelivery(false);
