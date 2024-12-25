@@ -15,8 +15,7 @@ public class Card : CardBase
     public bool IsVoid => CardData.IsVoid;
     public bool CanMoveOnWall => CardData.CanMoveOnWall;
     public int Speed => CardData.Stats.Speed;
-    public bool CanFlyToDodgeAttack => CardData.CanFlyToDodgeAttack;
-    public bool CanMove => CardData.CanMove;
+    public bool HasDelivery => CardData.HasDelivery;
     public bool CanBeUsed => CardData.CanBeUsed;
     public bool My => CardData.Owner == FirebaseManager.Instance.PlayerId;
     public CardMovementType MovementType => CardData.MovementType;
@@ -40,7 +39,7 @@ public class Card : CardBase
             UniqueId = _uniqueId,
             CardId = Details.Id,
             IsVoid = false,
-            CanFlyToDodgeAttack = false,
+            HasDelivery = false,
             CanMoveOnWall = false,
             MovementType = CardMovementType.FourDirections,
             Stats = new CardStats { 
@@ -146,17 +145,12 @@ public class Card : CardBase
 
     public void SetCanFlyToDodgeAttack(bool _status)
     {
-        CardData.CanFlyToDodgeAttack = _status;
+        CardData.HasDelivery = _status;
     }
 
     public void SetIsVoid(bool _status)
     {
         CardData.IsVoid = _status;
-    }
-
-    public void SetCanMove(bool _status)
-    {
-        CardData.CanMove = _status;
     }
 
     public void SetCanBeUsed(bool _status)
@@ -269,7 +263,7 @@ public class Card : CardBase
 
     public bool CheckCanMove()
     {
-        return CanMove && CanBeUsed;
+        return !CardData.IsStunned && CanBeUsed;
     }
     
 }

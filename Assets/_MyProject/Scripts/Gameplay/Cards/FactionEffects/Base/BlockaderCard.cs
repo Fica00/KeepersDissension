@@ -5,11 +5,11 @@ public class BlockaderCard : CardSpecialAbility
     
     private void Start()
     {
-        if (!Player.IsMy)
+        if (!GetPlayer().IsMy)
         {
             return;
         }
-        player = Player;
+        player = GetPlayer();
         player.OnStartedTurn += ResetCanBlock;
     }
 

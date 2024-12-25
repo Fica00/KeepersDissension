@@ -1016,7 +1016,7 @@ public class GameplayManagerPvp : GameplayManager
         if (_placeBehindOfPushedCard.GetCard() == null)
         {
             Card _pushedCardBase = _pushedCardPlace.GetCard();
-            if (!_pushedCardBase.CanMove || _placeBehindOfPushedCard.IsAbility)
+            if (!_pushedCardBase.CheckCanMove() || _placeBehindOfPushedCard.IsAbility)
             {
                 StartCoroutine(DamagePushedCard());
                 return;

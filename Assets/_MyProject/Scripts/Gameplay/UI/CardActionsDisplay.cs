@@ -249,7 +249,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        foreach (var _cardAbility in _cardAbilities)
+        foreach (CardSpecialAbility _cardAbility in _cardAbilities)
         {
             if (!_cardAbility.IsClickable)
             {
@@ -266,6 +266,11 @@ public class CardActionsDisplay : MonoBehaviour
                 }
                 
                 if (!GameplayManager.Instance.IsMyTurn())
+                {
+                    return;
+                }
+
+                if (!_cardAbility.CanUseAbility)
                 {
                     return;
                 }
