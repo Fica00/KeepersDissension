@@ -195,7 +195,7 @@ public class GameplayManager : MonoBehaviour
 
     public void ExecuteCardAction(CardAction _action)
     {
-        StartCoroutine(ClosePanelRoutine());
+        HideCardActions();
         switch (_action.Type)
         {
             case CardActionType.Attack:
@@ -219,7 +219,11 @@ public class GameplayManager : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
 
+    public void HideCardActions()
+    {
+        StartCoroutine(ClosePanelRoutine());
         IEnumerator ClosePanelRoutine()
         {
             yield return new WaitForSeconds(.01f);

@@ -13,10 +13,7 @@ public class BlockaderRam : CardSpecialAbility
         {
             PushCard(_firstCardId, _secondCardId, () =>
             {
-                MoveSelf(_firstCardId, _secondCardsPlace, () =>
-                {
-                    HandleMoveOutcome(null);
-                });
+                MoveSelf(_firstCardId, _secondCardsPlace, ClearActions);
             });
         }
         
@@ -29,9 +26,14 @@ public class BlockaderRam : CardSpecialAbility
                     return;
                 }
 
-                MoveSelf(_firstCardId, _secondCardsPlace, null);
+                MoveSelf(_firstCardId, _secondCardsPlace, ClearActions);
             });
         }
+    }
+
+    private void ClearActions()
+    {
+        GameplayManager.Instance.HideCardActions();
     }
 
     private void TryToPlaySoundEffect()
