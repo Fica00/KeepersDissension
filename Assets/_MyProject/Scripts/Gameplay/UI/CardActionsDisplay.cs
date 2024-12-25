@@ -272,6 +272,7 @@ public class CardActionsDisplay : MonoBehaviour
 
                 if (!_cardAbility.CanUseAbility)
                 {
+                    DialogsManager.Instance.ShowOkDialog("This ability has already been used");
                     return;
                 }
                 

@@ -3,6 +3,34 @@ using System.Linq;
 
 public class OrgCard : CardSpecialAbility
 {
+    private GameplayPlayer player;
+
+    private void Start()
+    {
+        if (!GetPlayer().IsMy)
+        {
+            return;
+        }
+        
+        player = GetPlayer();
+        player.OnStartedTurn += ResetAbilities;
+    }
+
+    private void OnDisable()
+    {
+        if (player==null)
+        {
+            return; 
+        }
+        
+        player.OnStartedTurn -= ResetAbilities;
+    }
+
+    private void ResetAbilities()
+    {
+        SetCanUseAbility(true);
+    }
+    
     public override void UseAbility()
     {
         DialogsManager.Instance.ShowYesNoDialog("Use orges Ground Pound  attack?",YesUseGroundPoundAttack);
