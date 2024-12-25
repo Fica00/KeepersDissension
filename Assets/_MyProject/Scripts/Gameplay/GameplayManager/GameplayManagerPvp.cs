@@ -515,6 +515,11 @@ public class GameplayManagerPvp : GameplayManager
                 TablePlaceHandler _place = _wall.GetTablePlace();
                 foreach (var _cardOnPlace in _place.GetCards())
                 {
+                    if (_cardOnPlace.GetIsMy() == _attackingCard.GetIsMy())
+                    {
+                        continue;
+                    }
+                    
                     if (_cardOnPlace is not Card _card)
                     {
                         continue;
