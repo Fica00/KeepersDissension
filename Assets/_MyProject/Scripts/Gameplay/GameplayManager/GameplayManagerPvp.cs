@@ -354,8 +354,26 @@ public class GameplayManagerPvp : GameplayManager
             if (_defendingCard.HasDelivery)
             {
                 _waitForSomething = false;
-                UseDelivery(_defendingCard.UniqueId, _defendingCard.GetTablePlace().Id,ContinueWithExecution);
-                yield return new WaitUntil(() => _waitForSomething);
+                if (_defendingCard.GetIsMy())
+                {
+                    UseDelivery(_defendingCard.UniqueId,ContinueWithExecution);
+                    yield return new WaitUntil(() => _waitForSomething);
+                }
+                else
+                {
+                    BoardData.DeliveryCard = _defendingCard.UniqueId;
+                    var _currentState = GetGameplaySubState();
+                    if (RoomHandler.IsOwner)
+                    {
+                        SetGameplaySubState(GameplaySubState.Player2DeliveryReposition);
+                    }
+                    else
+                    {
+                        SetGameplaySubState(GameplaySubState.Player1DeliveryReposition);
+                    }
+                    
+                    yield return new WaitUntil(() => GetGameplaySubState() == _currentState);
+                }
                 _defendingCard.ChangeDelivery(false);
                 _damage = 0;
                 _canGetResponse = false;
@@ -400,8 +418,9 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
     
-    private void UseDelivery(string _defendingCardId, int _startingPlace, Action _callBack)
+    public override void UseDelivery(string _defendingCardId, Action _callBack)
     {
+        int _startingPlace = GetCard(_defendingCardId).GetTablePlace().Id;
         List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces();
         if (_emptyPlaces.Count==0)
         {

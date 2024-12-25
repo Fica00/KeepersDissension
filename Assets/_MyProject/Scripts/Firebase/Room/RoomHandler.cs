@@ -143,6 +143,7 @@ namespace FirebaseMultiplayer.Room
             CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
             CheckForUnchain(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
+            CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
         }
 
@@ -311,6 +312,37 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.StrangeMatterAnimation;
             GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
+        }
+
+        private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1DeliveryReposition)
+                    {
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2DeliveryReposition)
+                    {
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+
+            void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
         
         private void ShouldEndTurn(RoomData _currentRoomData,RoomData _data)

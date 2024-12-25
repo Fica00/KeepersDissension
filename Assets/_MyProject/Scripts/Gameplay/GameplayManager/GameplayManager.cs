@@ -247,6 +247,11 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void UseDelivery(string _defendingCardId, Action _callBack)
+    {
+        throw new Exception();
+    }
     
     public virtual void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
     {
