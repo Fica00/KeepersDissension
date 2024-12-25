@@ -142,7 +142,7 @@ public class GameplayManager : MonoBehaviour
         else
         {
             OpponentPlayer.NewTurn();
-            yield return new WaitUntil(() => OpponentPlayer.Actions == 0);
+            yield return new WaitUntil(() => !DidIFinishMyTurn);
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
