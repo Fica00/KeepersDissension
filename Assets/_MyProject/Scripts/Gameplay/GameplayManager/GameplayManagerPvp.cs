@@ -224,10 +224,10 @@ public class GameplayManagerPvp : GameplayManager
         FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
     }
 
-    public override void ExecuteMove(CardAction _action, Action _callBack)
+    public override void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
     {
-        TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
-        Card _movingCard = GetCard(_action.FirstCardId);
+        TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
+        Card _movingCard = GetCard(_firstCardId);
 
         if (_movingCard == null)
         {
@@ -256,18 +256,18 @@ public class GameplayManagerPvp : GameplayManager
 
         ShowCardMoved(_movingCard.UniqueId, _destination.Id);
 
-        OnCardMoved?.Invoke(_movingCard, _action.StartingPlaceId, _action.FinishingPlaceId);
+        OnCardMoved?.Invoke(_movingCard, _startingPlaceId, _finishingPlaceId);
         PlayMovingSoundEffect(_movingCard);
         _callBack?.Invoke();
     }
 
-    protected override void ExecuteSwitchPlace(CardAction _action, Action _callBack)
+    protected override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
-        TablePlaceHandler _startingDestination = TableHandler.GetPlace(_action.StartingPlaceId);
-        TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
+        TablePlaceHandler _startingDestination = TableHandler.GetPlace(_startingPlaceId);
+        TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
 
-        Card _firstCard = GetCard(_action.FirstCardId);
-        Card _secondCard = GetCard(_action.SecondCardId);
+        Card _firstCard = GetCard(_firstCardId);
+        Card _secondCard = GetCard(_secondCardId);
 
         if (_firstCard == null || _secondCard == null)
         {
@@ -285,32 +285,10 @@ public class GameplayManagerPvp : GameplayManager
         _callBack?.Invoke();
     }
 
-    protected override void ExecuteMoveAbility(CardAction _action, Action _callBack)
+    protected override void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
     {
-        TablePlaceHandler _destination = TableHandler.GetPlace(_action.FinishingPlaceId);
-        CardBase _movingCard = GetCard(_action.FirstCardId);
-
-        if (_movingCard == null)
-        {
-            _callBack?.Invoke();
-            return;
-        }
-
-        if (_destination.ContainsMarker)
-        {
-            CardBase _cardBase = _destination.GetCardNoWall();
-            GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
-            _markerOwner.DestroyCard(_cardBase as Card);
-        }
-
-        _movingCard.MoveToPosition(_destination);
-        _callBack?.Invoke();
-    }
-
-    protected override void ExecuteAttack(CardAction _action,Action _callBack)
-    {
-        Card _attackingCard = GetCard(_action.FirstCardId);
-        Card _defendingCard = GetCard(_action.SecondCardId);
+        Card _attackingCard = GetCard(_firstCardId);
+        Card _defendingCard = GetCard(_secondCardId);
 
         if (_attackingCard == null || _defendingCard == null)
         {
@@ -399,25 +377,21 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_defendingCard.My == _attackingCard.My)
         {
-            Debug.Log(1111);
             return false;
         }
 
         if (_defendingCard.Health <= 0)
         {
-            Debug.Log(2222);
             return false;
         }
 
         if (!_defendingCard.IsWarrior())
         {
-            Debug.Log(3333);
             return false;
         }
 
         if (IsMyResponseAction2())
         {
-            Debug.Log(44444);
             return false;
         }
 
@@ -432,12 +406,10 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (RoomHandler.IsOwner)
             {
-                Debug.Log("Giving response action to player 1");
                 SetGameplaySubState(GameplaySubState.Player1ResponseAction);
             }
             else
             {
-                Debug.Log("Giving response action to player 2");
                 SetGameplaySubState(GameplaySubState.Player2ResponseAction);
             }
         }
@@ -445,12 +417,10 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (RoomHandler.IsOwner)
             {
-                Debug.Log("Giving response action to player 2");
                 SetGameplaySubState(GameplaySubState.Player2ResponseAction);
             }
             else
             {
-                Debug.Log("Giving response action to player 1");
                 SetGameplaySubState(GameplaySubState.Player1ResponseAction);
             }
         }

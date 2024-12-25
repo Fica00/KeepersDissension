@@ -209,25 +209,19 @@ public class GameplayManager : MonoBehaviour
         switch (_action.Type)
         {
             case CardActionType.Attack:
-                ExecuteAttack(_action, () =>
+                ExecuteAttack(_action.FirstCardId, _action.SecondCardId, () =>
                 {
                     FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.Move:
-                ExecuteMove(_action, () =>
+                ExecuteMove(_action.StartingPlaceId, _action.FinishingPlaceId, _action.FirstCardId, () =>
                 {
                     FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.SwitchPlace:
-                ExecuteSwitchPlace(_action, () =>
-                {
-                    FinishActionExecution(_action);
-                });
-                break;
-            case CardActionType.MoveAbility:
-                ExecuteMoveAbility(_action, () =>
+                ExecuteSwitchPlace(_action.StartingPlaceId, _action.FinishingPlaceId, _action.FirstCardId, _action.SecondCardId, () =>
                 {
                     FinishActionExecution(_action);
                 });
@@ -257,22 +251,17 @@ public class GameplayManager : MonoBehaviour
         RoomUpdater.Instance.ForceUpdate();
     }
 
-    protected virtual void ExecuteAttack(CardAction _action, Action _callBack)
+    protected virtual void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
     {
         throw new Exception();
     }
     
-    public virtual void ExecuteMove(CardAction _action,Action _callBack)
+    public virtual void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteSwitchPlace(CardAction _action,Action _callBack)
-    {
-        throw new Exception();
-    }
-    
-    protected virtual void ExecuteMoveAbility(CardAction _action,Action _callBack)
+    protected virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
         throw new Exception();
     }
