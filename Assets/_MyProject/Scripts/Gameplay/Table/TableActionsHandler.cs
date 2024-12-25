@@ -75,7 +75,7 @@ public class TableActionsHandler : MonoBehaviour
                 int _movingSpace = _card.Speed != 0 ? _card.Speed : 1;
                 var _movablePlaces = tableHandler.GetPlacesAround(_placeId, _movementType, _movingSpace);
                 AddSwitchActions(_movablePlaces, _card, _movingSpace);
-                // AddRamAbility(_movablePlaces, _card);
+                AddRamAbility(_movablePlaces, _card);
                 AddMovementActions(_card, _movingSpace);
                 break;
             default:
@@ -103,18 +103,7 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
-        bool _hasRam = false;
-
-        foreach (var _specialAbility in _card.SpecialAbilities)
-        {
-            if (_specialAbility is BlockaderRam)
-            {
-                _hasRam = true;
-                break;
-            }
-        }
-
-        if (!_hasRam)
+        if (!_card.HasBlockaderRamAbility())
         {
             return;
         }
@@ -173,46 +162,51 @@ public class TableActionsHandler : MonoBehaviour
 
     private void HandleChainedGuardian(Card _card)
     {
-        if (_card is Guardian { IsChained: true })
+        if (_card is not Guardian { IsChained: true })
         {
-            foreach (var _possibleAction in possibleActions.ToList())
+            return;
+        }
+        
+        foreach (var _possibleAction in possibleActions.ToList())
+        {
+            if (tableHandler.GetPlace(_possibleAction.FinishingPlaceId).ContainsPortal)
             {
-                if (tableHandler.GetPlace(_possibleAction.FinishingPlaceId).ContainsPortal)
+                continue;
+            }
+
+            if (_possibleAction.Type != CardActionType.Move && _possibleAction.Type != CardActionType.SwitchPlace)
+            {
+                continue;
+            }
+            
+            bool _foundLifeForce = false;
+            List<TablePlaceHandler> _placesAround =
+                tableHandler.GetPlacesAround(_possibleAction.FinishingPlaceId, CardMovementType.EightDirections);
+            foreach (var _placeAround in _placesAround)
+            {
+                CardBase _cardAround = _placeAround.GetCard();
+                if (_cardAround == null)
                 {
                     continue;
                 }
 
-                if (_possibleAction.Type == CardActionType.Move || _possibleAction.Type == CardActionType.SwitchPlace)
+                if (_cardAround is LifeForce)
                 {
-                    bool _foundLifeForce = false;
-                    List<TablePlaceHandler> _placesAround =
-                        tableHandler.GetPlacesAround(_possibleAction.FinishingPlaceId, CardMovementType.EightDirections);
-                    foreach (var _placeAround in _placesAround)
-                    {
-                        CardBase _cardAround = _placeAround.GetCard();
-                        if (_cardAround == null)
-                        {
-                            continue;
-                        }
-
-                        if (_cardAround is LifeForce)
-                        {
-                            _foundLifeForce = true;
-                            break;
-                        }
-
-                    }
-
-                    if (!_foundLifeForce)
-                    {
-                        ClearPossibleAction(_possibleAction);
-                        possibleActions.Remove(_possibleAction);
-                    }
+                    _foundLifeForce = true;
+                    break;
                 }
+
             }
+
+            if (_foundLifeForce)
+            {
+                continue;
+            }
+            
+            ClearPossibleAction(_possibleAction);
+            possibleActions.Remove(_possibleAction);
         }
     }
-
     
 
     public void ClearPossibleActions()
@@ -262,11 +256,11 @@ public class TableActionsHandler : MonoBehaviour
             {
                 _skip = true;
 
-                // if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
-                // {
-                //     _skip = false;
-                // }
-                // else 
+                if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
+                {
+                    _skip = false;
+                }
+                else 
                 if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
                 {
                     _skip = false;
@@ -288,7 +282,7 @@ public class TableActionsHandler : MonoBehaviour
 
             if (_skip)
             {
-                // AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+                AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard);
             }
             
             else if (_placeAround.ContainsWall)
@@ -297,24 +291,22 @@ public class TableActionsHandler : MonoBehaviour
                 {
                     if (_ability is ScalerLeapfrog)
                     {
-                        // AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard, _remainingSpeed, _processedPlaces);
+                        AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard);
                     }
                 }
             }
         }
     }
 
-    private void AddLeapfrogMovement(TablePlaceHandler _currentPlace, TablePlaceHandler _placeAround, Card _warriorCard, int _remainingSpeed,
-        HashSet<TablePlaceHandler> _processedPlaces)
+    private void AddLeapfrogMovement(TablePlaceHandler _currentPlace, TablePlaceHandler _placeAround, Card _warriorCard)
     {
-        foreach (var _special in _warriorCard.SpecialAbilities)
+        if (!_warriorCard.HasScalerLeapfrog())
         {
-            if (_special is ScalerLeapfrog)
-            {
-                Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
-                AddCardInFront(_warriorCard, _cordsInFront, 1, _dontAddIfItIsAWall: true);
-            }
+            return;
         }
+        
+        Vector2 _cordsInFront = tableHandler.GetFrontIndex(_currentPlace.Id, _placeAround.Id);
+        AddCardInFront(_warriorCard, _cordsInFront, 1, _dontAddIfItIsAWall: true);
     }
 
     private void AddCardInFront(Card _warriorCard, Vector2 _cordsInFront, int _actionCost, bool _dontAddIfItIsAWall = false)
@@ -325,23 +317,25 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
-        if (_placeInFront != default && !_placeInFront.ContainsWarrior() && !_placeInFront.IsAbility)
+        if (_placeInFront == default || _placeInFront.ContainsWarrior() || _placeInFront.IsAbility)
         {
-            if (_dontAddIfItIsAWall && _placeInFront.ContainsWall)
-            {
-                return;
-            }
-
-            possibleActions.Add(new CardAction()
-            {
-                FirstCardId = _warriorCard.UniqueId,
-                StartingPlaceId = _warriorCard.GetTablePlace().Id,
-                FinishingPlaceId = _placeInFront.Id,
-                Type = CardActionType.Move,
-                Cost = _actionCost,
-            });
-            _placeInFront.SetColor(Color.magenta);
+            return;
         }
+        
+        if (_dontAddIfItIsAWall && _placeInFront.ContainsWall)
+        {
+            return;
+        }
+
+        possibleActions.Add(new CardAction()
+        {
+            FirstCardId = _warriorCard.UniqueId,
+            StartingPlaceId = _warriorCard.GetTablePlace().Id,
+            FinishingPlaceId = _placeInFront.Id,
+            Type = CardActionType.Move,
+            Cost = _actionCost,
+        });
+        _placeInFront.SetColor(Color.magenta);
     }
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType _movementType,
@@ -660,159 +654,6 @@ public class TableActionsHandler : MonoBehaviour
 
     private void YesExecute(CardAction _action)
     {
-        if (_action.Type == CardActionType.RamAbility)
-        {
-            TablePlaceHandler _place = tableHandler.GetPlace(_action.StartingPlaceId);
-            Card _cardAtPlace = null;
-
-            foreach (var _cardBase in _place.GetCards())
-            {
-                if (_cardBase is Card _possibleCard && _possibleCard.UniqueId == _action.FirstCardId)
-                {
-                    _cardAtPlace = _possibleCard;
-                    break;
-                }
-            }
-
-            if (_cardAtPlace == null)
-            {
-                return;
-            }
-
-            foreach (var _specialAbility in _cardAtPlace.SpecialAbilities)
-            {
-                if (_specialAbility is BlockaderRam _ramAbility)
-                {
-                    _ramAbility.TryAndPush(_action.FirstCardId, _action.SecondCardId);
-                }
-            }
-
-            return;
-        }
-
-        // New logic to handle portals and occupied destinations
-        if (_action.Type == CardActionType.Move)
-        {
-            TablePlaceHandler _currentPlace = tableHandler.GetPlace(_action.StartingPlaceId);
-            TablePlaceHandler _destinationPlace = tableHandler.GetPlace(_action.FinishingPlaceId);
-
-            if (_destinationPlace.ContainsPortal)
-            {
-                TablePlaceHandler _exitPlace = _destinationPlace.GetComponentInChildren<PortalCard>()
-                    .GetExitPlace(_action.StartingPlaceId, _action.FinishingPlaceId);
-                
-                if (_exitPlace != null && _exitPlace.IsOccupied)
-                {
-                    Card _cardAtExitPlace = _exitPlace.GetCard();
-                    if (_cardAtExitPlace != null)
-                    {
-                        Vector2 direction = tableHandler.GetDirection(_currentPlace.Id, _action.FinishingPlaceId);
-                        Vector2 coordsInFront = tableHandler.GetIndexOfPlace(_exitPlace) + direction;
-                        TablePlaceHandler placeInFront = tableHandler.GetPlace(coordsInFront);
-                        if (placeInFront != null && !placeInFront.IsOccupied)
-                        {
-                            CardAction _pushAction = new CardAction
-                            {
-                                StartingPlaceId = _exitPlace.Id,
-                                FirstCardId = _cardAtExitPlace.UniqueId,
-                                FinishingPlaceId = placeInFront.Id,
-                                Type = CardActionType.Move,
-                                Cost = 0,
-                                Damage = 0,
-                            };
-                            GameplayManager.Instance.ExecuteCardAction(_pushAction);
-                            // Now move the moving card into the exit place
-                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.UniqueId == _action.FirstCardId);
-
-                            CardAction _moveAction = new CardAction
-                            {
-                                StartingPlaceId = _movingCard.GetTablePlace().Id,
-                                FirstCardId = _movingCard.UniqueId,
-                                FinishingPlaceId = _exitPlace.Id,
-                                Type = CardActionType.Move,
-                                Cost = 0,
-                                Damage = 0,
-                            };
-                            GameplayManager.Instance.ExecuteCardAction(_moveAction);
-
-                            return; // Action handled, so exit the function
-                        }
-                        else
-                        {
-                            int _cardsPlace = _cardAtExitPlace.GetTablePlace().Id;
-                            Card _movingCard = _currentPlace.GetCards().Cast<Card>().ToList().Find(_card => _card.UniqueId == _action.FirstCardId);
-
-                            CardAction _damageOtherCard = new CardAction
-                            {
-                                StartingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
-                                FirstCardId = _cardAtExitPlace.UniqueId,
-                                FinishingPlaceId = _cardAtExitPlace.GetTablePlace().Id,
-                                SecondCardId = _cardAtExitPlace.UniqueId,
-                                Type = CardActionType.Attack,
-                                Cost = 0,
-                                Damage = 1,
-                            };
-                            GameplayManager.Instance.ExecuteCardAction(_damageOtherCard);
-
-                            if (_cardAtExitPlace == null || _cardAtExitPlace.Health <= 0)
-                            {
-                                CardAction _moveAction = new CardAction
-                                {
-                                    StartingPlaceId = _currentPlace.Id,
-                                    FirstCardId = _movingCard.UniqueId,
-                                    FinishingPlaceId = _cardsPlace,
-                                    Type = CardActionType.Move,
-                                    Cost = 0,
-                                    Damage = 0,
-                                };
-                                GameplayManager.Instance.ExecuteCardAction(_moveAction);
-                            }
-                            return;
-                        }
-                    }
-                }
-
-                if (_exitPlace==null)
-                {
-                    return;
-                }
-
-                if (_exitPlace.IsActivationField)
-                {
-                    return;
-                }                
-                
-                if (_exitPlace.IsAbility)
-                {
-                    return;
-                }
-
-            }
-        }
-
-        if (_action.Type is CardActionType.Move or CardActionType.SwitchPlace or CardActionType.RamAbility)
-        {
-            if (GameplayManager.Instance.IsAbilityActive<Hinder>())
-            {
-                foreach (var _placeInRange in GameplayManager.Instance.TableHandler.GetPlacesAround(_action.StartingPlaceId,
-                             CardMovementType.EightDirections))
-                {
-                    if (!_placeInRange.IsOccupied || _placeInRange.GetCard() is not Keeper)
-                    {
-                        continue;
-                    }
-
-                    if (_placeInRange.GetCard().My)
-                    {
-                        continue;
-                    }
-
-                    DialogsManager.Instance.ShowOkDialog("This card can't move due to Hinder effect.");
-                    return;
-                }
-            }
-        }
-
         CardAction _newAction = new CardAction
         {
             StartingPlaceId = _action.StartingPlaceId,
@@ -823,81 +664,154 @@ public class TableActionsHandler : MonoBehaviour
             FirstCardId = _action.FirstCardId,
             SecondCardId = _action.SecondCardId
         };
-
-        if (_newAction.Type == CardActionType.SwitchPlace)
+        
+        if (!TryToUseRam(_newAction))
         {
-            Card _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
-
-            Card _cardTwo = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<Card>();
-
-            if (!_cardOne.CanMove || !_cardTwo.CanMove)
-            {
-                DialogsManager.Instance.ShowOkDialog("Cannot swap, one of the cards cannot move.");
-                return;
-            }
-        }
-        else if (_newAction.Type == CardActionType.Move)
-        {
-            Card _cardOne = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
-
-            if (!_cardOne.CanMove)
-            {
-                DialogsManager.Instance.ShowOkDialog("Cannot move this card.");
-                return;
-            }
-        }
-
-        TablePlaceHandler _tablePlace = GameplayManager.Instance.TableHandler.GetPlace(_action.StartingPlaceId);
-        Card _card = null;
-        foreach (var _cardBase in _tablePlace.GetCards())
-        {
-            if (_cardBase is Card _cardOnPlace)
-            {
-                if (_cardOnPlace.UniqueId == _newAction.FirstCardId)
-                {
-                    _card = _cardOnPlace;
-                    break;
-                }
-            }
-        }
-
-        Card _card1 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.StartingPlaceId).GetComponentInChildren<Card>();
-        Card _card2 = GameplayManager.Instance.TableHandler.GetPlace(_newAction.FinishingPlaceId).GetComponentInChildren<Card>();
-
-        if ((_card1 != null && !_card1.CanBeUsed) || _card2 != null && !_card2.CanBeUsed)
-        {
-            DialogsManager.Instance.ShowOkDialog("One of the cards cannot be used!");
-            CardActionsDisplay.Instance.Close();
-            ClearPossibleActions();
             return;
         }
 
-        if (GameplayManager.Instance.IsAbilityActiveForOpponent<Tar>())
+        if (!CheckForHinder(_newAction))
         {
-            if (_newAction.Type == CardActionType.Move || _newAction.Type == CardActionType.SwitchPlace)
-            {
-                if (_card1 != null)
-                {
-                    if (_card1 is Guardian)
-                    {
-                        DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
-                        return;
-                    }
-                }
+            return;
+        }
 
-                if (_card2 != null)
-                {
-                    if (_card2 is Guardian)
-                    {
-                        DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
-                        return;
-                    }
-                }
-            }
+        if (!CheckIfCardCanMove(_newAction))
+        {
+            return;
+        }
+
+        if (!CheckForTar(_newAction))
+        {
+            return;
         }
 
         GameplayManager.Instance.ExecuteCardAction(_newAction);
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();
+    }
+
+    private bool TryToUseRam(CardAction _action)
+    {
+        if (_action.Type != CardActionType.RamAbility)
+        {
+            return true;
+        }
+        
+        TablePlaceHandler _place = tableHandler.GetPlace(_action.StartingPlaceId);
+        Card _cardAtPlace = null;
+
+        foreach (var _cardBase in _place.GetCards())
+        {
+            if (_cardBase is Card _possibleCard && _possibleCard.UniqueId == _action.FirstCardId)
+            {
+                _cardAtPlace = _possibleCard;
+                break;
+            }
+        }
+
+        if (_cardAtPlace == null)
+        {
+            return false;
+        }
+
+        foreach (var _specialAbility in _cardAtPlace.SpecialAbilities)
+        {
+            if (_specialAbility is BlockaderRam _ramAbility)
+            {
+                _ramAbility.TryAndPush(_action.FirstCardId, _action.SecondCardId);
+            }
+        }
+
+        return false;
+    }
+
+    private bool CheckForHinder(CardAction _action)
+    {
+        if (_action.Type is not (CardActionType.Move or CardActionType.SwitchPlace or CardActionType.RamAbility))
+        {
+            return true;
+        }
+
+        if (!GameplayManager.Instance.IsAbilityActive<Hinder>())
+        {
+            return true;
+        }
+        
+        foreach (var _placeInRange in GameplayManager.Instance.TableHandler.GetPlacesAround(_action.StartingPlaceId,
+                     CardMovementType.EightDirections))
+        {
+            if (!_placeInRange.IsOccupied || _placeInRange.GetCard() is not Keeper)
+            {
+                continue;
+            }
+
+            if (_placeInRange.GetCard().My)
+            {
+                continue;
+            }
+
+            DialogsManager.Instance.ShowOkDialog("This card can't move due to Hinder effect.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool CheckIfCardCanMove(CardAction _action)
+    {
+        Card _cardOne = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        if (_action.Type == CardActionType.SwitchPlace)
+        {
+            Card _cardTwo = GameplayManager.Instance.GetCard(_action.SecondCardId);
+            if (!_cardOne.CheckCanMove() || !_cardTwo.CheckCanMove())
+            {
+                DialogsManager.Instance.ShowOkDialog("Cannot swap, one of the cards cannot move.");
+                return false;
+            }
+        }
+        else if (_action.Type == CardActionType.Move)
+        {
+            if (!_cardOne.CheckCanMove())
+            {
+                DialogsManager.Instance.ShowOkDialog("Cannot move this card.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool CheckForTar(CardAction _action)
+    {
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+
+        if (!GameplayManager.Instance.IsAbilityActiveForOpponent<Tar>())
+        {
+            return true;
+        }
+        
+        if (_action.Type == CardActionType.Move || _action.Type == CardActionType.SwitchPlace)
+        {
+            if (_card1 != null)
+            {
+                if (_card1 is Guardian)
+                {
+                    DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
+                    return false;
+                }
+            }
+
+            if (_card2 != null)
+            {
+                if (_card2 is Guardian)
+                {
+                    DialogsManager.Instance.ShowOkDialog("Action blocked due to Tar ability.");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

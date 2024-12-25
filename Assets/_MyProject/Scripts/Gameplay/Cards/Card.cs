@@ -232,6 +232,28 @@ public class Card : CardBase
 
         return true;
     }
+    
+    public bool HasBlockaderRamAbility()
+    {
+        BlockaderRam _blockader = EffectsHolder.GetComponent<BlockaderRam>();
+        if (_blockader== null)
+        {
+            return false;
+        }
+
+        return true;
+    }    
+    
+    public bool HasScalerLeapfrog()
+    {
+        ScalerLeapfrog _blockader = EffectsHolder.GetComponent<ScalerLeapfrog>();
+        if (_blockader== null)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
     public bool TryToUseBlockaderAbility()
     {
@@ -247,7 +269,7 @@ public class Card : CardBase
 
     public bool CheckCanMove()
     {
-        return true;
+        return CanMove && CanBeUsed;
     }
     
 }
