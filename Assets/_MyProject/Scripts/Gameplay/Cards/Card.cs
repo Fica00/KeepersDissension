@@ -13,7 +13,6 @@ public class Card : CardBase
     public int Range => CardData.Stats.Range;
     public int Damage => CardData.Stats.Damage;
     public bool IsVoid => CardData.IsVoid;
-    public bool CanMoveOnWall => CardData.CanMoveOnWall;
     public int Speed => CardData.Stats.Speed;
     public bool HasDelivery => CardData.HasDelivery;
     public bool CanBeUsed => CardData.CanBeUsed;
@@ -40,7 +39,6 @@ public class Card : CardBase
             CardId = Details.Id,
             IsVoid = false,
             HasDelivery = false,
-            CanMoveOnWall = false,
             MovementType = CardMovementType.FourDirections,
             Stats = new CardStats { 
                 Damage = Details.Stats.Damage,
@@ -136,11 +134,6 @@ public class Card : CardBase
     public void SetMaxHealth(int _amount)
     {
         CardData.Stats.MaxHealth = _amount;
-    }
-
-    public void SetCanMoveOnWall(bool _status)
-    {
-        CardData.CanMoveOnWall = _status;
     }
 
     public void SetCanFlyToDodgeAttack(bool _status)
@@ -250,9 +243,11 @@ public class Card : CardBase
         ScalerScale _scale = EffectsHolder.GetComponent<ScalerScale>();
         if (_scale== null)
         {
+            Debug.Log("Doesn't have scaler");
             return false;
         }
 
+        Debug.Log("Has scaler");
         return true;
     }
 

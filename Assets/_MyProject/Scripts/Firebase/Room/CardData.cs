@@ -9,7 +9,6 @@ public class CardData
     public int CardId;
     public bool IsVoid;
     public bool HasDelivery;
-    public bool CanMoveOnWall;
     public CardStats Stats;
     public CardMovementType MovementType;
     public bool HasDied;

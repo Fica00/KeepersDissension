@@ -256,12 +256,11 @@ public class TableActionsHandler : MonoBehaviour
             {
                 _skip = true;
 
-                if (_placeAround.ContainsWall && _warriorCard.CanMoveOnWall && !_placeAround.ContainsWarrior())
+                if (_placeAround.ContainsWall && _warriorCard.HasScaler() && !_placeAround.ContainsWarrior())
                 {
                     _skip = false;
                 }
-                else 
-                if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
+                else if (_placeAround.ContainsMarker || _placeAround.ContainsPortal)
                 {
                     _skip = false;
                 }
@@ -284,7 +283,6 @@ public class TableActionsHandler : MonoBehaviour
             {
                 AddLeapfrogMovement(_currentPlace, _placeAround, _warriorCard);
             }
-            
             else if (_placeAround.ContainsWall)
             {
                 foreach (var _ability in _warriorCard.SpecialAbilities)
@@ -399,7 +397,7 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
 
-                if (_cardAtPlace.GetTablePlace().ContainsWall && !_card.CanMoveOnWall)
+                if (_cardAtPlace.GetTablePlace().ContainsWall && !_card.HasScaler())
                 {
                     continue;
                 }
