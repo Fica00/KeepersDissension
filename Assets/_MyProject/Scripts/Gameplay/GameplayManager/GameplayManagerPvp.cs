@@ -505,13 +505,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             return false;
         }
-
-        if (_defendingCard.Health <= 0)
-        {
-            Debug.Log("Defending card is lower or equal to 0");
-            return false;
-        }
-
+        
         if (!_defendingCard.IsWarrior())
         {
             if (_defendingCard is Wall _wall)
@@ -531,13 +525,19 @@ public class GameplayManagerPvp : GameplayManager
                         continue;
                     }
 
-                Debug.Log("Found a card with it on wall");
+                    Debug.Log("Found a card with it on wall");
                     SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
                     return true;
                 }
             }
             
             Debug.Log("Not a wall");
+            return false;
+        }
+
+        if (_defendingCard.Health <= 0)
+        {
+            Debug.Log("Defending card is lower or equal to 0");
             return false;
         }
 

@@ -243,11 +243,9 @@ public class Card : CardBase
         ScalerScale _scale = EffectsHolder.GetComponent<ScalerScale>();
         if (_scale== null)
         {
-            Debug.Log("Doesn't have scaler");
             return false;
         }
 
-        Debug.Log("Has scaler");
         return true;
     }
 
