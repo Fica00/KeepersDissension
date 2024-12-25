@@ -229,12 +229,10 @@ public class GameplayManager : MonoBehaviour
 
     private void FinishActionExecution(CardAction _action)
     {
-        Debug.Log("Finished with action");
         MyPlayer.Actions-=_action.Cost;
 
         if (MyPlayer.Actions<=0)
         {
-            Debug.Log("Not updating because player has 0 actions");
             return;
         }
         

@@ -1,17 +1,25 @@
 using System;
+using UnityEngine;
 
 public class BlockaderRam : CardSpecialAbility
 {
     public void TryAndPush(string _firstCardId, string _secondCardId)
     {
+        Debug.Log("11111111111");
         TryToPlaySoundEffect();
         int _secondCardsPlace = GameplayManager.Instance.GetCard(_secondCardId).GetTablePlace().Id;
 
         if (CanPushCard(_firstCardId, _secondCardId))
         {
-            PushCard(_firstCardId, _secondCardId,
-                () => { TryToMoveSelf(_firstCardId, _secondCardsPlace, () => { GameplayManager.Instance.MyPlayer.Actions--; }); });
+            PushCard(_firstCardId, _secondCardId, () =>
+            {
+                MoveSelf(_firstCardId, _secondCardsPlace, () =>
+                {
+                    HandleMoveOutcome(null);
+                });
+            });
         }
+        
         else
         {
             GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>
@@ -21,7 +29,7 @@ public class BlockaderRam : CardSpecialAbility
                     return;
                 }
 
-                TryToMoveSelf(_firstCardId, _secondCardsPlace, () => { GameplayManager.Instance.MyPlayer.Actions--; });
+                MoveSelf(_firstCardId, _secondCardsPlace, null);
             });
         }
     }
@@ -87,9 +95,15 @@ public class BlockaderRam : CardSpecialAbility
         int _secondCardPlace = _secondCard.GetTablePlace().Id;
 
         TablePlaceHandler _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_firstCardPlace, _secondCardPlace);
-        GameplayManager.Instance.ExecuteMove(_secondCardPlace, _placeInFront.Id, _secondCardId, () => { HandleMoveOutcome(_callBack); });
+        GameplayManager.Instance.ExecuteMove(_secondCardPlace, _placeInFront.Id, _secondCardId, _callBack);
     }
 
+    private void MoveSelf(string _cardId, int _newPlaceId, Action _callBack)
+    {
+        int _currentPlaceId = GameplayManager.Instance.GetCard(_cardId).GetTablePlace().Id;
+        GameplayManager.Instance.ExecuteMove(_currentPlaceId, _newPlaceId, _cardId, () => { HandleMoveOutcome(_callBack); });
+    }
+    
     private void HandleMoveOutcome(Action _callBack)
     {
         GameplayManager.Instance.MyPlayer.Actions--;
@@ -99,11 +113,5 @@ public class BlockaderRam : CardSpecialAbility
         }
 
         _callBack?.Invoke();
-    }
-
-    private void TryToMoveSelf(string _cardId, int _newPlaceId, Action _callBack)
-    {
-        int _currentPlaceId = GameplayManager.Instance.GetCard(_cardId).GetTablePlace().Id;
-        GameplayManager.Instance.ExecuteMove(_currentPlaceId, _newPlaceId, _cardId, () => { HandleMoveOutcome(_callBack); });
     }
 }
