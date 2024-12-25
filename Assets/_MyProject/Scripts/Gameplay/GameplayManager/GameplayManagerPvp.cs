@@ -503,41 +503,12 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_defendingCard.My == _attackingCard.My)
         {
-            return false;
+            return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
         }
         
         if (!_defendingCard.IsWarrior())
         {
-            if (_defendingCard is Wall _wall)
-            {
-                Debug.Log("It is a wall");
-                //check if scaler ability is on same place:
-                TablePlaceHandler _place = _wall.GetTablePlace();
-                foreach (var _cardOnPlace in _place.GetCards())
-                {
-                    if (_cardOnPlace.GetIsMy() == _attackingCard.GetIsMy())
-                    {
-                        continue;
-                    }
-                    
-                    if (_cardOnPlace is not Card _card)
-                    {
-                        continue;
-                    }
-
-                    if (!_card.HasScaler())
-                    {
-                        continue;
-                    }
-
-                    Debug.Log("Found a card with it on wall");
-                    SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
-                    return true;
-                }
-            }
-            
-            Debug.Log("Not a wall");
-            return false;
+            return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
         }
 
         if (_defendingCard.Health <= 0)
@@ -553,6 +524,40 @@ public class GameplayManagerPvp : GameplayManager
 
         SetResponseAction(_defendingCard.My && RoomHandler.IsOwner, _defendingCard.UniqueId);
         return true;
+    }
+
+    private bool TryToAwardResponseForFalling(Card _attackingCard, Card _defendingCard)
+    {
+        if (_defendingCard is Wall _wall)
+        {
+            Debug.Log("It is a wall");
+            //check if scaler ability is on same place:
+            TablePlaceHandler _place = _wall.GetTablePlace();
+            foreach (var _cardOnPlace in _place.GetCards())
+            {
+                if (_cardOnPlace.GetIsMy() == _attackingCard.GetIsMy())
+                {
+                    continue;
+                }
+                    
+                if (_cardOnPlace is not Card _card)
+                {
+                    continue;
+                }
+
+                if (!_card.HasScaler())
+                {
+                    continue;
+                }
+
+                Debug.Log("Found a card with it on wall");
+                SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
+                return true;
+            }
+        }
+            
+        Debug.Log("Not a wall");
+        return false;
     }
 
     private void SetResponseAction(bool _forMe, string _uniqueCardId)
