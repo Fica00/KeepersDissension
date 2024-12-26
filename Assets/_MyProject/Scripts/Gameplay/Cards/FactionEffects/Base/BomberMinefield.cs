@@ -246,6 +246,8 @@ public class BomberMinefield : CardSpecialAbility
 
     private IEnumerator DelayCheck(BomberData _bomberData)
     {
+        Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
+        int _bomberPlace = _bomber.GetTablePlace().Id;
         yield return new WaitForSeconds(0.5f);
         
         foreach (var _markerId in _bomberData.Markers)
@@ -264,8 +266,7 @@ public class BomberMinefield : CardSpecialAbility
             GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
         }
 
-        Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
-        GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
+        GameplayManager.Instance.BombExploded(_bomberPlace, _bomber.UniqueId);
         Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
     }
 }
