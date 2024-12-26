@@ -142,11 +142,6 @@ public class Card : CardBase
         CardData.IsVoid = _status;
     }
 
-    public void SetCanBeUsed(bool _status)
-    {
-        CardData.HasSnowWallEffect = _status;
-    }
-    
     public void ChangeOwner()
     {
         CardData.Owner = GetIsMy() ? FirebaseManager.Instance.OpponentId : FirebaseManager.Instance.PlayerId;
