@@ -1,7 +1,14 @@
+using System;
+
 public class BomberMinefield : CardSpecialAbility
 {
     private WarriorAbilityData WarriorData => Card.CardData.WarriorAbilityData;
     BomberData bomberData = new();
+
+    private void Start()
+    {
+        SetCanUseAbility(true);
+    }
 
     public override void UseAbility()
     {
