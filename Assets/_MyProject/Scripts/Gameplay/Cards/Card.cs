@@ -281,5 +281,10 @@ public class Card : CardBase
     public bool IsCyber()
     {
         return Details.Faction.IsCyber;
+    }    
+    
+    public bool IsDragon()
+    {
+        return Details.Faction.IsDragon;
     }
 }

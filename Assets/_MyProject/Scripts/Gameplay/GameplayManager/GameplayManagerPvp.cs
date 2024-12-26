@@ -115,7 +115,7 @@ public class GameplayManagerPvp : GameplayManager
 
         Debug.Log("Ending game");
         var _winner = _didIWin ? BoardData.MyPlayer.PlayerId : BoardData.OpponentPlayer.PlayerId;
-        SetHasGameEnded(true,_winner);
+        SetHasGameEnded(true, _winner);
         ShowGameEnded(_winner);
         RoomUpdater.Instance.ForceUpdate();
     }
@@ -188,7 +188,7 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         var _destination = TableHandler.GetPlace(_positionId);
-        if (_destination==null)
+        if (_destination == null)
         {
             _callBack?.Invoke();
             return;
@@ -225,7 +225,7 @@ public class GameplayManagerPvp : GameplayManager
         FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
     }
 
-    public override void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
+    public override void ExecuteMove(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, Action _callBack)
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
         Card _movingCard = GetCard(_firstCardId);
@@ -264,7 +264,8 @@ public class GameplayManagerPvp : GameplayManager
         PlayMovingSoundEffect(_movingCard);
     }
 
-    protected override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
+    protected override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, string _secondCardId,
+        Action _callBack)
     {
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_startingPlaceId);
         TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
@@ -281,13 +282,13 @@ public class GameplayManagerPvp : GameplayManager
         _firstCard.CardData.PlaceId = _destination.Id;
         _secondCard.CardData.PlaceId = _startingDestination.Id;
 
-        ShowCardMoved(_firstCard.UniqueId, _destination.Id,null);
-        ShowCardMoved(_secondCard.UniqueId, _startingDestination.Id,_callBack);
+        ShowCardMoved(_firstCard.UniqueId, _destination.Id, null);
+        ShowCardMoved(_secondCard.UniqueId, _startingDestination.Id, _callBack);
 
         OnSwitchedPlace?.Invoke(_firstCard, _secondCard);
     }
 
-    protected override void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
+    protected override void ExecuteAttack(string _firstCardId, string _secondCardId, Action _callBack)
     {
         Card _attackingCard = GetCard(_firstCardId);
         Card _defendingCard = GetCard(_secondCardId);
@@ -299,14 +300,14 @@ public class GameplayManagerPvp : GameplayManager
             _callBack?.Invoke();
             return;
         }
-        
+
         AudioManager.Instance.PlaySoundEffect("Attack");
         int _attackerPlace = _attackingCard.GetTablePlace().Id;
         int _defenderPlace = _defendingCard.GetTablePlace().Id;
 
         if (_attackingCard == _defendingCard)
         {
-            ResolveEndOfAttack(_attackingCard, _defendingCard,TryToApplyWallAbility);
+            ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility);
             return;
         }
 
@@ -316,89 +317,72 @@ public class GameplayManagerPvp : GameplayManager
         };
 
 
-        AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId, () =>
-        {
-            ResolveEndOfAttack(_attackingCard, _defendingCard,TryToApplyWallAbility);
-        });
+        AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId,
+            () => { ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility); });
 
         void TryToApplyWallAbility()
         {
-            Debug.Log("Trying to apply");
             if (_defendingCard is not Wall _wall)
             {
-                Debug.Log("Didn't attack wall");
                 _callBack?.Invoke();
                 return;
             }
 
             if (_wall.IsCyber())
             {
-                Debug.Log("Attacked cyber wall");
                 ApplyCyborgAbility(_firstCardId, _defenderPlace, _callBack);
                 return;
             }
-            
-            _callBack?.Invoke();   
+
+            if (_wall.IsDragon())
+            {
+                ApplyDragonAbility(_defenderPlace);
+                _callBack?.Invoke();
+                return;
+            }
+
+            _callBack?.Invoke();
         }
     }
-    
+
     private void ApplyCyborgAbility(string _attacker, int _wallPosition, Action _callBack)
     {
-        Debug.Log(11111);
         if (CanPushBackCard(_attacker, _wallPosition))
         {
-        Debug.Log(222222);
-            PushCardBack(_attacker, _wallPosition, () =>
-            {
-        Debug.Log(33333);
-                _callBack?.Invoke();
-            });
+            PushCardBack(_attacker, _wallPosition, () => { _callBack?.Invoke(); });
         }
         else
         {
-        Debug.Log(444);
-            DamageCardByAbility(_attacker, 1, _ =>
-            {
-        Debug.Log(5555);
-                _callBack?.Invoke();
-            });
+            DamageCardByAbility(_attacker, 1, _ => { _callBack?.Invoke(); });
         }
     }
 
     private bool CanPushBackCard(string _attacker, int _secondCardPlace)
     {
         Card _attackerCard = GetCard(_attacker);
-        Debug.Log("Second card: ", _attackerCard.gameObject);
         if (!_attackerCard.CheckCanMove())
         {
-            Debug.Log("aaaa");
             return false;
         }
 
-        Debug.Log("bbbb");
         int _attackerPlace = _attackerCard.GetTablePlace().Id;
 
         TablePlaceHandler _placeInBack = TableHandler.CheckForPlaceInBack(_attackerPlace, _secondCardPlace);
-        Debug.Log("Place in back: ",_placeInBack.gameObject);
         if (_placeInBack == null)
         {
-            Debug.Log("cccc");
             return false;
         }
 
         if (_placeInBack.IsAbility)
         {
-            Debug.Log("dddd");
             return false;
         }
 
         if (_placeInBack.IsOccupied)
         {
-            Debug.Log("eeee");
             return false;
         }
 
-        Debug.Log("ffff");
         return true;
     }
 
@@ -408,10 +392,24 @@ public class GameplayManagerPvp : GameplayManager
         int _attackerPlace = _attackerCard.GetTablePlace().Id;
 
         TablePlaceHandler _placeInFront = TableHandler.CheckForPlaceInBack(_attackerPlace, _secondPlace);
-        ExecuteMove(GetCard(_attacker).GetTablePlace().Id, _placeInFront.Id,_attacker, _callBack);
+        ExecuteMove(GetCard(_attacker).GetTablePlace().Id, _placeInFront.Id, _attacker, _callBack);
     }
 
-    public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    private void ApplyDragonAbility(int _wallPlace)
+    {
+        List<Card> _cards = TableHandler.GetAttackableCards(_wallPlace, CardMovementType.EightDirections);
+        foreach (var _card in _cards)
+        {
+            if (_card is Wall)
+            {
+                continue;
+            }
+
+            DamageCardByAbility(_card.UniqueId, 1, null);
+        }
+    }
+
+public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
     {
         Card _attackingCard = GetCard(_attackerId);
         Card _defendingCard = GetCard(_defenderId);
