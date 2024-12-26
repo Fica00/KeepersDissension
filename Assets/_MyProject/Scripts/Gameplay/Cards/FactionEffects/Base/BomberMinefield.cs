@@ -5,7 +5,30 @@ public class BomberMinefield : CardSpecialAbility
     private WarriorAbilityData WarriorData => Card.CardData.WarriorAbilityData;
     BomberData bomberData = new();
 
+    private GameplayPlayer player;
+    
     private void Start()
+    {
+        if (!GetPlayer().IsMy)
+        {
+            return;
+        }
+        
+        player = GetPlayer();
+        player.OnStartedTurn += ResetAbilities;
+    }
+
+    private void OnDisable()
+    {
+        if (player==null)
+        {
+            return; 
+        }
+        
+        player.OnStartedTurn -= ResetAbilities;
+    }
+
+    private void ResetAbilities()
     {
         SetCanUseAbility(true);
     }
