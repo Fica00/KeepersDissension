@@ -32,7 +32,7 @@ public class CardBase : MonoBehaviour
     public void PositionOnTable(TablePlaceHandler _tablePosition)
     {
         SetPlace(CardPlace.Table);
-        MoveToPosition(_tablePosition);
+        MoveToPosition(_tablePosition,null);
         OnPositionedOnTable?.Invoke(this);
     }
 
@@ -50,13 +50,13 @@ public class CardBase : MonoBehaviour
         transform.rotation = Quaternion.Euler(_desiredRotation);
     }
 
-    public void MoveToPosition(TablePlaceHandler _tablePosition)
+    public void MoveToPosition(TablePlaceHandler _tablePosition, Action _callBack)
     {
         RectTransform _rect = GetComponent<RectTransform>();
         transform.SetParent(_tablePosition.transform);
         _rect.pivot = new Vector2(0.5f, 0.5f);
         transform.DOLocalMove(Vector3.zero, 1f);
-        transform.DOScale(ScaleOnTable, 1f);
+        transform.DOScale(ScaleOnTable, 1f).OnComplete(()=>{_callBack?.Invoke();});
         SetRotation();
     }
     

@@ -417,7 +417,7 @@ namespace FirebaseMultiplayer.Room
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
-            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId));
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId),null);
         }
         
         private int ConvertOpponentsPosition(int _position)

@@ -1013,7 +1013,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void ShowCardMoved(string _uniqueId, int _positionId)
+    public virtual void ShowCardMoved(string _uniqueId, int _positionId, Action _callBack)
     {
         throw new Exception();
     }

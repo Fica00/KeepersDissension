@@ -322,6 +322,22 @@ public class TableHandler : MonoBehaviour
 
         return null;
     }
+    public TablePlaceHandler CheckForPlaceInBack(int _startId, int _endId)
+    {
+        Vector2 _inFrontIndex = GetBehindIndex(_startId, _endId);
+
+        if (_inFrontIndex.x >= 0 && _inFrontIndex.x < tableSize.x && _inFrontIndex.y >= 0 &&
+            _inFrontIndex.y < tableSize.y)
+        {
+            TablePlaceHandler _inFrontPlaceHandler = tableMatrix[(int)_inFrontIndex.x, (int)_inFrontIndex.y];
+            if (_inFrontPlaceHandler)
+            {
+                return _inFrontPlaceHandler;
+            }
+        }
+
+        return null;
+    }
 
     public Vector2 GetFrontIndex(int _startId, int _endId)
     {

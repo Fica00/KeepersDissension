@@ -15,7 +15,6 @@ public class BlockaderRam : CardSpecialAbility
                 MoveSelf(_firstCardId, _secondCardsPlace, ClearActions);
             });
         }
-        
         else
         {
             GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>

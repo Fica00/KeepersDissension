@@ -243,6 +243,17 @@ public class Card : CardBase
         }
 
         return true;
+    }    
+    
+    public bool HasVision()
+    {
+        ScoutVision _vision = EffectsHolder.GetComponent<ScoutVision>();
+        if (_vision== null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public bool TryToUseBlockaderAbility()
@@ -267,4 +278,8 @@ public class Card : CardBase
         CardData.HasDelivery = _status;
     }
     
+    public bool IsCyber()
+    {
+        return Details.Faction.IsCyber;
+    }
 }
