@@ -245,6 +245,11 @@ public class BomberMinefield : CardSpecialAbility
                 {
                     continue;
                 }
+
+                if (_markerId == _bomberData.BombId)
+                {
+                    continue;
+                }
                 
                 GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
             }
