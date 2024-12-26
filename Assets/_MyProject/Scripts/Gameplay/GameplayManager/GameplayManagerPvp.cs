@@ -5,8 +5,6 @@ using DG.Tweening;
 using UnityEngine;
 using System.Linq;
 using FirebaseMultiplayer.Room;
-using JetBrains.Annotations;
-using Newtonsoft.Json;
 
 public class GameplayManagerPvp : GameplayManager
 {

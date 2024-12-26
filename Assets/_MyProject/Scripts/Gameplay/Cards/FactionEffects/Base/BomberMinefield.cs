@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
@@ -238,26 +239,33 @@ public class BomberMinefield : CardSpecialAbility
                 continue;
             }
 
-            foreach (var _markerId in _bomberData.Markers)
-            {
-                Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
-                if (_markerCard == null)
-                {
-                    continue;
-                }
+            StartCoroutine(DelayCheck(_bomberData));
+            break;
+        }   
+    }
 
-                if (_markerId == _bomberData.BombId)
-                {
-                    continue;
-                }
-                
-                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
+    private IEnumerator DelayCheck(BomberData _bomberData)
+    {
+        yield return new WaitForSeconds(0.5f);
+        
+        foreach (var _markerId in _bomberData.Markers)
+        {
+            Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
+            if (_markerCard == null)
+            {
+                continue;
             }
 
-            Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
-            GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
-            Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
-            break;
+            if (_markerId == _bomberData.BombId)
+            {
+                continue;
+            }
+                
+            GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
         }
+
+        Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
+        GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
+        Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
     }
 }
