@@ -341,6 +341,11 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
 
+            if (_wall.IsForest())
+            {
+                ApplyForestAbility(_attackingCard);
+            }
+
             _callBack?.Invoke();
         }
     }
@@ -407,9 +412,19 @@ public class GameplayManagerPvp : GameplayManager
 
             DamageCardByAbility(_card.UniqueId, 1, null);
         }
+    }   
+    
+    private void ApplyForestAbility(Card _attacker)
+    {
+        if (_attacker.Health<=0)
+        {
+            return;
+        }
+
+        _attacker.ChangeHealth(1);
     }
 
-public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
+    public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
     {
         Card _attackingCard = GetCard(_attackerId);
         Card _defendingCard = GetCard(_defenderId);

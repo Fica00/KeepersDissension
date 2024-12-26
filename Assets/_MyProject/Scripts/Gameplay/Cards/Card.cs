@@ -286,5 +286,10 @@ public class Card : CardBase
     public bool IsDragon()
     {
         return Details.Faction.IsDragon;
+    }    
+    
+    public bool IsForest()
+    {
+        return Details.Faction.IsDragon;
     }
 }
