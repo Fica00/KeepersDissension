@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
@@ -7,7 +6,12 @@ public class BomberMinefield : CardSpecialAbility
     BomberData bomberData = new();
 
     private GameplayPlayer player;
-    
+
+    private void OnEnable()
+    {
+        CardBase.OnGotDestroyed += CheckDestroyedCard;
+    }
+
     private void Start()
     {
         if (!GetPlayer().IsMy)
@@ -27,6 +31,7 @@ public class BomberMinefield : CardSpecialAbility
         }
         
         player.OnStartedTurn -= ResetAbilities;
+        CardBase.OnGotDestroyed -= CheckDestroyedCard;
     }
 
     private void ResetAbilities()
@@ -203,5 +208,51 @@ public class BomberMinefield : CardSpecialAbility
         }
 
         bomberData.Markers.Add(_marker.UniqueId);
+    }
+
+    private void CheckDestroyedCard(CardBase _cardBase)
+    {
+        if (_cardBase is not Card _card)
+        {
+            return;
+        }
+        if (Card.CardData.WarriorAbilityData == null)
+        {
+            return;
+        }
+
+        if (Card.CardData.WarriorAbilityData.BomberData == null)
+        {
+            return;
+        }
+
+        foreach (var _bomberData in Card.CardData.WarriorAbilityData.BomberData)
+        {
+            if (string.IsNullOrEmpty(_bomberData.BombId))
+            {
+                continue;
+            }
+
+            if (_bomberData.BombId != _card.UniqueId)
+            {
+                continue;
+            }
+
+            foreach (var _markerId in _bomberData.Markers)
+            {
+                Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
+                if (_markerCard == null)
+                {
+                    continue;
+                }
+                
+                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
+            }
+
+            Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
+            GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
+            Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
+            break;
+        }
     }
 }
