@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
 {
@@ -172,7 +173,7 @@ public class BomberMinefield : CardSpecialAbility
                 continue;
             }
 
-            var _marker = GameplayManager.Instance.GetCardOfType(CardType.Marker, GetPlayer().IsMy);
+            var _marker = GameplayManager.Instance.GetCardOfTypeNotPlaced(CardType.Marker, GetPlayer().IsMy);
             if (_marker == null)
             {
                 break;
@@ -195,6 +196,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void AddMarker(Card _marker, bool _isBomber)
     {
+        Debug.Log("Adding marker to: "+_isBomber, _marker.gameObject);
         if (_isBomber)
         {
             bomberData.BombId = _marker.UniqueId;
