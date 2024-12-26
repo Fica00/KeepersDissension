@@ -16,7 +16,7 @@ public class CardData
     public int PercentageOfHealthToRecover=100;
     public int PlaceId = -100;
     public CardPlace CardPlace = CardPlace.Deck;
-    public WarriorAbilityData WarriorAbilityData;
+    public WarriorAbilityData WarriorAbilityData = new ();
 
     public bool IsStunned;
 
