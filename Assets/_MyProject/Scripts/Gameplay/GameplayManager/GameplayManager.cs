@@ -129,12 +129,10 @@ public class GameplayManager : MonoBehaviour
     {
         if (IsMyTurn())
         {
-            Debug.Log("11111");
             DidIFinishMyTurn = false;
             MyPlayer.NewTurn();
             if (MyPlayer.Actions == 0)
             {
-                Debug.Log("22222");
                 DidIFinishMyTurn = true;
                 SetPlayersTurn(false);
             }
@@ -144,11 +142,9 @@ public class GameplayManager : MonoBehaviour
         else
         {
             DidOpponentFinish = false;
-            Debug.Log("3333333");
             OpponentPlayer.NewTurn();
             yield return new WaitUntil(() => DidOpponentFinish);
             OpponentPlayer.EndedTurn();
-            Debug.Log("4444");
         }
         CloseAllPanels();
     }
