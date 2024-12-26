@@ -59,7 +59,7 @@ public class TableHandler : MonoBehaviour
     }
 
     public List<TablePlaceHandler> GetPlacesAround(int _id, CardMovementType _movementType, int _range = 1,
-        bool _includeCenter = false, bool _log=false)
+        bool _includeCenter = false)
     {
         List<TablePlaceHandler> _surroundingPlaces = new List<TablePlaceHandler>();
         TablePlaceHandler _centerPlace = GetPlace(_id);
@@ -114,6 +114,35 @@ public class TableHandler : MonoBehaviour
         }
         
         return _surroundingPlaces;
+    }
+
+    public List<Card> GetAttackableCards(int _id, CardMovementType _movementType, int _range = 1,
+        bool _includeCenter = false)
+    {
+        List<TablePlaceHandler> _availablePlaces = GetPlacesAround(_id, _movementType, _range, _includeCenter);
+        List<Card> _attackableCards = new List<Card>();
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            if (!_availablePlace.IsOccupied)
+            {
+                continue;
+            }
+
+            Card _cardOnPlace = _availablePlace.GetCard();
+            if (!(_cardOnPlace != null))
+            {
+                continue;
+            }
+
+            if (!_cardOnPlace.IsAttackable())
+            {
+                continue;
+            }
+
+            _attackableCards.Add(_cardOnPlace);
+        }
+
+        return _attackableCards;
     }
 
     public List<TablePlaceHandler> GetPlacesAroundNoCorners(int _id, CardMovementType _movementType, int _range = 1,

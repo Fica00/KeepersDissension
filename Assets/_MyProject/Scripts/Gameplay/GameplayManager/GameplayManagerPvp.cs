@@ -1036,16 +1036,17 @@ public class GameplayManagerPvp : GameplayManager
         _card.ChangeOwner();
     }
 
-    public override void MarkMarkerAsBomb(string _cardId)
-    {
-        CardBase _cardBase = GetAllCards().Find(_card => _card.UniqueId == _cardId);
-        Sprite _bombSprite = _cardBase.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
-        _cardBase.Display.ChangeSprite(_bombSprite);
-        OnFoundBombMarker?.Invoke(_cardBase);
-    }
-
     public override void BombExploded(int _placeId, string _cardId)
     {
+        int _attackingPlaceId = _placeId;
+        List<Card> _availablePlaces = TableHandler.GetAttackableCards(_attackingPlaceId,
+            CardMovementType.EightDirections);
+
+        foreach (var _cardOnPlace in _availablePlaces.ToList())
+        {
+            DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions();});
+        }
+        
         BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = _placeId };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);
@@ -1264,54 +1265,48 @@ public class GameplayManagerPvp : GameplayManager
         _player.DestroyWithoutNotify(_bomber);
     }
 
-    public override void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation = false)
+    public override void ChangeSprite(string _cardId, int _spriteId, bool _showPlaceAnimation=false)
     {
-        StartCoroutine(HandleRoutine());
-
-        IEnumerator HandleRoutine()
+        Card _card = GetCard(_cardId);
+        if (_card == null)
         {
-            yield return new WaitForSeconds(1);
-            Card _card = FindObjectsOfType<Card>().ToList().Find(_card =>
-                _card.Details.Id == _cardId && _card.GetTablePlace() != null && _card.GetTablePlace().Id == _cardPlace);
-            if (_card == null)
-            {
-                yield break;
-            }
-
-            Sprite _sprite = null;
-
-            switch (_spriteId)
-            {
-                case 0:
-                    _sprite = voidMarker;
-                    _card.SetIsVoid(true);
-                    break;
-                case 1:
-                    _sprite = snowMarker;
-                    break;
-                case 2:
-                    _sprite = cyborgMarker;
-                    break;
-                case 3:
-                    _sprite = dragonMarker;
-                    break;
-                case 4:
-                    _sprite = forestMarker;
-                    break;
-            }
-
-            if (_card.IsVoid && _sprite != voidMarker)
-            {
-                yield break;
-            }
-
-            bool _changedSprite = _card.Display.ChangeSprite(_sprite);
-            if (_showPlaceAnimation && _changedSprite)
-            {
-                _card.transform.localPosition = new Vector3(-2000, 0);
-                _card.MoveToPosition(_card.GetTablePlace());
-            }
+            return;
         }
+
+        Sprite _sprite = null;
+        switch (_spriteId)
+        {
+            case 0:
+                _sprite = voidMarker;
+                _card.SetIsVoid(true);
+                break;
+            case 1:
+                _sprite = snowMarker;
+                break;
+            case 2:
+                _sprite = cyborgMarker;
+                break;
+            case 3:
+                _sprite = dragonMarker;
+                break;
+            case 4:
+                _sprite = forestMarker;
+                break;
+        }
+
+        if (_card.IsVoid && _sprite != voidMarker)
+        {
+            return;
+        }
+
+        bool _changedSprite = _card.Display.ChangeSprite(_sprite);
+        if (!_showPlaceAnimation || !_changedSprite)
+        {
+            return;
+        }
+        
+        _card.transform.localPosition = new Vector3(-2000, 0);
+        _card.MoveToPosition(_card.GetTablePlace());
     }
 
     public override void PlayAudioOnBoth(string _key, CardBase _cardBase)

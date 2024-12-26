@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class CardSpecialAbility : MonoBehaviour
 {
-    public Action OnActivated;
     [field: SerializeField] public bool IsClickable { get; protected set; }
     public bool IsMy => Card.My;
     public Card Card { get; private set; }

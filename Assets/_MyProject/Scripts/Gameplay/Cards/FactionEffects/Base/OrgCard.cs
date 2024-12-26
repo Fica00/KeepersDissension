@@ -72,29 +72,11 @@ public class OrgCard : CardSpecialAbility
     private void OrgAttack()
     {
         int _attackingPlaceId = Card.GetTablePlace().Id;
-        List<TablePlaceHandler> _availablePlaces = GameplayManager.Instance.TableHandler.GetPlacesAround(_attackingPlaceId,
+        List<Card> _availablePlaces = GameplayManager.Instance.TableHandler.GetAttackableCards(_attackingPlaceId,
                 CardMovementType.EightDirections);
 
-        foreach (var _availablePlace in _availablePlaces.ToList())
+        foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            if (!_availablePlace.IsOccupied)
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            Card _cardOnPlace = _availablePlace.GetCard();
-            if (!(_cardOnPlace != null))
-            {
-                _availablePlaces.Remove(_availablePlace);
-                continue;
-            }
-
-            if (!_cardOnPlace.IsAttackable())
-            {
-                continue;
-            }
-
             GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage, _ => { GameplayManager.Instance.HideCardActions();});
         }
     }

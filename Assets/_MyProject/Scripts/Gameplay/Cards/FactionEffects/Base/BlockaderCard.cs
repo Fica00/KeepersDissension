@@ -27,7 +27,7 @@ public class BlockaderCard : CardSpecialAbility
     private void ResetCanBlock()
     {
         Debug.Log("Reseting");
-         SetCanBlock(true);
+        SetCanBlock(true);
     }
 
     public void MarkAsUsed()

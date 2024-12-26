@@ -6,5 +6,6 @@ public class WarriorAbilityData
 {
     public bool CanBlock;
     public List<string> EffectedCards = new();
+    public List<BomberData> BomberData = new();
     public bool CanUseAbility;
 }

@@ -68,7 +68,7 @@ public class TableActionsHandler : MonoBehaviour
         {
             case CardActionType.Attack:
                 int _attackingRange = _card.Range != 1 ? _card.Range : 1;
-                List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _attackingRange, true, true);
+                List<TablePlaceHandler> _attackablePlaces = tableHandler.GetPlacesAround(_placeId, _card.MovementType, _attackingRange, true);
                 AddAttackAction(_attackablePlaces, _card);
                 break;
             case CardActionType.Move:

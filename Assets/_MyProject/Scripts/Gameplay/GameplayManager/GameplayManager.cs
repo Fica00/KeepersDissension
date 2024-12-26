@@ -13,7 +13,6 @@ public class GameplayManager : MonoBehaviour
     public static Action<Keeper> OnKeeperDied;
     public static GameplayManager Instance;
     public static Action FinishedSetup;
-    public static Action<CardBase> OnFoundBombMarker;
     public static Action OnUnchainedGuardian;
     
     public GameplayPlayer MyPlayer;
@@ -476,7 +475,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false)
+    public virtual void ChangeSprite(string _cardId, int _spriteId, bool _showPlaceAnimation=false)
     {
         throw new Exception();
     }
