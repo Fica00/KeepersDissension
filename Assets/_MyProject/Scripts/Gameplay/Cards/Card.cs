@@ -46,10 +46,6 @@ public class Card : CardBase
                 Range = Details.Stats.Range,
                 Speed =  Details.Stats.Speed,
                 MaxHealth = Details.Stats.MaxHealth},
-            WarriorAbilityData = new WarriorAbilityData()
-            {
-                CanBlock = EffectsHolder.GetComponent<BlockaderCard>() != null
-            }
         };
     }
 

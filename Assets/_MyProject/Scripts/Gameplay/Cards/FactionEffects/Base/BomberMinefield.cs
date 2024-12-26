@@ -1,9 +1,7 @@
-using System.Collections;
 using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
 {
-    private WarriorAbilityData WarriorData => Card.CardData.WarriorAbilityData;
     BomberData bomberData = new();
 
     private GameplayPlayer player;
@@ -26,13 +24,14 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnDisable()
     {
+        CardBase.OnGotDestroyed -= CheckDestroyedCard;
+
         if (player==null)
         {
             return; 
         }
         
         player.OnStartedTurn -= ResetAbilities;
-        CardBase.OnGotDestroyed -= CheckDestroyedCard;
     }
 
     private void ResetAbilities()
@@ -42,7 +41,7 @@ public class BomberMinefield : CardSpecialAbility
 
     public override void UseAbility()
     {
-        if (WarriorData.BomberData.Count >= 3)
+        if (Card.CardData.WarriorAbilityData.BomberData.Count >= 3)
         {
             DialogsManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
             return;
@@ -197,7 +196,7 @@ public class BomberMinefield : CardSpecialAbility
             GameplayManager.Instance.ChangeSprite(_markerPlace, Card.Details.Faction.Id + 1, true);
         }
 
-        WarriorData.BomberData.Add(bomberData);
+        Card.CardData.WarriorAbilityData.BomberData.Add(bomberData);
     }
 
     private void AddMarker(Card _marker, bool _isBomber)
@@ -239,29 +238,27 @@ public class BomberMinefield : CardSpecialAbility
                 continue;
             }
 
-            StartCoroutine(DelayCheck(_bomberData));
-            break;
-        }   
-    }
-
-    private IEnumerator DelayCheck(BomberData _bomberData)
-    {
-        Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
-        int _bomberPlace = _bomber.GetTablePlace().Id;
-        yield return new WaitForSeconds(0.5f);
-        
-        foreach (var _markerId in _bomberData.Markers)
-        {
-            Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
-            if (_markerCard == null)
+            foreach (var _markerId in _bomberData.Markers)
             {
-                continue;
+                Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
+                if (_markerCard == null)
+                {
+                    continue;
+                }
+
+                if (_markerId == _bomberData.BombId)
+                {
+                    continue;
+                }
+                
+                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
             }
 
-            GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
-        }
-
-        GameplayManager.Instance.BombExploded(_bomberPlace, _bomber.UniqueId);
-        Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
+            Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
+            GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
+            Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
+            
+            break;
+        }   
     }
 }
