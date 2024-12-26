@@ -42,6 +42,15 @@ public class GameplayPlayer : MonoBehaviour
     public void NewTurn()
     {
         Actions = GameplayManager.Instance.AmountOfActionsPerTurn();
+        foreach (var _card in GameplayManager.Instance.GetAllCards())
+        {
+            if (_card.GetIsMy() != isMy)
+            {
+                continue;
+            }
+
+            _card.CardData.HasSnowWallEffect = false;
+        }
         OnStartedTurn?.Invoke();
     }
 

@@ -15,13 +15,13 @@ public class Card : CardBase
     public bool IsVoid => CardData.IsVoid;
     public int Speed => CardData.Stats.Speed;
     public bool HasDelivery => CardData.HasDelivery;
-    public bool CanBeUsed => CardData.CanBeUsed;
+    public bool HasSnowWallEffect => CardData.HasSnowWallEffect;
     public bool My => CardData.Owner == FirebaseManager.Instance.PlayerId;
     public CardMovementType MovementType => CardData.MovementType;
     public bool HasDied => CardData.HasDied;
     public string UniqueId => CardData.UniqueId;
     public int PercentageOfHealthToRecover => CardData.PercentageOfHealthToRecover;
-    
+    private GameplayPlayer player;
 
     public void Setup(string _uniqueId)
     {
@@ -144,7 +144,7 @@ public class Card : CardBase
 
     public void SetCanBeUsed(bool _status)
     {
-        CardData.CanBeUsed = _status;
+        CardData.HasSnowWallEffect = _status;
     }
     
     public void ChangeOwner()
@@ -270,7 +270,7 @@ public class Card : CardBase
 
     public bool CheckCanMove()
     {
-        return !CardData.IsStunned && CanBeUsed;
+        return !CardData.IsStunned && !HasSnowWallEffect;
     }
 
     public void ChangeDelivery(bool _status)
@@ -290,6 +290,11 @@ public class Card : CardBase
     
     public bool IsForest()
     {
-        return Details.Faction.IsDragon;
+        return Details.Faction.IsForest;
+    }
+
+    public bool IsSnow()
+    {
+        return Details.Faction.IsSnow;
     }
 }

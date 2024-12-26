@@ -344,6 +344,15 @@ public class GameplayManagerPvp : GameplayManager
             if (_wall.IsForest())
             {
                 ApplyForestAbility(_attackingCard);
+                _callBack?.Invoke();
+                return;
+            }
+
+            if (_wall.IsSnow())
+            {
+                ApplySnowAbility(_attackingCard);
+                _callBack?.Invoke();
+                return;
             }
 
             _callBack?.Invoke();
@@ -422,6 +431,11 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         _attacker.ChangeHealth(1);
+    }    
+    
+    private void ApplySnowAbility(Card _attacker)
+    {
+        _attacker.CardData.HasSnowWallEffect= true;
     }
 
     public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)

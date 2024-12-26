@@ -187,7 +187,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (!selectedCard.CanBeUsed)
+        if (!selectedCard.HasSnowWallEffect)
         {
             DialogsManager.Instance.ShowOkDialog("This card can't be used!");
             selectedCard = null;
