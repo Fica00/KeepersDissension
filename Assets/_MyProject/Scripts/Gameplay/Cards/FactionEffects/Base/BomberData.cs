@@ -4,6 +4,6 @@ using System.Collections.Generic;
 [Serializable]
 public class BomberData
 {
-    public string BombId;
+    public int BombPlace = -1;
     public List<string> Markers = new ();
 }
