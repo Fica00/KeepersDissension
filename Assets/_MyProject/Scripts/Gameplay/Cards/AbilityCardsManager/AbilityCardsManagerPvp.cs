@@ -212,7 +212,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         return _ability;
     }
     
-    private void ShowShop()
+    protected override void ShowShop()
     {
         for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
         {

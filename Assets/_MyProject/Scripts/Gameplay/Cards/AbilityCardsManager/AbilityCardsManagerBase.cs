@@ -9,8 +9,11 @@ public class AbilityCardsManagerBase : MonoBehaviour
     [SerializeField] protected ArrowPanel arrowPanel;
     [SerializeField] private AbilityShopDisplay abilityShopDisplayPrefab;
     [SerializeField] private Transform abilityShopDisplayHolder;
+    [SerializeField] private ArrowPanel shopPanel;
 
     protected List<AbilityShopDisplay> ShopAbilitiesDisplays = new();
+    
+
     
     private void Awake()
     {
@@ -52,12 +55,19 @@ public class AbilityCardsManagerBase : MonoBehaviour
     {
         CardHandInteractions.OnCardClicked += TryBuyFromHand;
         AbilityShopDisplay.OnAbilityClicked += TryBuyFromShop;
+        shopPanel.OnOpened += ShowShop;
     }
 
     private void OnDisable()
     {
         CardHandInteractions.OnCardClicked -= TryBuyFromHand;
         AbilityShopDisplay.OnAbilityClicked -= TryBuyFromShop;
+        shopPanel.OnOpened -= ShowShop;
+    }
+
+    protected virtual void ShowShop()
+    {
+        throw new Exception();
     }
 
     protected virtual void TryBuyFromHand(CardBase _card)
