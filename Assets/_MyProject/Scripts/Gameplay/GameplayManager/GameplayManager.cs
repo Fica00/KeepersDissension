@@ -393,7 +393,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BombExploded(int _placeId, string _cardId)
+    public virtual void BombExploded(int _placeId, bool _includeSelf)
     {
         throw new NotImplementedException();
     }

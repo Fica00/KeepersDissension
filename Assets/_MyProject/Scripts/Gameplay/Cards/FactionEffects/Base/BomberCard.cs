@@ -22,6 +22,6 @@ public class BomberCard : CardSpecialAbility
             return;
         }
 
-        GameplayManager.Instance.BombExploded(_card.GetTablePlace().Id, _card.UniqueId);
+        GameplayManager.Instance.BombExploded(_card.GetTablePlace().Id, false);
     }
 }

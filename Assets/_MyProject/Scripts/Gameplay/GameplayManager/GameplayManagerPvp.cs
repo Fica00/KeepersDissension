@@ -1161,11 +1161,11 @@ public class GameplayManagerPvp : GameplayManager
         _card.ChangeOwner();
     }
 
-    public override void BombExploded(int _placeId, string _cardId)
+    public override void BombExploded(int _placeId, bool _includeSelf)
     {
         int _attackingPlaceId = _placeId;
         List<Card> _availablePlaces = TableHandler.GetAttackableCards(_attackingPlaceId,
-            CardMovementType.EightDirections);
+            CardMovementType.EightDirections, _includeCenter: _includeSelf);
 
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {

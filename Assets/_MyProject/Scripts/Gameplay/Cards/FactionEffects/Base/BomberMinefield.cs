@@ -195,7 +195,6 @@ public class BomberMinefield : CardSpecialAbility
 
     private void AddMarker(Card _marker, bool _isBomber, int _place)
     {
-        Debug.Log("Adding marker to: "+_isBomber, _marker.gameObject);
         if (_isBomber)
         {
             bomberData.BombPlace = _place;
@@ -206,20 +205,17 @@ public class BomberMinefield : CardSpecialAbility
 
     private void CheckDestroyedCard(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
     {
-        if (_cardBase is not Card _card)
+        if (_cardBase is not Card _)
         {
-            Debug.Log(1111);
             return;
         }
         if (Card.CardData.WarriorAbilityData == null)
         {
-            Debug.Log(222222);
             return;
         }
 
         if (Card.CardData.WarriorAbilityData.BomberData == null)
         {
-            Debug.Log(33333);
             return;
         }
 
@@ -227,13 +223,11 @@ public class BomberMinefield : CardSpecialAbility
         {
             if (_bomberData.BombPlace == -1)
             {
-                Debug.Log(444444);
                 continue;
             }
 
             if (_bomberData.BombPlace != _finishingPlaceId)
             {
-                Debug.Log(5555);
                 continue;
             }
 
@@ -248,7 +242,7 @@ public class BomberMinefield : CardSpecialAbility
                 GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
             }
 
-            GameplayManager.Instance.BombExploded(_cardBase.GetTablePlace().Id, ((Card)_cardBase).UniqueId);
+            GameplayManager.Instance.BombExploded(_cardBase.GetTablePlace().Id, true);
             Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
             break;
         }   
