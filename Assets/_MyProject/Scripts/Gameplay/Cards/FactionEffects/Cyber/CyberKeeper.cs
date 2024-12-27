@@ -81,6 +81,6 @@ public class CyberKeeper : CardSpecialAbility
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= ReturnCard;
         GameplayManager.Instance.ChangeOwnerOfCard(Card.CardData.WarriorAbilityData.EffectedCards[0]);
         Card.CardData.WarriorAbilityData.EffectedCards.Clear();
-        RoomUpdater.Instance.ForceUpdate();
+        RoomUpdater.Instance.ForceUpdate();add 
     }
 }
