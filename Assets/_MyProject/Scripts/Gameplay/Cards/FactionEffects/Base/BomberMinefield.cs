@@ -163,7 +163,7 @@ public class BomberMinefield : CardSpecialAbility
 
             if (_place.ContainsMarker)
             {
-                AddMarker(_place.GetMarker(), _place.Id == _placeId);
+                AddMarker(_place.GetMarker(), _place.Id == _placeId, _place.Id);
                 continue;
             }
 
@@ -179,7 +179,7 @@ public class BomberMinefield : CardSpecialAbility
             }
 
 
-            AddMarker(_marker, _place.Id == _placeId);
+            AddMarker(_marker, _place.Id == _placeId, _place.Id);
             GameplayManager.Instance.PlaceCard(_marker, _place.Id);
             GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
         }
@@ -193,12 +193,12 @@ public class BomberMinefield : CardSpecialAbility
         Card.CardData.WarriorAbilityData.BomberData.Add(bomberData);
     }
 
-    private void AddMarker(Card _marker, bool _isBomber)
+    private void AddMarker(Card _marker, bool _isBomber, int _place)
     {
         Debug.Log("Adding marker to: "+_isBomber, _marker.gameObject);
         if (_isBomber)
         {
-            bomberData.BombPlace = _marker.GetTablePlace().Id;
+            bomberData.BombPlace = _place;
         }
 
         bomberData.Markers.Add(_marker.UniqueId);
