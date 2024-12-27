@@ -13,8 +13,6 @@ public class AbilityCardsManagerBase : MonoBehaviour
 
     protected List<AbilityShopDisplay> ShopAbilitiesDisplays = new();
     
-
-    
     private void Awake()
     {
         Instance = this;

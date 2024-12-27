@@ -214,6 +214,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     
     protected override void ShowShop()
     {
+        Debug.Log("lllllllll");
         for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
         {
             var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.FindAll(_ability => _ability.Owner == "shop");

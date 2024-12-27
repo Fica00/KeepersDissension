@@ -4921,6 +4921,7 @@ MonoBehaviour:
   abilityShopDisplayPrefab: {fileID: 4460485098416715022, guid: f7423f92dd5923e46a46a6c51612fe1f,
     type: 3}
   abilityShopDisplayHolder: {fileID: 1293477663}
+  shopPanel: {fileID: 493734893}
 --- !u!1 &674888751
 GameObject:
   m_ObjectHideFlags: 0
@@ -9766,25 +9767,6 @@ MonoBehaviour:
   MyPlayer: {fileID: 114929504}
   OpponentPlayer: {fileID: 389635581}
   TableHandler: {fileID: 1231806644}
-  AmountOfActionsPerTurn: 3
-  UnchainingGuardianPrice: 20
-  LastAction:
-    StartingPlaceId: 0
-    FirstCardId: -1
-    FinishingPlaceId: 0
-    SecondCardId: -1
-    Type: 0
-    Cost: 0
-    CanTransferLoot: 1
-    Damage: -1
-    CanCounter: 1
-    GiveLoot: 0
-    CanBeBlocked: 1
-    ResetSpeed: 0
-    DidTeleport: 0
-    DiedByBomb: 0
-    AllowCardEffectOnDeath: 1
-  GameState: 0
   healthTracker: {fileID: 1497496152}
   simplePanels:
   - {fileID: 89120723}
@@ -9800,6 +9782,7 @@ MonoBehaviour:
   forestMarker: {fileID: 21300000, guid: 3d53ff9b6f102204ba1c18318ce257f9, type: 3}
   bombEffect: {fileID: 6507998695647225779, guid: e8f5e9da827f53e45b38c76ed387acc0,
     type: 3}
+  DidOpponentFinish: 0
 --- !u!114 &1241439618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35881,7 +35864,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9609710
+      value: -9622611
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
