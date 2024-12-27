@@ -129,16 +129,16 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     
     private AbilityData DrawAbilityCard(bool _startingDraw=true)
     {
-        // var _allAbilities = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities;
-        // for (int _i = 0; _i < _allAbilities.Count; _i++)
-        // {
-        //     if (_startingDraw && !CardsManager.Instance.CanAbilityBeGiven(_allAbilities[_i].CardId))
-        //     {
-        //         continue;
-        //     }
-        //
-        //     return _allAbilities[_i];
-        // }
+        var _allAbilities = FirebaseManager.Instance.RoomHandler.BoardData.Abilities;
+        for (int _i = 0; _i < _allAbilities.Count; _i++)
+        {
+            if (_startingDraw && !CardsManager.Instance.CanAbilityBeGiven(_allAbilities[_i].CardId))
+            {
+                continue;
+            }
+        
+            return _allAbilities[_i];
+        }
 
         return null;
     }
@@ -214,14 +214,14 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     
     private void ShowShop()
     {
-        // for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
-        // {
-        //     var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop;
-        //     if (_i>=_abilitiesInShop.Count)
-        //     {
-        //         return;
-        //     }
-        //     ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
-        // }
+        for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
+        {
+            var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.FindAll(_ability => _ability.Owner == "shop");
+            if (_i>=_abilitiesInShop.Count)
+            {
+                return;
+            }
+            ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
+        }
     }
 }

@@ -10,7 +10,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
     [SerializeField] private AbilityShopDisplay abilityShopDisplayPrefab;
     [SerializeField] private Transform abilityShopDisplayHolder;
 
-    private List<AbilityShopDisplay> shopAbilitiesDisplays = new();
+    protected List<AbilityShopDisplay> ShopAbilitiesDisplays = new();
     
     private void Awake()
     {
@@ -22,7 +22,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
         for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
         {
             AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
-            shopAbilitiesDisplays.Add(_abilityDisplay);
+            ShopAbilitiesDisplays.Add(_abilityDisplay);
         }
     }
 
