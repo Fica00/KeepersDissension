@@ -49,8 +49,7 @@ public class DragonKeeper : CardSpecialAbility
 
     private List<Card> GetAvailableCards()
     {
-        List<Card> _availableCards = new ();
-        GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, IsMy);
+        List<Card> _availableCards = GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, IsMy);
         foreach (var _availableCard in _availableCards.ToList())
         {
             if (_availableCard.HasDied)
