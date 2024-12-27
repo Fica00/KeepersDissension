@@ -1084,14 +1084,21 @@ public class GameplayManagerPvp : GameplayManager
         RoomUpdater.Instance.ForceUpdate();
     }
 
-    public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
+    public override void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null, int _placeId = -1)
     {
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
 
         IEnumerator SelectPlaceRoutine()
         {
-            yield return StartCoroutine(GetPlaceOnTable(FinishRevive));
+            if (_placeId==-1)
+            {
+                yield return StartCoroutine(GetPlaceOnTable(FinishRevive));
+            }
+            else
+            {
+                FinishRevive(_placeId);
+            }
 
             void FinishRevive(int _positionId)
             {
@@ -1099,11 +1106,10 @@ public class GameplayManagerPvp : GameplayManager
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
-                }
-
-                if (MyPlayer.Actions>0)
-                {
-                    RoomUpdater.Instance.ForceUpdate();
+                    if (MyPlayer.Actions>0)
+                    {
+                        RoomUpdater.Instance.ForceUpdate();
+                    }
                 }
                 _callBack?.Invoke();
             }

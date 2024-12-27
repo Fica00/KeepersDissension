@@ -26,10 +26,10 @@ public class SnowKeeper : CardSpecialAbility
             return;
         }
 
-        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
+        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Activate);
     }
     
-    private void Use()
+    private void Activate()
     {
         GameplayPlayer _player = GetPlayer();
         GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");

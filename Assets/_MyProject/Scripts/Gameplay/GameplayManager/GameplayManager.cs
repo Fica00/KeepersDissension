@@ -264,7 +264,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
     
-    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
+    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null, int _placeId = -1)
     {
         throw new NotImplementedException();
     }
