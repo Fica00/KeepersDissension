@@ -23,14 +23,14 @@ public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
     
     private void BuyWhiteStrangeMatter()
     {
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
 
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
                 return;
             }
@@ -47,7 +47,7 @@ public class EconomyStrangeMatterDisplay : MonoBehaviour,IPointerClickHandler
         }
         if (GameplayManager.Instance.MyPlayer.Actions==0)
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 DialogsManager.Instance.ShowOkDialog("You don't have enough actions");
                 return;   

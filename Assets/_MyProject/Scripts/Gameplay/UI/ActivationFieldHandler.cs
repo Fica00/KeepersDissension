@@ -89,14 +89,14 @@ public class ActivationFieldHandler : MonoBehaviour
     
     private void CheckCard(CardBase _cardBase)
     {
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
 
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
                 return;
             }

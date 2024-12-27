@@ -81,9 +81,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -105,9 +105,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -144,9 +144,9 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -161,9 +161,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
                 int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
                 if (_id != _placeId)

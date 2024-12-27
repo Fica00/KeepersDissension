@@ -203,18 +203,15 @@ public class GameplayManagerPvp : GameplayManager
         _card.MoveToPosition(_destination, _callBack);
     }
 
-    public override void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
+    public override void AddAbilityToPlayer(string _owner, string _abilityId)
     {
-        var _player = _isMyPlayer
-            ? BoardData.MyPlayer
-            : BoardData.OpponentPlayer;
         var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
         if (_abilityData == null)
         {
             return;
         }
 
-        _abilityData.Owner = _player.PlayerId;
+        _abilityData.Owner = _owner;
     }
 
     public override void AddAbilityToShop(string _abilityId)
@@ -638,7 +635,7 @@ public class GameplayManagerPvp : GameplayManager
             return false;
         }
 
-        if (IsMyResponseAction2())
+        if (IsMyResponseAction())
         {
             return false;
         }
@@ -1060,9 +1057,9 @@ public class GameplayManagerPvp : GameplayManager
         CloseAllPanels();
         TableHandler.ActionsHandler.ClearPossibleActions();
 
-        if (IsResponseAction2())
+        if (IsResponseAction())
         {
-            if (!IsMyResponseAction2())
+            if (!IsMyResponseAction())
             {
                 return;
             }
@@ -2003,14 +2000,14 @@ public class GameplayManagerPvp : GameplayManager
         return _forMe ? BoardData.MyPlayer.DidUnchainGuardian : BoardData.OpponentPlayer.DidUnchainGuardian;
     }
 
-    public override bool IsMyResponseAction2()
+    public override bool IsMyResponseAction()
     {
         return RoomHandler.IsOwner
             ? GetGameplaySubState() == GameplaySubState.Player1ResponseAction
             : GetGameplaySubState() == GameplaySubState.Player2ResponseAction;
     }
     
-    public override bool IsResponseAction2()
+    public override bool IsResponseAction()
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }

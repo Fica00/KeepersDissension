@@ -34,7 +34,7 @@ public class GameplayManager : MonoBehaviour
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
     
-    public bool IsKeeperResponseAction2 =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     
     protected virtual void Awake()
     {
@@ -185,7 +185,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
+    public virtual void AddAbilityToPlayer(string _owner, string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -1129,12 +1129,12 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual bool IsMyResponseAction2()
+    public virtual bool IsMyResponseAction()
     {
         throw new Exception();
     }
     
-    public virtual bool IsResponseAction2()
+    public virtual bool IsResponseAction()
     {
         throw new Exception();
     }
