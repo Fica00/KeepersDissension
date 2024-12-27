@@ -3,6 +3,25 @@ using System.Linq;
 
 public class DragonKeeper : CardSpecialAbility
 {
+    private GameplayPlayer player;
+    
+    private void Start()
+    {
+        if (!GetPlayer().IsMy)
+        {
+            return;
+        }
+        
+        player = GetPlayer();
+        player.OnStartedTurn += EnableAbility;
+    }
+
+    private void EnableAbility()
+    {
+        player.OnStartedTurn -= EnableAbility;
+        SetCanUseAbility(true);
+    }
+    
     public override void UseAbility()
     {
         DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Activate);
