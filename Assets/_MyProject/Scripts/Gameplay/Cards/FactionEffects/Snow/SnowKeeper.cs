@@ -1,5 +1,24 @@
 public class SnowKeeper : CardSpecialAbility
 {
+    private GameplayPlayer player;
+    
+    private void Start()
+    {
+        if (!GetPlayer().IsMy)
+        {
+            return;
+        }
+        
+        player = GetPlayer();
+        player.OnStartedTurn += EnableAbility;
+    }
+
+    private void EnableAbility()
+    {
+        player.OnStartedTurn -= EnableAbility;
+        SetCanUseAbility(true);
+    }
+
     public override void UseAbility()
     {
         if (!CanUseAbility)
@@ -10,7 +29,7 @@ public class SnowKeeper : CardSpecialAbility
         DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Use);
     }
     
-    void Use()
+    private void Use()
     {
         GameplayPlayer _player = GetPlayer();
         GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
