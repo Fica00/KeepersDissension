@@ -254,8 +254,7 @@ public class BomberMinefield : CardSpecialAbility
                 GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
             }
 
-            Card _bomber = GameplayManager.Instance.GetCard(_bomberData.BombId);
-            GameplayManager.Instance.BombExploded(_bomber.GetTablePlace().Id, _bomber.UniqueId);
+            GameplayManager.Instance.BombExploded(_cardBase.GetTablePlace().Id, ((Card)_cardBase).UniqueId);
             Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
             
             break;
