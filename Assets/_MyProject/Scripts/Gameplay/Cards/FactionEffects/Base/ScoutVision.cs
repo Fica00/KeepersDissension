@@ -26,6 +26,30 @@ public class ScoutVision : CardSpecialAbility
             {
                 continue;
             }
+
+            bool _skip = false;
+            foreach (var _card in FirebaseManager.Instance.RoomHandler.BoardData.Cards)
+            {
+                if (_card.WarriorAbilityData.BomberData == null)
+                {
+                    continue;
+                }
+
+                foreach (var _bomberData in _card.WarriorAbilityData.BomberData)
+                {
+                    if (_bomberData.BombPlace == _cardAround.GetTablePlace().Id)
+                    {
+                        GameplayManager.Instance.MarkMarkerAsBomb(_cardAround.UniqueId);
+                        _skip = true;
+                        break;
+                    }
+                }
+            }
+
+            if (_skip)
+            {
+                continue;
+            }
             
             GameplayManager.Instance.DamageCardByAbility(_marker.UniqueId, 1,null);
         }
