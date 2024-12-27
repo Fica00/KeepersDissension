@@ -50,10 +50,14 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
         {
             var _ability = DrawAbilityCard(false);
+            Debug.Log(11111);
             if (_ability==null)
             {
+            Debug.Log(22222);
                 return;
             }
+            
+            Debug.Log(_ability.UniqueId);
             GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
         }
     }
