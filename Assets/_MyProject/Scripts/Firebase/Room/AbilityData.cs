@@ -15,6 +15,8 @@ public class AbilityData
     public List<string> EffectedCards = new();
     public CardPlace CardPlace = CardPlace.Deck;
     public int CardId;
+    public AbilityColor Color;
+    public bool CanBeGivenToPlayer;
     
     //helpers
     public bool IsApplied;

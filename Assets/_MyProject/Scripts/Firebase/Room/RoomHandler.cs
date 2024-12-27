@@ -134,6 +134,7 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             CheckIfCreatedCard(_currentRoomState,_data);
+            CheckIfAbilityCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
             CheckForAttackAnimation(_currentRoomState,_data);
             CheckIfCardDied(_currentRoomState,_data);
@@ -212,6 +213,30 @@ namespace FirebaseMultiplayer.Room
                         GameplayManager.Instance.OpponentCreatedCard(_card);
                         ShowCardMoved(_card.UniqueId, _card.PlaceId);
                     }
+                }
+            }
+        }
+        
+        private void CheckIfAbilityCard(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldSpawnCard = true;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    _shouldSpawnCard = false;
+                    break;
+                }
+
+
+                if (_shouldSpawnCard)
+                {
+                    GameplayManager.Instance.OpponentCreatedAbility(_card);
                 }
             }
         }
@@ -383,6 +408,7 @@ namespace FirebaseMultiplayer.Room
             
             GameplayManager.Instance.EndTurn();
         }
+        
         private void CheckIfOpponentEndedTurn(RoomData _currentRoomData,RoomData _data)
         {
             bool _didOpponentEndTurn = false;

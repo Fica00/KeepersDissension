@@ -83,6 +83,12 @@ public class GameplayManagerPvp : GameplayManager
         CreateCard(_cardData.CardId, OpponentPlayer.TableSideHandler, _cardData.UniqueId, false, _cardData.Owner);
     }
 
+    public override void OpponentCreatedAbility(AbilityData _abilityData)
+    {
+        var _card = Instantiate(Resources.LoadAll<AbilityCard>("Abilities").First(_ability => _ability.Details.Id == _abilityData.CardId));
+        _card.Setup(_abilityData.UniqueId);
+    }
+
     private Card CreateCard(int _cardId, TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
     {
         Transform _cardsHolder = _tableSideHandler.CardsHolder;

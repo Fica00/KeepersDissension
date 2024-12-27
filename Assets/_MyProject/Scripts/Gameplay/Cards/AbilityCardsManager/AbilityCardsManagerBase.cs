@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AbilityCardsManagerBase : MonoBehaviour
@@ -9,8 +8,6 @@ public class AbilityCardsManagerBase : MonoBehaviour
     [SerializeField] protected ArrowPanel arrowPanel;
     [SerializeField] private AbilityShopDisplay abilityShopDisplayPrefab;
     [SerializeField] private Transform abilityShopDisplayHolder;
-    
-    protected List<AbilityShopDisplay> ShopAbilitiesDisplays = new ();
 
     private void Awake()
     {
@@ -24,13 +21,9 @@ public class AbilityCardsManagerBase : MonoBehaviour
         SetupShopAbilities();
     }
 
-    private void CreateCards()
+    protected virtual void CreateCards()
     {
-        for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
-        {
-            AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
-            ShopAbilitiesDisplays.Add(_abilityDisplay);
-        }
+        throw new Exception("Create cards");
     }
     
     protected virtual void DealAbilities()

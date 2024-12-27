@@ -1008,6 +1008,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void OpponentCreatedAbility(AbilityData _abilityData)
+    {
+        throw new Exception();
+    }
+
     public virtual void ShowCardPlaced(string _uniqueId, int _positionId)
     {
         throw new Exception();

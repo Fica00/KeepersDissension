@@ -10,7 +10,19 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             return;
         }
         
+        Debug.Log("Setting up");
         base.Setup();
+    }
+
+    protected override void CreateCards()
+    {
+        foreach (AbilityCard _ability in Resources.LoadAll<AbilityCard>("Abilities"))
+        {
+            var _abilityInstance = Instantiate(_ability, null);
+            AbilityData _abilityData = _abilityInstance.CreateData("shop");
+            _abilityInstance.Setup(_abilityData.UniqueId);
+            FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Add(_abilityData);
+        }
     }
 
     protected override void DealAbilities()
@@ -35,15 +47,20 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
     protected override void SetupShopAbilities()
     {
-        for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
-        {
-            var _ability = DrawAbilityCard(false);
-            if (_ability==null)
-            {
-                return;
-            }
-            GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
-        }
+        // for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
+        // {
+        //     AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
+        //     ShopAbilitiesDisplays.Add(_abilityDisplay);
+        // }
+        // for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
+        // {
+        //     var _ability = DrawAbilityCard(false);
+        //     if (_ability==null)
+        //     {
+        //         return;
+        //     }
+        //     GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
+        // }
     }
 
     protected override void TryBuyFromShop(AbilityData _abilityData)
@@ -113,98 +130,99 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     
     private AbilityData DrawAbilityCard(bool _startingDraw=true)
     {
-        var _allAbilities = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities;
-        for (int _i = 0; _i < _allAbilities.Count; _i++)
-        {
-            if (_startingDraw && !CardsManager.Instance.CanAbilityBeGiven(_allAbilities[_i].CardId))
-            {
-                continue;
-            }
-
-            return _allAbilities[_i];
-        }
+        // var _allAbilities = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities;
+        // for (int _i = 0; _i < _allAbilities.Count; _i++)
+        // {
+        //     if (_startingDraw && !CardsManager.Instance.CanAbilityBeGiven(_allAbilities[_i].CardId))
+        //     {
+        //         continue;
+        //     }
+        //
+        //     return _allAbilities[_i];
+        // }
 
         return null;
     }
 
     protected override void TryBuyFromHand(CardBase _card)
     {
-        if (_card is not AbilityCard _abilityCard)
-        {
-            return;
-        }
-
-        if (GameplayManager.Instance.IsResponseAction2())
-        {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
-            {
-                return;
-            }
-
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
-            {
-                return;
-            }
-        }
-        else if (!GameplayManager.Instance.IsMyTurn())
-        {
-            return;
-        }
-
-        int _price = FirebaseManager.Instance.RoomHandler.RoomData.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
-
-        if (GameplayManager.Instance.MyStrangeMatter()<_price && !GameplayCheats.HasUnlimitedGold)
-        {
-            DialogsManager.Instance.ShowOkDialog($"You dont have enough strange matter, this action requires {_price}");
-            return;
-        }
-        
-        if (_abilityCard==null)
-        {
-            return;
-        }
-
-        DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy this ability for {_price} strange matter?", () =>
-        {
-            if (_abilityCard != null)
-            {
-                GameplayManager.Instance.BuyAbilityFromHand(_abilityCard.UniqueId);
-                GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
-            }
-        });
+        // if (_card is not AbilityCard _abilityCard)
+        // {
+        //     return;
+        // }
+        //
+        // if (GameplayManager.Instance.IsResponseAction2())
+        // {
+        //     if (!GameplayManager.Instance.IsMyResponseAction2())
+        //     {
+        //         return;
+        //     }
+        //
+        //     if (!GameplayManager.Instance.IsKeeperResponseAction2)
+        //     {
+        //         return;
+        //     }
+        // }
+        // else if (!GameplayManager.Instance.IsMyTurn())
+        // {
+        //     return;
+        // }
+        //
+        // int _price = FirebaseManager.Instance.RoomHandler.RoomData.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
+        //
+        // if (GameplayManager.Instance.MyStrangeMatter()<_price && !GameplayCheats.HasUnlimitedGold)
+        // {
+        //     DialogsManager.Instance.ShowOkDialog($"You dont have enough strange matter, this action requires {_price}");
+        //     return;
+        // }
+        //
+        // if (_abilityCard==null)
+        // {
+        //     return;
+        // }
+        //
+        // DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy this ability for {_price} strange matter?", () =>
+        // {
+        //     if (_abilityCard != null)
+        //     {
+        //         GameplayManager.Instance.BuyAbilityFromHand(_abilityCard.UniqueId);
+        //         GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
+        //     }
+        // });
     }
 
     public override AbilityData RemoveAbilityFromShop(string _abilityId)
     {
-        var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop;
-        AbilityData _ability = _abilitiesInShop.Find(_element => _element.UniqueId == _abilityId);
-        if (_ability==null)
-        {
-            return null;
-        }
-        _abilitiesInShop.Remove(_ability);
-        for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
-        {
-            if (ShopAbilitiesDisplays[_i].Ability==_ability)
-            {
-                ShopAbilitiesDisplays[_i].Empty();
-            }
-        }
-
-        ShowShop();
-        return _ability;
+        // var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop;
+        // AbilityData _ability = _abilitiesInShop.Find(_element => _element.UniqueId == _abilityId);
+        // if (_ability==null)
+        // {
+        //     return null;
+        // }
+        // _abilitiesInShop.Remove(_ability);
+        // for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
+        // {
+        //     if (ShopAbilitiesDisplays[_i].Ability==_ability)
+        //     {
+        //         ShopAbilitiesDisplays[_i].Empty();
+        //     }
+        // }
+        //
+        // ShowShop();
+        // return _ability;
+        return null;
     }
     
     private void ShowShop()
     {
-        for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
-        {
-            var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop;
-            if (_i>=_abilitiesInShop.Count)
-            {
-                return;
-            }
-            ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
-        }
+        // for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
+        // {
+        //     var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop;
+        //     if (_i>=_abilitiesInShop.Count)
+        //     {
+        //         return;
+        //     }
+        //     ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
+        // }
     }
 }
