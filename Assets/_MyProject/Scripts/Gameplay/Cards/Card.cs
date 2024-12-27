@@ -13,6 +13,7 @@ public class Card : CardBase
     public int Range => CardData.Stats.Range;
     public int Damage => CardData.Stats.Damage;
     public bool IsVoid => CardData.IsVoid;
+    private bool HasSnowUltimateEffect => CardData.HasSnowUltimateEffect;
     public int Speed => CardData.Stats.Speed;
     public bool HasDelivery => CardData.HasDelivery;
     public bool HasSnowWallEffect => CardData.HasSnowWallEffect;
@@ -265,7 +266,7 @@ public class Card : CardBase
 
     public bool CheckCanMove()
     {
-        return !CardData.IsStunned && !HasSnowWallEffect;
+        return !CardData.IsStunned && !HasSnowWallEffect &&!HasSnowUltimateEffect;
     }
 
     public void ChangeDelivery(bool _status)
@@ -291,5 +292,10 @@ public class Card : CardBase
     public bool IsSnow()
     {
         return Details.Faction.IsSnow;
+    }
+
+    public void ApplyHasSnowUltimateEffect(bool _status)
+    {
+        CardData.HasSnowUltimateEffect = _status;
     }
 }

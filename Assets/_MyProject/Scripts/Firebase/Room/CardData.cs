@@ -13,6 +13,7 @@ public class CardData
     public CardMovementType MovementType;
     public bool HasDied;
     public bool HasSnowWallEffect;
+    public bool HasSnowUltimateEffect;
     public int PercentageOfHealthToRecover=100;
     public int PlaceId = -100;
     public CardPlace CardPlace = CardPlace.Deck;
