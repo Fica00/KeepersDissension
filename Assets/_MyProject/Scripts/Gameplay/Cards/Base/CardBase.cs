@@ -52,6 +52,10 @@ public class CardBase : MonoBehaviour
 
     public void MoveToPosition(TablePlaceHandler _tablePosition, Action _callBack)
     {
+        if (this is Card _card)
+        {
+            _card.SetHasDied(false);
+        }
         RectTransform _rect = GetComponent<RectTransform>();
         transform.SetParent(_tablePosition.transform);
         _rect.pivot = new Vector2(0.5f, 0.5f);
