@@ -210,7 +210,6 @@ namespace FirebaseMultiplayer.Room
                     GameplayManager.Instance.OpponentCreatedCard(_card);
                     if (_card.PlaceId != -100)
                     {
-                        GameplayManager.Instance.OpponentCreatedCard(_card);
                         ShowCardMoved(_card.UniqueId, _card.PlaceId);
                     }
                 }
