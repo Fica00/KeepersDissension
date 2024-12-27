@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class DragonKeeper : CardSpecialAbility
 {
@@ -54,11 +53,9 @@ public class DragonKeeper : CardSpecialAbility
         {
             if (_availableCard.HasDied)
             {
-                Debug.Log("1111111");
                 continue;
             }
 
-                Debug.Log("222222222");
             _availableCards.Remove(_availableCard);
         }
 
