@@ -1118,6 +1118,7 @@ public class GameplayManagerPvp : GameplayManager
         void HandleBoughtMinion(int _positionId)
         {
             ChangeMyStrangeMatter(-_cost);
+            BoardData.StrangeMaterInEconomy += _cost;
             (_cardBase as Card)?.SetHasDied(false);
             PlaceCard(_cardId, _positionId);
         }
@@ -1135,6 +1136,7 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 ChangeMyStrangeMatter(-_cost);
+                BoardData.StrangeMaterInEconomy += _cost;
                 PlaceCard(_cardId, _positionId);
                 
                 if (_cost > 0)
@@ -1973,6 +1975,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         BoardData.MyPlayer.DidUnchainGuardian = true;
         ChangeMyStrangeMatter(-_price);
+        BoardData.StrangeMaterInEconomy += _price;
         ShowGuardianUnchained(true);
         if (_reduceAction)
         {

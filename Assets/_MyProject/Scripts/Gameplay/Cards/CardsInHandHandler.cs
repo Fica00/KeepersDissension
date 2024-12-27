@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,12 +11,11 @@ public class CardsInHandHandler : MonoBehaviour
    [SerializeField] private Button closeButton;
 
    private List<CardBase> shownCards = new ();
-   private Vector3 sizeOfCards = new Vector3(2, 2, 1);
+   private Vector3 sizeOfCards = new(2, 2, 1);
 
    public void Setup(GameplayPlayer _player)
    {
       player = _player;
-
       DeckDisplay.OnDeckClicked += ShowCards;
       CardHandInteractions.OnCardClicked += CheckForBuy;
       CardHandInteractions.OnCardClicked += CheckForWallPurchase;
