@@ -8,7 +8,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnEnable()
     {
-        CardBase.OnGotDestroyed += CheckDestroyedCard;
+        GameplayManager.OnCardMoved += CheckDestroyedCard;
     }
 
     private void Start()
@@ -24,7 +24,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnDisable()
     {
-        CardBase.OnGotDestroyed -= CheckDestroyedCard;
+        GameplayManager.OnCardMoved -= CheckDestroyedCard;
 
         if (player==null)
         {
@@ -210,7 +210,7 @@ public class BomberMinefield : CardSpecialAbility
         bomberData.Markers.Add(_marker.UniqueId);
     }
 
-    private void CheckDestroyedCard(CardBase _cardBase)
+    private void CheckDestroyedCard(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
     {
         if (_cardBase is not Card _card)
         {
