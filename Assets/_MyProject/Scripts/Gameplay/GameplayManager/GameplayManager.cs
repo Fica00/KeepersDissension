@@ -383,7 +383,7 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    public virtual void ChangeOwnerOfCard(string _placeId)
+    public virtual void ChangeOwnerOfCard(string _cardId)
     {
         throw new NotImplementedException();
     }

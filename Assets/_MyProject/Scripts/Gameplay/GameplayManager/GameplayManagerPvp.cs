@@ -2014,4 +2014,16 @@ public class GameplayManagerPvp : GameplayManager
         _card.ChangeHealth(-_damage);
         CheckIfDefenderIsDestroyed(_card,_callBack);
     }
+
+    public override void MarkMarkerAsBomb(string _cardId)
+    {
+        Card _card = GetCard(_cardId);
+        if (_card==null)
+        {
+            return;
+        }
+        
+        Sprite _bombSprite = _card.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
+        _card.Display.ChangeSprite(_bombSprite);
+    }
 }
