@@ -220,14 +220,11 @@ public class GameplayManagerPvp : GameplayManager
     public override void AddAbilityToShop(string _abilityId)
     {
         var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
-        Debug.Log(3333333);
         if (_abilityData == null)
         {
-        Debug.Log(4444444);
             return;
         }
 
-        Debug.Log(555555);
         _abilityData.Owner = "shop";
     }
 
