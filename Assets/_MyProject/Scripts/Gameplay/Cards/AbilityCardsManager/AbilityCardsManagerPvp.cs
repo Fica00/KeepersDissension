@@ -19,7 +19,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         foreach (AbilityCard _ability in Resources.LoadAll<AbilityCard>("Abilities"))
         {
             var _abilityInstance = Instantiate(_ability, null);
-            AbilityData _abilityData = _abilityInstance.CreateData("shop");
+            AbilityData _abilityData = _abilityInstance.CreateData("noone");
             _abilityInstance.Setup(_abilityData.UniqueId);
             FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Add(_abilityData);
         }
@@ -47,20 +47,15 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
     protected override void SetupShopAbilities()
     {
-        // for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
-        // {
-        //     AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
-        //     ShopAbilitiesDisplays.Add(_abilityDisplay);
-        // }
-        // for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
-        // {
-        //     var _ability = DrawAbilityCard(false);
-        //     if (_ability==null)
-        //     {
-        //         return;
-        //     }
-        //     GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
-        // }
+        for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
+        {
+            var _ability = DrawAbilityCard(false);
+            if (_ability==null)
+            {
+                return;
+            }
+            GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
+        }
     }
 
     protected override void TryBuyFromShop(AbilityData _abilityData)

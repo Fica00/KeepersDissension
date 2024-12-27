@@ -12,8 +12,6 @@ namespace FirebaseMultiplayer.Room
         public int StrangeMatterCostChange;
         public string IdOfCardWithResponseAction;
         public List<RoomGameplayPlayer> PlayersData = new ();
-        public List<AbilityData> AbilitiesInShop = new();
-        public List<AbilityData> AvailableAbilities = new();
         public List<CardData> Cards = new();
         public List<AbilityData> Abilities = new();
         

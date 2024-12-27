@@ -156,8 +156,6 @@ public class MatchMakingHandler : MonoBehaviour
                             AmountOfAbilitiesPlayerCanBuy = 7
                         }
                     },
-                    AbilitiesInShop = new List<AbilityData>(),
-                    AvailableAbilities = new List<AbilityData>()
                 }
             };
 

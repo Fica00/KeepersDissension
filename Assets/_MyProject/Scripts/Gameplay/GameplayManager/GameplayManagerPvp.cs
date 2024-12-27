@@ -206,29 +206,26 @@ public class GameplayManagerPvp : GameplayManager
     public override void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
     {
         var _player = _isMyPlayer
-            ? FirebaseManager.Instance.RoomHandler.BoardData.MyPlayer
-            : FirebaseManager.Instance.RoomHandler.BoardData.OpponentPlayer;
-        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Find(_ability => _ability.UniqueId == _abilityId);
+            ? BoardData.MyPlayer
+            : BoardData.OpponentPlayer;
+        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
         if (_abilityData == null)
         {
             return;
         }
 
         _abilityData.Owner = _player.PlayerId;
-        BoardData.Abilities.Add(_abilityData);
-        BoardData.AvailableAbilities.Remove(_abilityData);
     }
 
     public override void AddAbilityToShop(string _abilityId)
     {
-        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Find(_ability => _ability.UniqueId == _abilityId);
+        var _abilityData = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
         if (_abilityData == null)
         {
             return;
         }
 
-        FirebaseManager.Instance.RoomHandler.BoardData.AvailableAbilities.Remove(_abilityData);
-        FirebaseManager.Instance.RoomHandler.BoardData.AbilitiesInShop.Add(_abilityData);
+        _abilityData.Owner = "shop";
     }
 
     public override void ExecuteMove(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, Action _callBack)
@@ -1258,8 +1255,9 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void BuyAbilityFromHand(string _abilityId)
     {
-        BoardData.AbilitiesInShop.Remove(BoardData.AbilitiesInShop.Find(_ability => _ability.UniqueId == _abilityId));
         MyPlayer.AddOwnedAbility(_abilityId);
+        AbilityData _abilityData = BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
+        _abilityData.Owner = BoardData.MyPlayer.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
 
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
