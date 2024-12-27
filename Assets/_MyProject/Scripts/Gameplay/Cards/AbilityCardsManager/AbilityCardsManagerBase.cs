@@ -30,6 +30,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
     {
         CreateCards();
         DealAbilities();
+        SetupShopAbilities();
     }
 
     protected virtual void CreateCards()
