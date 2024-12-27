@@ -11,11 +11,26 @@ public class AbilityCardsManagerBase : MonoBehaviour
     [SerializeField] private Transform abilityShopDisplayHolder;
     
     protected List<AbilityShopDisplay> ShopAbilitiesDisplays = new ();
-    
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     public virtual void Setup()
     {
+        CreateCards();
         DealAbilities();
         SetupShopAbilities();
+    }
+
+    private void CreateCards()
+    {
+        for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
+        {
+            AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
+            ShopAbilitiesDisplays.Add(_abilityDisplay);
+        }
     }
     
     protected virtual void DealAbilities()
@@ -26,17 +41,6 @@ public class AbilityCardsManagerBase : MonoBehaviour
     protected virtual void SetupShopAbilities()
     {
         throw new Exception("Setup shop abilities must be implemented");
-    }
-
-    protected void Awake()
-    {
-        Instance = this;
-        
-        for (int _i = 0; _i < FirebaseManager.Instance.RoomHandler.BoardData.AmountOfCardsInShop; _i++)
-        {
-            AbilityShopDisplay _abilityDisplay = Instantiate(abilityShopDisplayPrefab, abilityShopDisplayHolder);
-            ShopAbilitiesDisplays.Add(_abilityDisplay);
-        }
     }
     
     private void OnEnable()
