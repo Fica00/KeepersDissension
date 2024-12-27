@@ -11,7 +11,7 @@ public class Guardian: Card
     public CardStats GainStatsOnUnchaining;
     [SerializeField] private TextMeshProUGUI healthDisplay;
     [SerializeField] private LineRenderer chain;
-    private GameplayPlayer player;
+    private GameplayPlayer player2;
 
     public bool IsChained => !GameplayManager.Instance.DidUnchainGuardian(GetIsMy());
 
@@ -19,8 +19,8 @@ public class Guardian: Card
     {
         if (My)
         {
-            player = GameplayManager.Instance.MyPlayer;
-            player.OnEndedTurn += AddSpeed;
+            player2 = GameplayManager.Instance.MyPlayer;
+            player2.OnEndedTurn += AddSpeed;
         }
         
         RectTransform _cardBaseTransform = Display.GetComponent<RectTransform>();
@@ -54,9 +54,9 @@ public class Guardian: Card
     private void OnDisable()
     {
         StopAllCoroutines();
-        if (player!=null)
+        if (player2!=null)
         {
-            player.OnEndedTurn -= AddSpeed;
+            player2.OnEndedTurn -= AddSpeed;
         }
         
         GameplayManager.OnCardAttacked -= AddSpeed;

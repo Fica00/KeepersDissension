@@ -7,12 +7,12 @@ public class LifeForce : Card
 {
     [SerializeField] private TextMeshProUGUI lifeForceDisplay;
 
-    private GameplayPlayer player;
+    private GameplayPlayer player2;
     private Guardian guardian;
 
     protected override void Setup()
     {
-        player = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
+        player2 = My ? GameplayManager.Instance.MyPlayer : GameplayManager.Instance.OpponentPlayer;
         StartCoroutine(ShowHealth());
     }
 
@@ -29,7 +29,7 @@ public class LifeForce : Card
             lifeForceDisplay.text = Health.ToString(CultureInfo.InvariantCulture);
             if (Health==0 && !GameplayManager.Instance.IsAbilityActive<Risk>())
             {
-                GameplayManager.Instance.EndGame(!player.IsMy);
+                GameplayManager.Instance.EndGame(!player2.IsMy);
                 yield break;
             }
         }
