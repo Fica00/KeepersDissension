@@ -742,7 +742,7 @@ MonoBehaviour:
   healGuardianButton: {fileID: 835057732}
   showButton: {fileID: 200222736}
   closeButton: {fileID: 1246050851}
-  addStrangeMatter: {fileID: 0}
+  addStrangeMatter: {fileID: 1761902082}
   holder: {fileID: 610346072}
 --- !u!1 &95056896
 GameObject:
@@ -35801,7 +35801,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9785655
+      value: -9790774
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
