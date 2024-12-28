@@ -109,7 +109,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             GameplayManager.Instance.ChangeStrangeMaterInEconomy(_price);
             arrowPanel.Hide();
             ReplaceCardInShop();
-            GameplayManager.Instance.BuyAbilityFromShop(_abilityData.UniqueId);
+            GameplayManager.Instance.BuyAbility(_abilityData.UniqueId);
         });
     }
 
@@ -186,7 +186,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             if (_abilityCard != null)
             {
                 GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
-                GameplayManager.Instance.BuyAbilityFromShop(_abilityCard.UniqueId);
+                GameplayManager.Instance.BuyAbility(_abilityCard.UniqueId);
             }
         });
     }

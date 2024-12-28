@@ -136,6 +136,7 @@ namespace FirebaseMultiplayer.Room
             CheckIfCreatedCard(_currentRoomState,_data);
             CheckIfAbilityCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
+            CheckIfAbilityPlaced(_currentRoomState, _data);
             CheckForAttackAnimation(_currentRoomState,_data);
             CheckIfCardDied(_currentRoomState,_data);
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
@@ -262,6 +263,31 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldMoveCard)
                 {
                     ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                }
+            }
+        }
+        private void CheckIfAbilityPlaced(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldMoveCard = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.PlaceId != _existingCard.PlaceId)
+                    {
+                        _shouldMoveCard = true;
+                        break;
+                    }
+                }
+
+                if (_shouldMoveCard)
+                {
+                    GameplayManager.Instance.PlaceAbilityOnTable(_card.UniqueId, _card.PlaceId);
                 }
             }
         }

@@ -1225,7 +1225,7 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    public override void BuyAbilityFromShop(string _abilityId)
+    public override void BuyAbility(string _abilityId)
     {
         AbilityData _ability = AbilityCardsManagerBase.Instance.RemoveAbilityFromShop(_abilityId);
         if (_ability == null)
@@ -1241,7 +1241,6 @@ public class GameplayManagerPvp : GameplayManager
         if (MyPlayer.Actions>0)
         {
             RoomUpdater.Instance.ForceUpdate();
-            return;
         }
     }
 

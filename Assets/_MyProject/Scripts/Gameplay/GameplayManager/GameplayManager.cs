@@ -409,7 +409,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromShop(string _abilityId)
+    public virtual void BuyAbility(string _abilityId)
     {
         throw new NotImplementedException();
     }
