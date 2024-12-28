@@ -994,6 +994,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void SetAbilityPlace(string _uniqueId, CardPlace _place)
+    {
+        throw new Exception();
+    }
+
     public virtual CardPlace GetCardPlace(CardBase _cardBase)
     {
         throw new Exception();

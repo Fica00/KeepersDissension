@@ -140,7 +140,7 @@ public class CardBase : MonoBehaviour
         }
         else if (this is AbilityCard _ability)
         {
-            GameplayManager.Instance.SetCardPlace(_ability.UniqueId, _place);
+            GameplayManager.Instance.SetAbilityPlace(_ability.UniqueId, _place);
         }
     }
 }

@@ -1603,6 +1603,11 @@ public class GameplayManagerPvp : GameplayManager
         GetCard(_uniqueCardId).CardData.CardPlace = _place;
     }
 
+    public override void SetAbilityPlace(string _uniqueId, CardPlace _place)
+    {
+        GetAbility(_uniqueId).Data.CardPlace = _place;
+    }
+
     public override CardPlace GetCardPlace(CardBase _cardBase)
     {
         CardPlace _cardPlace = CardPlace.Deck;
