@@ -52,14 +52,14 @@ public class AbilityCardsManagerBase : MonoBehaviour
     private void OnEnable()
     {
         CardHandInteractions.OnCardClicked += TryBuyFromHand;
-        AbilityShopDisplay.OnAbilityClicked += TryBuyFromShop;
+        AbilityShopDisplay.OnAbilityClicked += BuyAbility;
         shopPanel.OnOpened += ShowShop;
     }
 
     private void OnDisable()
     {
         CardHandInteractions.OnCardClicked -= TryBuyFromHand;
-        AbilityShopDisplay.OnAbilityClicked -= TryBuyFromShop;
+        AbilityShopDisplay.OnAbilityClicked -= BuyAbility;
         shopPanel.OnOpened -= ShowShop;
     }
 
@@ -73,7 +73,7 @@ public class AbilityCardsManagerBase : MonoBehaviour
         throw new Exception();
     }
     
-    protected virtual void TryBuyFromShop(AbilityData _abilityData)
+    protected virtual void BuyAbility(AbilityData _abilityData)
     {
         throw new Exception("Try buy ability card must be implemented");
     }

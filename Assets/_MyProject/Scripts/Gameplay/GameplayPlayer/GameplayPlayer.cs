@@ -83,12 +83,6 @@ public class GameplayPlayer : MonoBehaviour
         _cardBase.PositionAsDead();
     }
 
-    public void DestroyAbility(CardBase _ability)
-    {
-        _ability.Destroy();
-        _ability.ReturnFromHand();
-    }
-
     public void DestroyWithoutNotify(CardBase _cardBase)
     {
         Card _card = ((Card)_cardBase);
@@ -102,7 +96,7 @@ public class GameplayPlayer : MonoBehaviour
         _card.SetHasDied(true);
     }
 
-    public void AddOwnedAbility(string _abilityId)
+    public void ActivateAbility(string _abilityId)
     {
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _abilityId);
         cardsInHandHandler.HideCards();
@@ -112,17 +106,12 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
+        Debug.Log(2222222);
         GameplayManager.Instance.PlaceAbilityOnTable(_ability.UniqueId);
 
         if (_ability.Details.Type == AbilityCardType.Passive)
         {
-            StartCoroutine(ActivateAbility());
-        }
-
-
-        IEnumerator ActivateAbility()
-        {
-            yield return new WaitForSeconds(1);
+            Debug.Log(3333333);
             GameplayManager.Instance.ActivateAbility(_ability.UniqueId);
         }
     }

@@ -58,7 +58,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         }
     }
 
-    protected override void TryBuyFromShop(AbilityData _abilityData)
+    protected override void BuyAbility(AbilityData _abilityData)
     {
         int _price = FirebaseManager.Instance.RoomHandler.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
         
@@ -107,19 +107,18 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         {
             GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
             FirebaseManager.Instance.RoomHandler.BoardData.StrangeMaterInEconomy += _price;
-            GameplayManager.Instance.BuyAbilityFromShop(_abilityData.UniqueId);
             arrowPanel.Hide();
-            StartCoroutine(ReplaceCardInShop());
+            ReplaceCardInShop();
+            GameplayManager.Instance.BuyAbilityFromShop(_abilityData.UniqueId);
         });
     }
 
-    IEnumerator ReplaceCardInShop()
+    private void ReplaceCardInShop()
     {
-        yield return new WaitForSeconds(1);
         var _ability = DrawAbilityCard(false);
         if (_ability==null)
         {
-            yield break;
+            return;
         }
         GameplayManager.Instance.AddAbilityToShop(_ability.UniqueId);
     }
@@ -186,8 +185,8 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         {
             if (_abilityCard != null)
             {
-                GameplayManager.Instance.BuyAbilityFromHand(_abilityCard.UniqueId);
                 GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
+                GameplayManager.Instance.BuyAbilityFromShop(_abilityCard.UniqueId);
             }
         });
     }

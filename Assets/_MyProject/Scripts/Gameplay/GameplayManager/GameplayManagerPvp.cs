@@ -1233,44 +1233,11 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Debug.Log("1111");
+        Debug.Log("11111111");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
-
-        int _abilityIdInt = _ability.CardId;
-        if (_abilityIdInt == 1031)
-        {
-            return;
-        }
-
-        if (!(_abilityIdInt == 1005 && MyPlayer.Actions == 1))
-        {
-            MyPlayer.Actions--;
-        }
-        
-        Debug.Log("22222222");
-    }
-
-    public override void BuyAbilityFromHand(string _abilityId)
-    {
-        MyPlayer.AddOwnedAbility(_abilityId);
-        AbilityData _abilityData = BoardData.Abilities.Find(_ability => _ability.UniqueId == _abilityId);
-        _abilityData.Owner = BoardData.MyPlayer.PlayerId;
-        ChangeAmountOfAbilitiesICanBuy(-1);
-
-        AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
-        var _ability = GetAbility(_abilityId);
-        int _abilityIdInt = _ability.Details.Id;
-        if (_abilityIdInt == 1031)
-        {
-            return;
-        }
-
-        if (!(_abilityIdInt == 1005 && MyPlayer.Actions == 1))
-        {
-            MyPlayer.Actions--;
-        }
+        MyPlayer.ActivateAbility(_abilityId);
     }
 
     public override void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
@@ -1351,7 +1318,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void PlaceAbilityOnTable(string _abilityId, int _placeId)
     {
-        AbilityCard _ability = Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _abilityId);
+        AbilityCard _ability = GetAbilityCard(_abilityId);
         TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
         _ability.PositionOnTable(_tablePlace);
     }

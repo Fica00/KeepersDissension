@@ -414,11 +414,6 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromHand(string _abilityId)
-    {
-        throw new NotImplementedException();
-    }
-
     public virtual void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         throw new NotImplementedException();
@@ -1142,5 +1137,10 @@ public class GameplayManager : MonoBehaviour
     public virtual void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
     {
         throw new Exception();
+    }
+
+    public AbilityCard GetAbilityCard(string _uniqueId)
+    {
+        return Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _uniqueId);
     }
 }
