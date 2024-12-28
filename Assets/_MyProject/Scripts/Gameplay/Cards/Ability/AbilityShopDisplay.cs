@@ -18,15 +18,12 @@ public class AbilityShopDisplay : MonoBehaviour, IPointerDownHandler, IPointerCl
 
     public void Setup(AbilityData _card)
     {
-        Debug.Log("Showing");
         if (_card==null)
         {
-            Debug.Log(11111111111);
             Empty();
             return;
         }
 
-        Debug.Log(22222222);
         gameObject.name = CardsManager.Instance.GetAbilityName(_card.CardId);
         Ability = _card;
         foreground.enabled = true;

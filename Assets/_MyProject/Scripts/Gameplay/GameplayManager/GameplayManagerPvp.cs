@@ -1233,8 +1233,8 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        Debug.Log("1111");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
-        BoardData.Abilities.Add(_ability);
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
 
@@ -1248,6 +1248,8 @@ public class GameplayManagerPvp : GameplayManager
         {
             MyPlayer.Actions--;
         }
+        
+        Debug.Log("22222222");
     }
 
     public override void BuyAbilityFromHand(string _abilityId)

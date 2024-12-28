@@ -106,6 +106,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             $"Are you sure that you want to buy ability for {_price} strange matter?", ()=>
         {
             GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
+            FirebaseManager.Instance.RoomHandler.BoardData.StrangeMaterInEconomy += _price;
             GameplayManager.Instance.BuyAbilityFromShop(_abilityData.UniqueId);
             arrowPanel.Hide();
             StartCoroutine(ReplaceCardInShop());
@@ -214,7 +215,6 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     
     protected override void ShowShop()
     {
-        Debug.Log("lllllllll");
         for (int _i = 0; _i < ShopAbilitiesDisplays.Count; _i++)
         {
             var _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.FindAll(_ability => _ability.Owner == "shop");
