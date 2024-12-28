@@ -1118,7 +1118,7 @@ public class GameplayManagerPvp : GameplayManager
         void HandleBoughtMinion(int _positionId)
         {
             ChangeMyStrangeMatter(-_cost);
-            BoardData.StrangeMaterInEconomy += _cost;
+            ChangeStrangeMaterInEconomy(_cost);
             (_cardBase as Card)?.SetHasDied(false);
             PlaceCard(_cardId, _positionId);
         }
@@ -1136,7 +1136,7 @@ public class GameplayManagerPvp : GameplayManager
             void FinishRevive(int _positionId)
             {
                 ChangeMyStrangeMatter(-_cost);
-                BoardData.StrangeMaterInEconomy += _cost;
+                ChangeStrangeMaterInEconomy(_cost);
                 PlaceCard(_cardId, _positionId);
                 
                 if (_cost > 0)
@@ -1233,11 +1233,16 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Debug.Log("11111111");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
         MyPlayer.ActivateAbility(_abilityId);
+        MyPlayer.Actions--;
+        if (MyPlayer.Actions>0)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+            return;
+        }
     }
 
     public override void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
@@ -1644,7 +1649,7 @@ public class GameplayManagerPvp : GameplayManager
 
         int _price = BoardData.UnchainingGuardianPrice - StrangeMatterCostChange();
 
-        if (MyStrangeMatter() < _price && !GameplayCheats.HasUnlimitedGold)
+        if (MyStrangeMatter() < _price)
         {
             DialogsManager.Instance.ShowOkDialog($"You don't have enough strange matter, this action requires {_price}");
             return;
@@ -1950,7 +1955,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         BoardData.MyPlayer.DidUnchainGuardian = true;
         ChangeMyStrangeMatter(-_price);
-        BoardData.StrangeMaterInEconomy += _price;
+        ChangeStrangeMaterInEconomy(_price);
         ShowGuardianUnchained(true);
         if (_reduceAction)
         {

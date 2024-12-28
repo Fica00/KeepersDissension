@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -26,6 +25,10 @@ public class GameplayPlayer : MonoBehaviour
         get => GameplayManager.Instance.AmountOfActions(IsMy);
         set
         {
+            if (GameplayCheats.UnlimitedActions)
+            {
+                return;
+            }
             GameplayManager.Instance.SetAmountOfActions(value, IsMy);
             UpdatedActions?.Invoke();
         }
@@ -106,12 +109,10 @@ public class GameplayPlayer : MonoBehaviour
             return;
         }
 
-        Debug.Log(2222222);
         GameplayManager.Instance.PlaceAbilityOnTable(_ability.UniqueId);
 
         if (_ability.Details.Type == AbilityCardType.Passive)
         {
-            Debug.Log(3333333);
             GameplayManager.Instance.ActivateAbility(_ability.UniqueId);
         }
     }

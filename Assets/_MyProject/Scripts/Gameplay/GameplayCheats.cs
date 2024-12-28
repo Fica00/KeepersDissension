@@ -7,50 +7,48 @@ public class GameplayCheats : MonoBehaviour
 {
     public static bool UnlimitedActions;
     public static bool CheckForCd;
-    public static bool HasUnlimitedGold;
     
     [SerializeField] private Toggle unlimitedActions;
     [SerializeField] private Toggle checkForCD;
-    [SerializeField] private Toggle hasUnlimitedGold;
     [SerializeField] private Button healKeeperButton;
     [SerializeField] private Button healGuardianButton;
     [SerializeField] private Button showButton;
     [SerializeField] private Button closeButton;
+    [SerializeField] private Button addStrangeMatter;
     [SerializeField] private Transform holder;
 
     private void Awake()
     {
         UnlimitedActions = false;
         CheckForCd = true;
-        HasUnlimitedGold = false;
         gameObject.SetActive(FirebaseManager.Instance.RoomHandler.IsTestingRoom);
     }
 
     private void OnEnable()
     {
-        hasUnlimitedGold.onValueChanged.AddListener(ToggleUnlimitedGold);
         unlimitedActions.onValueChanged.AddListener(ToggleUnlimitedActions);
         checkForCD.onValueChanged.AddListener(ToggleCheckForCd);
         healGuardianButton.onClick.AddListener(HealGuardian);
         healKeeperButton.onClick.AddListener(HealKeeper);
         showButton.onClick.AddListener(Show);
         closeButton.onClick.AddListener(Close);
+        addStrangeMatter.onClick.AddListener(AddStrangeMatter);
     }
 
     private void OnDisable()
     {
-        hasUnlimitedGold.onValueChanged.RemoveListener(ToggleUnlimitedGold);
         unlimitedActions.onValueChanged.RemoveListener(ToggleUnlimitedActions);
         checkForCD.onValueChanged.RemoveListener(ToggleCheckForCd);
         healGuardianButton.onClick.RemoveListener(HealGuardian);
         healKeeperButton.onClick.RemoveListener(HealKeeper);
         showButton.onClick.RemoveListener(Show);
         closeButton.onClick.RemoveListener(Close);
+        addStrangeMatter.onClick.RemoveListener(AddStrangeMatter);
     }
 
-    private void ToggleUnlimitedGold(bool _status)
+    private void AddStrangeMatter()
     {
-        HasUnlimitedGold = _status;
+        GameplayManager.Instance.ChangeMyStrangeMatter(20);
     }
 
     private void ToggleUnlimitedActions(bool _status)

@@ -96,7 +96,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             return;
         }
 
-        if (GameplayManager.Instance.MyStrangeMatter()<_price&& !GameplayCheats.HasUnlimitedGold)
+        if (GameplayManager.Instance.MyStrangeMatter()<_price)
         {
             DialogsManager.Instance.ShowOkDialog($"You need {_price} strange matter to buy ability card");
             return;
@@ -106,7 +106,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             $"Are you sure that you want to buy ability for {_price} strange matter?", ()=>
         {
             GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
-            FirebaseManager.Instance.RoomHandler.BoardData.StrangeMaterInEconomy += _price;
+            GameplayManager.Instance.ChangeStrangeMaterInEconomy(_price);
             arrowPanel.Hide();
             ReplaceCardInShop();
             GameplayManager.Instance.BuyAbilityFromShop(_abilityData.UniqueId);
@@ -170,7 +170,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         
         int _price = FirebaseManager.Instance.RoomHandler.RoomData.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
         
-        if (GameplayManager.Instance.MyStrangeMatter()<_price && !GameplayCheats.HasUnlimitedGold)
+        if (GameplayManager.Instance.MyStrangeMatter()<_price)
         {
             DialogsManager.Instance.ShowOkDialog($"You dont have enough strange matter, this action requires {_price}");
             return;
