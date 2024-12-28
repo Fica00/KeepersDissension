@@ -1323,6 +1323,7 @@ public class GameplayManagerPvp : GameplayManager
     public override void PlaceAbilityOnTable(string _abilityId, int _placeId)
     {
         AbilityCard _ability = GetAbilityCard(_abilityId);
+        _ability.Data.PlaceId = _placeId;
         TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
         _ability.PositionOnTable(_tablePlace);
     }
