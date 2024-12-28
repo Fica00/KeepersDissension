@@ -287,6 +287,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldMoveCard)
                 {
+                    Debug.Log($"Should move ability {_card.UniqueId} to: {_card.PlaceId}");
                     GameplayManager.Instance.PlaceAbilityOnTable(_card.UniqueId, _card.PlaceId);
                 }
             }
