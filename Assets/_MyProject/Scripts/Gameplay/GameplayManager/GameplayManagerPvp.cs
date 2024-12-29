@@ -322,6 +322,28 @@ public class GameplayManagerPvp : GameplayManager
 
         void TryToApplyWallAbility()
         {
+            if (IsAbilityActive<Collapse>())
+            {
+                DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
+                {
+                    if (_didKill)
+                    {
+                        _callBack?.Invoke();
+                        return;
+                    }
+                    
+                    ApplyWallAbility();
+                });
+            }
+            else
+            {
+                ApplyWallAbility();
+            }
+            
+        }
+
+        void ApplyWallAbility()
+        {
             if (_defendingCard is not Wall _wall)
             {
                 _callBack?.Invoke();
@@ -352,15 +374,6 @@ public class GameplayManagerPvp : GameplayManager
             {
                 ApplySnowAbility(_attackingCard);
                 _callBack?.Invoke();
-                return;
-            }
-
-            if (IsAbilityActive<Collapse>())
-            {
-                DamageCardByAbility(_attackingCard.UniqueId, 1, _ =>
-                {
-                    _callBack?.Invoke();
-                });
                 return;
             }
 
