@@ -290,6 +290,13 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ExecuteAttack(string _firstCardId, string _secondCardId, Action _callBack)
     {
+        if (IsAbilityActive<Truce>())
+        {
+            SaySomethingToAll("Truce is active, attack canceled");
+            _callBack?.Invoke();
+            return;
+        }
+        
         Card _attackingCard = GetCard(_firstCardId);
         Card _defendingCard = GetCard(_secondCardId);
 
@@ -519,6 +526,30 @@ public class GameplayManagerPvp : GameplayManager
                 _defendingCard.ChangeDelivery(false);
                 _damage = 0;
                 _canGetResponse = false;
+            }
+
+            if (IsAbilityActive<Hunter>())
+            {
+                Hunter _hunter = FindObjectOfType<Hunter>();
+                if (_hunter.IsMy != _defendingCard.GetIsMy())
+                {
+                    if (_defendingCard is Guardian)
+                    {
+                        _damage *= 2;
+                    }
+                }
+            }
+
+            if (IsAbilityActive<Invincible>())
+            {
+                Invincible _invincible = FindObjectOfType<Invincible>();
+                if (_invincible.IsMy == _defendingCard.GetIsMy())
+                {
+                    if (_defendingCard is Keeper)
+                    {
+                        _damage = 0;
+                    }
+                }
             }
         
             _defendingCard.ChangeHealth(-_damage);
@@ -780,6 +811,11 @@ public class GameplayManagerPvp : GameplayManager
 
         void FinishPlaceKeeper()
         {
+            if (IsAbilityActive<Comrade>())
+            {
+                //if it is my turn I should be able to pick a minion
+                //if not then I should wait for opponent to pick one
+            }
             _callBack?.Invoke(true);
         }
     }

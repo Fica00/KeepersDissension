@@ -10,7 +10,7 @@ public class Return : AbilityEffect
         GameplayManager.Instance.ChangeMyStrangeMatter(-GameplayManager.Instance.MyStrangeMatter());
         GameplayManager.Instance.ChangeOpponentsStrangeMatter(-GameplayManager.Instance.OpponentsStrangeMatter());
         
-        RemoveAction();
         OnActivated?.Invoke();
+        RemoveAction();
     }
 }

@@ -246,7 +246,7 @@ public class CardsInHandHandler : MonoBehaviour
       DialogsManager.Instance.ShowYesNoDialog($"Do you want to build wall for {_buildPrice} strange matter?",
          () =>
          {
-            GameplayManager.Instance.BuildWall(_card, _buildPrice);
+            GameplayManager.Instance.BuildWall(_card, _buildPrice, null);
             HideCards();
          });
    }

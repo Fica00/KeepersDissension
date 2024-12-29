@@ -6,6 +6,7 @@ public class Dash : AbilityEffect
     {
         SetIsActive(true);
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
         _keeper.ChangeSpeed(speedChange);
         RemoveAction();
         OnActivated?.Invoke();
@@ -14,7 +15,7 @@ public class Dash : AbilityEffect
     protected override void CancelEffect()
     {
         ManageActiveDisplay(false);
-        Card _keeper = GameplayManager.Instance.GetMyKeeper();
+        Card _keeper = GameplayManager.Instance.GetCard(EffectedCards[0]);
         _keeper.ChangeSpeed(speedChange);
         SetIsActive(false);
     }

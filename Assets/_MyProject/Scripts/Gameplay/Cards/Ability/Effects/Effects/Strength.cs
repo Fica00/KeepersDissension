@@ -8,9 +8,9 @@ public class Strength : AbilityEffect
         _keeper.ChangeDamage(amount);
         AddEffectedCard(_keeper.UniqueId);
         SetIsActive(true);
-        RemoveAction();
-        OnActivated?.Invoke();
         ManageActiveDisplay(true);
+        OnActivated?.Invoke();
+        RemoveAction();
     }
 
     protected override void CancelEffect()

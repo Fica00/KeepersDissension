@@ -4,6 +4,7 @@ public class Armor : AbilityEffect
     {
         SetIsActive(true);
         Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
+        AddEffectedCard(_keeper.UniqueId);
         BlockaderCard _blockader = _keeper.EffectsHolder.AddComponent<BlockaderCard>();
         _blockader.Activate();
         EffectedCards.Add(_keeper.UniqueId);
@@ -13,8 +14,8 @@ public class Armor : AbilityEffect
 
     protected override void CancelEffect()
     {
-        Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
-        var _effect = _keeper.EffectsHolder.GetComponent<BlockaderCard>();
+        Card _card = GameplayManager.Instance.GetCard(EffectedCards[0]);
+        var _effect = _card.EffectsHolder.GetComponent<BlockaderCard>();
         if (_effect)
         {
             Destroy(_effect);

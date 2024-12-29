@@ -15,7 +15,7 @@ public class WallBuilder : AbilityEffect
 
     private void FinishBuild()
     {
-        RemoveAction();
         OnActivated?.Invoke();
+        RemoveAction();
     }
 }
