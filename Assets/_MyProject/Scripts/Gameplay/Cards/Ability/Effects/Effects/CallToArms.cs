@@ -14,7 +14,7 @@ public class CallToArms : AbilityEffect
         
         if (_guardian.IsChained)
         {
-            _guardian.OnUnchained += ApplyEffect;
+            _guardian.OnUnchained += ApplyEffectAndUpdateRoom;
         }
         else
         {
@@ -26,14 +26,21 @@ public class CallToArms : AbilityEffect
         RemoveAction();
     }
 
+    private void ApplyEffectAndUpdateRoom()
+    {
+        ApplyEffect();
+        RoomUpdater.Instance.ForceUpdate();
+    }
+
     private void ApplyEffect()
     {
         if (GameplayManager.Instance.IsCardVetoed(UniqueId))
         {
             return;
         }
+        
         List<Card> _minions = GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, true);
-
+        
         foreach (var _minion in _minions)
         {
             _minion.ChangeDamage(powerChange);
@@ -43,6 +50,9 @@ public class CallToArms : AbilityEffect
 
     protected override void CancelEffect()
     {
+        Guardian _guardian = GameplayManager.Instance.GetOpponentGuardian();
+        _guardian.OnUnchained -= ApplyEffectAndUpdateRoom;
+
         List<Card> _minions = GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, true);
 
         foreach (var _minion in _minions)

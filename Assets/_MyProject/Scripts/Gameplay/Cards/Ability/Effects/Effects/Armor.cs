@@ -4,7 +4,8 @@ public class Armor : AbilityEffect
     {
         SetIsActive(true);
         Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
-        _keeper.EffectsHolder.AddComponent<BlockaderCard>();
+        BlockaderCard _blockader = _keeper.EffectsHolder.AddComponent<BlockaderCard>();
+        _blockader.Activate();
         EffectedCards.Add(_keeper.UniqueId);
         RemoveAction();
         OnActivated?.Invoke();

@@ -22,6 +22,11 @@ public class BlockaderCard : CardSpecialAbility
         player.OnStartedTurn -= ResetCanBlock;
     }
 
+    public void Activate()
+    {
+        ResetCanBlock();
+    }
+
     private void ResetCanBlock()
     {
         SetCanBlock(true);
