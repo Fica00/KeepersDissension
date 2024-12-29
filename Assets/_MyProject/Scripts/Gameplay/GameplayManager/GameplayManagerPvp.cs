@@ -322,6 +322,12 @@ public class GameplayManagerPvp : GameplayManager
 
         void TryToApplyWallAbility()
         {
+            if (_defendingCard is not Wall _wall)
+            {
+                _callBack?.Invoke();
+                return;
+            }
+            
             if (IsAbilityActive<Collapse>())
             {
                 DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
@@ -332,23 +338,18 @@ public class GameplayManagerPvp : GameplayManager
                         return;
                     }
                     
-                    ApplyWallAbility();
+                    ApplyWallAbility(_wall);
                 });
             }
             else
             {
-                ApplyWallAbility();
+                ApplyWallAbility(_wall);
             }
             
         }
 
-        void ApplyWallAbility()
+        void ApplyWallAbility(Wall _wall)
         {
-            if (_defendingCard is not Wall _wall)
-            {
-                _callBack?.Invoke();
-                return;
-            }
 
             if (_wall.IsCyber())
             {
