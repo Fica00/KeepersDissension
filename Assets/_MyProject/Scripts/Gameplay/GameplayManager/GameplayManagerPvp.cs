@@ -288,7 +288,7 @@ public class GameplayManagerPvp : GameplayManager
         OnSwitchedPlace?.Invoke(_firstCard, _secondCard);
     }
 
-    protected override void ExecuteAttack(string _firstCardId, string _secondCardId, Action _callBack)
+    public override void ExecuteAttack(string _firstCardId, string _secondCardId, Action _callBack)
     {
         Card _attackingCard = GetCard(_firstCardId);
         Card _defendingCard = GetCard(_secondCardId);
@@ -352,6 +352,15 @@ public class GameplayManagerPvp : GameplayManager
             {
                 ApplySnowAbility(_attackingCard);
                 _callBack?.Invoke();
+                return;
+            }
+
+            if (IsAbilityActive<Collapse>())
+            {
+                DamageCardByAbility(_attackingCard.UniqueId, 1, _ =>
+                {
+                    _callBack?.Invoke();
+                });
                 return;
             }
 
@@ -664,6 +673,17 @@ public class GameplayManagerPvp : GameplayManager
                 if (!_card.HasScaler())
                 {
                     continue;
+                }
+
+                if (IsAbilityActive<Ambush>())
+                {
+                    Ambush _ambush = FindObjectOfType<Ambush>();
+                    if (!_ambush.IsMy)
+                    {
+                        _ambush.MarkAsUsed();
+                        SaySomethingToAll("Ambus activated");
+                        return false;
+                    }
                 }
 
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
@@ -2008,5 +2028,11 @@ public class GameplayManagerPvp : GameplayManager
         
         Sprite _bombSprite = _card.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
         _card.Display.ChangeSprite(_bombSprite);
+    }
+
+    public override void SaySomethingToAll(string _text)
+    {
+        
+        DialogsManager.Instance.ShowOkDialog(_text);
     }
 }

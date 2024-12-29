@@ -245,7 +245,7 @@ public class GameplayManager : MonoBehaviour
         RoomUpdater.Instance.ForceUpdate();
     }
 
-    protected virtual void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
+    public virtual void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
     {
         throw new Exception();
     }
@@ -1147,5 +1147,10 @@ public class GameplayManager : MonoBehaviour
     public AbilityCard GetAbilityCard(string _uniqueId)
     {
         return Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _uniqueId);
+    }
+
+    public virtual void SaySomethingToAll(string _text)
+    {
+        throw new Exception();
     }
 }

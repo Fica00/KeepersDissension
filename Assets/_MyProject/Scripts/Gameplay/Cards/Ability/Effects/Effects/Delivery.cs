@@ -3,7 +3,7 @@ using UnityEngine;
 public class Delivery : AbilityEffect
 {
     [SerializeField] private Sprite sprite;
-
+    
     protected override void ActivateForOwner()
     {
         var _keeper = GameplayManager.Instance.GetMyKeeper();
@@ -12,18 +12,13 @@ public class Delivery : AbilityEffect
         MageCardDelivery _delivery = _keeper.EffectsHolder.AddComponent<MageCardDelivery>();
         _delivery.IsBaseCardsEffect = false;
         _delivery.Setup(true,sprite);
-        RemoveAction();
         OnActivated?.Invoke();
         ManageActiveDisplay(true);
+        RemoveAction();
     }
 
     protected override void CancelEffect()
     {
-        if (GetEffectedCards().Count==0)
-        {
-            return;
-        }
-
         Card _keeper = GetEffectedCards()[0];
         MageCardDelivery _delivery = _keeper.EffectsHolder.GetComponent<MageCardDelivery>();
         if (_delivery==null)
@@ -31,6 +26,8 @@ public class Delivery : AbilityEffect
             return;
         }
         
+        Destroy(_delivery);
         ManageActiveDisplay(false);
+        SetIsActive(false);
     }
 }

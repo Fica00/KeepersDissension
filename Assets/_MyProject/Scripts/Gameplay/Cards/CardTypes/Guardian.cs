@@ -8,21 +8,13 @@ using UnityEngine;
 public class Guardian: Card
 {
     public Action OnUnchained;
-    public CardStats GainStatsOnUnchaining;
     [SerializeField] private TextMeshProUGUI healthDisplay;
     [SerializeField] private LineRenderer chain;
-    private GameplayPlayer player2;
 
     public bool IsChained => !GameplayManager.Instance.DidUnchainGuardian(GetIsMy());
 
     public void ShowUnchain()
     {
-        if (My)
-        {
-            player2 = GameplayManager.Instance.MyPlayer;
-            player2.OnEndedTurn += AddSpeed;
-        }
-        
         RectTransform _cardBaseTransform = Display.GetComponent<RectTransform>();
         Vector3 _startingScale = _cardBaseTransform.localScale;
         _cardBaseTransform.DOScale(new Vector3(_startingScale.x,0,_startingScale.z), 0.5f).OnComplete(() =>
@@ -32,10 +24,9 @@ public class Guardian: Card
         });
         chain.gameObject.SetActive(false);
         
-        SetSpeed(2);
+        ChangeSpeed(1);
         OnUnchained?.Invoke();
     }
-    
     
     protected override void Setup()
     {
@@ -43,55 +34,9 @@ public class Guardian: Card
         chain.gameObject.SetActive(false);
     }
 
-    private void OnEnable()
-    {
-        GameplayManager.OnCardAttacked += AddSpeed;
-        GameplayManager.OnCardMoved += AddSpeed;
-        GameplayManager.OnPlacedCard += AddSpeed;
-        GameplayManager.OnSwitchedPlace += AddSpeed;
-    }
-
     private void OnDisable()
     {
         StopAllCoroutines();
-        if (player2!=null)
-        {
-            player2.OnEndedTurn -= AddSpeed;
-        }
-        
-        GameplayManager.OnCardAttacked -= AddSpeed;
-        GameplayManager.OnCardMoved -= AddSpeed;
-        GameplayManager.OnPlacedCard -= AddSpeed;
-        GameplayManager.OnSwitchedPlace -= AddSpeed;
-    }
-
-    private void AddSpeed(CardBase _cardOne, CardBase _cardTwo)
-    {
-        AddSpeed();
-    }
-
-    private void AddSpeed(CardBase _arg1, CardBase _arg2, int _arg3)
-    {
-        AddSpeed();
-    }
-
-    private void AddSpeed(CardBase _arg1, int _arg2, int _arg3)
-    {
-        AddSpeed();
-    }
-
-    private void AddSpeed(CardBase _obj)
-    {
-        AddSpeed();
-    }
-    
-    private void AddSpeed()
-    {
-        if (IsChained)
-        {
-            return;
-        }
-        SetSpeed(2);
     }
 
     private IEnumerator ShowHealth()

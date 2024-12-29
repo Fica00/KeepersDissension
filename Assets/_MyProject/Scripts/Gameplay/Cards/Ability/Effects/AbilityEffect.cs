@@ -75,7 +75,12 @@ public class AbilityEffect : MonoBehaviour
 
     protected void MoveToActivationField()
     {
-       
+        if (AbilityCard.Data.Type == AbilityCardType.Passive)
+        {
+            return;   
+        }
+        
+        GameplayManager.Instance.PlaceAbilityOnTable(AbilityCard.UniqueId, GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField.Id);
     }
 
     protected void RemoveAction()
@@ -88,6 +93,10 @@ public class AbilityEffect : MonoBehaviour
         if (AbilityCard.Details.Type!=AbilityCardType.Passive)
         {
             GameplayManager.Instance.MyPlayer.Actions--;
+            if (GameplayManager.Instance.MyPlayer.Actions>0)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
     }
 
