@@ -1153,4 +1153,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void ManageAbilityActive(string _uniqueId, bool _status)
+    {
+        throw new Exception();
+    }
 }

@@ -286,4 +286,9 @@ public class AbilityCard : CardBase
     {
         Data.PlaceId = _placeId;
     }
+    
+    public void ManageActiveDisplay(bool _status)
+    {
+        ActiveDisplay.gameObject.SetActive(_status);
+    }
 }

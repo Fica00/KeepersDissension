@@ -2047,7 +2047,16 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void SaySomethingToAll(string _text)
     {
-        
         DialogsManager.Instance.ShowOkDialog(_text);
+    }
+    
+    public override void ManageAbilityActive(string _uniqueId, bool _status)
+    {
+        AbilityCard _ability = GetAbility(_uniqueId);
+        if (_ability==null)
+        {
+            return;
+        }
+        _ability.ManageActiveDisplay(_status);
     }
 }
