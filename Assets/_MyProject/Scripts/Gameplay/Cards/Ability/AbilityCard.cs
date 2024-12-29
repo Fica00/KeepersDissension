@@ -289,6 +289,7 @@ public class AbilityCard : CardBase
     
     public void ManageActiveDisplay(bool _status)
     {
+        Data.IsLightUp = _status;
         ActiveDisplay.gameObject.SetActive(_status);
     }
 }

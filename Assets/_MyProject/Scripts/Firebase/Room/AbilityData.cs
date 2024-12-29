@@ -19,6 +19,7 @@ public class AbilityData
     public bool CanBeGivenToPlayer;
     
     //helpers
+    public bool IsLightUp;
     public bool IsApplied;
     public int Multiplayer;
     public bool CanExecuteThisTurn;

@@ -145,6 +145,7 @@ namespace FirebaseMultiplayer.Room
             CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
             CheckForUnchain(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
+            CheckForAbilityDisplay(_currentRoomState,_data);
             CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
@@ -266,6 +267,7 @@ namespace FirebaseMultiplayer.Room
                 }
             }
         }
+        
         private void CheckIfAbilityPlaced(RoomData _currentRoomData,RoomData _data)
         {
             foreach (var _card in _data.BoardData.Abilities)
@@ -518,6 +520,27 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.BombAnimation;
             GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
+        }
+        
+        private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _currentAbility in _currentRoomData.BoardData.Abilities)
+            {
+                foreach (var _newAbility in _data.BoardData.Abilities)
+                {
+                    if (_newAbility.UniqueId != _currentAbility.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_currentAbility.IsLightUp == _newAbility.IsLightUp)
+                    {
+                        continue;
+                    }
+
+                    GameplayManager.Instance.ManageAbilityActive(_newAbility.UniqueId, _newAbility.IsLightUp);
+                }
+            }
         }
         
         private void CheckForBoughtStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
