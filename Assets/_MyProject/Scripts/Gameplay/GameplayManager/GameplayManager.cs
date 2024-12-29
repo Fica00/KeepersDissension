@@ -270,7 +270,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuildWall(CardBase _cardBase, int _cost)
+    public virtual void BuildWall(CardBase _cardBase, int _cost, Action _callBack)
     {
         throw new NotImplementedException();
     }

@@ -752,7 +752,6 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_defendingCard is Keeper _keeper)
         {
-            
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
@@ -1168,7 +1167,7 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    public override void BuildWall(CardBase _cardBase, int _cost)
+    public override void BuildWall(CardBase _cardBase, int _cost, Action _callBack)
     {
         string _cardId = ((Card)_cardBase).UniqueId;
         StartCoroutine(SelectPlaceRoutine());
@@ -1186,12 +1185,14 @@ public class GameplayManagerPvp : GameplayManager
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
+                    
+                    if (MyPlayer.Actions>0)
+                    {
+                        RoomUpdater.Instance.ForceUpdate();
+                    }
                 }
                 
-                if (MyPlayer.Actions>0)
-                {
-                    RoomUpdater.Instance.ForceUpdate();
-                }
+                _callBack?.Invoke();
             }
         }
     }
