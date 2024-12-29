@@ -16,13 +16,11 @@ public class BomberCard : CardSpecialAbility
     {
         if (_cardBase is not Card _card)
         {
-            Debug.Log("1111111");
             return;
         }
 
         if (_card.UniqueId != Card.UniqueId)
         {
-            Debug.Log("2222222");
             return;
         }
 

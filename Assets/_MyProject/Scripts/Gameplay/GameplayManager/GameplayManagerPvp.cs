@@ -760,6 +760,15 @@ public class GameplayManagerPvp : GameplayManager
             _defendingCard.SetHealth(_heal);
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
             _lifeForce.ChangeHealth(-_heal);
+
+            if (IsAbilityActive<Explode>())
+            {
+                var _explode = FindObjectOfType<Explode>();
+                if (_keeper.GetIsMy() == _explode.IsMy)
+                {
+                    BombExploded(_keeper.GetTablePlace().Id,false);
+                }
+            }
             
             PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
         }
