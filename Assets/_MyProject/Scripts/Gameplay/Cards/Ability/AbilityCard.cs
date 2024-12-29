@@ -201,6 +201,11 @@ public class AbilityCard : CardBase
     {
         Data.IsActive = _status;
     }
+    
+    public void SetIsLightUp(bool _status)
+    {
+        Data.IsLightUp = _status;
+    }
 
     public void AddEffectedCard(string _cardUniqueId)
     {
@@ -289,7 +294,6 @@ public class AbilityCard : CardBase
     
     public void ManageActiveDisplay(bool _status)
     {
-        Data.IsLightUp = _status;
         ActiveDisplay.gameObject.SetActive(_status);
     }
 }

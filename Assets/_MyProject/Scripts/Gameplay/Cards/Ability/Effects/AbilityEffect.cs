@@ -107,6 +107,7 @@ public class AbilityEffect : MonoBehaviour
 
     protected void ManageActiveDisplay(bool _status)
     {
+        AbilityCard.SetIsLightUp(_status);
         AbilityCard.ActiveDisplay.gameObject.SetActive(_status);
     }
 
