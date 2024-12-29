@@ -1158,4 +1158,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void ShowAbilityOnTable(string _abilityId, int _placeId)
+    {
+        throw new Exception();
+    }
 }

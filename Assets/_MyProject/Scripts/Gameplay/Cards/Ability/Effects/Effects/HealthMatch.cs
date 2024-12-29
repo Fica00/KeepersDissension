@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class HealthMatch : AbilityEffect
 {
     protected override void ActivateForOwner()
@@ -5,15 +7,10 @@ public class HealthMatch : AbilityEffect
         Keeper _myKeeper = GameplayManager.Instance.GetMyKeeper();
         Keeper _opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
         
-        if (_myKeeper.Health>_opponentKeeper.Health)
-        {
-            _opponentKeeper.SetHealth(_myKeeper.Health);
-        }
-        else
-        {
-            int _difference = _opponentKeeper.Health-_myKeeper.Health;
-            _opponentKeeper.ChangeHealth(_difference);
-        }
+        Debug.Log($"My health: {_myKeeper.Health}");
+        Debug.Log($"Opponent health: {_opponentKeeper.Health}");
+        
+        _opponentKeeper.SetHealth(_myKeeper.Health);
         
         MoveToActivationField();
         OnActivated?.Invoke();
