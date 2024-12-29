@@ -512,6 +512,18 @@ public class GameplayManagerPvp : GameplayManager
 
             OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
             bool _didGiveResponseAction = false;
+            
+            if (IsAbilityActive<Ambush>())
+            {
+                Ambush _ambush = FindObjectOfType<Ambush>();
+                if (_ambush.IsMy == _attackingCard.GetIsMy())
+                {
+                    _ambush.MarkAsUsed();
+                    SaySomethingToAll("Ambus activated");
+                    _canGetResponse = false;
+                }
+            }
+            
             if (_canGetResponse)
             {
                 _didGiveResponseAction = CheckForResponseAction(_attackingCard, _defendingCard);
@@ -673,17 +685,6 @@ public class GameplayManagerPvp : GameplayManager
                 if (!_card.HasScaler())
                 {
                     continue;
-                }
-
-                if (IsAbilityActive<Ambush>())
-                {
-                    Ambush _ambush = FindObjectOfType<Ambush>();
-                    if (!_ambush.IsMy)
-                    {
-                        _ambush.MarkAsUsed();
-                        SaySomethingToAll("Ambus activated");
-                        return false;
-                    }
                 }
 
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
