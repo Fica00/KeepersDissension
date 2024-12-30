@@ -22,6 +22,7 @@ public class Tar : AbilityEffect
         SetIsActive(false);
         ManageActiveDisplay(false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= TryEnd;
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     protected override void CancelEffect()

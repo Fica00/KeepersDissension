@@ -6,7 +6,7 @@ public class GameplayPlayer : MonoBehaviour
 {
     public Action OnStartedTurn;
     public Action OnEndedTurn;
-    public Action UpdatedActions;
+    public Action OnUpdatedActions;
     
     [SerializeField] private TableSideHandler tableSideHandler;
     [SerializeField] private CardsInHandHandler cardsInHandHandler;
@@ -30,7 +30,7 @@ public class GameplayPlayer : MonoBehaviour
                 return;
             }
             GameplayManager.Instance.SetAmountOfActions(value, IsMy);
-            UpdatedActions?.Invoke();
+            OnUpdatedActions?.Invoke();
         }
     }
 

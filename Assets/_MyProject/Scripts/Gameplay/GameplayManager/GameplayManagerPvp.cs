@@ -264,7 +264,7 @@ public class GameplayManagerPvp : GameplayManager
         PlayMovingSoundEffect(_movingCard);
     }
 
-    protected override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, string _secondCardId,
+    public override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, string _secondCardId,
         Action _callBack)
     {
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_startingPlaceId);
@@ -489,6 +489,15 @@ public class GameplayManagerPvp : GameplayManager
         IEnumerator ResolveEndOfAttackRoutine()
         {
             int _damage = _attackingCard.Damage;
+            
+            if (IsAbilityActive<HighStakes>())
+            {
+                HighStakes _highStakes = FindObjectOfType<HighStakes>();
+                _highStakes.TryToCancel();
+                _damage = 8;
+            }
+
+            
             bool _canGetResponse = true;
             bool _waitForSomething;
 
@@ -533,7 +542,7 @@ public class GameplayManagerPvp : GameplayManager
                 Hunter _hunter = FindObjectOfType<Hunter>();
                 if (_hunter.IsMy != _defendingCard.GetIsMy())
                 {
-                    if (_defendingCard is Guardian)
+                    if (_defendingCard is Guardian && _attackingCard is Keeper)
                     {
                         _damage *= 2;
                     }
@@ -546,6 +555,18 @@ public class GameplayManagerPvp : GameplayManager
                 if (_invincible.IsMy == _defendingCard.GetIsMy())
                 {
                     if (_defendingCard is Keeper)
+                    {
+                        _damage = 0;
+                    }
+                }
+            }
+
+            if (IsAbilityActive<Steadfast>())
+            {
+                Steadfast _steadfast = FindObjectOfType<Steadfast>();
+                if (_steadfast.IsMy == _defendingCard.GetIsMy())
+                {
+                    if (_defendingCard is Keeper && _attackingCard is Minion)
                     {
                         _damage = 0;
                     }
@@ -592,7 +613,22 @@ public class GameplayManagerPvp : GameplayManager
 
                     HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
                 }
-            
+
+                if (IsAbilityActive<Retaliate>())
+                {
+                    Retaliate _retaliate = FindObjectOfType<Retaliate>();
+                    if (_retaliate.IsMy == _defendingCard.GetIsMy() && _defendingCard is Keeper)
+                    {
+                        DamageCardByAbility(_attackingCard.UniqueId, _damage, _ => CallEnd());
+                        return;
+                    }
+                }
+
+                CallEnd();
+            }
+
+            void CallEnd()
+            {
                 _callBack?.Invoke();
                 if (_didGiveResponseAction && MyPlayer.Actions==0)
                 {
@@ -923,20 +959,7 @@ public class GameplayManagerPvp : GameplayManager
         int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
         bool _didIAttack = _attackingCard.GetIsMy();
         int _amount = _additionalMatter;
-        if (_defendingCard is Minion)
-        {
-            _amount += 2;
-        }
-
-        if (_defendingCard is Guardian)
-        {
-            _amount += 10;
-        }
-
-        if (_defendingCard is Keeper)
-        {
-            _amount += 5;
-        }
+        _amount += GetStrangeMatterForCard(_defendingCard);
 
         AddStrangeMatter(_amount, _didIAttack, _placeOfDefendingCard);
     }
@@ -1537,14 +1560,21 @@ public class GameplayManagerPvp : GameplayManager
         BoardData.StrangeMaterInEconomy += _amount;
     }
 
-    public override int StrangeMatterCostChange()
+    public override int StrangeMatterCostChange(bool _forMe)
     {
-        return BoardData.StrangeMatterCostChange;
+        return _forMe ? BoardData.MyPlayer.StrangeMatterCostChange : BoardData.OpponentPlayer.StrangeMatterCostChange;
     }
 
-    public override void ChangeStrangeMatterCostChange(int _amount)
+    public override void ChangeStrangeMatterCostChange(int _amount, bool _forMe)
     {
-        BoardData.StrangeMatterCostChange += _amount;
+        if (_forMe)
+        {
+            BoardData.MyPlayer.StrangeMatterCostChange += _amount;
+        }
+        else
+        {
+            BoardData.OpponentPlayer.StrangeMatterCostChange += _amount;
+        }
     }
 
     public override string IdOfCardWithResponseAction()
@@ -1734,7 +1764,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        int _price = BoardData.UnchainingGuardianPrice - StrangeMatterCostChange();
+        int _price = BoardData.UnchainingGuardianPrice - StrangeMatterCostChange(true);
 
         if (MyStrangeMatter() < _price)
         {
@@ -2080,6 +2110,13 @@ public class GameplayManagerPvp : GameplayManager
     
     public override void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
     {
+        if (IsAbilityActive<HighStakes>())
+        {
+            HighStakes _highStakes = FindObjectOfType<HighStakes>();
+            _highStakes.TryToCancel();
+            _damage = 8;
+        }
+        
         Card _card = GetCard(_uniqueId);
         _card.ChangeHealth(-_damage);
         CheckIfDefenderIsDestroyed(_card,_callBack);
@@ -2110,5 +2147,11 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
         _ability.ManageActiveDisplay(_status);
+    }
+
+    public override List<AbilityData> GetPurchasedAbilities(bool _forMe)
+    {
+        return BoardData.Abilities.FindAll(_ability =>
+            _forMe ? _ability.Owner == FirebaseManager.Instance.PlayerId : _ability.Owner == FirebaseManager.Instance.OpponentId);
     }
 }

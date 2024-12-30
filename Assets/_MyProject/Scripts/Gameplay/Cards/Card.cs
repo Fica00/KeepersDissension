@@ -70,6 +70,11 @@ public class Card : CardBase
     public void HealFull()
     {
         float _amount = Details.Stats.Health - CardData.Stats.Health;
+        if (CardData.Stats.MaxHealth != -1)
+        {
+            _amount = CardData.Stats.MaxHealth = CardData.Stats.Health;
+        }
+        
         ChangeHealth((int)_amount);
         UpdatedHealth?.Invoke();
     }

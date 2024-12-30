@@ -9,6 +9,7 @@ public class RoomGameplayPlayer
     public int StrangeMatter;
     public int AmountOfAbilitiesPlayerCanBuy;
     public bool DidUnchainGuardian;
+    public int StrangeMatterCostChange;
 
     public int ActionsLeft;
 

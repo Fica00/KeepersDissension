@@ -44,7 +44,7 @@ public class GameplayManager : MonoBehaviour
     private void Start()
     {
         SetupTable();
-        MyPlayer.UpdatedActions += TryEndTurn;
+        MyPlayer.OnUpdatedActions += TryEndTurn;
         StartCoroutine(GameplayRoutine());
     }
 
@@ -260,7 +260,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
     
-    protected virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
+    public virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
         throw new Exception();
     }
@@ -894,12 +894,12 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual int StrangeMatterCostChange()
+    public virtual int StrangeMatterCostChange(bool _forMe)
     {
         throw new Exception();
     }
 
-    public virtual void ChangeStrangeMatterCostChange(int _amount)
+    public virtual void ChangeStrangeMatterCostChange(int _amount, bool _forMe)
     {
         throw new Exception();
     }
@@ -1162,5 +1162,30 @@ public class GameplayManager : MonoBehaviour
     public virtual void ShowAbilityOnTable(string _abilityId, int _placeId)
     {
         throw new Exception();
+    }
+
+    public virtual List<AbilityData> GetPurchasedAbilities(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public int GetStrangeMatterForCard(Card _card)
+    {
+        if (_card is Minion)
+        {
+            return 2;
+        }
+
+        if (_card is Guardian)
+        {
+            return 10;
+        }
+
+        if (_card is Keeper)
+        {
+            return 5;
+        }
+
+        return 0;
     }
 }

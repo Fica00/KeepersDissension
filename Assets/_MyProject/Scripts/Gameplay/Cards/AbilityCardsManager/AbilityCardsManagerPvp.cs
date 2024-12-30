@@ -60,7 +60,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
     protected override void BuyAbility(AbilityData _abilityData)
     {
-        int _price = FirebaseManager.Instance.RoomHandler.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
+        int _price = FirebaseManager.Instance.RoomHandler.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange(true);
         
         if (_abilityData==null)
         {
@@ -168,7 +168,8 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             return;
         }
         
-        int _price = FirebaseManager.Instance.RoomHandler.RoomData.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange();
+        int _price = FirebaseManager.Instance.RoomHandler.RoomData.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange
+            (true);
         
         if (GameplayManager.Instance.MyStrangeMatter()<_price)
         {

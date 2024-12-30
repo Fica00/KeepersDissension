@@ -144,7 +144,6 @@ public class MatchMakingHandler : MonoBehaviour
                 BoardData = new BoardData
                 {
                     StrangeMaterInEconomy = 20,
-                    StrangeMatterCostChange = 0,
                     IdOfCardWithResponseAction = string.Empty,
                     PlayersData = new List<RoomGameplayPlayer>()
                     {

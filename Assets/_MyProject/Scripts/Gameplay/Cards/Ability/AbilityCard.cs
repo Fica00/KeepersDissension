@@ -146,6 +146,12 @@ public class AbilityCard : CardBase
     
     private void DoActivate()
     {
+        if (GameplayManager.Instance.IsAbilityActive<Subdued>())
+        {
+            DialogsManager.Instance.ShowOkDialog("Subdued is active");
+            return;
+        }
+        
         if (GameplayManager.Instance.IsCardTaxed(UniqueId))
         {
             if (GameplayManager.Instance.MyStrangeMatter()<=0)

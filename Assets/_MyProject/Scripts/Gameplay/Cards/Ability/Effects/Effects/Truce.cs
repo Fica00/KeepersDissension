@@ -22,6 +22,7 @@ public class Truce : AbilityEffect
         ManageActiveDisplay(false);
         SetIsActive(false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= CheckForEnd;
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     protected override void CancelEffect()
