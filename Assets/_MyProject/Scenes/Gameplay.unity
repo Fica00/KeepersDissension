@@ -2994,6 +2994,8 @@ MonoBehaviour:
   holder: {fileID: 632507975}
   closeButton: {fileID: 632507977}
   cardsHolder: {fileID: 44189166}
+  activationFiledAbilityDisplay: {fileID: 243373072280357589, guid: 6e45fe855df26124fa2e4918cc090599,
+    type: 3}
 --- !u!114 &379036762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35801,7 +35803,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -9824538
+      value: -10027796
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}

@@ -1421,7 +1421,8 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void PlaceAbilityOnTable(string _abilityId)
     {
-        TableHandler.GetAbilityPosition((_placeId) => { PlaceAbilityOnTable(_abilityId, _placeId); });
+        TableHandler.GetAbilityPosition(_placeId => { PlaceAbilityOnTable(_abilityId, _placeId); });
+        
     }
 
     public override void PlaceAbilityOnTable(string _abilityId, int _placeId)
@@ -1440,12 +1441,11 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ReturnAbilityFromActivationField(string _abilityId)
     {
-        StartCoroutine(Handle());
-
-        IEnumerator Handle()
+        PlaceAbilityOnTable(_abilityId);
+        MyPlayer.Actions--;
+        if (MyPlayer.Actions>0)
         {
-            yield return new WaitForSeconds(1);
-            PlaceAbilityOnTable(_abilityId);
+            RoomUpdater.Instance.ForceUpdate();
         }
     }
 
