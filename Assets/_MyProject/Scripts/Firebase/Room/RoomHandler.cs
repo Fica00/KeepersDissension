@@ -134,7 +134,9 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             CheckIfCreatedCard(_currentRoomState,_data);
+            CheckIfAbilityCard(_currentRoomState,_data);
             CheckIfCardMoved(_currentRoomState,_data);
+            CheckIfAbilityPlaced(_currentRoomState, _data);
             CheckForAttackAnimation(_currentRoomState,_data);
             CheckIfCardDied(_currentRoomState,_data);
             CheckForStrangeMatterAnimation(_currentRoomState,_data);
@@ -143,7 +145,10 @@ namespace FirebaseMultiplayer.Room
             CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
             CheckForUnchain(_currentRoomState,_data);
             CheckForGameEnd(_currentRoomState,_data);
+            CheckForAbilityDisplay(_currentRoomState,_data);
+            CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
+            CheckIfOpponentEndedTurn(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -207,9 +212,32 @@ namespace FirebaseMultiplayer.Room
                     GameplayManager.Instance.OpponentCreatedCard(_card);
                     if (_card.PlaceId != -100)
                     {
-                        GameplayManager.Instance.OpponentCreatedCard(_card);
                         ShowCardMoved(_card.UniqueId, _card.PlaceId);
                     }
+                }
+            }
+        }
+        
+        private void CheckIfAbilityCard(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldSpawnCard = true;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    _shouldSpawnCard = false;
+                    break;
+                }
+
+
+                if (_shouldSpawnCard)
+                {
+                    GameplayManager.Instance.OpponentCreatedAbility(_card);
                 }
             }
         }
@@ -236,6 +264,32 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldMoveCard)
                 {
                     ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                }
+            }
+        }
+        
+        private void CheckIfAbilityPlaced(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldMoveCard = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.PlaceId != _existingCard.PlaceId)
+                    {
+                        _shouldMoveCard = true;
+                        break;
+                    }
+                }
+
+                if (_shouldMoveCard)
+                {
+                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, ConvertOpponentsPosition(_card.PlaceId));
                 }
             }
         }
@@ -312,6 +366,37 @@ namespace FirebaseMultiplayer.Room
             var _animationData = _data.BoardData.StrangeMatterAnimation;
             GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
         }
+
+        private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1DeliveryReposition)
+                    {
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2DeliveryReposition)
+                    {
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+
+            void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
         
         private void ShouldEndTurn(RoomData _currentRoomData,RoomData _data)
         {
@@ -348,13 +433,44 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             
-            Debug.Log("Should end turn detected");
             GameplayManager.Instance.EndTurn();
+        }
+        
+        private void CheckIfOpponentEndedTurn(RoomData _currentRoomData,RoomData _data)
+        {
+            bool _didOpponentEndTurn = false;
+            if (IsOwner)
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 2)
+                {
+                    if (_data.CurrentPlayerTurn == 1)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+            else
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 1)
+                {
+                    if (_data.CurrentPlayerTurn == 2)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+
+            if (!_didOpponentEndTurn)
+            {
+                return;
+            }
+
+            GameplayManager.Instance.DidOpponentFinish = true;
         }
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
-            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId));
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId),null);
         }
         
         private int ConvertOpponentsPosition(int _position)
@@ -403,6 +519,27 @@ namespace FirebaseMultiplayer.Room
             
             var _animationData = _data.BoardData.BombAnimation;
             GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
+        }
+        
+        private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _currentAbility in _currentRoomData.BoardData.Abilities)
+            {
+                foreach (var _newAbility in _data.BoardData.Abilities)
+                {
+                    if (_newAbility.UniqueId != _currentAbility.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_currentAbility.IsLightUp == _newAbility.IsLightUp)
+                    {
+                        continue;
+                    }
+
+                    GameplayManager.Instance.ManageAbilityActive(_newAbility.UniqueId, _newAbility.IsLightUp);
+                }
+            }
         }
         
         private void CheckForBoughtStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
@@ -489,7 +626,7 @@ namespace FirebaseMultiplayer.Room
             GameplayManager.Instance.ShowGameEnded(_data.Winner);
         }
         
-        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = 
+        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 
                 default)
         {
             string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, 
@@ -497,29 +634,29 @@ namespace FirebaseMultiplayer.Room
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
-                NewJoinRoom _responseData = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 roomData = _responseData.Room;
                 _responseData.Name = _name;
                 _responseData.Type = _type;
                 _callBack?.Invoke(_responseData);
             }, _response =>
             {
-                NewJoinRoom _data = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _data = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 _callBack?.Invoke(_data);
             }, _includeHeader: false);
         }
 
-        public void CreateRoom(RoomData _roomData, Action<NewCreateRoom> _callBack)
+        public void CreateRoom(RoomData _roomData, Action<CreateRoom> _callBack)
         {
             string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData),GameVersion = Application.version });
 
             WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
                 roomData = _roomData;
-                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
             }, _response =>
             {
-                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
             });
         }
 

@@ -1,0 +1,87 @@
+public class CyberKeeper : CardSpecialAbility
+{
+    private GameplayPlayer player;
+
+    private void Start()
+    {
+        if (!GetPlayer().IsMy)
+        {
+            return;
+        }
+
+        player = GetPlayer();
+        player.OnStartedTurn += EnableAbility;
+    }
+
+    private void EnableAbility()
+    {
+        player.OnStartedTurn -= EnableAbility;
+        SetCanUseAbility(true);
+    }
+
+    public override void UseAbility()
+    {
+        DialogsManager.Instance.ShowYesNoDialog("Use keepers ultimate?", Activate);
+    }
+
+    private void Activate()
+    {
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, Card.Range, PlaceLookFor.Occupied,
+            CardMovementType.EightDirections, false, LookForCardOwner.Enemy, SelectedSpot);
+    }
+
+    private void SelectedSpot(int _placeId)
+    {
+        if (_placeId == -1)
+        {
+            RemoveAction();
+            SetCanUseAbility(false);
+            return;
+        }
+
+        CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_placeId).GetCard();
+        if (!(_cardAtSpot != null))
+        {
+            DialogsManager.Instance.ShowOkDialog("Select warrior");
+            return;
+        }
+
+        Card _card = ((Card)_cardAtSpot);
+        
+        if (!_card.IsWarrior())
+        {
+            DialogsManager.Instance.ShowOkDialog("Select warrior");
+            return;
+        }
+
+        if (_card.My)
+        {
+            DialogsManager.Instance.ShowOkDialog("Select opponents card");
+            return;
+        }
+
+        GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
+        SetCanUseAbility(false);
+        GameplayManager.Instance.ChangeOwnerOfCard(_card.UniqueId);
+        Card.CardData.WarriorAbilityData.EffectedCards.Add(_card.UniqueId);
+        GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;
+        RemoveAction();
+    }
+
+    private void RemoveAction()
+    {
+        GameplayManager.Instance.MyPlayer.Actions--;
+        if (GameplayManager.Instance.MyPlayer.Actions > 0)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
+    }
+
+    private void ReturnCard()
+    {
+        GameplayManager.Instance.MyPlayer.OnEndedTurn -= ReturnCard;
+        GameplayManager.Instance.ChangeOwnerOfCard(Card.CardData.WarriorAbilityData.EffectedCards[0]);
+        Card.CardData.WarriorAbilityData.EffectedCards.Clear();
+        RoomUpdater.Instance.ForceUpdate(); 
+    }
+}

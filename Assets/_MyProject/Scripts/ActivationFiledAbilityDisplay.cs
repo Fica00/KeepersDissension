@@ -1,0 +1,34 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ActivationFiledAbilityDisplay : MonoBehaviour
+{
+    public static Action<AbilityCard> OnClicked;
+    [SerializeField] private Image image;
+    [SerializeField] private Button button;
+
+    private AbilityCard abilityCard;
+    public AbilityCard AbilityCard => abilityCard;
+    
+    public void Setup(AbilityCard _abilityCard)
+    {
+        abilityCard = _abilityCard;
+        image.sprite = CardsManager.Instance.GetAbilityImage(_abilityCard.Details.Id);
+    }
+
+    private void OnEnable()
+    {
+        button.onClick.AddListener(Select);
+    }
+
+    private void OnDisable()
+    {
+        button.onClick.RemoveListener(Select);
+    }
+
+    private void Select()
+    {
+        OnClicked?.Invoke(abilityCard);
+    }
+}

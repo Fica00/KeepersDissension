@@ -6,21 +6,18 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-    public static Action<CardBase, int, int, bool> OnCardMoved;
+    public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
     public static Action<CardBase> OnPlacedCard;
     public static Action<Keeper> OnKeeperDied;
     public static GameplayManager Instance;
     public static Action FinishedSetup;
-    public static Action<CardBase> OnFoundBombMarker;
     public static Action OnUnchainedGuardian;
     
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
-    
-    [HideInInspector] public CardAction LastAction;
     
     [SerializeField] private HealthTracker healthTracker;
 
@@ -33,11 +30,11 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected Sprite forestMarker;
     [SerializeField] protected GameObject bombEffect;
 
+    [HideInInspector] public bool DidOpponentFinish;
     protected bool DidIFinishMyTurn;
-    private bool didOpponentFinishHisTurn;
     private bool doIPlayFirst;
     
-    public bool IsKeeperResponseAction2 =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     
     protected virtual void Awake()
     {
@@ -47,7 +44,7 @@ public class GameplayManager : MonoBehaviour
     private void Start()
     {
         SetupTable();
-        MyPlayer.UpdatedActions += TryEndTurn;
+        MyPlayer.OnUpdatedActions += TryEndTurn;
         StartCoroutine(GameplayRoutine());
     }
 
@@ -72,7 +69,6 @@ public class GameplayManager : MonoBehaviour
         yield return new WaitForSeconds(2);
         SetGameState(GameplayState.SettingUpTable);
         DidIFinishMyTurn = false;
-        didOpponentFinishHisTurn = false;
 
         yield return NewMatchRoutine();
         SetPlayersTurn(doIPlayFirst);
@@ -84,9 +80,7 @@ public class GameplayManager : MonoBehaviour
         while (!HasGameEnded())
         {
             yield return WaitUntilTheEndOfTurn();
-            yield return new WaitForSeconds(1);
             yield return WaitUntilTheEndOfTurn();
-            yield return new WaitForSeconds(1);
         }
     }
 
@@ -111,6 +105,7 @@ public class GameplayManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         AbilityCardsManagerBase.Instance.Setup();
+        RoomUpdater.Instance.ForceUpdate();
         yield return new WaitForSeconds(1f);
 
         FinishedSetup?.Invoke();
@@ -147,14 +142,9 @@ public class GameplayManager : MonoBehaviour
         }
         else
         {
-            didOpponentFinishHisTurn = false;
+            DidOpponentFinish = false;
             OpponentPlayer.NewTurn();
-            if (OpponentPlayer.Actions == 0)
-            {
-                didOpponentFinishHisTurn = true;
-                SetPlayersTurn(true);
-            }
-            yield return new WaitUntil(() => didOpponentFinishHisTurn);
+            yield return new WaitUntil(() => DidOpponentFinish);
             OpponentPlayer.EndedTurn();
         }
         CloseAllPanels();
@@ -195,7 +185,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void AddAbilityToPlayer(bool _isMyPlayer, string _abilityId)
+    public virtual void AddAbilityToPlayer(string _owner, string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -207,38 +197,35 @@ public class GameplayManager : MonoBehaviour
 
     public void ExecuteCardAction(CardAction _action)
     {
-        StartCoroutine(ClosePanelRoutine());
-        LastAction = _action;
+        HideCardActions();
         switch (_action.Type)
         {
             case CardActionType.Attack:
-                ExecuteAttack(_action, () =>
+                ExecuteAttack(_action.FirstCardId, _action.SecondCardId, () =>
                 {
-                    FinishActionExecution(1);
+                    FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.Move:
-                ExecuteMove(_action, () =>
+                ExecuteMove(_action.StartingPlaceId, _action.FinishingPlaceId, _action.FirstCardId, () =>
                 {
-                    FinishActionExecution(1);
+                    FinishActionExecution(_action);
                 });
                 break;
             case CardActionType.SwitchPlace:
-                ExecuteSwitchPlace(_action, () =>
+                ExecuteSwitchPlace(_action.StartingPlaceId, _action.FinishingPlaceId, _action.FirstCardId, _action.SecondCardId, () =>
                 {
-                    FinishActionExecution(2);
-                });
-                break;
-            case CardActionType.MoveAbility:
-                ExecuteMoveAbility(_action, () =>
-                {
-                    FinishActionExecution(0);
+                    FinishActionExecution(_action);
                 });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
 
+    public void HideCardActions()
+    {
+        StartCoroutine(ClosePanelRoutine());
         IEnumerator ClosePanelRoutine()
         {
             yield return new WaitForSeconds(.01f);
@@ -246,46 +233,44 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    private void FinishActionExecution(int _actionCost)
+    private void FinishActionExecution(CardAction _action)
     {
-        Debug.Log("Finished with action");
-        MyPlayer.Actions-=_actionCost;
+        MyPlayer.Actions-=_action.Cost;
 
         if (MyPlayer.Actions<=0)
         {
-            Debug.Log("Not updating because player has 0 actions");
             return;
         }
         
         RoomUpdater.Instance.ForceUpdate();
     }
 
-    protected virtual void ExecuteAttack(CardAction _action, Action _callBack)
+    public virtual void ExecuteAttack(string _firstCardId, string _secondCardId,Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual void UseDelivery(string _defendingCardId, Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteMove(CardAction _action,Action _callBack)
+    public virtual void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteSwitchPlace(CardAction _action,Action _callBack)
+    public virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
         throw new Exception();
     }
     
-    protected virtual void ExecuteMoveAbility(CardAction _action,Action _callBack)
-    {
-        throw new Exception();
-    }
-    
-    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null)
+    public virtual void BuyMinion(CardBase _cardBase, int _cost, Action _callBack = null, int _placeId = -1)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void BuildWall(CardBase _cardBase, int _cost)
+    public virtual void BuildWall(CardBase _cardBase, int _cost, Action _callBack)
     {
         throw new NotImplementedException();
     }
@@ -399,7 +384,7 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    public virtual void ChangeOwnerOfCard(string _placeId)
+    public virtual void ChangeOwnerOfCard(string _cardId)
     {
         throw new NotImplementedException();
     }
@@ -409,7 +394,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BombExploded(int _placeId, string _cardId)
+    public virtual void BombExploded(int _placeId, bool _includeSelf)
     {
         throw new NotImplementedException();
     }
@@ -424,17 +409,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void BuyAbilityFromShop(string _abilityId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void BuyAbilityFromHand(string _abilityId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual int PushCardForward(int _startingPlace, int _endingPlace, int _chanceForPush = 100, bool _tryToMoveSelf = false)
+    public virtual void BuyAbility(string _abilityId)
     {
         throw new NotImplementedException();
     }
@@ -492,7 +467,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void ChangeSprite(int _cardPlace, int _cardId, int _spriteId, bool _showPlaceAnimation=false)
+    public virtual void ChangeSprite(string _cardId, int _spriteId, bool _showPlaceAnimation=false)
     {
         throw new Exception();
     }
@@ -919,12 +894,12 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual int StrangeMatterCostChange()
+    public virtual int StrangeMatterCostChange(bool _forMe)
     {
         throw new Exception();
     }
 
-    public virtual void ChangeStrangeMatterCostChange(int _amount)
+    public virtual void ChangeStrangeMatterCostChange(int _amount, bool _forMe)
     {
         throw new Exception();
     }
@@ -1019,6 +994,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void SetAbilityPlace(string _uniqueId, CardPlace _place)
+    {
+        throw new Exception();
+    }
+
     public virtual CardPlace GetCardPlace(CardBase _cardBase)
     {
         throw new Exception();
@@ -1029,12 +1009,17 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void OpponentCreatedAbility(AbilityData _abilityData)
+    {
+        throw new Exception();
+    }
+
     public virtual void ShowCardPlaced(string _uniqueId, int _positionId)
     {
         throw new Exception();
     }
 
-    public virtual void ShowCardMoved(string _uniqueId, int _positionId)
+    public virtual void ShowCardMoved(string _uniqueId, int _positionId, Action _callBack)
     {
         throw new Exception();
     }
@@ -1144,14 +1129,63 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual bool IsMyResponseAction2()
+    public virtual bool IsMyResponseAction()
     {
         throw new Exception();
     }
     
-    public virtual bool IsResponseAction2()
+    public virtual bool IsResponseAction()
     {
         throw new Exception();
     }
-    
+
+    public virtual void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
+    {
+        throw new Exception();
+    }
+
+    public AbilityCard GetAbilityCard(string _uniqueId)
+    {
+        return Resources.FindObjectsOfTypeAll<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _uniqueId);
+    }
+
+    public virtual void SaySomethingToAll(string _text)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ManageAbilityActive(string _uniqueId, bool _status)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowAbilityOnTable(string _abilityId, int _placeId)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<AbilityData> GetPurchasedAbilities(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public int GetStrangeMatterForCard(Card _card)
+    {
+        if (_card is Minion)
+        {
+            return 2;
+        }
+
+        if (_card is Guardian)
+        {
+            return 10;
+        }
+
+        if (_card is Keeper)
+        {
+            return 5;
+        }
+
+        return 0;
+    }
 }

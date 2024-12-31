@@ -115,7 +115,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandleJoinRoom(NewJoinRoom _response)
+    private void HandleJoinRoom(JoinRoom _response)
     {
         if (_response.Success)
         {
@@ -144,7 +144,6 @@ public class MatchMakingHandler : MonoBehaviour
                 BoardData = new BoardData
                 {
                     StrangeMaterInEconomy = 20,
-                    StrangeMatterCostChange = 0,
                     IdOfCardWithResponseAction = string.Empty,
                     PlayersData = new List<RoomGameplayPlayer>()
                     {
@@ -156,8 +155,6 @@ public class MatchMakingHandler : MonoBehaviour
                             AmountOfAbilitiesPlayerCanBuy = 7
                         }
                     },
-                    AbilitiesInShop = new List<AbilityData>(),
-                    AvailableAbilities = new List<AbilityData>()
                 }
             };
 
@@ -166,7 +163,7 @@ public class MatchMakingHandler : MonoBehaviour
         }
     }
 
-    private void HandeCreateRoom(NewCreateRoom _response)
+    private void HandeCreateRoom(CreateRoom _response)
     {
         if (_response.Success)
         {

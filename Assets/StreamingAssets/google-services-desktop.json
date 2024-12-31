@@ -3,25 +3,27 @@
     "project_number": "667989231623",
     "firebase_url": "https://keepersdissension-default-rtdb.firebaseio.com",
     "project_id": "keepersdissension",
-    "storage_bucket": "keepersdissension.appspot.com"
+    "storage_bucket": "keepersdissension.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:667989231623:android:09058a6cb727d742af02a2",
+        "mobilesdk_app_id": "1:667989231623:ios:f7de2e56d25b6bfdaf02a2",
         "android_client_info": {
           "package_name": "com.MagmaDev.Keepers"
         }
       },
-      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCdMhCl7aGNZQjQrKq-Ted2HNL2AFTiWQA"
+          "current_key": "AIzaSyDvD5RofQLUqbuBWQt4_ltMjCG-21lZr5E"
         }
       ],
       "services": {
+        "analytics_service": {
+          "status": 0
+        },
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "status": 1
         }
       }
     }

@@ -7,107 +7,43 @@ public class ActivationFieldHandler : MonoBehaviour
 {
     public static Action OnShowed;
     public static Action OnHided;
+    
     [SerializeField] private GameObject holder;
     [SerializeField] private Button closeButton;
     [SerializeField] private Transform cardsHolder;
-    
-    private Vector3 sizeOfCards = new (2, 2, 1);
-    private List<CardBase> shownCards = new ();
-    private int placeId;
-
-
+    [SerializeField] private ActivationFiledAbilityDisplay activationFiledAbilityDisplay;
+    private List<ActivationFiledAbilityDisplay> shownCards = new();
     
     private void OnEnable()
     {
-        TablePlaceHandler.OnPlaceClicked -= CheckPlace;
-        CardTableInteractions.OnPlaceClicked += CheckPlace;
+        ActivationFiledAbilityDisplay.OnClicked += CheckIfCanBringBack;
+        TablePlaceHandler.OnPlaceClicked += CheckPlace;
         closeButton.onClick.AddListener(Close);
     }
 
     private void OnDisable()
     {
+        ActivationFiledAbilityDisplay.OnClicked -= CheckIfCanBringBack;
         TablePlaceHandler.OnPlaceClicked -= CheckPlace;
-        CardTableInteractions.OnPlaceClicked -= CheckPlace;
         closeButton.onClick.RemoveListener(Close);
     }
-
-    private void CheckPlace(TablePlaceHandler _clickedPlace)
-    {
-        if (_clickedPlace.Id != 65 && _clickedPlace.Id != -1)
-        {
-            return;
-        }
-
-        placeId = _clickedPlace.Id;
-        ShowCards(_clickedPlace.GetCards());
-    }
-
-    private void ShowCards(List<CardBase> _cardBase)
-    {
-        if (_cardBase==null || _cardBase.Count == 0)
-        {
-            return;
-        }
-        
-        foreach (var _card in _cardBase)
-        {
-            _card.transform.SetParent(cardsHolder);
-            _card.PositionInHand();
-            _card.transform.localScale = sizeOfCards;
-            _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
-            shownCards.Add(_card);
-        }
-        
-        holder.SetActive(true);
-        CardHandInteractions.OnCardClicked += CheckCard;
-        OnShowed?.Invoke();
-    }
-
-    private void Close()
-    {
-        ClearShownCards();
-        holder.SetActive(false);
-        CardHandInteractions.OnCardClicked -= CheckCard;
-        OnHided?.Invoke();
-    }
-
-    private void ClearShownCards()
-    {
-        TablePlaceHandler _activationField = GameplayManager.Instance.TableHandler.GetPlace(placeId);
-        foreach (var _shownCard in shownCards)
-        {
-            CardHandInteractions _cardHandler = _shownCard.GetComponent<CardHandInteractions>();
-            if (_cardHandler!=null)
-            {
-                Destroy(_cardHandler);
-            }
-            _shownCard.PositionOnTable(_activationField);
-        }
-        
-        shownCards.Clear();
-    }
     
-    private void CheckCard(CardBase _cardBase)
+    private void CheckIfCanBringBack(AbilityCard _abilityCards)
     {
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
 
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
                 return;
             }
         }
         
         if (!GameplayManager.Instance.IsMyTurn())
-        {
-            return;
-        }
-        
-        if (!shownCards.Contains(_cardBase))
         {
             return;
         }
@@ -121,7 +57,7 @@ public class ActivationFieldHandler : MonoBehaviour
         int _indexOfCard = 1;
         foreach (var _shownCard in shownCards)
         {
-            if (_shownCard==_cardBase)
+            if (_shownCard.AbilityCard==_abilityCards)
             {
                 break;
             }
@@ -129,31 +65,19 @@ public class ActivationFieldHandler : MonoBehaviour
             _indexOfCard++;
         }
 
-        AbilityEffect _effect = (_cardBase as AbilityCard)?.Effect;
+        AbilityEffect _effect = _abilityCards.Effect;
         int _amountOfCardsOnTop = shownCards.Count - _indexOfCard;
         bool _canReturn = _effect.Cooldown <= _amountOfCardsOnTop;
+        
         if (!GameplayCheats.CheckForCd)
         {
             _canReturn = true;
         }
+        
         if (_canReturn)
         {
-            CardTableInteractions _tableInteractions = _cardBase.GetComponent<CardTableInteractions>();
-            if (_tableInteractions!=null)
-            {
-                Destroy(_tableInteractions);
-            }
-
-            CardHandInteractions _handInteractions = _cardBase.GetComponent<CardHandInteractions>();
-            if (_handInteractions!=null)
-            {
-                Destroy(_handInteractions);
-            }
-            shownCards.Remove(_cardBase);
-            _cardBase.transform.SetParent(null);
-            _cardBase.PositionInHand();
+            GameplayManager.Instance.ReturnAbilityFromActivationField(_abilityCards.UniqueId);
             Close();
-            GameplayManager.Instance.ReturnAbilityFromActivationField(((AbilityCard)_cardBase).UniqueId);
         }
         else
         {
@@ -161,4 +85,51 @@ public class ActivationFieldHandler : MonoBehaviour
                                             $"{_amountOfCardsOnTop}");
         }
     }
+
+    private void CheckPlace(TablePlaceHandler _clickedPlace)
+    {
+        if (_clickedPlace.Id != 65 && _clickedPlace.Id != -1)
+        {
+            return;
+        }
+
+        ShowCards(_clickedPlace.GetCards());
+    }
+
+    private void ShowCards(List<CardBase> _cardBase)
+    {
+        if (_cardBase==null || _cardBase.Count == 0)
+        {
+            return;
+        }
+
+        if (shownCards.Count>0)
+        {
+            return;
+        }
+
+        foreach (var _card in _cardBase)
+        {
+            AbilityCard _abilityCard = _card as AbilityCard;
+            var _display = Instantiate(activationFiledAbilityDisplay, cardsHolder);
+            _display.Setup(_abilityCard);
+            shownCards.Add(_display);
+        }
+        
+        holder.SetActive(true);
+        OnShowed?.Invoke();
+    }
+
+    private void Close()
+    {
+        foreach (var _shownCard in shownCards)
+        {
+            Destroy(_shownCard.gameObject);
+        }
+        shownCards.Clear();
+        
+        holder.SetActive(false);
+        OnHided?.Invoke();
+    }
+
 }

@@ -81,9 +81,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -105,9 +105,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -144,9 +144,9 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction2())
+            if (!GameplayManager.Instance.IsMyResponseAction())
             {
                 return;
             }
@@ -161,9 +161,9 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (GameplayManager.Instance.IsResponseAction2())
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            if (!GameplayManager.Instance.IsKeeperResponseAction2)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
                 int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
                 if (_id != _placeId)
@@ -187,7 +187,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (!selectedCard.CanBeUsed)
+        if (selectedCard.HasSnowWallEffect)
         {
             DialogsManager.Instance.ShowOkDialog("This card can't be used!");
             selectedCard = null;
@@ -249,7 +249,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        foreach (var _cardAbility in _cardAbilities)
+        foreach (CardSpecialAbility _cardAbility in _cardAbilities)
         {
             if (!_cardAbility.IsClickable)
             {
@@ -267,6 +267,12 @@ public class CardActionsDisplay : MonoBehaviour
                 
                 if (!GameplayManager.Instance.IsMyTurn())
                 {
+                    return;
+                }
+
+                if (!_cardAbility.CanUseAbility)
+                {
+                    DialogsManager.Instance.ShowOkDialog("This ability has already been used");
                     return;
                 }
                 

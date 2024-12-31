@@ -9,11 +9,8 @@ namespace FirebaseMultiplayer.Room
     public class BoardData
     {
         public int StrangeMaterInEconomy;
-        public int StrangeMatterCostChange;
         public string IdOfCardWithResponseAction;
         public List<RoomGameplayPlayer> PlayersData = new ();
-        public List<AbilityData> AbilitiesInShop = new();
-        public List<AbilityData> AvailableAbilities = new();
         public List<CardData> Cards = new();
         public List<AbilityData> Abilities = new();
         
@@ -32,5 +29,7 @@ namespace FirebaseMultiplayer.Room
         public SoundAnimation SoundAnimation = new();
         public BombAnimation BombAnimation = new();
         public BoughtStrangeMatterAnimation BoughtStrangeMatterAnimation = new();
+
+        public string DeliveryCard;
     }
 }

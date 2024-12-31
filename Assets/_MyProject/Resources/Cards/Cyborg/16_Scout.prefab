@@ -201,3 +201,18 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 21300000, guid: 78e6f3fe7f93197458a3dffc76d80894,
     type: 3}
   IsBaseCardsEffect: 1
+--- !u!114 &6907518934863395387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82895929959744482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5b6bc950ce8754aa2ab7bb29af7b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsClickable>k__BackingField: 0
+  <Sprite>k__BackingField: {fileID: 0}
+  IsBaseCardsEffect: 1
