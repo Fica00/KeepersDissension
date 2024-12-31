@@ -36,7 +36,7 @@ public class SniperStealth : CardSpecialAbility
             return;
         }
 
-        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use minefield ability?", YesUseStealth, null);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use stealth ability?", YesUseStealth);
     }
 
     private void YesUseStealth()

@@ -74,6 +74,7 @@ public class GameplayCheats : MonoBehaviour
         }
 
         _guardian.ChangeHealth(10);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     private void HealKeeper()
@@ -85,6 +86,7 @@ public class GameplayCheats : MonoBehaviour
         }
 
         _keeper.ChangeHealth(10);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     private void Show()

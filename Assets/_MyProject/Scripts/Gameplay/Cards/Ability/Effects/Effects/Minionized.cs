@@ -47,6 +47,7 @@ public class Minionized : AbilityEffect
         _opponentKeeper.SetMaxHealth(-1);
         _myKeeper.SetHealth(HasMyRequiredCardDied ? 5 : StartingHealth);
         _opponentKeeper.SetHealth(HasOpponentsRequiredCardDied ? 5 : OpponentsStartingHealth);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     private void CheckKeeper(Keeper _keeper)

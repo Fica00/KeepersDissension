@@ -825,7 +825,7 @@ public class GameplayManagerPvp : GameplayManager
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
-            _lifeForce.ChangeHealth(-_heal);
+            _lifeForce.ChangeHealth(-_defendingCard.Health);
 
             if (IsAbilityActive<Explode>())
             {

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Tar : AbilityEffect
 {
     protected override void ActivateForOwner()
@@ -13,12 +15,14 @@ public class Tar : AbilityEffect
 
     private void TryEnd()
     {
+        Debug.Log(RemainingCooldown);
         if (RemainingCooldown>0)
         {
             SetRemainingCooldown(RemainingCooldown-1);
             return;
         }
         
+        Debug.Log("got here");
         SetIsActive(false);
         ManageActiveDisplay(false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= TryEnd;
