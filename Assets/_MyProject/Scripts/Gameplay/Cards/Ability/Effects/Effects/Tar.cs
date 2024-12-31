@@ -15,7 +15,6 @@ public class Tar : AbilityEffect
 
     private void TryEnd()
     {
-        Debug.Log(RemainingCooldown);
         if (RemainingCooldown>0)
         {
             SetRemainingCooldown(RemainingCooldown-1);
@@ -23,7 +22,6 @@ public class Tar : AbilityEffect
             return;
         }
         
-        Debug.Log("got here");
         SetIsActive(false);
         ManageActiveDisplay(false);
         GameplayManager.Instance.MyPlayer.OnEndedTurn -= TryEnd;

@@ -34,6 +34,7 @@ public class Minionized : AbilityEffect
         if (RemainingCooldown>0)
         {
             SetRemainingCooldown(RemainingCooldown-1);
+            RoomUpdater.Instance.ForceUpdate();
             return;
         }
 

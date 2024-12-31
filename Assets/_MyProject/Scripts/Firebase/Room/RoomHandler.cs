@@ -537,7 +537,6 @@ namespace FirebaseMultiplayer.Room
                         continue;
                     }
 
-                    Debug.Log($"Detected change: {_currentAbility.IsLightUp} -> {_newAbility.IsLightUp}");
                     GameplayManager.Instance.ManageAbilityActive(_newAbility.UniqueId, _newAbility.IsLightUp);
                 }
             }

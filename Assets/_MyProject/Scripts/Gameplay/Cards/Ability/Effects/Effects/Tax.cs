@@ -17,11 +17,21 @@ public class Tax : AbilityEffect
         foreach (var _availableCard in _availableCards.ToList())
         {
             AbilityCard _card = GameplayManager.Instance.GetAbilityCard(_availableCard.UniqueId);
-            if (_card.Details.Type==AbilityCardType.CrowdControl)
+            bool _shouldSkip = false;
+            foreach (var _effect in _card.EffectsHolder.GetComponents<AbilityEffect>())
+            {
+                if (_effect.Cooldown > 0)
+                {
+                    _shouldSkip = true;
+                    break;
+                }
+            }
+
+            if (_shouldSkip)
             {
                 continue;
             }
-
+            
             _availableCards.Remove(_availableCard);
         }
         

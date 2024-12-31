@@ -822,6 +822,12 @@ public class GameplayManagerPvp : GameplayManager
             float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
+            if (IsAbilityActive<Subdued>())
+            {
+                Subdued _subdued = FindObjectOfType<Subdued>();
+                _subdued.TryToCancel();
+            }
+
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
