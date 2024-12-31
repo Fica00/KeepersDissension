@@ -31,5 +31,6 @@ public class Retaliate : AbilityEffect
         RemoveEffectedCard(_keeper.UniqueId);
         SetIsActive(false);
         ManageActiveDisplay(false);
+        RoomUpdater.Instance.ForceUpdate();
     }
 }

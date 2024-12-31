@@ -10,6 +10,7 @@ public class Toughen : AbilityEffect
         _keeper.HealFull();
         OnActivated?.Invoke();
         RemoveAction();
+        RoomUpdater.Instance.ForceUpdate();
     }
 
 
@@ -20,5 +21,6 @@ public class Toughen : AbilityEffect
         _keeper.SetMaxHealth(5);
         ManageActiveDisplay(false);
         SetIsActive(false);
+        RoomUpdater.Instance.ForceUpdate();
     }
 }
