@@ -1263,7 +1263,11 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ChangeOwnerOfCard(string _cardId)
     {
-        Card _card = GetAllMinions().Find(_card => _card.UniqueId == _cardId);
+        Card _card = GetAllCards().Find(_card => _card.UniqueId == _cardId);
+        if (_card==null)
+        {
+            return;
+        }
         _card.ChangeOwner();
     }
 

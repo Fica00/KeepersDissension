@@ -47,6 +47,7 @@ public class CyberKeeper : CardSpecialAbility
         }
 
         Card _card = ((Card)_cardAtSpot);
+        
         if (!_card.IsWarrior())
         {
             DialogsManager.Instance.ShowOkDialog("Select warrior");
