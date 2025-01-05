@@ -18,7 +18,7 @@ public class Toughen : AbilityEffect
     {
         var _keeper = GetEffectedCards()[0];
         RemoveEffectedCard(_keeper.UniqueId);
-        _keeper.SetMaxHealth(5);
+        _keeper.SetMaxHealth(-1);
         ManageActiveDisplay(false);
         SetIsActive(false);
         RoomUpdater.Instance.ForceUpdate();

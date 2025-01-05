@@ -72,7 +72,7 @@ public class Card : CardBase
         float _amount = Details.Stats.Health - CardData.Stats.Health;
         if (CardData.Stats.MaxHealth != -1)
         {
-            _amount = CardData.Stats.MaxHealth = CardData.Stats.Health;
+            _amount = CardData.Stats.MaxHealth;
         }
         
         ChangeHealth((int)_amount);
