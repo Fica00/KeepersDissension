@@ -85,7 +85,16 @@ public class Portal : AbilityEffect
         if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {
             Debug.Log("Place on the other side is occupied, damaging my self");
-            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1,_ => _callBack?.Invoke());
+            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _didKill =>
+            {
+                if (_didKill)
+                {
+                    _callBack?.Invoke();
+                    return;
+                }
+                GameplayManager.Instance.PushCard(_finishingPlace, _startingPlace, 100);
+                _callBack?.Invoke();
+            });
         }
         else
         {

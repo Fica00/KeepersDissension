@@ -265,6 +265,7 @@ public class GameplayManagerPvp : GameplayManager
                 _portal.CheckCardThatMoved(_movingCard, _startingPlaceId,_finishingPlaceId, _callBack);
                 return;
             }
+            
             _callBack?.Invoke();
         });
         PlayMovingSoundEffect(_movingCard);
