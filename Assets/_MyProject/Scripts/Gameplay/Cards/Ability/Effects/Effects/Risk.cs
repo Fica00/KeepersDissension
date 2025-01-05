@@ -2,6 +2,7 @@ public class Risk : AbilityEffect
 {
     protected override void ActivateForOwner()
     {
+        SetIsActive(true);
         bool _didGameEnd = Activate();
         if (_didGameEnd)
         {
