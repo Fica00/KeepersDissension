@@ -94,7 +94,12 @@ public class Card : CardBase
 
     public void ChangeHealth(int _amount)
     {
-        int _newHealth = Math.Clamp(CardData.Stats.Health + _amount, 0, CardData.Stats.Health==-1 ? Details.Stats.Health : Details.Stats.MaxHealth);
+        int _newHealth = Math.Clamp(
+            CardData.Stats.Health + _amount, 
+            0,
+            CardData.Stats.MaxHealth == -1 ? Details.Stats.Health : CardData.Stats.MaxHealth
+        );        
+        
         CardData.Stats.Health = _newHealth;
         UpdatedHealth?.Invoke();
     }
