@@ -216,7 +216,7 @@ public class AbilityEffect : MonoBehaviour
         return false;
     }
     
-    protected List<Card> GetEffectedCards()
+    public List<Card> GetEffectedCards()
     {
         List<Card> _effectedCards = new();
         List<Card> _allCards = FindObjectsOfType<Card>().ToList();

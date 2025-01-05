@@ -259,13 +259,6 @@ public class GameplayManagerPvp : GameplayManager
         ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
         {
             OnCardMoved?.Invoke(_movingCard, _startingPlaceId, _finishingPlaceId);
-            if (IsAbilityActive<Portal>())
-            {
-                Portal _portal = FindObjectOfType<Portal>();
-                _portal.CheckCardThatMoved(_movingCard, _startingPlaceId,_finishingPlaceId, _callBack);
-                return;
-            }
-            
             _callBack?.Invoke();
         });
         PlayMovingSoundEffect(_movingCard);

@@ -610,6 +610,17 @@ public class TableActionsHandler : MonoBehaviour
 
     private void ExecuteAction(CardAction _action)
     {
+        bool _didAsk = TryAskForAction(_action);
+        if (_didAsk)
+        {
+            return;
+        }
+        
+        YesExecute(_action);
+    }
+
+    private bool TryAskForAction(CardAction _action)
+    {
         CardBase _attackingCard = tableHandler.GetPlace(_action.StartingPlaceId).GetComponentInChildren<CardBase>();
         CardBase _defendingCard = tableHandler.GetPlace(_action.FinishingPlaceId).GetComponentInChildren<CardBase>();
         if (_attackingCard != null && _defendingCard != null)
@@ -643,11 +654,11 @@ public class TableActionsHandler : MonoBehaviour
                 }
 
                 DialogsManager.Instance.ShowYesNoDialog(_question, () => { YesExecute(_action); });
-                return;
+                return true;
             }
         }
 
-        YesExecute(_action);
+        return false;
     }
 
     private void YesExecute(CardAction _action)
@@ -682,10 +693,93 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
-
-        GameplayManager.Instance.ExecuteCardAction(_newAction);
+        
+        bool _continue =TryHandlePortalMove(_newAction);
+        
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();
+        
+        if (_continue)
+        {
+            GameplayManager.Instance.ExecuteCardAction(_newAction);
+        }
+
+        CardActionsDisplay.Instance.Close();
+        ClearPossibleActions();
+    }
+
+    private bool TryHandlePortalMove(CardAction _action)
+    {
+        if (!GameplayManager.Instance.IsAbilityActive<Portal>())
+        {
+            return true;
+        }
+
+        if (_action.Type != CardActionType.Move)
+        {
+            return true;
+        }
+
+        Portal _portal = FindObjectOfType<Portal>();
+        Card _enteredPortal = null;
+        Card _exitPortal = null;
+        Card _cardThatMoved = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        int _finishingPlace = _action.FinishingPlaceId;
+        int _startingPlace = _action.StartingPlaceId;
+
+        var _effectedCards = _portal.GetEffectedCards();
+        for (int _i = 0; _i < _effectedCards.Count; _i++)
+        {
+            Card _currentPortal = _effectedCards[_i];
+            if (_currentPortal.GetTablePlace().Id == _finishingPlace)
+            {
+                _enteredPortal = _currentPortal;
+                _exitPortal = _i == 0 ? _effectedCards[1] : _effectedCards[0];
+            }
+        }
+
+        if (_enteredPortal == null)
+        {
+            Debug.Log("Didn't enter a portal");
+            return true;
+        }
+        
+        Debug.Log("Entered a portal");
+
+        int _exitIndex = GameplayManager.Instance.TableHandler.GetTeleportExitIndex(_startingPlace, _enteredPortal.GetTablePlace().Id,
+            _exitPortal.GetTablePlace().Id);
+        if (_exitIndex != -1 && _cardThatMoved.name.ToLower().Contains("blockader") &&
+            GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
+        {
+            // Debug.Log("Blockader moved");
+            // //handle blockader
+            // int _exitPortalIndex = _exitPortal.GetTablePlace().Id;
+            // int _placeIdOfSecondCard = _cardThatMoved.GetTablePlace().Id;
+            // var _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_exitIndex, _exitPortalIndex);
+            //
+            // if (_placeInFront != null && !_placeInFront.IsOccupied)
+            // {
+            //     Debug.Log("Trying to push card out of the way");
+            //     GameplayManager.Instance.PushCard(_placeIdOfSecondCard, _exitPortalIndex, 100);
+            // }
+            // else
+            // {
+            //     Debug.Log("Damaging card");
+            //     GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, null);
+            // }
+            // return;
+        }
+
+        if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
+        {
+            Debug.Log("Place on the other side is occupied, damaging my self");
+            GameplayManager.Instance.DamageCardByAbility(_cardThatMoved.UniqueId, 1, null);
+            return false;
+        }
+
+        Debug.Log("moving to the new place");
+        GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, _cardThatMoved.UniqueId,null);
+        return false;
     }
 
     private bool TryToUseRam(CardAction _action)

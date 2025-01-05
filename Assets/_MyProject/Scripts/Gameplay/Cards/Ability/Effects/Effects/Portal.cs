@@ -36,73 +36,7 @@ public class Portal : AbilityEffect
         }
     }
 
-    public void CheckCardThatMoved(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace, Action _callBack)
-    {
-        Card _enteredPortal = null;
-        Card _exitPortal = null;
-
-        for (int _i = 0; _i < GetEffectedCards().Count; _i++)
-        {
-            Card _currentPortal = GetEffectedCards()[_i];
-            if (_currentPortal.GetTablePlace().Id == _finishingPlace)
-            {
-                _enteredPortal = _currentPortal;
-                _exitPortal = _i == 0 ? GetEffectedCards()[1] : GetEffectedCards()[0];
-            }
-        }
-
-        if (_enteredPortal == null)
-        {
-            Debug.Log("Didn't enter a portal");
-            _callBack?.Invoke();
-            return;
-        }
-
-        int _exitIndex = GameplayManager.Instance.TableHandler.GetTeleportExitIndex(_startingPlace, _enteredPortal.GetTablePlace().Id,
-            _exitPortal.GetTablePlace().Id);
-        if (_exitIndex != -1 && _cardThatMoved.name.ToLower().Contains("blockader") &&
-            GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
-        {
-            Debug.Log("Blockader moved");
-            //handle blockader
-            int _exitPortalIndex = _exitPortal.GetTablePlace().Id;
-            int _placeIdOfSecondCard = _cardThatMoved.GetTablePlace().Id;
-            var _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_exitIndex, _exitPortalIndex);
-
-            if (_placeInFront != null && !_placeInFront.IsOccupied)
-            {
-                Debug.Log("Trying to push card out of the way");
-                GameplayManager.Instance.PushCard(_placeIdOfSecondCard, _exitPortalIndex, 100);
-                _callBack?.Invoke();
-            }
-            else
-            {
-                Debug.Log("Damaging card");
-                GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _ => _callBack?.Invoke());
-            }
-            return;
-        }
-
-        if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
-        {
-            Debug.Log("Place on the other side is occupied, damaging my self");
-            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _didKill =>
-            {
-                if (_didKill)
-                {
-                    _callBack?.Invoke();
-                    return;
-                }
-                GameplayManager.Instance.PushCard(_finishingPlace, _startingPlace, 100);
-                _callBack?.Invoke();
-            });
-        }
-        else
-        {
-            Debug.Log("moving to the new place");
-            GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, ((Card)_cardThatMoved).UniqueId,_callBack);
-        }
-    }
+    
 
     protected override void CancelEffect()
     {
