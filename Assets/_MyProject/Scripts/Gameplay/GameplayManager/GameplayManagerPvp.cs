@@ -832,7 +832,8 @@ public class GameplayManagerPvp : GameplayManager
                     return;
                 }
             }
-            int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.CardData.Stats.Health : _keeper.CardData.Stats.MaxHealth;
+            Debug.Log(_keeper.CardData.Stats.MaxHealth);
+            int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.CardData.Stats.MaxHealth;
             float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
