@@ -3,9 +3,9 @@ public class Risk : AbilityEffect
     protected override void ActivateForOwner()
     {
         Activate();
-        RemoveAction();
-        OnActivated?.Invoke();
         MoveToActivationField();
+        OnActivated?.Invoke();
+        RemoveAction();
     }
 
     private void Activate()
