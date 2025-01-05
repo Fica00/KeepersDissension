@@ -1397,6 +1397,9 @@ public class GameplayManagerPvp : GameplayManager
 
         if (!_pushedCard.IsWarrior())
         {
+            Debug.Log(_pushedCard);
+            Debug.Log(_pushedCard.UniqueId);
+            Debug.Log(_pushedCard.GetType());
             Debug.Log("Pushed card is not a warrior");
             return;
         }

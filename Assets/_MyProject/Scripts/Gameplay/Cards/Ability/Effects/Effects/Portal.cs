@@ -54,6 +54,7 @@ public class Portal : AbilityEffect
         if (_enteredPortal == null)
         {
             Debug.Log("Didn't enter a portal");
+            _callBack?.Invoke();
             return;
         }
 
