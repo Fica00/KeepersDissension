@@ -48,11 +48,6 @@ public class Guardian: Card
             if (Health<=0)
             {
                 healthDisplay.text = 0.ToString();
-                if (GameplayManager.Instance.IsAbilityActive<Risk>())
-                {
-                    GameplayManager.Instance.EndGame(!My);
-                    yield break;
-                }
             }
 
             yield return new WaitForSeconds(1);
