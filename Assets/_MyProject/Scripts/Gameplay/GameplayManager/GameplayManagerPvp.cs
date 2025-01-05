@@ -1388,7 +1388,7 @@ public class GameplayManagerPvp : GameplayManager
     public override void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetWarrior() as Card;
-
+        Debug.Log(_pushedCard.name,_pushedCard.gameObject);
         if (_pushedCard == null)
         {
             Debug.Log("Pushed card is null");
