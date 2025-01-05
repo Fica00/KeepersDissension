@@ -34,12 +34,15 @@ public class Risk : AbilityEffect
         if (_activatorsLifeForce.Health<=0)
         {
             GameplayManager.Instance.EndGame(!_activatorsLifeForce.My);
-        }
-        else if (_otherLifeForce.Health<=0)
-        {
-            GameplayManager.Instance.EndGame(!_otherLifeForce.My);
+            return true;
         }
 
-        return true;
+        if (_otherLifeForce.Health<=0)
+        {
+            GameplayManager.Instance.EndGame(!_otherLifeForce.My);
+            return true;
+        }
+
+        return false;
     }
 }
