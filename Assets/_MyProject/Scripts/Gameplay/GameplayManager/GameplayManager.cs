@@ -424,7 +424,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
+    public virtual void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         throw new NotImplementedException();
     }

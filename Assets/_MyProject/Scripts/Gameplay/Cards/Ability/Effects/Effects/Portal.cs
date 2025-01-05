@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using UnityEngine;
 
 public class Portal : AbilityEffect
 {
@@ -18,7 +20,7 @@ public class Portal : AbilityEffect
 
         GameplayManager.Instance.PlaceCard(_portal, _selectedPlace);
         AddEffectedCard(_portal.UniqueId);
-        ;
+        
         if (GetEffectedCards().Count == 2)
         {
             SetIsActive(true);
@@ -52,6 +54,7 @@ public class Portal : AbilityEffect
 
         if (_enteredPortal == null)
         {
+            Debug.Log("Didn't enter a portal");
             return;
         }
 
@@ -60,29 +63,35 @@ public class Portal : AbilityEffect
         if (_exitIndex != -1 && _cardThatMoved.name.ToLower().Contains("blockader") &&
             GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {
+            Debug.Log("Blockader moved");
             //handle blockader
             int _exitPortalIndex = _exitPortal.GetTablePlace().Id;
             int _placeIdOfSecondCard = _cardThatMoved.GetTablePlace().Id;
             var _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_exitIndex, _exitPortalIndex);
 
-            if (_placeInFront == null)
+            if (_placeInFront != null && !_placeInFront.IsOccupied)
             {
-                GameplayManager.Instance.PushCardBack(_placeIdOfSecondCard, _exitPortalIndex, 100);
+                Debug.Log("Trying to push card out of the way");
+                GameplayManager.Instance.PushCard(_placeIdOfSecondCard, _exitPortalIndex, 100);
+                RoomUpdater.Instance.ForceUpdate();
             }
             else
             {
-                GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, null);
+                Debug.Log("Damaging card");
+                GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _ => RoomUpdater.Instance.ForceUpdate());
             }
             return;
         }
 
         if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {
-            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1,null);
+            Debug.Log("Place on the other side is occupied, damaging my self");
+            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1,_ => RoomUpdater.Instance.ForceUpdate());
         }
         else
         {
-            GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, ((Card)_cardThatMoved).UniqueId,null);
+            Debug.Log("moving to the new place");
+            GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, ((Card)_cardThatMoved).UniqueId,RoomUpdater.Instance.ForceUpdate);
         }
     }
 
@@ -96,7 +105,7 @@ public class Portal : AbilityEffect
         SetIsActive(false);
         portalId = 2000;
 
-        foreach (var _portal in GetEffectedCards())
+        foreach (var _portal in GetEffectedCards().ToList())
         {
             RemoveEffectedCard(_portal.UniqueId);
             Destroy(_portal.gameObject);

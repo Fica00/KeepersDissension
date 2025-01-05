@@ -1365,6 +1365,12 @@ public class GameplayManagerPvp : GameplayManager
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
         MyPlayer.ActivateAbility(_abilityId);
+        if (_ability.CardId == 1069)
+        {
+            //dont remove strange matter when portal is purchased
+            RoomUpdater.Instance.ForceUpdate();
+            return;
+        }
         MyPlayer.Actions--;
         if (MyPlayer.Actions>0)
         {
@@ -1372,22 +1378,25 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    public override void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
+    public override void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetCardNoWall();
 
         if (_pushedCard == null)
         {
+            Debug.Log("Pushed card is null");
             return;
         }
 
         if (!_pushedCard.IsWarrior())
         {
+            Debug.Log("Pushed card is not a warrior");
             return;
         }
 
         if (UnityEngine.Random.Range(0, 100) > _chanceForPush)
         {
+            Debug.Log("Didn't get rng to push");
             return;
         }
 
@@ -1396,18 +1405,22 @@ public class GameplayManagerPvp : GameplayManager
         TablePlaceHandler _placeBehindOfPushedCard = TableHandler.GetPlace(_indexBehindOfPushedCard);
         if (_placeBehindOfPushedCard == default)
         {
+            Debug.Log("There is no place available in the back");
             return;
         }
 
-        if (_placeBehindOfPushedCard.GetCard() == null)
+        if (!_placeBehindOfPushedCard.IsOccupied)
         {
+            Debug.Log("Place is not occupied, trying to move");
             Card _pushedCardBase = _pushedCardPlace.GetCard();
             if (!_pushedCardBase.CheckCanMove() || _placeBehindOfPushedCard.IsAbility)
             {
+                Debug.Log("I can't move damaging my self");
                 StartCoroutine(DamagePushedCard());
                 return;
             }
 
+            Debug.Log("Moving my self");
             CardAction _moveCardInFront = new CardAction
             {
                 FirstCardId = _pushedCardPlace.GetCardNoWall().UniqueId,
@@ -1422,6 +1435,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        Debug.Log("Damaging pushed card");
         StartCoroutine(DamagePushedCard());
         return;
 
