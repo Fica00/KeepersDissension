@@ -87,7 +87,7 @@ public class Card : CardBase
     
     public void SetHealth(int _amount)
     {
-        int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.Health);
+        int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.MaxHealth == -1 ? Details.Stats.Health : Details.Stats.MaxHealth);
         CardData.Stats.Health = _alteredAmount;
         UpdatedHealth?.Invoke();
     }
