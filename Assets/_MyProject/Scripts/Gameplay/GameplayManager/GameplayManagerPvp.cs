@@ -819,7 +819,8 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_defendingCard is Keeper _keeper)
         {
-            float _healthToRecover = _keeper.Details.Stats.Health * _keeper.PercentageOfHealthToRecover / 100;
+            int _maxHealth = _keeper.Details.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.Details.Stats.MaxHealth;
+            float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             if (IsAbilityActive<Subdued>())
