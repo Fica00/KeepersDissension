@@ -70,16 +70,10 @@ public class Card : CardBase
     public void HealFull()
     {
         float _amount = Details.Stats.Health - CardData.Stats.Health;
-        Debug.Log(Details.Stats.Health);
-        Debug.Log(CardData.Stats.Health);
-        Debug.Log(_amount);
         if (CardData.Stats.MaxHealth != -1)
         {
             _amount = CardData.Stats.MaxHealth;
         }
-        Debug.Log(CardData.Stats.MaxHealth);
-        Debug.Log(_amount);
-        
         
         ChangeHealth((int)_amount);
         UpdatedHealth?.Invoke();
@@ -87,7 +81,6 @@ public class Card : CardBase
     
     public void SetHealth(int _amount)
     {
-        Debug.Log(_amount);
         int _alteredAmount = Math.Clamp(_amount, 0, CardData.Stats.MaxHealth == -1 ? Details.Stats.Health : CardData.Stats.MaxHealth);
         CardData.Stats.Health = _alteredAmount;
         UpdatedHealth?.Invoke();
@@ -99,7 +92,7 @@ public class Card : CardBase
             CardData.Stats.Health + _amount, 
             0,
             CardData.Stats.MaxHealth == -1 ? Details.Stats.Health : CardData.Stats.MaxHealth
-        );        
+        );
         
         CardData.Stats.Health = _newHealth;
         UpdatedHealth?.Invoke();
