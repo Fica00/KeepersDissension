@@ -534,4 +534,24 @@ public class TableHandler : MonoBehaviour
 
         return baseCost;
     }
+    
+    public (Card, Card) GetPortals(int _enterId)
+    {
+        Card _enteredPortal = null;
+        Card _exitPortal = null;
+        Portal _portal = FindObjectOfType<Portal>();
+
+        var _effectedCards = _portal.GetEffectedCards();
+        for (int _i = 0; _i < _effectedCards.Count; _i++)
+        {
+            Card _currentPortal = _effectedCards[_i];
+            if (_currentPortal.GetTablePlace().Id == _enterId)
+            {
+                _enteredPortal = _currentPortal;
+                _exitPortal = _i == 0 ? _effectedCards[1] : _effectedCards[0];
+            }
+        }
+
+        return (_enteredPortal,_exitPortal);
+    }
 }

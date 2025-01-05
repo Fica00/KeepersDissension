@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using UnityEngine;
 
 public class Portal : AbilityEffect
 {
@@ -35,8 +34,6 @@ public class Portal : AbilityEffect
             portalId++;
         }
     }
-
-    
 
     protected override void CancelEffect()
     {

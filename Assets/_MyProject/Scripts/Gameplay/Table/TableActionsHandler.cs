@@ -720,55 +720,20 @@ public class TableActionsHandler : MonoBehaviour
             return true;
         }
 
-        Portal _portal = FindObjectOfType<Portal>();
-        Card _enteredPortal = null;
-        Card _exitPortal = null;
+        
         Card _cardThatMoved = GameplayManager.Instance.GetCard(_action.FirstCardId);
         int _finishingPlace = _action.FinishingPlaceId;
         int _startingPlace = _action.StartingPlaceId;
-
-        var _effectedCards = _portal.GetEffectedCards();
-        for (int _i = 0; _i < _effectedCards.Count; _i++)
-        {
-            Card _currentPortal = _effectedCards[_i];
-            if (_currentPortal.GetTablePlace().Id == _finishingPlace)
-            {
-                _enteredPortal = _currentPortal;
-                _exitPortal = _i == 0 ? _effectedCards[1] : _effectedCards[0];
-            }
-        }
+        (Card _enteredPortal, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_finishingPlace);
 
         if (_enteredPortal == null)
         {
-            Debug.Log("Didn't enter a portal");
             return true;
         }
         
-        Debug.Log("Entered a portal");
 
         int _exitIndex = GameplayManager.Instance.TableHandler.GetTeleportExitIndex(_startingPlace, _enteredPortal.GetTablePlace().Id,
             _exitPortal.GetTablePlace().Id);
-        if (_exitIndex != -1 && _cardThatMoved.name.ToLower().Contains("blockader") &&
-            GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
-        {
-            // Debug.Log("Blockader moved");
-            // //handle blockader
-            // int _exitPortalIndex = _exitPortal.GetTablePlace().Id;
-            // int _placeIdOfSecondCard = _cardThatMoved.GetTablePlace().Id;
-            // var _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_exitIndex, _exitPortalIndex);
-            //
-            // if (_placeInFront != null && !_placeInFront.IsOccupied)
-            // {
-            //     Debug.Log("Trying to push card out of the way");
-            //     GameplayManager.Instance.PushCard(_placeIdOfSecondCard, _exitPortalIndex, 100);
-            // }
-            // else
-            // {
-            //     Debug.Log("Damaging card");
-            //     GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, null);
-            // }
-            // return;
-        }
 
         if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {

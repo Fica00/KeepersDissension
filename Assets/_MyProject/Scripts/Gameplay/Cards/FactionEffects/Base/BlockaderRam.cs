@@ -17,6 +17,11 @@ public class BlockaderRam : CardSpecialAbility
         }
         else
         {
+            if (HandlePortal(_firstCardId, _secondCardId))
+            {
+                return;
+            }
+            
             GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>
             {
                 if (!_didKillCard)
@@ -87,7 +92,6 @@ public class BlockaderRam : CardSpecialAbility
             return false;
         }
 
-        Debug.Log(_placeInFront.Id, _placeInFront.gameObject);
         return true;
     }
 
@@ -111,6 +115,51 @@ public class BlockaderRam : CardSpecialAbility
     {
         ReduceActions();
         _callBack?.Invoke();
+    }
+
+    private bool HandlePortal(string _firstCardId, string _secondCardId)
+    {
+        Card _secondCard = GameplayManager.Instance.GetCard(_secondCardId);
+
+        if (!_secondCard.CheckCanMove())
+        {
+            return false;
+        }
+
+        int _firstCardPlace = GameplayManager.Instance.GetCard(_firstCardId).GetTablePlace().Id;
+        int _secondCardPlace = _secondCard.GetTablePlace().Id;
+
+        TablePlaceHandler _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_firstCardPlace, _secondCardPlace);
+
+        if (_placeInFront == null)
+        {
+            return false;
+        }
+
+        if (_placeInFront.IsAbility)
+        {
+            return false;
+        }
+
+        if (!_placeInFront.ContainsPortal)
+        {
+            return false;
+        }
+        
+        Debug.Log("Trying to push into portal");
+        Card _firstCard = GameplayManager.Instance.GetCard(_firstCardId);
+        int _exitPortalIndex = _firstCard.GetTablePlace().Id;
+        int _placeIdOfSecondCard = _secondCard.GetTablePlace().Id;
+        (Card _, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_secondCard.GetTablePlace().Id);
+        var _direction = GameplayManager.Instance.TableHandler.GetDirection(_firstCard.GetTablePlace().Id, _secondCard.GetTablePlace().Id);
+        var _locationOfPlaceBehindPortal = GameplayManager.Instance.TableHandler.GetIndexOfPlace(GameplayManager.Instance.TableHandler.GetPlace
+            ((Vector2)_exitPortal.transform.position + _direction));
+        var _placeBehindExitPortal = GameplayManager.Instance.TableHandler.GetPlace(_locationOfPlaceBehindPortal);
+        TablePlaceHandler _placeInFrontOfPortal = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_placeBehindExitPortal.Id, 
+            _exitPortal.GetTablePlace().Id);
+
+        Debug.Log("Place in front of exit portal: ",_placeInFrontOfPortal.gameObject);
+        return true;
     }
 
     private void ReduceActions()
