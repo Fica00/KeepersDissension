@@ -2096,6 +2096,13 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
+    public override void UnchainOpponentsGuardian()
+    {
+        BoardData.OpponentPlayer.DidUnchainGuardian = true;
+        ShowGuardianUnchained(false);
+        OnUnchainedGuardian?.Invoke();
+    }
+
     public override void ShowGuardianUnchained(bool _didIUnchain)
     {
         Guardian _guardian = _didIUnchain ? GetMyGuardian() : GetOpponentGuardian();

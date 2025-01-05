@@ -175,6 +175,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void UnchainOpponentsGuardian()
+    {
+        throw new Exception();
+    }
+
     public virtual void PlaceStartingWall()
     {
         throw new Exception();
