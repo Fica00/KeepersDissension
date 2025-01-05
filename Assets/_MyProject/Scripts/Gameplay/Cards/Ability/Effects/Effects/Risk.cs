@@ -27,6 +27,7 @@ public class Risk : AbilityEffect
         if (_activatorsLifeForce.Health<=0 && _otherLifeForce.Health<=0)
         {
             GameplayManager.Instance.UnchainGuardian(0,false);
+            GameplayManager.Instance.UnchainOpponentsGuardian();
             _playerThatActivated.DestroyCard(_activatorsLifeForce);
             _otherPlayer.DestroyCard(_otherLifeForce);
             return false;
