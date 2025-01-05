@@ -1387,7 +1387,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
-        Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetCardNoWall();
+        Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetCard();
 
         if (_pushedCard == null)
         {
