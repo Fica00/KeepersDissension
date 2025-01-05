@@ -90,7 +90,19 @@ public class AbilityEffect : MonoBehaviour
             return;
         }
 
-        if (AbilityCard.Details.Type!=AbilityCardType.Passive)
+        if (AbilityCard.Details.Type == AbilityCardType.Passive)
+        {
+            if (AbilityCard.Details.Id == 1069)
+            {
+                DoRemove();
+            }
+            
+            return;
+        }
+
+        DoRemove();
+
+        void DoRemove()
         {
             GameplayManager.Instance.MyPlayer.Actions--;
             if (GameplayManager.Instance.MyPlayer.Actions>0)

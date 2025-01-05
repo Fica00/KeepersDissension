@@ -24,7 +24,6 @@ public class Portal : AbilityEffect
         if (GetEffectedCards().Count == 2)
         {
             SetIsActive(true);
-            GameplayManager.OnCardMoved += CheckCardThatMoved;
             OnActivated?.Invoke();
             RemoveAction();
         }
@@ -37,7 +36,7 @@ public class Portal : AbilityEffect
         }
     }
 
-    private void CheckCardThatMoved(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace)
+    public void CheckCardThatMoved(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace, Action _callBack)
     {
         Card _enteredPortal = null;
         Card _exitPortal = null;
@@ -73,12 +72,12 @@ public class Portal : AbilityEffect
             {
                 Debug.Log("Trying to push card out of the way");
                 GameplayManager.Instance.PushCard(_placeIdOfSecondCard, _exitPortalIndex, 100);
-                RoomUpdater.Instance.ForceUpdate();
+                _callBack?.Invoke();
             }
             else
             {
                 Debug.Log("Damaging card");
-                GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _ => RoomUpdater.Instance.ForceUpdate());
+                GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1, _ => _callBack?.Invoke());
             }
             return;
         }
@@ -86,12 +85,12 @@ public class Portal : AbilityEffect
         if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {
             Debug.Log("Place on the other side is occupied, damaging my self");
-            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1,_ => RoomUpdater.Instance.ForceUpdate());
+            GameplayManager.Instance.DamageCardByAbility(((Card)_cardThatMoved).UniqueId, 1,_ => _callBack?.Invoke());
         }
         else
         {
             Debug.Log("moving to the new place");
-            GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, ((Card)_cardThatMoved).UniqueId,RoomUpdater.Instance.ForceUpdate);
+            GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, ((Card)_cardThatMoved).UniqueId,_callBack);
         }
     }
 
