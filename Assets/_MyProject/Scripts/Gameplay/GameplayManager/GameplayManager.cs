@@ -63,6 +63,11 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
+    public virtual Card CreateCard(int _cardId, TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
+    {
+        throw new Exception();
+    }
+
     private IEnumerator GameplayRoutine()
     {
         SetGameState(GameplayState.WaitingForPlayersToLoad);

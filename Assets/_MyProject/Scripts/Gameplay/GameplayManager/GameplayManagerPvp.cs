@@ -89,7 +89,7 @@ public class GameplayManagerPvp : GameplayManager
         _card.Setup(_abilityData.UniqueId);
     }
 
-    private Card CreateCard(int _cardId, TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
+    public override Card CreateCard(int _cardId, TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
     {
         Transform _cardsHolder = _tableSideHandler.CardsHolder;
         Card _card = CardsManager.Instance.CreateCard(_cardId);
