@@ -1,9 +1,11 @@
 using FirebaseMultiplayer.Room;
+using UnityEngine;
 
 public class GameplayUIPVP : GameplayUI
 {
     public override void ShowResult(bool _didIWin)
     {
+        Debug.Log("Showing result");
         if (_didIWin)
         {
             DialogsManager.Instance.ShowOkDialog("You won!",LeaveRoom);
