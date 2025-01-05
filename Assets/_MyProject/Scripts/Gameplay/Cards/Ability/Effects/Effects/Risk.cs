@@ -2,13 +2,17 @@ public class Risk : AbilityEffect
 {
     protected override void ActivateForOwner()
     {
-        Activate();
+        bool _didGameEnd = Activate();
+        if (_didGameEnd)
+        {
+            return;
+        }
         MoveToActivationField();
         OnActivated?.Invoke();
         RemoveAction();
     }
 
-    private void Activate()
+    private bool Activate()
     {
         GameplayPlayer _playerThatActivated = GameplayManager.Instance.MyPlayer;
         GameplayPlayer _otherPlayer = GameplayManager.Instance.OpponentPlayer;
@@ -24,7 +28,7 @@ public class Risk : AbilityEffect
             GameplayManager.Instance.UnchainGuardian(0,false);
             _playerThatActivated.DestroyCard(_activatorsLifeForce);
             _otherPlayer.DestroyCard(_otherLifeForce);
-            return;
+            return false;
         }
         
         if (_activatorsLifeForce.Health<=0)
@@ -35,5 +39,7 @@ public class Risk : AbilityEffect
         {
             GameplayManager.Instance.EndGame(!_otherLifeForce.My);
         }
+
+        return true;
     }
 }
