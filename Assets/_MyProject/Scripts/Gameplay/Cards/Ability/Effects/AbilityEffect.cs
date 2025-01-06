@@ -158,7 +158,7 @@ public class AbilityEffect : MonoBehaviour
         AbilityCard.SetStartingRange(_amount);
     }
     
-    protected void SetRemainingCooldown(int _amount)
+    public void SetRemainingCooldown(int _amount)
     {
         AbilityCard.SetRemainingCooldown(_amount);
     }
