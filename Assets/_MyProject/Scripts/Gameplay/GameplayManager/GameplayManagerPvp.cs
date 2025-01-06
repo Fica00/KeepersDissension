@@ -949,46 +949,30 @@ public class GameplayManagerPvp : GameplayManager
     private void ActivateComrade(Card _keeper, Action<bool> _callBack)
     {
         Comrade _comrade = FindObjectOfType<Comrade>();
-        Debug.Log("Comrade is active");
             
         if (_comrade.IsMy)
         {
-            Debug.Log("I owe it");
             if (_keeper.GetIsMy())
             {
-                Debug.Log("Keeper that died is my, I should use comrade");
                 HandleComrade(_callBack);
-            }
-            else
-            {
-                Debug.Log("Keeper that died is opponents, dont do anything");
             }
         }
         else
         {
-            Debug.Log("I dont owe it");
             if (!_keeper.GetIsMy())
             {
-                Debug.Log("Keeper that died is not my");
                 if (RoomHandler.IsOwner)
                 {
-                    Debug.Log("I am owner setting player 1");
                     SetGameplaySubState(GameplaySubState.Player1UseComrade);
                 }
                 else
                 {
-                    Debug.Log("I am not owner setting player 2");
                     SetGameplaySubState(GameplaySubState.Player2UseComrade);
                 }
 
-                Debug.Log("Waiting for opponent to finish");
                 StartCoroutine(WaitForOpponentToUseComrade(_callBack));
                 RoomUpdater.Instance.ForceUpdate();
                 return;
-            }
-            else
-            {
-                Debug.Log("Keeper is my so don't do anything");
             }
         }
         
@@ -1004,6 +988,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void HandleComrade(Action<bool> _callBack)
     {
+        Debug.Log("Got here");
         List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
         
         if (_validCards.Count==0)
@@ -1013,8 +998,10 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
             
+        Debug.Log("Got here 2");
         ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
         {
+        Debug.Log("Got here 3");
             ReviveMinionComrade(_selected,_callBack);
         },true,true);
     }
@@ -1023,12 +1010,14 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_cardBase==null)
         {
+            Debug.Log("Got here 4");
             _callBack?.Invoke(true);
             return;
         }
             
         BuyMinion(_cardBase, 0, () =>
         {
+            Debug.Log("Got here 5");
             _callBack?.Invoke(true);
         });
     }
