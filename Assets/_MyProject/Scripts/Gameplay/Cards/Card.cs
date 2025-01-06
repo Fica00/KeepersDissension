@@ -150,6 +150,7 @@ public class Card : CardBase
 
     public void SetIsVoid(bool _status)
     {
+        Debug.Log("Setting is void: "+_status);
         CardData.IsVoid = _status;
     }
 
