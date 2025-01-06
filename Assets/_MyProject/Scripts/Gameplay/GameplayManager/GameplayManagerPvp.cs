@@ -2465,9 +2465,9 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         DialogsManager.Instance.ShowOkDialog("Please select warrior to be sacrificed");
-        TablePlaceHandler.OnPlaceClicked += TryTiPlaceReduction;
+        TablePlaceHandler.OnPlaceClicked += TryToPlaceReduction;
 
-        void TryTiPlaceReduction(TablePlaceHandler _place)
+        void TryToPlaceReduction(TablePlaceHandler _place)
         {
             if (!_availablePlaces.Contains(_place))
             {
@@ -2479,8 +2479,9 @@ public class GameplayManagerPvp : GameplayManager
                 _availablePlace.SetColor(Color.white);
             }
 
-            TablePlaceHandler.OnPlaceClicked -= TryTiPlaceReduction;
+            TablePlaceHandler.OnPlaceClicked -= TryToPlaceReduction;
             Card _card = _place.GetCardNoWall();
+            AddStrangeMatter(GetStrangeMatterForCard(_card),true,_place.Id);
            
             DamageCardByAbility(_card.UniqueId,_card.CardData.Stats.Health, _ =>
             {
