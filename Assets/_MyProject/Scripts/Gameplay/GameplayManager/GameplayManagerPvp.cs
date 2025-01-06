@@ -261,12 +261,10 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_destination.ContainsMarker)
         {
-            Debug.Log(1111111);
             Card _marker = _destination.GetMarker();
             
             if (_marker.IsVoid)
             {
-                Debug.Log(222222222);
                 ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
                 {
                     DamageCardByAbility(_movingCard.UniqueId, _movingCard.CardData.Stats.Health, _ => _callBack?.Invoke());
@@ -275,7 +273,6 @@ public class GameplayManagerPvp : GameplayManager
             }
             else
             {
-                Debug.Log(333333);
                 CardBase _cardBase = _destination.GetCardNoWall();
                 GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
                 _markerOwner.DestroyCard(_cardBase as Card);
@@ -904,7 +901,7 @@ public class GameplayManagerPvp : GameplayManager
                     return;
                 }
             }
-            Debug.Log(_keeper.CardData.Stats.MaxHealth);
+            
             int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.CardData.Stats.MaxHealth;
             float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
