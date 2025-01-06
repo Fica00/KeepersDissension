@@ -630,6 +630,17 @@ public class GameplayManagerPvp : GameplayManager
 
                     HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
                 }
+                else
+                {
+                    if (IsAbilityActive<Repel>())
+                    {
+                        Repel _repel = FindObjectOfType<Repel>();
+                        if (_repel.IsMy && _attackingCard is Keeper)
+                        {
+                            PushCard(_defendingCard.GetTablePlace().Id,_attackingCard.GetTablePlace().Id);
+                        }
+                    }
+                }
 
                 if (IsAbilityActive<Retaliate>())
                 {
