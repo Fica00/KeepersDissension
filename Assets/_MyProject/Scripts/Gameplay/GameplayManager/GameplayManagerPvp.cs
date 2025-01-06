@@ -281,8 +281,12 @@ public class GameplayManagerPvp : GameplayManager
                 Penalty _penalty = FindObjectOfType<Penalty>();
                 if (!_penalty.IsMy && _movingCard is Keeper)
                 {
-                    Debug.Log(TableHandler.DistanceBetweenPlaces(TableHandler.GetPlace(_startingPlaceId),TableHandler.GetPlace(_finishingPlaceId)));
-                    DamageCardByAbility(_movingCard.UniqueId,1, _ =>
+                    int _distance =
+                        TableHandler.DistanceBetweenPlaces(TableHandler.GetPlace(_startingPlaceId), TableHandler.GetPlace(_finishingPlaceId));
+                    int _speed = _movingCard.CardData.Stats.Speed;
+                    int _damageToTake = Mathf.Min(_speed, _distance);
+                    Debug.Log($"Distance: {_distance}, Speed: {_speed} => {_damageToTake}");
+                    DamageCardByAbility(_movingCard.UniqueId,_damageToTake, _ =>
                     {
                         _callBack?.Invoke();
                     });
