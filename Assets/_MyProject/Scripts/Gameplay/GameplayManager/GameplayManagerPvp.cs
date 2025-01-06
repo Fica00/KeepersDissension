@@ -270,8 +270,8 @@ public class GameplayManagerPvp : GameplayManager
                 ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
                 {
                     Debug.Log(555555);
-                    GameplayPlayer _markerOwner = _marker.GetIsMy() ? MyPlayer : OpponentPlayer;
-                    _markerOwner.DestroyCard(_marker);
+                    GameplayPlayer _cardOwner = _movingCard.GetIsMy() ? MyPlayer : OpponentPlayer;
+                    _cardOwner.DestroyCard(_movingCard);
                 });
                 return;
             }
