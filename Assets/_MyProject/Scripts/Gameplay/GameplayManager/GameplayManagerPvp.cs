@@ -276,6 +276,19 @@ public class GameplayManagerPvp : GameplayManager
         ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
         {
             OnCardMoved?.Invoke(_movingCard, _startingPlaceId, _finishingPlaceId);
+            if (IsAbilityActive<Penalty>())
+            {
+                Penalty _penalty = FindObjectOfType<Penalty>();
+                if (!_penalty.IsMy && _movingCard is Keeper)
+                {
+                    DamageCardByAbility(_movingCard.UniqueId,1, _ =>
+                    {
+                        _callBack?.Invoke();
+                    });
+                    
+                    return;
+                }
+            }
             _callBack?.Invoke();
         });
         PlayMovingSoundEffect(_movingCard);
@@ -597,6 +610,7 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     _grounded.ApplyEffect(_defendingCard.UniqueId);
                     _damage=0;
+                    SaySomethingToAll("Grounded activated");
                 }
                 else if(_grounded.IsCardEffected(_defendingCard.UniqueId))
                 {
