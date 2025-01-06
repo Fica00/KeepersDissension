@@ -1900,9 +1900,9 @@ public class GameplayManagerPvp : GameplayManager
         Debug.Log("Owners:");
         foreach (var _ability in BoardData.Abilities)
         {
-            Debug.Log(_ability.UniqueId);
+            Debug.Log(_ability.Owner);
         }
-        return BoardData.Abilities.FindAll(_ability => _ability.UniqueId == _playerId);
+        return BoardData.Abilities.FindAll(_ability => _ability.Owner == _playerId);
     }
 
     public override Card GetCard(string _uniqueId)
