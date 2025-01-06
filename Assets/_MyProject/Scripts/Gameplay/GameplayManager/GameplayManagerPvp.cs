@@ -961,6 +961,13 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (!_keeper.GetIsMy())
             {
+                var _opponentsDeadMinions = GetDeadMinions(false);
+                if (_opponentsDeadMinions == null || _opponentsDeadMinions.Count==0)
+                {
+                    Debug.Log("Opponent doesn't have minions to revive, so I will skip updtaing him");
+                    _callBack?.Invoke(true);
+                    return;
+                }
                 if (RoomHandler.IsOwner)
                 {
                     SetGameplaySubState(GameplaySubState.Player1UseComrade);
