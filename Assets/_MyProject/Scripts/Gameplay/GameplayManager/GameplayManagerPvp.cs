@@ -285,9 +285,9 @@ public class GameplayManagerPvp : GameplayManager
                         TableHandler.DistanceBetweenPlaces(TableHandler.GetPlace(_startingPlaceId), TableHandler.GetPlace(_finishingPlaceId));
                     int _speed = _movingCard.CardData.Stats.Speed;
                     int _damageToTake = Mathf.Min(_speed, _distance);
-                    Debug.Log($"Distance: {_distance}, Speed: {_speed} => {_damageToTake}");
                     DamageCardByAbility(_movingCard.UniqueId,_damageToTake, _ =>
                     {
+                        Debug.Log("aaaaa");
                         _callBack?.Invoke();
                     });
                     
