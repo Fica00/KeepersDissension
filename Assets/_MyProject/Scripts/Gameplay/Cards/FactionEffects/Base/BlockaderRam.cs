@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class BlockaderRam : CardSpecialAbility
@@ -148,10 +149,17 @@ public class BlockaderRam : CardSpecialAbility
         
         Debug.Log("Trying to push into portal");
         Card _firstCard = GameplayManager.Instance.GetCard(_firstCardId);
+        Debug.Log("Card that is pushing", _firstCard.gameObject);
+        Debug.Log("Card that is being pushed, ",_secondCard.gameObject);
         int _exitPortalIndex = _firstCard.GetTablePlace().Id;
         int _placeIdOfSecondCard = _secondCard.GetTablePlace().Id;
-        (Card _, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_secondCard.GetTablePlace().Id);
+        (Card _e, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_secondCard.GetTablePlace().Id);
+        Debug.Log("Enter portal: "+ _e.gameObject);
+        Debug.Log("Exit portal: "+_exitPortal.gameObject);
         var _direction = GameplayManager.Instance.TableHandler.GetDirection(_firstCard.GetTablePlace().Id, _secondCard.GetTablePlace().Id);
+        Debug.Log(JsonConvert.SerializeObject(_direction));
+        Debug.Log(JsonConvert.SerializeObject(GameplayManager.Instance.TableHandler.GetPlace
+            ((Vector2)_exitPortal.transform.position + _direction)));
         var _locationOfPlaceBehindPortal = GameplayManager.Instance.TableHandler.GetIndexOfPlace(GameplayManager.Instance.TableHandler.GetPlace
             ((Vector2)_exitPortal.transform.position + _direction));
         var _placeBehindExitPortal = GameplayManager.Instance.TableHandler.GetPlace(_locationOfPlaceBehindPortal);
