@@ -27,6 +27,11 @@ public class ScoutVision : CardSpecialAbility
                 continue;
             }
 
+            if (_marker.IsVoid)
+            {
+                continue;
+            }
+
             bool _skip = false;
             foreach (var _card in FirebaseManager.Instance.RoomHandler.BoardData.Cards)
             {
