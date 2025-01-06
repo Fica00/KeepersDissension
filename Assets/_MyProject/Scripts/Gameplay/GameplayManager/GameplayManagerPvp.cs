@@ -964,7 +964,6 @@ public class GameplayManagerPvp : GameplayManager
                 var _opponentsDeadMinions = GetDeadMinions(false);
                 if (_opponentsDeadMinions == null || _opponentsDeadMinions.Count==0)
                 {
-                    Debug.Log("Opponent doesn't have minions to revive, so I will skip updtaing him");
                     _callBack?.Invoke(true);
                     return;
                 }
@@ -990,12 +989,10 @@ public class GameplayManagerPvp : GameplayManager
     {
         yield return new WaitUntil(()=> GetGameplaySubState() == GameplaySubState.Playing);
         _callBack?.Invoke(true);
-        Debug.Log("Opponent finished");
     }
 
     public override void HandleComrade(Action<bool> _callBack)
     {
-        Debug.Log("Got here");
         List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
         
         if (_validCards.Count==0)
@@ -1005,10 +1002,8 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
             
-        Debug.Log("Got here 2");
         ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
         {
-        Debug.Log("Got here 3");
             ReviveMinionComrade(_selected,_callBack);
         },true,true);
     }

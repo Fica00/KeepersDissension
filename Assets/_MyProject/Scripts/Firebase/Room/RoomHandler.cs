@@ -630,44 +630,30 @@ namespace FirebaseMultiplayer.Room
         {
             if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
             {
-                Debug.Log("State is the same: "+_currentRoomData.GameplaySubState);
                 return;
             }
             
             GameplaySubState _subState;
             if (_data.GameplaySubState is GameplaySubState.Player1UseComrade)
             {
-                Debug.Log("Looks like owner should play");
                 if (IsOwner)
                 {
-                    Debug.Log("I am owner, triggering comrade");
                     _subState = _currentRoomData.GameplaySubState;
                     GameplayManager.Instance.HandleComrade(Finish);
-                }
-                else
-                {
-                    Debug.Log("I am not owner not doing anything");
                 }
             }
             else if (_data.GameplaySubState is GameplaySubState.Player2UseComrade)
             {
-                Debug.Log("Looks like notowner should play");
                 if (!IsOwner)
                 {
-                    Debug.Log("That is me, starting comrade");
                     _subState = _currentRoomData.GameplaySubState;
                     GameplayManager.Instance.HandleComrade(Finish);
-                }
-                else
-                {
-                    Debug.Log("That is not me");
                 }
             }
 
 
             void Finish(bool _)
             {
-                Debug.Log("Finished with comrade, setting state: "+_subState);
                 GameplayManager.Instance.SetGameplaySubState(_subState);
                 RoomUpdater.Instance.ForceUpdate();
             }
