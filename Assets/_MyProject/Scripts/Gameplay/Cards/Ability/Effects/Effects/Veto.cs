@@ -26,7 +26,7 @@ public class Veto : AbilityEffect
         {
             SetIsActive(true);
             ManageActiveDisplay(true);
-            AddEffectedCard(((Card)_card).UniqueId);
+            AddEffectedCard(((AbilityCard)_card).UniqueId);
             OnActivated?.Invoke();
             RemoveAction();
         }
