@@ -891,6 +891,11 @@ public class TableActionsHandler : MonoBehaviour
         Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
         SlowDown _slowDown = FindObjectOfType<SlowDown>();
 
-        return _slowDown.CanMoveCard(_card1.UniqueId);
+        if (!_slowDown.CanMoveCard(_card1.UniqueId))
+        {
+            DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+            return false;
+        }
+        return true;
     }
 }

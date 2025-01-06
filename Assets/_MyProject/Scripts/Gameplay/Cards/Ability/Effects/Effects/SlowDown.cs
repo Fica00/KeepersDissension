@@ -19,7 +19,6 @@ public class SlowDown : AbilityEffect
             AddEffectedCard(_uniqueId);
             RoomUpdater.Instance.ForceUpdate();
         }
-    
 
         public void ClearEffectedCardsForMe()
         {
@@ -63,5 +62,7 @@ public class SlowDown : AbilityEffect
             GameplayManager.Instance.MyPlayer.OnEndedTurn -= LowerCounter;
             SetIsActive(false);
             ClearEffectedCards();
+            
+            RoomUpdater.Instance.ForceUpdate();
         }
 }
