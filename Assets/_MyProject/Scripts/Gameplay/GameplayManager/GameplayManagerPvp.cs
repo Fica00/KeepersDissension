@@ -269,9 +269,7 @@ public class GameplayManagerPvp : GameplayManager
                 Debug.Log(222222222);
                 ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
                 {
-                    Debug.Log(555555);
-                    GameplayPlayer _cardOwner = _movingCard.GetIsMy() ? MyPlayer : OpponentPlayer;
-                    _cardOwner.DestroyCard(_movingCard);
+                    DamageCardByAbility(_movingCard.UniqueId, _movingCard.CardData.Stats.Health, _ => _callBack?.Invoke());
                 });
                 return;
             }
