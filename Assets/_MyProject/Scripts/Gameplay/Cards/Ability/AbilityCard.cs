@@ -17,7 +17,6 @@ public class AbilityCard : CardBase
 
     public bool My => Data.Owner == FirebaseManager.Instance.PlayerId;
     public string UniqueId => Data.UniqueId;
-    public bool IsVetoed => Data.IsVetoed;
     public int PlaceId => Data.PlaceId;
     public bool IsActive => Data.IsActive;
     public bool IsApplied => Data.IsApplied;
@@ -44,7 +43,6 @@ public class AbilityCard : CardBase
         {
             UniqueId = Guid.NewGuid().ToString(),
             Owner = _owner,
-            IsVetoed = false,
             RemainingCooldown = 0,
             PlaceId = -100,
             Cooldown = 0,
@@ -109,9 +107,13 @@ public class AbilityCard : CardBase
             return false;
         }
 
-        if (Data.IsVetoed)
+        if (GameplayManager.Instance.IsAbilityActive<Veto>())
         {
-            return false;
+            Veto _veto = FindObjectOfType<Veto>();
+            if (_veto.IsCardEffected(UniqueId))
+            {
+                return false;
+            }
         }
         
         if (Details.Type!=AbilityCardType.CrowdControl)
@@ -175,9 +177,13 @@ public class AbilityCard : CardBase
 
     public void Activate()
     {
-        if (Data.IsVetoed)
+        if (GameplayManager.Instance.IsAbilityActive<Veto>())
         {
-            return;
+            Veto _veto = FindObjectOfType<Veto>();
+            if (_veto.IsCardEffected(UniqueId))
+            {
+                return;
+            }
         }
 
         if (IsActive)

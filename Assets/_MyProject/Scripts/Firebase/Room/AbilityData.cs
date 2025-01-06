@@ -6,7 +6,6 @@ public class AbilityData
 {
     public string UniqueId;
     public string Owner;
-    public bool IsVetoed;
     public int RemainingCooldown;
     public int PlaceId = -100;
     public int Cooldown;
