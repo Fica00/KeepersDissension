@@ -693,6 +693,11 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (!CheckForSlowDown(_newAction))
+        {
+            return;
+        }
         
         bool _continue =TryHandlePortalMove(_newAction);
         
@@ -870,5 +875,22 @@ public class TableActionsHandler : MonoBehaviour
         }
 
         return true;
+    }
+    private bool CheckForSlowDown(CardAction _action)
+    {
+        if (_action.Type != CardActionType.Move)
+        {
+            return true;
+        }
+
+        if (!GameplayManager.Instance.IsAbilityActive<SlowDown>())
+        {
+            return true;
+        }
+        
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        SlowDown _slowDown = FindObjectOfType<SlowDown>();
+
+        return _slowDown.CanMoveCard(_card1.UniqueId);
     }
 }
