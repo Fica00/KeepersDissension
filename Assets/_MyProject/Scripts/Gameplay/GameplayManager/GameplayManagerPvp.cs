@@ -970,11 +970,11 @@ public class GameplayManagerPvp : GameplayManager
                 }
                 if (RoomHandler.IsOwner)
                 {
-                    SetGameplaySubState(GameplaySubState.Player1UseComrade);
+                    SetGameplaySubState(GameplaySubState.Player2UseComrade);
                 }
                 else
                 {
-                    SetGameplaySubState(GameplaySubState.Player2UseComrade);
+                    SetGameplaySubState(GameplaySubState.Player1UseComrade);
                 }
 
                 StartCoroutine(WaitForOpponentToUseComrade(_callBack));
