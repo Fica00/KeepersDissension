@@ -261,12 +261,15 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_destination.ContainsMarker)
         {
+            Debug.Log(1111111);
             Card _marker = _destination.GetMarker();
             
             if (_marker.IsVoid)
             {
+                Debug.Log(222222222);
                 ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
                 {
+                    Debug.Log(555555);
                     GameplayPlayer _markerOwner = _marker.GetIsMy() ? MyPlayer : OpponentPlayer;
                     _markerOwner.DestroyCard(_marker);
                 });
@@ -274,6 +277,7 @@ public class GameplayManagerPvp : GameplayManager
             }
             else
             {
+                Debug.Log(333333);
                 CardBase _cardBase = _destination.GetCardNoWall();
                 GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
                 _markerOwner.DestroyCard(_cardBase as Card);

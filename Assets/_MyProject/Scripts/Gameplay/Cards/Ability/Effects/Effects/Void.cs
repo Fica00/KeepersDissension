@@ -27,17 +27,11 @@ public class Void : AbilityEffect
         }
 
         GameplayManager.Instance.PlaceCard(_marker,_placeId);
-        AddEffectedCard(_marker.UniqueId);
         _marker.SetIsVoid(true);
         GameplayManager.Instance.ChangeSprite(_marker.UniqueId,0,true);
         SetIsActive(true);
         OnActivated?.Invoke();
         RemoveAction();
-    }
-
-    public bool IsEffectedCard(string _uniqueId)
-    {
-        return EffectedCards[0] == _uniqueId;
     }
 
     protected override void CancelEffect()
@@ -46,6 +40,5 @@ public class Void : AbilityEffect
         SetIsActive(false);
         var _effectedCardBase = GetEffectedCards()[0];
         _player.DestroyCard(_effectedCardBase);
-        RemoveEffectedCard(_effectedCardBase.UniqueId);
     }
 }
