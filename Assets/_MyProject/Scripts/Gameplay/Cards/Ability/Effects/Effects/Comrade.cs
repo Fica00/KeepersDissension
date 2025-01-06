@@ -3,9 +3,9 @@ public class Comrade : AbilityEffect
     protected override void ActivateForOwner()
     {
         SetIsActive(true);
-        RemoveAction();
-        OnActivated?.Invoke();
         ManageActiveDisplay(true);
+        OnActivated?.Invoke();
+        RemoveAction();
     }
 
     protected override void CancelEffect()

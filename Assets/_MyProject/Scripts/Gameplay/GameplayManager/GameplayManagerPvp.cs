@@ -939,11 +939,52 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (IsAbilityActive<Comrade>())
             {
-                //if it is my turn I should be able to pick a minion
-                //if not then I should wait for opponent to pick one
+                HandleComrade(_callBack);
+                return;
             }
             _callBack?.Invoke(true);
         }
+    }
+
+    private void HandleComrade(Action<bool> _callBack)
+    {
+        Comrade _comrade = FindObjectOfType<Comrade>();
+        if (_comrade.IsMy)
+        {
+            List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
+        
+            if (_validCards.Count==0)
+            {
+                DialogsManager.Instance.ShowOkDialog("You don't have any dead minion to execute Comrade");
+                _callBack?.Invoke(true);
+                return;
+            }
+            
+            ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
+            {
+                ReviveMinionComrade(_selected,_callBack);
+            },true,true);
+        }
+        else
+        {
+            Debug.Log("I klled opponents keeper, should wait for him to pick a card");
+        }
+        //if it is my turn I should be able to pick a minion
+        //if not then I should wait for opponent to pick one
+    }
+
+    private void ReviveMinionComrade(CardBase _cardBase, Action<bool> _callBack)
+    {
+        if (_cardBase==null)
+        {
+            _callBack?.Invoke(true);
+            return;
+        }
+            
+        BuyMinion(_cardBase, 0, () =>
+        {
+            _callBack?.Invoke(true);
+        });
     }
 
     private void PlaceKeeperOnTable(CardBase _card, Action _callBack)
@@ -2250,5 +2291,22 @@ public class GameplayManagerPvp : GameplayManager
     {
         return BoardData.Abilities.FindAll(_ability =>
             _forMe ? _ability.Owner == FirebaseManager.Instance.PlayerId : _ability.Owner == FirebaseManager.Instance.OpponentId);
+    }
+
+    public override List<Card> GetDeadMinions(bool _forMe)
+    {
+        var _validCards = GetAllCardsOfType(CardType.Minion, _forMe).ToList().ToList();
+        
+        foreach (var _validCard in _validCards.ToList())
+        {
+            if (_validCard.HasDied)
+            {
+                continue;
+            }
+
+            _validCards.Remove(_validCard);
+        }
+
+        return _validCards.ToList();
     }
 }

@@ -10,17 +10,7 @@ public class Revive : AbilityEffect
     protected override void ActivateForOwner()
     {
         MoveToActivationField();
-        List<CardBase> _validCards = GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, true).ToList().Cast<CardBase>().ToList();
-        
-        foreach (var _validCard in _validCards.ToList())
-        {
-            if (((Card)_validCard).HasDied)
-            {
-                continue;
-            }
-
-            _validCards.Remove(_validCard);
-        }
+        List<CardBase> _validCards = GameplayManager.Instance.GetDeadMinions(true).Cast<CardBase>().ToList();
         
         if (_validCards.Count==0)
         {

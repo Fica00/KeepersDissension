@@ -269,7 +269,11 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
-    
+
+    public virtual List<Card> GetDeadMinions(bool _forMe)
+    {
+        throw new Exception();
+    }
     public virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
         throw new Exception();
