@@ -21,11 +21,28 @@ public class GameplayManagerPvp : GameplayManager
     private void OnEnable()
     {
         RoomHandler.OnPlayerLeft += OpponentLeftRoom;
+        OnCardMoved += TrySaveSlowDown;
     }
 
     private void OnDisable()
     {
         RoomHandler.OnPlayerLeft -= OpponentLeftRoom;
+        OnCardMoved -= TrySaveSlowDown;
+    }
+
+    private void TrySaveSlowDown(CardBase _cardThatMoved, int _arg2, int _arg3)
+    {
+        string _uniqueId = ((Card)_cardThatMoved).UniqueId;
+        if (IsAbilityActive<SlowDown>())
+        {
+            SlowDown _slowDown = FindObjectOfType<SlowDown>();
+            if (!_slowDown.CanMoveCard(_uniqueId))
+            {
+                return;
+            }
+            
+            _slowDown.AddCard(_uniqueId);
+        }
     }
 
     private void OpponentLeftRoom(RoomPlayer _player)

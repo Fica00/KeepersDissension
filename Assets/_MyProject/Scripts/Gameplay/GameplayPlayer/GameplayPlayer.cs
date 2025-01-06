@@ -54,6 +54,12 @@ public class GameplayPlayer : MonoBehaviour
 
             _card.CardData.HasSnowWallEffect = false;
         }
+
+        if (GameplayManager.Instance.IsAbilityActive<SlowDown>())
+        {
+            SlowDown _slowDown = FindObjectOfType<SlowDown>();
+            _slowDown.ClearEffectedCardsForMe();
+        }
         OnStartedTurn?.Invoke();
     }
 
