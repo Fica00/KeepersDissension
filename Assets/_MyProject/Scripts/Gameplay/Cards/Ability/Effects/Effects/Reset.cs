@@ -11,15 +11,15 @@ public class Reset : AbilityEffect
         if (_cards == null || _cards.Count==0)
         {
             DialogsManager.Instance.ShowOkDialog("You don't have any card on cooldown");
-            RemoveAction();
+            SetIsActive(false);
+            MoveToActivationField();
             OnActivated?.Invoke();
+            RemoveAction();
+            return;
         }
-        else
-        {
-            ChooseCardImagePanel.Instance.Show(_cards,ReduceCooldown);
-        }
-        
+
         MoveToActivationField();
+        ChooseCardImagePanel.Instance.Show(_cards,ReduceCooldown);
     }
     
     private void ReduceCooldown(CardBase _selectedCard)
