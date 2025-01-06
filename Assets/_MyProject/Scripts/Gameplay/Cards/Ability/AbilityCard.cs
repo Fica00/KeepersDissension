@@ -112,7 +112,13 @@ public class AbilityCard : CardBase
             Veto _veto = FindObjectOfType<Veto>();
             if (_veto.IsCardEffected(UniqueId))
             {
-                return false;
+                if (GameplayManager.Instance.MyStrangeMatter()<1)
+                {
+                    return false;
+                }
+
+                GameplayManager.Instance.ChangeMyStrangeMatter(-1);
+                GameplayManager.Instance.ChangeOpponentsStrangeMatter(1);;
             }
         }
         
@@ -177,15 +183,6 @@ public class AbilityCard : CardBase
 
     public void Activate()
     {
-        if (GameplayManager.Instance.IsAbilityActive<Veto>())
-        {
-            Veto _veto = FindObjectOfType<Veto>();
-            if (_veto.IsCardEffected(UniqueId))
-            {
-                return;
-            }
-        }
-
         if (IsActive)
         {
             return;
