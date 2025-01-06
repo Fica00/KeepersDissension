@@ -41,9 +41,8 @@ public class BomberMinefield : CardSpecialAbility
 
     public override void UseAbility()
     {
-        if (Card.CardData.WarriorAbilityData.BomberData.Count >= 3)
+        if (!CanUse())
         {
-            DialogsManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
             return;
         }
 
@@ -51,6 +50,17 @@ public class BomberMinefield : CardSpecialAbility
         {
             YesUseMinefield(null,true);
         });
+    }
+
+    public bool CanUse()
+    {
+        if (Card.CardData.WarriorAbilityData.BomberData.Count >= 3)
+        {
+            DialogsManager.Instance.ShowOkDialog("You can have maximum of 3 bombs");
+            return false;
+        }
+
+        return true;
     }
 
     public void UseForFree(Action _callBack)

@@ -3,16 +3,29 @@ using UnityEngine;
 public class Minefield : AbilityEffect
 {
     [SerializeField] private Sprite sprite;
+    private BomberMinefield bomberMinefield;
     
     protected override void ActivateForOwner()
     {
         var _keeper = GameplayManager.Instance.GetMyKeeper();
         AddEffectedCard(_keeper.UniqueId);
         SetIsActive(true);
-        BomberMinefield _bomberMinefield = _keeper.EffectsHolder.AddComponent<BomberMinefield>();
-        _bomberMinefield.IsBaseCardsEffect = false;
-        _bomberMinefield.Setup(true,null);
-        _bomberMinefield.UseForFree(Finish);
+        
+        if (bomberMinefield==default)
+        {
+            bomberMinefield = _keeper.EffectsHolder.AddComponent<BomberMinefield>();
+            bomberMinefield.IsBaseCardsEffect = false;
+            bomberMinefield.Setup(false,null);
+        }
+
+        if (bomberMinefield.CanUse())
+        {
+            bomberMinefield.UseForFree(Finish);
+        }
+        else
+        {
+            Finish();
+        }
 
         void Finish()
         {
