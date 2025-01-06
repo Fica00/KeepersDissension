@@ -939,41 +939,67 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (IsAbilityActive<Comrade>())
             {
-                ActivateComrade(_callBack);
+                ActivateComrade(_defendingCard,_callBack);
                 return;
             }
             _callBack?.Invoke(true);
         }
     }
 
-    private void ActivateComrade(Action<bool> _callBack)
+    private void ActivateComrade(Card _keeper, Action<bool> _callBack)
     {
         Comrade _comrade = FindObjectOfType<Comrade>();
+        Debug.Log("Comrade is active");
+            
         if (_comrade.IsMy)
         {
-            HandleComrade(_callBack);
-        }
-        else
-        {
-            Debug.Log("I klled opponents keeper, should wait for him to pick a card");
-            if (RoomHandler.IsOwner)
+            Debug.Log("I owe it");
+            if (_keeper.GetIsMy())
             {
-                SetGameplaySubState(GameplaySubState.Player1UseComrade);
+                Debug.Log("Keeper that died is my, I should use comrade");
+                HandleComrade(_callBack);
             }
             else
             {
-                SetGameplaySubState(GameplaySubState.Player2UseComrade);
+                Debug.Log("Keeper that died is opponents, dont do anything");
             }
-
-            StartCoroutine(WaitForOpponentToUseComrade(_callBack));
-            RoomUpdater.Instance.ForceUpdate();
         }
+        else
+        {
+            Debug.Log("I dont owe it");
+            if (!_keeper.GetIsMy())
+            {
+                Debug.Log("Keeper that died is not my");
+                if (RoomHandler.IsOwner)
+                {
+                    Debug.Log("I am owner setting player 1");
+                    SetGameplaySubState(GameplaySubState.Player1UseComrade);
+                }
+                else
+                {
+                    Debug.Log("I am not owner setting player 2");
+                    SetGameplaySubState(GameplaySubState.Player2UseComrade);
+                }
+
+                Debug.Log("Waiting for opponent to finish");
+                StartCoroutine(WaitForOpponentToUseComrade(_callBack));
+                RoomUpdater.Instance.ForceUpdate();
+                return;
+            }
+            else
+            {
+                Debug.Log("Keeper is my so don't do anything");
+            }
+        }
+        
+        _callBack?.Invoke(true);
     }
 
     private IEnumerator WaitForOpponentToUseComrade(Action<bool> _callBack)
     {
         yield return new WaitUntil(()=> GetGameplaySubState() == GameplaySubState.Playing);
         _callBack?.Invoke(true);
+        Debug.Log("Opponent finished");
     }
 
     public override void HandleComrade(Action<bool> _callBack)
