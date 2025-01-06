@@ -153,7 +153,7 @@ public class BlockaderRam : CardSpecialAbility
         Debug.Log("Card that is being pushed, ",_secondCard.gameObject);
         int _exitPortalIndex = _firstCard.GetTablePlace().Id;
         int _placeIdOfSecondCard = _secondCard.GetTablePlace().Id;
-        (Card _e, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_secondCard.GetTablePlace().Id);
+        (Card _e, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_placeInFront.Id);
         Debug.Log("Enter portal: "+ _e.gameObject);
         Debug.Log("Exit portal: "+_exitPortal.gameObject);
         var _direction = GameplayManager.Instance.TableHandler.GetDirection(_firstCard.GetTablePlace().Id, _secondCard.GetTablePlace().Id);
