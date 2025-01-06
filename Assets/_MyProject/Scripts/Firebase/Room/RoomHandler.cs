@@ -150,6 +150,7 @@ namespace FirebaseMultiplayer.Room
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
             CheckForComrade(_currentRoomState, _data);
+            CheckForReduction(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -626,6 +627,7 @@ namespace FirebaseMultiplayer.Room
 
             GameplayManager.Instance.ShowGameEnded(_data.Winner);
         }
+        
         private void CheckForComrade(RoomData _currentRoomData,RoomData _data)
         {
             if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
@@ -633,12 +635,11 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
             
-            GameplaySubState _subState;
             if (_data.GameplaySubState is GameplaySubState.Player1UseComrade)
             {
                 if (IsOwner)
                 {
-                    _subState = _currentRoomData.GameplaySubState;
+                     GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
                     GameplayManager.Instance.HandleComrade(Finish);
                 }
             }
@@ -646,7 +647,7 @@ namespace FirebaseMultiplayer.Room
             {
                 if (!IsOwner)
                 {
-                    _subState = _currentRoomData.GameplaySubState;
+                    GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
                     GameplayManager.Instance.HandleComrade(Finish);
                 }
             }
@@ -654,7 +655,37 @@ namespace FirebaseMultiplayer.Room
 
             void Finish(bool _)
             {
-                GameplayManager.Instance.SetGameplaySubState(_subState);
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForReduction(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            if (_data.GameplaySubState is GameplaySubState.Player1UseReduction)
+            {
+                if (IsOwner)
+                {
+                     GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseReduction)
+            {
+                if (!IsOwner)
+                {
+                    GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+
+
+            void Finish()
+            {
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
                 RoomUpdater.Instance.ForceUpdate();
             }
         }

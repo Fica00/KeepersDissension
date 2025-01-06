@@ -40,7 +40,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 return;
             }
-            
+
             _slowDown.AddCard(_uniqueId);
         }
     }
@@ -262,13 +262,11 @@ public class GameplayManagerPvp : GameplayManager
         if (_destination.ContainsMarker)
         {
             Card _marker = _destination.GetMarker();
-            
+
             if (_marker.IsVoid)
             {
-                ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
-                {
-                    DamageCardByAbility(_movingCard.UniqueId, _movingCard.CardData.Stats.Health, _ => _callBack?.Invoke());
-                });
+                ShowCardMoved(_movingCard.UniqueId, _destination.Id,
+                    () => { DamageCardByAbility(_movingCard.UniqueId, _movingCard.CardData.Stats.Health, _ => _callBack?.Invoke()); });
                 return;
             }
             else
@@ -284,7 +282,7 @@ public class GameplayManagerPvp : GameplayManager
         ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
         {
             OnCardMoved?.Invoke(_movingCard, _startingPlaceId, _finishingPlaceId);
-            
+
             if (IsAbilityActive<Penalty>())
             {
                 Penalty _penalty = FindObjectOfType<Penalty>();
@@ -294,21 +292,18 @@ public class GameplayManagerPvp : GameplayManager
                         TableHandler.DistanceBetweenPlaces(TableHandler.GetPlace(_startingPlaceId), TableHandler.GetPlace(_finishingPlaceId));
                     int _speed = _movingCard.CardData.Stats.Speed;
                     int _damageToTake = Mathf.Min(_speed, _distance);
-                    DamageCardByAbility(_movingCard.UniqueId,_damageToTake, _ =>
-                    {
-                        _callBack?.Invoke();
-                    });
-                    
+                    DamageCardByAbility(_movingCard.UniqueId, _damageToTake, _ => { _callBack?.Invoke(); });
+
                     return;
                 }
             }
+
             _callBack?.Invoke();
         });
         PlayMovingSoundEffect(_movingCard);
     }
 
-    public override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, string _secondCardId,
-        Action _callBack)
+    public override void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId, string _firstCardId, string _secondCardId, Action _callBack)
     {
         TablePlaceHandler _startingDestination = TableHandler.GetPlace(_startingPlaceId);
         TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
@@ -339,7 +334,7 @@ public class GameplayManagerPvp : GameplayManager
             _callBack?.Invoke();
             return;
         }
-        
+
         Card _attackingCard = GetCard(_firstCardId);
         Card _defendingCard = GetCard(_secondCardId);
 
@@ -377,7 +372,7 @@ public class GameplayManagerPvp : GameplayManager
                 _callBack?.Invoke();
                 return;
             }
-            
+
             if (IsAbilityActive<Collapse>())
             {
                 DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
@@ -387,7 +382,7 @@ public class GameplayManagerPvp : GameplayManager
                         _callBack?.Invoke();
                         return;
                     }
-                    
+
                     ApplyWallAbility(_wall);
                 });
             }
@@ -395,7 +390,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 ApplyWallAbility(_wall);
             }
-            
+
         }
 
         void ApplyWallAbility(Wall _wall)
@@ -494,45 +489,42 @@ public class GameplayManagerPvp : GameplayManager
 
             DamageCardByAbility(_card.UniqueId, 1, null);
         }
-    }   
-    
+    }
+
     private void ApplyForestAbility(Card _attacker)
     {
-        if (_attacker.Health<=0)
+        if (_attacker.Health <= 0)
         {
             return;
         }
 
         _attacker.ChangeHealth(1);
-    }    
-    
+    }
+
     private void ApplySnowAbility(Card _attacker)
     {
-        _attacker.CardData.HasSnowWallEffect= true;
+        _attacker.CardData.HasSnowWallEffect = true;
     }
 
     public override void AnimateAttack(string _attackerId, string _defenderId, Action _callBack = null)
     {
         Card _attackingCard = GetCard(_attackerId);
         Card _defendingCard = GetCard(_defenderId);
-        
+
         _attackingCard.transform.DOMove(_defendingCard.transform.position, 0.5f).OnComplete(() =>
         {
-            _attackingCard.transform.DOLocalMove(Vector3.zero, 0.5f).SetDelay(0.2f).OnComplete(() =>
-            {
-                _callBack?.Invoke();
-            });
+            _attackingCard.transform.DOLocalMove(Vector3.zero, 0.5f).SetDelay(0.2f).OnComplete(() => { _callBack?.Invoke(); });
         });
     }
 
     private void ResolveEndOfAttack(Card _attackingCard, Card _defendingCard, Action _callBack)
     {
         StartCoroutine(ResolveEndOfAttackRoutine());
-        
+
         IEnumerator ResolveEndOfAttackRoutine()
         {
             int _damage = _attackingCard.Damage;
-            
+
             if (IsAbilityActive<HighStakes>())
             {
                 HighStakes _highStakes = FindObjectOfType<HighStakes>();
@@ -540,7 +532,7 @@ public class GameplayManagerPvp : GameplayManager
                 _damage = 8;
             }
 
-            
+
             bool _canGetResponse = true;
             bool _waitForSomething;
 
@@ -549,7 +541,7 @@ public class GameplayManagerPvp : GameplayManager
                 if (_defendingCard.TryToUseBlockaderAbility())
                 {
                     _damage--;
-                }   
+                }
             }
 
             if (_defendingCard.HasDelivery)
@@ -557,7 +549,7 @@ public class GameplayManagerPvp : GameplayManager
                 _waitForSomething = false;
                 if (_defendingCard.GetIsMy())
                 {
-                    UseDelivery(_defendingCard.UniqueId,ContinueWithExecution);
+                    UseDelivery(_defendingCard.UniqueId, ContinueWithExecution);
                     yield return new WaitUntil(() => _waitForSomething);
                 }
                 else
@@ -572,9 +564,11 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         SetGameplaySubState(GameplaySubState.Player1DeliveryReposition);
                     }
+
                     RoomUpdater.Instance.ForceUpdate();
                     yield return new WaitUntil(() => GetGameplaySubState() == _currentState);
                 }
+
                 _defendingCard.ChangeDelivery(false);
                 _damage = 0;
                 _canGetResponse = false;
@@ -622,21 +616,21 @@ public class GameplayManagerPvp : GameplayManager
                 if (_grounded.IsMy && _attackingCard is Keeper && _grounded.CanApplyEffect())
                 {
                     _grounded.ApplyEffect(_defendingCard.UniqueId);
-                    _damage=0;
+                    _damage = 0;
                     SaySomethingToAll("Grounded activated");
                 }
-                else if(_grounded.IsCardEffected(_defendingCard.UniqueId))
+                else if (_grounded.IsCardEffected(_defendingCard.UniqueId))
                 {
                     _grounded.EndEffect();
                 }
             }
-        
+
             _defendingCard.ChangeHealth(-_damage);
             var _defendingPosition = _defendingCard.GetTablePlace().Id;
 
             OnCardAttacked?.Invoke(_attackingCard, _defendingCard, _damage);
             bool _didGiveResponseAction = false;
-            
+
             if (IsAbilityActive<Ambush>())
             {
                 Ambush _ambush = FindObjectOfType<Ambush>();
@@ -647,18 +641,19 @@ public class GameplayManagerPvp : GameplayManager
                     _canGetResponse = false;
                 }
             }
-            
+
             if (_canGetResponse)
             {
                 _didGiveResponseAction = CheckForResponseAction(_attackingCard, _defendingCard);
             }
-            CheckIfDefenderIsDestroyed(_defendingCard,FinishResolve);
+
+            CheckIfDefenderIsDestroyed(_defendingCard, FinishResolve);
 
             void ContinueWithExecution()
             {
                 _waitForSomething = true;
             }
-            
+
             void FinishResolve(bool _didDie)
             {
                 if (_didDie)
@@ -669,7 +664,7 @@ public class GameplayManagerPvp : GameplayManager
                         return;
                     }
 
-                    HandleLoot(_attackingCard, _defendingCard,_defendingPosition);
+                    HandleLoot(_attackingCard, _defendingCard, _defendingPosition);
                 }
                 else
                 {
@@ -678,7 +673,7 @@ public class GameplayManagerPvp : GameplayManager
                         Repel _repel = FindObjectOfType<Repel>();
                         if (_repel.IsMy && _attackingCard is Keeper)
                         {
-                            PushCard(_defendingCard.GetTablePlace().Id,_attackingCard.GetTablePlace().Id);
+                            PushCard(_defendingCard.GetTablePlace().Id, _attackingCard.GetTablePlace().Id);
                         }
                     }
                 }
@@ -699,7 +694,7 @@ public class GameplayManagerPvp : GameplayManager
             void CallEnd()
             {
                 _callBack?.Invoke();
-                if (_didGiveResponseAction && MyPlayer.Actions==0)
+                if (_didGiveResponseAction && MyPlayer.Actions == 0)
                 {
                     Debug.Log("Forcing an update because response was given but");
                     RoomUpdater.Instance.ForceUpdate();
@@ -707,58 +702,98 @@ public class GameplayManagerPvp : GameplayManager
             }
         }
     }
-    
+
     public override void UseDelivery(string _defendingCardId, Action _callBack)
     {
         int _startingPlace = GetCard(_defendingCardId).GetTablePlace().Id;
         List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces();
-        if (_emptyPlaces.Count==0)
+        if (_emptyPlaces.Count == 0)
         {
             _callBack?.Invoke();
             return;
         }
-        
-        if (_emptyPlaces.Count==1)
+
+        if (_emptyPlaces.Count == 1)
         {
-            ExecuteMove(_startingPlace,_emptyPlaces[0].Id,_defendingCardId, _callBack);
+            ExecuteMove(_startingPlace, _emptyPlaces[0].Id, _defendingCardId, _callBack);
         }
         else
         {
             StartCoroutine(SelectPlace(_emptyPlaces, true, DoPlaceDeliveryCard));
         }
-        
+
         void DoPlaceDeliveryCard(int _placeId)
-        { 
-            ExecuteMove(_startingPlace,_placeId,_defendingCardId, _callBack);
+        {
+            ExecuteMove(_startingPlace, _placeId, _defendingCardId, _callBack);
         }
     }
 
     private List<TablePlaceHandler> GetDeliveryPlaces()
     {
-        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>(){8,9,10,11,12,13,14});
+        List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>()
+        {
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+        });
         if (_emptyPlaces.Count != 0)
         {
             return _emptyPlaces;
         }
-        
-        _emptyPlaces = GetEmptyPlaces(new List<int>(){12,10,19,18,17});
+
+        _emptyPlaces = GetEmptyPlaces(new List<int>()
+        {
+            12,
+            10,
+            19,
+            18,
+            17
+        });
         if (_emptyPlaces.Count != 0)
         {
             return _emptyPlaces;
         }
-        
-        _emptyPlaces = GetEmptyPlaces(new List<int>(){13,20,27,26,25,24,23,16,9});
+
+        _emptyPlaces = GetEmptyPlaces(new List<int>()
+        {
+            13,
+            20,
+            27,
+            26,
+            25,
+            24,
+            23,
+            16,
+            9
+        });
         if (_emptyPlaces.Count != 0)
         {
             return _emptyPlaces;
         }
-        
-        _emptyPlaces = GetEmptyPlaces(new List<int>(){14,21,28,27,26,25,24,23,22,15,8});
+
+        _emptyPlaces = GetEmptyPlaces(new List<int>()
+        {
+            14,
+            21,
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            15,
+            8
+        });
         if (_emptyPlaces.Count != 0)
         {
             return _emptyPlaces;
         }
-        
+
         for (int _i = 8; _i < 57; _i++)
         {
             TablePlaceHandler _place = TableHandler.GetPlace(_i);
@@ -771,7 +806,7 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         return _emptyPlaces;
-        
+
         List<TablePlaceHandler> GetEmptyPlaces(List<int> _placeIds)
         {
             List<TablePlaceHandler> _places = new List<TablePlaceHandler>();
@@ -782,6 +817,7 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     continue;
                 }
+
                 _places.Add(_place);
             }
 
@@ -795,7 +831,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
         }
-        
+
         if (!_defendingCard.IsWarrior())
         {
             return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
@@ -826,7 +862,7 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     continue;
                 }
-                    
+
                 if (_cardOnPlace is not Card _card)
                 {
                     continue;
@@ -841,7 +877,7 @@ public class GameplayManagerPvp : GameplayManager
                 return true;
             }
         }
-            
+
         return false;
     }
 
@@ -901,7 +937,7 @@ public class GameplayManagerPvp : GameplayManager
                     return;
                 }
             }
-            
+
             int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.CardData.Stats.MaxHealth;
             float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
@@ -922,10 +958,10 @@ public class GameplayManagerPvp : GameplayManager
                 var _explode = FindObjectOfType<Explode>();
                 if (_keeper.GetIsMy() == _explode.IsMy)
                 {
-                    BombExploded(_keeper.GetTablePlace().Id,false);
+                    BombExploded(_keeper.GetTablePlace().Id, false);
                 }
             }
-            
+
             PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
         }
         else
@@ -939,9 +975,10 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (IsAbilityActive<Comrade>())
             {
-                ActivateComrade(_defendingCard,_callBack);
+                ActivateComrade(_defendingCard, _callBack);
                 return;
             }
+
             _callBack?.Invoke(true);
         }
     }
@@ -949,7 +986,7 @@ public class GameplayManagerPvp : GameplayManager
     private void ActivateComrade(Card _keeper, Action<bool> _callBack)
     {
         Comrade _comrade = FindObjectOfType<Comrade>();
-            
+
         if (_comrade.IsMy)
         {
             if (_keeper.GetIsMy())
@@ -962,11 +999,12 @@ public class GameplayManagerPvp : GameplayManager
             if (!_keeper.GetIsMy())
             {
                 var _opponentsDeadMinions = GetDeadMinions(false);
-                if (_opponentsDeadMinions == null || _opponentsDeadMinions.Count==0)
+                if (_opponentsDeadMinions == null || _opponentsDeadMinions.Count == 0)
                 {
                     _callBack?.Invoke(true);
                     return;
                 }
+
                 if (RoomHandler.IsOwner)
                 {
                     SetGameplaySubState(GameplaySubState.Player2UseComrade);
@@ -981,42 +1019,39 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
         }
-        
+
         _callBack?.Invoke(true);
     }
 
     private IEnumerator WaitForOpponentToUseComrade(Action<bool> _callBack)
     {
-        yield return new WaitUntil(()=> GetGameplaySubState() == GameplaySubState.Playing);
+        yield return new WaitUntil(() => GetGameplaySubState() == GetGameplaySubStateHelper());
         _callBack?.Invoke(true);
     }
 
     public override void HandleComrade(Action<bool> _callBack)
     {
         List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
-        
-        if (_validCards.Count==0)
+
+        if (_validCards.Count == 0)
         {
             DialogsManager.Instance.ShowOkDialog("You don't have any dead minion to execute Comrade");
             _callBack?.Invoke(true);
             return;
         }
-            
-        ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
-        {
-            ReviveMinionComrade(_selected,_callBack);
-        },true,true);
+
+        ChooseCardImagePanel.Instance.Show(_validCards, _selected => { ReviveMinionComrade(_selected, _callBack); }, true, true);
     }
 
     private void ReviveMinionComrade(CardBase _cardBase, Action<bool> _callBack)
     {
-        if (_cardBase==null)
+        if (_cardBase == null)
         {
             Debug.Log("Got here 4");
             _callBack?.Invoke(true);
             return;
         }
-            
+
         BuyMinion(_cardBase, 0, () =>
         {
             Debug.Log("Got here 5");
@@ -1074,7 +1109,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (TryPlaceKeeper(_placeNear))
             {
-                ReplaceKeeper(_card, _placeNear,_callBack);
+                ReplaceKeeper(_card, _placeNear, _callBack);
                 return;
             }
         }
@@ -1085,7 +1120,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (TryPlaceKeeper(_i))
                 {
-                    ReplaceKeeper(_card, _i,_callBack);
+                    ReplaceKeeper(_card, _i, _callBack);
                     return;
                 }
             }
@@ -1096,7 +1131,7 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (TryPlaceKeeper(_i))
                 {
-                    ReplaceKeeper(_card, _i,_callBack);
+                    ReplaceKeeper(_card, _i, _callBack);
                     return;
                 }
             }
@@ -1122,7 +1157,7 @@ public class GameplayManagerPvp : GameplayManager
         return false;
     }
 
-    private void HandleLoot(Card _attackingCard, Card _defendingCard,int _placeOfDefendingCard)
+    private void HandleLoot(Card _attackingCard, Card _defendingCard, int _placeOfDefendingCard)
     {
         int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
         bool _didIAttack = _attackingCard.GetIsMy();
@@ -1146,10 +1181,7 @@ public class GameplayManagerPvp : GameplayManager
         AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
         BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
         {
-            Id = Guid.NewGuid().ToString(),
-            Amount = _amount,
-            ForMe = _forMe,
-            PositionId = _placeOfDefendingCard,
+            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = _placeOfDefendingCard,
         };
     }
 
@@ -1338,7 +1370,7 @@ public class GameplayManagerPvp : GameplayManager
             RoomUpdater.Instance.ForceUpdate();
             return;
         }
-        
+
         if (!IsMyTurn())
         {
             return;
@@ -1361,7 +1393,7 @@ public class GameplayManagerPvp : GameplayManager
 
         IEnumerator SelectPlaceRoutine()
         {
-            if (_placeId==-1)
+            if (_placeId == -1)
             {
                 yield return StartCoroutine(GetPlaceOnTable(FinishRevive));
             }
@@ -1376,11 +1408,12 @@ public class GameplayManagerPvp : GameplayManager
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
-                    if (MyPlayer.Actions>0)
+                    if (MyPlayer.Actions > 0)
                     {
                         RoomUpdater.Instance.ForceUpdate();
                     }
                 }
+
                 _callBack?.Invoke();
             }
         }
@@ -1408,17 +1441,17 @@ public class GameplayManagerPvp : GameplayManager
                 ChangeMyStrangeMatter(-_cost);
                 ChangeStrangeMaterInEconomy(_cost);
                 PlaceCard(_cardId, _positionId);
-                
+
                 if (_cost > 0)
                 {
                     MyPlayer.Actions--;
-                    
-                    if (MyPlayer.Actions>0)
+
+                    if (MyPlayer.Actions > 0)
                     {
                         RoomUpdater.Instance.ForceUpdate();
                     }
                 }
-                
+
                 _callBack?.Invoke();
             }
         }
@@ -1432,10 +1465,11 @@ public class GameplayManagerPvp : GameplayManager
     public override void ChangeOwnerOfCard(string _cardId)
     {
         Card _card = GetAllCards().Find(_card => _card.UniqueId == _cardId);
-        if (_card==null)
+        if (_card == null)
         {
             return;
         }
+
         _card.ChangeOwner();
     }
 
@@ -1447,9 +1481,9 @@ public class GameplayManagerPvp : GameplayManager
 
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions();});
+            DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions(); });
         }
-        
+
         BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = _placeId };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);
@@ -1459,13 +1493,13 @@ public class GameplayManagerPvp : GameplayManager
     {
         StartCoroutine(ShowBombEffect(_placeId));
     }
-    
+
     private IEnumerator ShowBombEffect(int _placeId)
     {
         TablePlaceHandler _tablePlace = TableHandler.GetPlace(_placeId);
         GameObject _bombEffect = Instantiate(bombEffect, GameplayUI.Instance.transform);
         yield return null;
-        _bombEffect.transform.position=_tablePlace.transform.position;
+        _bombEffect.transform.position = _tablePlace.transform.position;
         yield return new WaitForSeconds(2);
         Destroy(_bombEffect);
     }
@@ -1518,15 +1552,17 @@ public class GameplayManagerPvp : GameplayManager
             //dont remove strange matter when portal is purchased
             RoomUpdater.Instance.ForceUpdate();
             return;
-        }   
+        }
+
         if (_ability.CardId == 1031)
         {
             //dont remove strange matter when void is purchased
             RoomUpdater.Instance.ForceUpdate();
             return;
         }
+
         MyPlayer.Actions--;
-        if (MyPlayer.Actions>0)
+        if (MyPlayer.Actions > 0)
         {
             RoomUpdater.Instance.ForceUpdate();
         }
@@ -1558,7 +1594,7 @@ public class GameplayManagerPvp : GameplayManager
         TablePlaceHandler _placeBehindOfPushedCard = TableHandler.GetPlace(_indexBehindOfPushedCard);
         if (_placeBehindOfPushedCard == default)
         {
-            DamageCardByAbility(_pushedCard.UniqueId, 1,null);
+            DamageCardByAbility(_pushedCard.UniqueId, 1, null);
             return;
         }
 
@@ -1569,23 +1605,23 @@ public class GameplayManagerPvp : GameplayManager
             if (!_pushedCardBase.CheckCanMove() || _placeBehindOfPushedCard.IsAbility)
             {
                 Debug.Log("I can't move damaging my self");
-                DamageCardByAbility(_pushedCard.UniqueId, 1,null);
+                DamageCardByAbility(_pushedCard.UniqueId, 1, null);
                 return;
             }
 
             Debug.Log("Moving my self");
-            ExecuteMove(_pushedCardPlace.Id, _placeBehindOfPushedCard.Id, _pushedCard.UniqueId,null);
+            ExecuteMove(_pushedCardPlace.Id, _placeBehindOfPushedCard.Id, _pushedCard.UniqueId, null);
             return;
         }
 
         Debug.Log("Damaging pushed card");
-        DamageCardByAbility(_pushedCard.UniqueId, 1,null);
+        DamageCardByAbility(_pushedCard.UniqueId, 1, null);
     }
 
     public override void PlaceAbilityOnTable(string _abilityId)
     {
         TableHandler.GetAbilityPosition(_placeId => { PlaceAbilityOnTable(_abilityId, _placeId); });
-        
+
     }
 
     public override void PlaceAbilityOnTable(string _abilityId, int _placeId)
@@ -1606,7 +1642,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         PlaceAbilityOnTable(_abilityId);
         MyPlayer.Actions--;
-        if (MyPlayer.Actions>0)
+        if (MyPlayer.Actions > 0)
         {
             RoomUpdater.Instance.ForceUpdate();
         }
@@ -1632,7 +1668,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         EconomyPanelHandler.Instance.ShowBoughtMatter(true);
     }
-    
+
     public override void DestroyBombWithoutActivatingIt(int _cardId, bool _isMy)
     {
         Card _bomber = FindObjectsOfType<Card>().ToList().Find(_card => _card.Details.Id == _cardId && _card.My == _isMy);
@@ -1640,7 +1676,7 @@ public class GameplayManagerPvp : GameplayManager
         _player.DestroyWithoutNotify(_bomber);
     }
 
-    public override void ChangeSprite(string _cardId, int _spriteId, bool _showPlaceAnimation=false)
+    public override void ChangeSprite(string _cardId, int _spriteId, bool _showPlaceAnimation = false)
     {
         Card _card = GetCard(_cardId);
         if (_card == null)
@@ -1679,9 +1715,9 @@ public class GameplayManagerPvp : GameplayManager
         {
             return;
         }
-        
+
         _card.transform.localPosition = new Vector3(-2000, 0);
-        _card.MoveToPosition(_card.GetTablePlace(),null);
+        _card.MoveToPosition(_card.GetTablePlace(), null);
     }
 
     public override void PlayAudioOnBoth(string _key, CardBase _cardBase)
@@ -1940,7 +1976,7 @@ public class GameplayManagerPvp : GameplayManager
 
     private void YesUnchain(int _price)
     {
-        UnchainGuardian(_price,true);
+        UnchainGuardian(_price, true);
     }
 
     public override int AmountOfActionsPerTurn()
@@ -2246,8 +2282,9 @@ public class GameplayManagerPvp : GameplayManager
         {
             MyPlayer.Actions--;
         }
+
         OnUnchainedGuardian?.Invoke();
-        if (MyPlayer.Actions>0 && _reduceAction)
+        if (MyPlayer.Actions > 0 && _reduceAction)
         {
             RoomUpdater.Instance.ForceUpdate();
         }
@@ -2277,12 +2314,12 @@ public class GameplayManagerPvp : GameplayManager
             ? GetGameplaySubState() == GameplaySubState.Player1ResponseAction
             : GetGameplaySubState() == GameplaySubState.Player2ResponseAction;
     }
-    
+
     public override bool IsResponseAction()
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
-    
+
     public override void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
     {
         if (IsAbilityActive<HighStakes>())
@@ -2291,20 +2328,20 @@ public class GameplayManagerPvp : GameplayManager
             _highStakes.TryToCancel();
             _damage = 8;
         }
-        
+
         Card _card = GetCard(_uniqueId);
         _card.ChangeHealth(-_damage);
-        CheckIfDefenderIsDestroyed(_card,_callBack);
+        CheckIfDefenderIsDestroyed(_card, _callBack);
     }
 
     public override void MarkMarkerAsBomb(string _cardId)
     {
         Card _card = GetCard(_cardId);
-        if (_card==null)
+        if (_card == null)
         {
             return;
         }
-        
+
         Sprite _bombSprite = _card.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
         _card.Display.ChangeSprite(_bombSprite);
     }
@@ -2313,14 +2350,15 @@ public class GameplayManagerPvp : GameplayManager
     {
         DialogsManager.Instance.ShowOkDialog(_text);
     }
-    
+
     public override void ManageAbilityActive(string _uniqueId, bool _status)
     {
         AbilityCard _ability = GetAbility(_uniqueId);
-        if (_ability==null)
+        if (_ability == null)
         {
             return;
         }
+
         _ability.ManageActiveDisplay(_status);
     }
 
@@ -2333,7 +2371,7 @@ public class GameplayManagerPvp : GameplayManager
     public override List<Card> GetDeadMinions(bool _forMe)
     {
         var _validCards = GetAllCardsOfType(CardType.Minion, _forMe).ToList().ToList();
-        
+
         foreach (var _validCard in _validCards.ToList())
         {
             if (_validCard.HasDied)
@@ -2345,5 +2383,109 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         return _validCards.ToList();
+    }
+
+    public override void SetGameplaySubStateHelper(GameplaySubState _subState)
+    {
+        RoomData.GameplaySubStateHelper = _subState;
+    }
+
+    public override GameplaySubState GetGameplaySubStateHelper()
+    {
+        return RoomData.GameplaySubStateHelper;
+    }
+
+    public override void StartReduction(Action _callBack)
+    {
+        SetGameplaySubStateHelper(GetGameplaySubState());
+        UseReduction(StartSecondPlayersReduction);
+
+        void StartSecondPlayersReduction()
+        {
+            if (RoomHandler.IsOwner)
+            {
+                SetGameplaySubState(GameplaySubState.Player2UseReduction);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player1UseReduction);
+            }
+            
+            StartCoroutine(WaitForOpponentToUseReduction(_callBack));
+            RoomUpdater.Instance.ForceUpdate();
+        }
+    }
+    
+    private IEnumerator WaitForOpponentToUseReduction(Action _callBack)
+    {
+        yield return new WaitUntil(() => GetGameplaySubState() == GetGameplaySubStateHelper());
+        _callBack?.Invoke();
+    }
+
+    public override void UseReduction(Action _callBack)
+    {
+        List<Card> _cards = new();
+        foreach (var _card in GetAllCards().ToList())
+        {
+            if (!_card.GetIsMy())
+            {
+                continue;
+            }
+
+            if (!_card.IsWarrior())
+            {
+                continue;
+            }
+
+            _cards.Add(_card);
+        }
+
+        List<TablePlaceHandler> _availablePlaces = new();
+        foreach (var _card in _cards)
+        {
+            TablePlaceHandler _tablePlace = _card.GetTablePlace();
+            if (_tablePlace == null)
+            {
+                continue;
+            }
+
+            _availablePlaces.Add(_tablePlace);
+        }
+
+        if (_availablePlaces.Count == 0)
+        {
+            DialogsManager.Instance.ShowOkDialog("You dont have warrior to sacrifice");
+            _callBack?.Invoke();
+            return;
+        }
+
+        foreach (var _availablePlace in _availablePlaces)
+        {
+            _availablePlace.SetColor(Color.green);
+        }
+
+        DialogsManager.Instance.ShowOkDialog("Please select warrior to be sacrificed");
+        TablePlaceHandler.OnPlaceClicked += TryTiPlaceReduction;
+
+        void TryTiPlaceReduction(TablePlaceHandler _place)
+        {
+            if (!_availablePlaces.Contains(_place))
+            {
+                return;
+            }
+
+            foreach (var _availablePlace in _availablePlaces)
+            {
+                _availablePlace.SetColor(Color.white);
+            }
+
+            TablePlaceHandler.OnPlaceClicked -= TryTiPlaceReduction;
+            Card _card = _place.GetCardNoWall();
+           
+            DamageCardByAbility(_card.UniqueId,_card.CardData.Stats.Health, _ =>
+            {
+                _callBack?.Invoke();
+            });
+        }
     }
 }

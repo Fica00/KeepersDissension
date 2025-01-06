@@ -65,7 +65,6 @@ public class AbilityEffect : MonoBehaviour
 
     protected virtual void CancelEffect()
     {
-        throw new Exception();
     }
 
     public virtual void SetupAfterGameReset()

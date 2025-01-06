@@ -989,11 +989,6 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual bool ContainsCard(CardData _requestedCard, bool _forMe)
-    {
-        throw new Exception();
-    }
-
     public virtual List<AbilityData> GetOwnedAbilities(bool _forMe)
     {
         throw new Exception();
@@ -1207,5 +1202,25 @@ public class GameplayManager : MonoBehaviour
         }
 
         return 0;
+    }
+
+    public virtual void SetGameplaySubStateHelper(GameplaySubState _subState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplaySubState GetGameplaySubStateHelper()
+    {
+        throw new Exception();
+    }
+
+    public virtual void StartReduction(Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual void UseReduction(Action _callBack)
+    {
+        throw new Exception();
     }
 }
