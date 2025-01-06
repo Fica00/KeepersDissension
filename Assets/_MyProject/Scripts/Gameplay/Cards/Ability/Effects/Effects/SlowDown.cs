@@ -1,4 +1,5 @@
 using System.Linq;
+using UnityEngine;
 
 public class SlowDown : AbilityEffect
 {
@@ -22,6 +23,7 @@ public class SlowDown : AbilityEffect
 
         public void ClearEffectedCardsForMe()
         {
+            Debug.Log(11111);
             foreach (var _effectedCard in GetEffectedCards().ToList())
             {
                 if (!_effectedCard.GetIsMy())
@@ -64,7 +66,6 @@ public class SlowDown : AbilityEffect
             GameplayManager.Instance.MyPlayer.OnEndedTurn -= LowerCounter;
             SetIsActive(false);
             ClearEffectedCards();
-            
             RoomUpdater.Instance.ForceUpdate();
         }
 }
