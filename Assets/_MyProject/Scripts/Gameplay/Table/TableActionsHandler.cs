@@ -748,13 +748,25 @@ public class TableActionsHandler : MonoBehaviour
         if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
         {
             Debug.Log("Place on the other side is occupied, damaging my self");
-            GameplayManager.Instance.DamageCardByAbility(_cardThatMoved.UniqueId, 1, null);
+            GameplayManager.Instance.DamageCardByAbility(_cardThatMoved.UniqueId, 1, _ =>
+            {
+                RemoveAction();
+            });
             return false;
         }
 
         Debug.Log("moving to the new place");
-        GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, _cardThatMoved.UniqueId,null);
+        GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, _cardThatMoved.UniqueId,RemoveAction);
         return false;
+
+        void RemoveAction()
+        {
+            GameplayManager.Instance.MyPlayer.Actions--;
+            if (GameplayManager.Instance.MyPlayer.Actions>0)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
     }
 
     private bool TryToUseRam(CardAction _action)

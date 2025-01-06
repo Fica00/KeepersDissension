@@ -287,7 +287,6 @@ public class GameplayManagerPvp : GameplayManager
                     int _damageToTake = Mathf.Min(_speed, _distance);
                     DamageCardByAbility(_movingCard.UniqueId,_damageToTake, _ =>
                     {
-                        Debug.Log("aaaaa");
                         _callBack?.Invoke();
                     });
                     
