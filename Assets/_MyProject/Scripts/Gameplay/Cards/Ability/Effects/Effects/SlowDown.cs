@@ -33,8 +33,6 @@ public class SlowDown : AbilityEffect
                 
                 RemoveEffectedCard(_effectedCard.UniqueId);
             }
-            
-            RoomUpdater.Instance.ForceUpdate();
         }
     
         public bool CanMoveCard(string _uniqueId)
