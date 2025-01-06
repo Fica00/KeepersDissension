@@ -8,7 +8,7 @@ public class Reset : AbilityEffect
         TablePlaceHandler _tablePlace = GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField;
         List<CardBase> _cards = _tablePlace.GetCards();
         
-        if (_cards.Count==0)
+        if (_cards == null || _cards.Count==0)
         {
             DialogsManager.Instance.ShowOkDialog("You don't have any card on cooldown");
             RemoveAction();
