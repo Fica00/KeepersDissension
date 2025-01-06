@@ -939,38 +939,58 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (IsAbilityActive<Comrade>())
             {
-                HandleComrade(_callBack);
+                ActivateComrade(_callBack);
                 return;
             }
             _callBack?.Invoke(true);
         }
     }
 
-    private void HandleComrade(Action<bool> _callBack)
+    private void ActivateComrade(Action<bool> _callBack)
     {
         Comrade _comrade = FindObjectOfType<Comrade>();
         if (_comrade.IsMy)
         {
-            List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
-        
-            if (_validCards.Count==0)
-            {
-                DialogsManager.Instance.ShowOkDialog("You don't have any dead minion to execute Comrade");
-                _callBack?.Invoke(true);
-                return;
-            }
-            
-            ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
-            {
-                ReviveMinionComrade(_selected,_callBack);
-            },true,true);
+            HandleComrade(_callBack);
         }
         else
         {
             Debug.Log("I klled opponents keeper, should wait for him to pick a card");
+            if (RoomHandler.IsOwner)
+            {
+                SetGameplaySubState(GameplaySubState.Player1UseComrade);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player2UseComrade);
+            }
+
+            StartCoroutine(WaitForOpponentToUseComrade(_callBack));
+            RoomUpdater.Instance.ForceUpdate();
         }
-        //if it is my turn I should be able to pick a minion
-        //if not then I should wait for opponent to pick one
+    }
+
+    private IEnumerator WaitForOpponentToUseComrade(Action<bool> _callBack)
+    {
+        yield return new WaitUntil(()=> GetGameplaySubState() == GameplaySubState.Playing);
+        _callBack?.Invoke(true);
+    }
+
+    public override void HandleComrade(Action<bool> _callBack)
+    {
+        List<CardBase> _validCards = GetDeadMinions(true).Cast<CardBase>().ToList();
+        
+        if (_validCards.Count==0)
+        {
+            DialogsManager.Instance.ShowOkDialog("You don't have any dead minion to execute Comrade");
+            _callBack?.Invoke(true);
+            return;
+        }
+            
+        ChooseCardImagePanel.Instance.Show(_validCards, _selected =>
+        {
+            ReviveMinionComrade(_selected,_callBack);
+        },true,true);
     }
 
     private void ReviveMinionComrade(CardBase _cardBase, Action<bool> _callBack)

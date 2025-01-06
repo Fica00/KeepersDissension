@@ -274,6 +274,12 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void HandleComrade(Action<bool> _callBack)
+    {
+        throw new Exception();
+    }
+    
     public virtual void ExecuteSwitchPlace(int _startingPlaceId, int _finishingPlaceId,string _firstCardId,string _secondCardId, Action _callBack)
     {
         throw new Exception();

@@ -149,6 +149,7 @@ namespace FirebaseMultiplayer.Room
             CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
+            CheckForComrade(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -624,6 +625,38 @@ namespace FirebaseMultiplayer.Room
             }
 
             GameplayManager.Instance.ShowGameEnded(_data.Winner);
+        }
+        private void CheckForComrade(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            GameplaySubState _subState;
+            if (_data.GameplaySubState is GameplaySubState.Player1UseComrade)
+            {
+                if (IsOwner)
+                {
+                    _subState = _currentRoomData.GameplaySubState;
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseComrade)
+            {
+                if (!IsOwner)
+                {
+                    _subState = _currentRoomData.GameplaySubState;
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+
+
+            void Finish(bool _)
+            {
+                GameplayManager.Instance.SetGameplaySubState(_subState);
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 

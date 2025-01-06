@@ -15,4 +15,6 @@ public enum GameplaySubState
     Playing=9,
     Player1DeliveryReposition=10,
     Player2DeliveryReposition=11,
+    Player1UseComrade=12,
+    Player2UseComrade=13,
 }
