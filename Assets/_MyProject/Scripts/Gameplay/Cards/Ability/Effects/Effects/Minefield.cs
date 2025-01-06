@@ -9,7 +9,6 @@ public class Minefield : AbilityEffect
     {
         var _keeper = GameplayManager.Instance.GetMyKeeper();
         AddEffectedCard(_keeper.UniqueId);
-        SetIsActive(true);
         
         if (bomberMinefield==default)
         {
@@ -29,24 +28,23 @@ public class Minefield : AbilityEffect
 
         void Finish()
         {
-            OnActivated?.Invoke();
             ManageActiveDisplay(true);
+            MoveToActivationField();
+            OnActivated?.Invoke();
             RemoveAction();
         }
     }
 
     protected override void CancelEffect()
     {
-        Card _keeper = GetEffectedCards()[0];
-        BomberMinefield _bomberMinefield = _keeper.EffectsHolder.GetComponent<BomberMinefield>();
         ManageActiveDisplay(false);
-        SetIsActive(false);
         
-        if (_bomberMinefield==null)
+        if (bomberMinefield==null)
         {
             return;
         }
         
-        Destroy(_bomberMinefield);
+        Destroy(bomberMinefield);
+        ClearEffectedCards();
     }
 }
