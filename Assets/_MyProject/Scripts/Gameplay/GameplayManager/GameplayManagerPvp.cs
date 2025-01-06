@@ -1410,7 +1410,6 @@ public class GameplayManagerPvp : GameplayManager
     public override void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetWarrior() as Card;
-        Debug.Log(_pushedCard.name,_pushedCard.gameObject);
         if (_pushedCard == null)
         {
             Debug.Log("Pushed card is null");
@@ -1419,9 +1418,6 @@ public class GameplayManagerPvp : GameplayManager
 
         if (!_pushedCard.IsWarrior())
         {
-            Debug.Log(_pushedCard);
-            Debug.Log(_pushedCard.UniqueId);
-            Debug.Log(_pushedCard.GetType());
             Debug.Log("Pushed card is not a warrior");
             return;
         }
@@ -1437,7 +1433,7 @@ public class GameplayManagerPvp : GameplayManager
         TablePlaceHandler _placeBehindOfPushedCard = TableHandler.GetPlace(_indexBehindOfPushedCard);
         if (_placeBehindOfPushedCard == default)
         {
-            Debug.Log("There is no place available in the back");
+            DamageCardByAbility(_pushedCard.UniqueId, 1,null);
             return;
         }
 
@@ -1448,45 +1444,17 @@ public class GameplayManagerPvp : GameplayManager
             if (!_pushedCardBase.CheckCanMove() || _placeBehindOfPushedCard.IsAbility)
             {
                 Debug.Log("I can't move damaging my self");
-                StartCoroutine(DamagePushedCard());
+                DamageCardByAbility(_pushedCard.UniqueId, 1,null);
                 return;
             }
 
             Debug.Log("Moving my self");
-            CardAction _moveCardInFront = new CardAction
-            {
-                FirstCardId = _pushedCardPlace.GetCardNoWall().UniqueId,
-                StartingPlaceId = _pushedCardPlace.Id,
-                FinishingPlaceId = _placeBehindOfPushedCard.Id,
-                Type = CardActionType.Move,
-                Cost = 0,
-                Damage = -1,
-            };
-
-            ExecuteCardAction(_moveCardInFront);
+            ExecuteMove(_pushedCardPlace.Id, _placeBehindOfPushedCard.Id, _pushedCard.UniqueId,null);
             return;
         }
 
         Debug.Log("Damaging pushed card");
-        StartCoroutine(DamagePushedCard());
-        return;
-
-        IEnumerator DamagePushedCard()
-        {
-            yield return new WaitForSeconds(0.5f);
-            CardAction _damage = new CardAction()
-            {
-                FirstCardId = _pushedCardPlace.GetCard().UniqueId,
-                SecondCardId = _pushedCardPlace.GetCard().UniqueId,
-                StartingPlaceId = _pushedCardPlace.Id,
-                FinishingPlaceId = _pushedCardPlace.Id,
-                Type = CardActionType.Attack,
-                Cost = 0,
-                Damage = 1,
-            };
-
-            ExecuteCardAction(_damage);
-        }
+        DamageCardByAbility(_pushedCard.UniqueId, 1,null);
     }
 
     public override void PlaceAbilityOnTable(string _abilityId)
