@@ -29,7 +29,7 @@ public class Void : AbilityEffect
         GameplayManager.Instance.PlaceCard(_marker,_placeId);
         AddEffectedCard(_marker.UniqueId);
         _marker.SetIsVoid(true);
-        GameplayManager.Instance.ChangeSprite(_marker.UniqueId,_marker.Details.Id,true);
+        GameplayManager.Instance.ChangeSprite(_marker.UniqueId,0,true);
         SetIsActive(true);
         OnActivated?.Invoke();
         RemoveAction();

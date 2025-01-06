@@ -1441,6 +1441,12 @@ public class GameplayManagerPvp : GameplayManager
             //dont remove strange matter when portal is purchased
             RoomUpdater.Instance.ForceUpdate();
             return;
+        }   
+        if (_ability.CardId == 1031)
+        {
+            //dont remove strange matter when void is purchased
+            RoomUpdater.Instance.ForceUpdate();
+            return;
         }
         MyPlayer.Actions--;
         if (MyPlayer.Actions>0)

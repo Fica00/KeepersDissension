@@ -96,6 +96,11 @@ public class AbilityEffect : MonoBehaviour
             {
                 DoRemove();
             }
+
+            if (AbilityCard.Details.Id == 1031)
+            {
+                DoRemove();
+            }
             
             return;
         }
