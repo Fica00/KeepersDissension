@@ -1896,12 +1896,6 @@ public class GameplayManagerPvp : GameplayManager
     public override List<AbilityData> GetOwnedAbilities(bool _forMe)
     {
         string _playerId = _forMe ? BoardData.MyPlayer.PlayerId : BoardData.OpponentPlayer.PlayerId;
-        Debug.Log(_playerId);
-        Debug.Log("Owners:");
-        foreach (var _ability in BoardData.Abilities)
-        {
-            Debug.Log(_ability.Owner);
-        }
         return BoardData.Abilities.FindAll(_ability => _ability.Owner == _playerId);
     }
 
