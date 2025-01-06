@@ -16,7 +16,7 @@ public class Reset : AbilityEffect
         }
         else
         {
-            ChooseCardPanel.Instance.ShowCards(_cards,ReduceCooldown);
+            ChooseCardImagePanel.Instance.Show(_cards,ReduceCooldown);
         }
         
         MoveToActivationField();
