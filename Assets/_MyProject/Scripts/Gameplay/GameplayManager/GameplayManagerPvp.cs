@@ -262,7 +262,17 @@ public class GameplayManagerPvp : GameplayManager
         if (_destination.ContainsMarker)
         {
             Card _marker = _destination.GetMarker();
-            if (!_marker.IsVoid)
+            
+            if (_marker.IsVoid)
+            {
+                ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
+                {
+                    GameplayPlayer _markerOwner = _marker.GetIsMy() ? MyPlayer : OpponentPlayer;
+                    _markerOwner.DestroyCard(_marker);
+                });
+                return;
+            }
+            else
             {
                 CardBase _cardBase = _destination.GetCardNoWall();
                 GameplayPlayer _markerOwner = _cardBase.GetIsMy() ? MyPlayer : OpponentPlayer;
@@ -272,10 +282,10 @@ public class GameplayManagerPvp : GameplayManager
 
         _movingCard.CardData.PlaceId = _destination.Id;
 
-
         ShowCardMoved(_movingCard.UniqueId, _destination.Id, () =>
         {
             OnCardMoved?.Invoke(_movingCard, _startingPlaceId, _finishingPlaceId);
+            
             if (IsAbilityActive<Penalty>())
             {
                 Penalty _penalty = FindObjectOfType<Penalty>();
@@ -2090,6 +2100,11 @@ public class GameplayManagerPvp : GameplayManager
             if (_card.Details.Type != _type)
             {
                 continue;
+            }
+
+            if (_type == CardType.Marker)
+            {
+                _card.SetIsVoid(false);
             }
 
             return _card;
