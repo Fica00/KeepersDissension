@@ -589,6 +589,20 @@ public class GameplayManagerPvp : GameplayManager
                     }
                 }
             }
+
+            if (IsAbilityActive<Grounded>())
+            {
+                Grounded _grounded = FindObjectOfType<Grounded>();
+                if (_grounded.IsMy && _attackingCard is Keeper && _grounded.CanApplyEffect())
+                {
+                    _grounded.ApplyEffect(_defendingCard.UniqueId);
+                    _damage=0;
+                }
+                else if(_grounded.IsCardEffected(_defendingCard.UniqueId))
+                {
+                    _grounded.EndEffect();
+                }
+            }
         
             _defendingCard.ChangeHealth(-_damage);
             var _defendingPosition = _defendingCard.GetTablePlace().Id;

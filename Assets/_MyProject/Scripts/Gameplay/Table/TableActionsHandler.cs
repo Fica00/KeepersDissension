@@ -698,6 +698,11 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (!CheckForGrounded(_newAction))
+        {
+            return;
+        }
         
         bool _continue =TryHandlePortalMove(_newAction);
         
@@ -876,13 +881,9 @@ public class TableActionsHandler : MonoBehaviour
 
         return true;
     }
+    
     private bool CheckForSlowDown(CardAction _action)
     {
-        if (_action.Type != CardActionType.Move)
-        {
-            return true;
-        }
-
         if (!GameplayManager.Instance.IsAbilityActive<SlowDown>())
         {
             return true;
@@ -891,11 +892,67 @@ public class TableActionsHandler : MonoBehaviour
         Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
         SlowDown _slowDown = FindObjectOfType<SlowDown>();
 
-        if (!_slowDown.CanMoveCard(_card1.UniqueId))
+        if (_action.Type == CardActionType.Move)
         {
-            DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
-            return false;
+            if (!_slowDown.CanMoveCard(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
         }
+        else if (_action.Type == CardActionType.RamAbility || _action.Type == CardActionType.SwitchPlace)
+        {
+            Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+            
+            if (!_slowDown.CanMoveCard(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
+            
+            if (!_slowDown.CanMoveCard(_card2.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private bool CheckForGrounded(CardAction _action)
+    {
+        if (!GameplayManager.Instance.IsAbilityActive<Grounded>())
+        {
+            return true;
+        }
+        
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Grounded _grounded = FindObjectOfType<Grounded>();
+        
+        if (_action.Type == CardActionType.Move)
+        {
+            if (_grounded.IsCardEffected(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+        }
+        else if (_action.Type == CardActionType.RamAbility || _action.Type == CardActionType.SwitchPlace)
+        {
+            Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+            if (_grounded.IsCardEffected(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+            if (_grounded.IsCardEffected(_card2.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+        }
+
         return true;
     }
 }
