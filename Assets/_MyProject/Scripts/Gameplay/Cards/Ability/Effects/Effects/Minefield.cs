@@ -28,7 +28,6 @@ public class Minefield : AbilityEffect
 
         void Finish()
         {
-            ManageActiveDisplay(true);
             MoveToActivationField();
             OnActivated?.Invoke();
             RemoveAction();
@@ -37,8 +36,6 @@ public class Minefield : AbilityEffect
 
     protected override void CancelEffect()
     {
-        ManageActiveDisplay(false);
-        
         if (bomberMinefield==null)
         {
             return;
