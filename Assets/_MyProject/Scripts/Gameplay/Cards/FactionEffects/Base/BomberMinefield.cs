@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public class BomberMinefield : CardSpecialAbility
 {
@@ -47,34 +47,51 @@ public class BomberMinefield : CardSpecialAbility
             return;
         }
 
-        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use minefield ability?", YesUseMinefield, null);
+        DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to use minefield ability?", () =>
+        {
+            YesUseMinefield(null,true);
+        });
     }
 
-    private void YesUseMinefield()
+    public void UseForFree(Action _callBack)
+    {
+        YesUseMinefield(_callBack,false);
+    }
+
+    private void YesUseMinefield(Action _callBack, bool _useActions)
     {
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, 1, PlaceLookFor.Empty, CardMovementType.EightDirections, false,
-            LookForCardOwner.My, PlaceBomb);
+            LookForCardOwner.My, _place =>
+            {
+                PlaceBomb(_place, _callBack, _useActions);
+            });
     }
 
-    private void PlaceBomb(int _placeId)
+    private void PlaceBomb(int _placeId, Action _callBack,bool _useActions)
     {
         bomberData = new BomberData();
         GameplayManager.Instance.CloseAllPanels();
 
         if (!CanPlaceBomb(_placeId))
         {
+            _callBack?.Invoke();
             return;
         }
 
         TryPlayAudio();
         DoPlaceBomb(_placeId);
 
-        var _player = GetPlayer();
-        _player.Actions--;
-        if (_player.Actions > 0)
+        if (_useActions)
         {
-            RoomUpdater.Instance.ForceUpdate();
+            var _player = GetPlayer();
+            _player.Actions--;
+            if (_player.Actions > 0)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }
         }
+        
+        _callBack?.Invoke();
     }
 
     private bool CanPlaceBomb(int _placeId)
