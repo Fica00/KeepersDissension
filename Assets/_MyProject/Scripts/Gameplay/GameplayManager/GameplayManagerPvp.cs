@@ -1505,24 +1505,17 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (IsAbilityActive<Tax>())
         {
-            Debug.Log("11111");
             var _taxedCard = FindObjectOfType<Tax>();
             if (_taxedCard.IsCardEffected(_cardId))
             {
-                Debug.Log("Ability is taxed");
                 if (MyStrangeMatter()<=0)
                 {
                     DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
                     return;
                 }
 
-                Debug.Log("Paying tax");
                 ChangeMyStrangeMatter(-1);
                 ChangeOpponentsStrangeMatter(1);
-            }
-            else
-            {
-                Debug.Log("Tax is not activate");
             }
         }
         

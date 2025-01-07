@@ -169,6 +169,7 @@ public class AbilityCard : CardBase
     {
         if (IsActive)
         {
+            effect.RemoveAction();
             return;
         }
         

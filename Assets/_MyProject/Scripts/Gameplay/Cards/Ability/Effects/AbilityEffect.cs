@@ -82,7 +82,7 @@ public class AbilityEffect : MonoBehaviour
         GameplayManager.Instance.PlaceAbilityOnTable(AbilityCard.UniqueId, GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField.Id);
     }
 
-    protected void RemoveAction()
+    public void RemoveAction()
     {
         if (!AbilityCard.My)
         {
