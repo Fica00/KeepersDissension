@@ -202,11 +202,9 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ShowCardMoved(string _uniqueId, int _positionId, Action _callBack)
     {
-        Debug.Log($"Showing that card moved: {_uniqueId} new position: {_positionId}");
         Card _card = GetCard(_uniqueId);
         if (_card == null)
         {
-            Debug.Log($"Didn't manage to find card with id {_uniqueId}");
             _callBack?.Invoke();
             return;
         }
@@ -218,7 +216,12 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        _card.MoveToPosition(_destination, _callBack);
+        IsAnimating = true;
+        _card.MoveToPosition(_destination, () =>
+        {
+            IsAnimating = false;
+            _callBack?.Invoke();
+        });
     }
 
     public override void AddAbilityToPlayer(string _owner, string _abilityId)

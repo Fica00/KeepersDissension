@@ -247,13 +247,6 @@ namespace FirebaseMultiplayer.Room
         
         private void CheckIfCardMoved(RoomData _currentRoomData,RoomData _data)
         {
-            if (GameplayManager.Instance.IsMyTurn())
-            {
-                if (!GameplayManager.Instance.IsResponseAction())
-                {
-                    return;
-                }
-            }
             foreach (var _card in _data.BoardData.Cards)
             {
                 bool _shouldMoveCard = false;

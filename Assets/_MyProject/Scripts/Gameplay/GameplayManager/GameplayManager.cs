@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
+    public static bool IsAnimating; 
     public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;

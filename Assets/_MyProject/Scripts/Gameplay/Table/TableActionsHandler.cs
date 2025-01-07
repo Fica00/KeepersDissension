@@ -53,6 +53,12 @@ public class TableActionsHandler : MonoBehaviour
 
     public void ShowPossibleActions(TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
+        if (GameplayManager.IsAnimating)
+        {
+            Debug.Log("Not showing possible actions because I am animating");
+            return;
+        }
+        
         ClearPossibleActions();
 
         if (!_card.IsWarrior())
