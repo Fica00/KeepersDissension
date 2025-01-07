@@ -15,7 +15,6 @@ public class Tax : AbilityEffect
     {
         List<CardBase> _cards = new();
         var _availableCards = GameplayManager.Instance.GetOwnedAbilities(false);
-        Debug.Log(_availableCards.Count);
         foreach (var _availableCard in _availableCards.ToList())
         {
             AbilityCard _card = GameplayManager.Instance.GetAbilityCard(_availableCard.UniqueId);
@@ -51,7 +50,7 @@ public class Tax : AbilityEffect
             _cards.Add(_card);
         }
         
-        ChooseCardPanel.Instance.ShowCards(_cards,SetAsTax);
+        ChooseCardImagePanel.Instance.Show(_cards,SetAsTax);
     }
     
     void SetAsTax(CardBase _selectedCard)
