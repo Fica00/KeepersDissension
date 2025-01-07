@@ -87,27 +87,6 @@ public class AbilityCard : CardBase
             return;
         }
         
-        if (GameplayManager.Instance.IsAbilityActive<Veto>())
-        {
-            Veto _veto = FindObjectOfType<Veto>();
-            if (_veto.IsCardEffected(UniqueId))
-            {
-                if (GameplayManager.Instance.MyStrangeMatter()<1)
-                {
-                    DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Veto");
-                    return;
-                }
-
-                DialogsManager.Instance.ShowYesNoDialog("Additional payment of 1 strange matter is required by Veto, continue?", () =>
-                {
-                    GameplayManager.Instance.ChangeMyStrangeMatter(-1);
-                    GameplayManager.Instance.ChangeOpponentsStrangeMatter(1);;
-                    DoActivate();
-                });
-                return;
-            }
-        }
-        
         DialogsManager.Instance.ShowYesNoDialog("Are you sure that you want to activate this ability?",DoActivate);
     }
 
@@ -141,6 +120,16 @@ public class AbilityCard : CardBase
         if (!My)
         {
             return false;
+        }
+        
+        if (GameplayManager.Instance.IsAbilityActive<Veto>())
+        {
+            Veto _veto = FindObjectOfType<Veto>();
+            if (_veto.IsCardEffected(UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Card blocked by Veto");
+                return false;
+            }
         }
 
         if (GameplayManager.Instance.MyPlayer.Actions<=0)
