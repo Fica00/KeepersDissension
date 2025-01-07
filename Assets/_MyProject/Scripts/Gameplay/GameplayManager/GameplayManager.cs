@@ -111,7 +111,10 @@ public class GameplayManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         AbilityCardsManagerBase.Instance.Setup();
-        RoomUpdater.Instance.ForceUpdate();
+        if (FirebaseManager.Instance.RoomHandler.IsOwner)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
         yield return new WaitForSeconds(1f);
 
         FinishedSetup?.Invoke();
