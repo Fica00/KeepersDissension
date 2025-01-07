@@ -10,7 +10,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnEnable()
     {
-        GameplayManager.OnCardMoved += CheckDestroyedCard;
+        GameplayManager.OnCardMoved += CheckForMine;
     }
 
     private void Start()
@@ -26,7 +26,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnDisable()
     {
-        GameplayManager.OnCardMoved -= CheckDestroyedCard;
+        GameplayManager.OnCardMoved -= CheckForMine;
 
         if (player==null)
         {
@@ -231,7 +231,7 @@ public class BomberMinefield : CardSpecialAbility
         Card.CardData.WarriorAbilityData.BomberData.Add(bomberData);
     }
 
-    private void CheckDestroyedCard(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
+    private void CheckForMine(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
     {
         if (_cardBase is not Card _)
         {
@@ -278,7 +278,13 @@ public class BomberMinefield : CardSpecialAbility
                     continue;
                 }
 
-                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
+                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1, _didDie =>
+                {
+                    if (_didDie)
+                    {
+                        CheckForMine(_markerCard, 0, _placeAround.Id);
+                    }
+                });
             }
 
             Debug.Log("Bomb exploded");
