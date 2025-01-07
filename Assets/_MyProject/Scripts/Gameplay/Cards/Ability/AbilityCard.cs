@@ -127,7 +127,7 @@ public class AbilityCard : CardBase
             Veto _veto = FindObjectOfType<Veto>();
             if (_veto.IsCardEffected(UniqueId))
             {
-                DialogsManager.Instance.ShowOkDialog("Card blocked by Veto");
+                DialogsManager.Instance.ShowOkDialog("Ability blocked by Veto");
                 return false;
             }
         }
