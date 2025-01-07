@@ -1586,6 +1586,12 @@ public class GameplayManagerPvp : GameplayManager
         {
             RoomUpdater.Instance.ForceUpdate();
             return;
+        }    
+        
+        if (_ability.CardId == 1060)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+            return;
         }
 
         MyPlayer.Actions--;

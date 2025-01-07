@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class Tax : AbilityEffect
 {
@@ -57,7 +56,6 @@ public class Tax : AbilityEffect
     {
         string _uniqueId = ((AbilityCard)_selectedCard).UniqueId;
         AddEffectedCard(_uniqueId);
-        Debug.Log("Taxed card: "+_uniqueId);
         OnActivated?.Invoke();
         RemoveAction();
     }
