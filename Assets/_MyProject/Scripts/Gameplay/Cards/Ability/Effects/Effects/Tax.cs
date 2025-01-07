@@ -55,8 +55,9 @@ public class Tax : AbilityEffect
     
     void SetAsTax(CardBase _selectedCard)
     {
-        AddEffectedCard((_selectedCard as Card)?.UniqueId);
-        Debug.Log("Taxed card: "+(_selectedCard as Card)?.UniqueId);
+        string _uniqueId = ((AbilityCard)_selectedCard).UniqueId;
+        AddEffectedCard(_uniqueId);
+        Debug.Log("Taxed card: "+_uniqueId);
         OnActivated?.Invoke();
         RemoveAction();
     }
