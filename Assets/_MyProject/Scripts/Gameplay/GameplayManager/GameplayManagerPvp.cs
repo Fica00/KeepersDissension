@@ -202,6 +202,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ShowCardMoved(string _uniqueId, int _positionId, Action _callBack)
     {
+        Debug.Log($"Showing that card moved: {_uniqueId} new position: {_positionId}");
         Card _card = GetCard(_uniqueId);
         if (_card == null)
         {
