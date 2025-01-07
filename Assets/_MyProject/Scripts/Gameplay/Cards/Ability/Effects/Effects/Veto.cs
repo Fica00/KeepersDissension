@@ -27,6 +27,7 @@ public class Veto : AbilityEffect
             SetIsActive(true);
             ManageActiveDisplay(true);
             AddEffectedCard(((AbilityCard)_card).UniqueId);
+            GameplayManager.Instance.NoteVetoAnimation(EffectedCards[0],true);
             OnActivated?.Invoke();
             RemoveAction();
         }
@@ -34,6 +35,7 @@ public class Veto : AbilityEffect
 
     protected override void CancelEffect()
     {
+        GameplayManager.Instance.NoteVetoAnimation(EffectedCards[0],false);
         ClearEffectedCards();
         SetIsActive(false);
         ManageActiveDisplay(false);

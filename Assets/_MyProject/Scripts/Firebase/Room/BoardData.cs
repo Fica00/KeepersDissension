@@ -29,6 +29,7 @@ namespace FirebaseMultiplayer.Room
         public SoundAnimation SoundAnimation = new();
         public BombAnimation BombAnimation = new();
         public BoughtStrangeMatterAnimation BoughtStrangeMatterAnimation = new();
+        public VetoAnimation VetoAnimation = new();
 
         public string DeliveryCard;
     }

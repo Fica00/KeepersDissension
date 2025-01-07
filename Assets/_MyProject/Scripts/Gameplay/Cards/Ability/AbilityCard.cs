@@ -98,7 +98,7 @@ public class AbilityCard : CardBase
                     return;
                 }
 
-                DialogsManager.Instance.ShowOkDialog("Additional payment of 1 strange matter is required by Veto, continue?", () =>
+                DialogsManager.Instance.ShowYesNoDialog("Additional payment of 1 strange matter is required by Veto, continue?", () =>
                 {
                     GameplayManager.Instance.ChangeMyStrangeMatter(-1);
                     GameplayManager.Instance.ChangeOpponentsStrangeMatter(1);;

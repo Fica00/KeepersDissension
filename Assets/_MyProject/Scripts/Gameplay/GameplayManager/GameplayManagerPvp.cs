@@ -1559,6 +1559,12 @@ public class GameplayManagerPvp : GameplayManager
             //dont remove strange matter when void is purchased
             RoomUpdater.Instance.ForceUpdate();
             return;
+        }        
+        
+        if (_ability.CardId == 1068)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+            return;
         }
 
         MyPlayer.Actions--;
@@ -2487,6 +2493,25 @@ public class GameplayManagerPvp : GameplayManager
             {
                 _callBack?.Invoke();
             });
+        }
+    }
+
+    public override void NoteVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        BoardData.VetoAnimation = new VetoAnimation { Id = Guid.NewGuid().ToString(), CardId = _uniqueId, IsVetoed = _isVetoed };
+        ShowVetoAnimation(_uniqueId, _isVetoed);
+    }
+
+    public override void ShowVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        AbilityCard _ability = GetAbility(_uniqueId);
+        if (_isVetoed)
+        {
+            _ability.RotateToBeVertical();
+        }
+        else
+        {
+            _ability.RotateNormal();
         }
     }
 }

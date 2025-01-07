@@ -1223,4 +1223,14 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void NoteVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        throw new Exception();
+    }
 }

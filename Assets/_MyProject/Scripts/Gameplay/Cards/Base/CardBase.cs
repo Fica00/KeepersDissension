@@ -72,6 +72,11 @@ public class CardBase : MonoBehaviour
         transform.DORotate(_targetRotation, 1f);
     }
 
+    public void RotateNormal()
+    {
+        SetRotation();
+    }
+
     protected void SetRotation()
     {
         Vector3 _targetRotation = new Vector3(0, 0, 90);
