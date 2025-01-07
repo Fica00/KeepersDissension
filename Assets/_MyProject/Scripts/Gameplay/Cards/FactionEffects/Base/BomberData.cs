@@ -5,5 +5,5 @@ using System.Collections.Generic;
 public class BomberData
 {
     public int BombPlace = -1;
-    public List<string> Markers = new ();
+    public int PlacedPlace = -1;
 }

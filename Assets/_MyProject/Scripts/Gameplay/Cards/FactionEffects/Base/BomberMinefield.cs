@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
@@ -182,6 +183,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void DoPlaceBomb(int _placeId)
     {
+        List<string> _markers = new();
         foreach (var _place in GameplayManager.Instance.TableHandler.GetPlacesAround(TablePlaceHandler.Id, CardMovementType.EightDirections))
         {
             if (_place.ContainsVoid)
@@ -191,7 +193,11 @@ public class BomberMinefield : CardSpecialAbility
 
             if (_place.ContainsMarker)
             {
-                AddMarker(_place.GetMarker(), _place.Id == _placeId, _place.Id);
+                if (_place.Id == _placeId)
+                {
+                    bomberData.BombPlace = _place.Id;
+                }
+                _markers.Add(_place.GetMarker().UniqueId);
                 continue;
             }
 
@@ -206,29 +212,23 @@ public class BomberMinefield : CardSpecialAbility
                 break;
             }
 
-
-            AddMarker(_marker, _place.Id == _placeId, _place.Id);
+            _markers.Add(_marker.UniqueId);
+            if (_place.Id == _placeId)
+            {
+                bomberData.BombPlace = _placeId;
+            }
             GameplayManager.Instance.PlaceCard(_marker, _place.Id);
             GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
         }
 
 
-        foreach (var _markerPlace in bomberData.Markers)
+        bomberData.PlacedPlace = _placeId;
+        foreach (var _markerPlace in _markers)
         {
             GameplayManager.Instance.ChangeSprite(_markerPlace, Card.Details.Faction.Id + 1, true);
         }
 
         Card.CardData.WarriorAbilityData.BomberData.Add(bomberData);
-    }
-
-    private void AddMarker(Card _marker, bool _isBomber, int _place)
-    {
-        if (_isBomber)
-        {
-            bomberData.BombPlace = _place;
-        }
-
-        bomberData.Markers.Add(_marker.UniqueId);
     }
 
     private void CheckDestroyedCard(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
@@ -259,9 +259,20 @@ public class BomberMinefield : CardSpecialAbility
                 continue;
             }
 
-            foreach (var _markerId in _bomberData.Markers)
+            List<TablePlaceHandler> _placesAround =
+                GameplayManager.Instance.TableHandler.GetPlacesAround(_bomberData.PlacedPlace, CardMovementType.EightDirections);
+            foreach (var _placeAround in _placesAround)
             {
-                Card _markerCard = GameplayManager.Instance.GetCard(_markerId);
+                if (!_placeAround.ContainsMarker)
+                {
+                    continue;
+                }
+                
+                Card _markerCard = _placeAround.GetMarker();
+                if (_markerCard.GetIsMy() != IsMy)
+                {
+                    continue;
+                }
                 if (_markerCard == null)
                 {
                     continue;
