@@ -19,7 +19,6 @@ public class Shockwave : AbilityEffect
             return;
         }
 
-        Debug.Log("Damage: "+_damage);
         List<Card> _killedCards = new List<Card>();
         foreach (var _card in FindObjectsOfType<Card>().ToList())
         {
@@ -54,14 +53,12 @@ public class Shockwave : AbilityEffect
             _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
         }
             
-        Debug.Log("Adding strange matter: "+_strangeMatter);
         GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
         Finish();
     }
 
     private void Finish()
     {
-        Debug.Log("Finished");
         OnActivated?.Invoke();
         RemoveAction();
     }
