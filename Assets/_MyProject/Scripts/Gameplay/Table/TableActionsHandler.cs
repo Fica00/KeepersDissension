@@ -327,7 +327,6 @@ public class TableActionsHandler : MonoBehaviour
 
         if (_placeInFront.GetComponentInChildren<LifeForce>() != null)
         {
-            Debug.Log("1111111");
             return;
         }
         

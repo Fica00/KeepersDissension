@@ -1,15 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 
 public class Shockwave : AbilityEffect
 {
-    private int strangeMatter;
-    private int cardsToDamage;
-
     protected override void ActivateForOwner()
     {
         MoveToActivationField();
-        strangeMatter = 0;
-        cardsToDamage = 0;
         
         int _damage = FindObjectsOfType<AbilityCard>().ToList().FindAll(_ability => _ability.My &&_ability.Details
         .Type == AbilityCardType.CrowdControl && _ability.Details.Color == AbilityColor.Red && _ability.GetTablePlace() != null).Count;
@@ -22,6 +18,8 @@ public class Shockwave : AbilityEffect
         }
 
         
+        List<Card> _killedCards = new List<Card>();
+        int _amountOfCardsToDamage = 0;
         foreach (var _card in FindObjectsOfType<Card>().ToList())
         {
             if (!_card.IsAttackable())
@@ -34,24 +32,31 @@ public class Shockwave : AbilityEffect
                 continue;
             }
 
-            cardsToDamage++;
+            _amountOfCardsToDamage++;
             GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, _damage, _didKill =>
             {
-                AddStrangeMatter(_card);
+                _amountOfCardsToDamage--;
+                if (_didKill)
+                {
+                    _killedCards.Add(_card);
+                }
+
+                if (_amountOfCardsToDamage==0)
+                {
+                    CalculateStrangeMatter();
+                }
             });
         }
-        
-    }
 
-    private void AddStrangeMatter(Card _card)
-    {
-        cardsToDamage--;
-
-        strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_card);
-        
-        if (cardsToDamage==0)
+        void CalculateStrangeMatter()
         {
-            GameplayManager.Instance.ChangeStrangeMaterInEconomy(strangeMatter);
+            int _strangeMatter = 0;
+            foreach (var _killedCard in _killedCards)
+            {
+                _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
+            }
+            
+            GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
             Finish();
         }
     }
