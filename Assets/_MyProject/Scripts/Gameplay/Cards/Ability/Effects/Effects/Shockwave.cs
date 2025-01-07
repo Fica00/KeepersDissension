@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Shockwave : AbilityEffect
 {
@@ -43,6 +44,7 @@ public class Shockwave : AbilityEffect
 
                 if (_amountOfCardsToDamage==0)
                 {
+                    Debug.Log("Finished with damaging the cards");
                     CalculateStrangeMatter();
                 }
             });
@@ -54,6 +56,7 @@ public class Shockwave : AbilityEffect
             foreach (var _killedCard in _killedCards)
             {
                 _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
+                Debug.Log("Added strange matter: "+_strangeMatter);
             }
             
             GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
@@ -63,6 +66,7 @@ public class Shockwave : AbilityEffect
 
     private void Finish()
     {
+        Debug.Log("Finished");
         OnActivated?.Invoke();
         RemoveAction();
     }
