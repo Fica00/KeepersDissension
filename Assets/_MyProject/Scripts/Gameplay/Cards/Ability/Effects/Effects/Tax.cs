@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Tax : AbilityEffect
 {
@@ -14,13 +15,14 @@ public class Tax : AbilityEffect
     {
         List<CardBase> _cards = new();
         var _availableCards = GameplayManager.Instance.GetOwnedAbilities(false);
+        Debug.Log(_availableCards.Count);
         foreach (var _availableCard in _availableCards.ToList())
         {
             AbilityCard _card = GameplayManager.Instance.GetAbilityCard(_availableCard.UniqueId);
             bool _shouldSkip = false;
             foreach (var _effect in _card.EffectsHolder.GetComponents<AbilityEffect>())
             {
-                if (_effect.Cooldown <= 0)
+                if (_effect.Cooldown > 0)
                 {
                     _shouldSkip = true;
                     break;
