@@ -1794,6 +1794,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ChangeStrangeMaterInEconomy(int _amount)
     {
+        Debug.Log(_amount);
         BoardData.StrangeMaterInEconomy += _amount;
     }
 
