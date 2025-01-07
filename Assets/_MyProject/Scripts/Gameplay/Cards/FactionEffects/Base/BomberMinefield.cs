@@ -9,7 +9,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnEnable()
     {
-        GameplayManager.OnCardMoved += CheckDestroyedCard;
+        GameplayManager.OnCardMoved += CheckIfSteptedOnBomb;
     }
 
     private void Start()
@@ -25,7 +25,7 @@ public class BomberMinefield : CardSpecialAbility
 
     private void OnDisable()
     {
-        GameplayManager.OnCardMoved -= CheckDestroyedCard;
+        GameplayManager.OnCardMoved -= CheckIfSteptedOnBomb;
 
         if (player==null)
         {
@@ -231,18 +231,13 @@ public class BomberMinefield : CardSpecialAbility
         bomberData.Markers.Add(_marker.UniqueId);
     }
 
-    private void CheckDestroyedCard(CardBase _cardBase,int _,int  _finishingPlaceId)
+    private void CheckIfSteptedOnBomb(CardBase _cardBase,int _,int  _finishingPlaceId)
     {
-        if (_cardBase is not Card _card)
+        if (_cardBase is not Card _)
         {
             return;
         }
 
-        if (_card is not Marker)
-        {
-            return;
-        }
-        
         if (Card.CardData.WarriorAbilityData == null)
         {
             return;
@@ -278,7 +273,7 @@ public class BomberMinefield : CardSpecialAbility
                 {
                     if (_didDie)
                     {
-                        CheckDestroyedCard(_markerCard,0,_markerPlace);
+                        CheckIfSteptedOnBomb(_markerCard,0,_markerPlace);
                     }
                 });
             }
