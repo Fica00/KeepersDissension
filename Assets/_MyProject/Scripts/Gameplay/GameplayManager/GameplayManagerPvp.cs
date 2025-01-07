@@ -2548,6 +2548,6 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ClearChangeSpriteData()
     {
-        // BoardData.ChangeSpriteData.Clear();
+        BoardData.ChangeSpriteData.Clear();
     }
 }
