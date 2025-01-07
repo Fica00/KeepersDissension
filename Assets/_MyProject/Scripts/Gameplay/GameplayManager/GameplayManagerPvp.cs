@@ -246,6 +246,8 @@ public class GameplayManagerPvp : GameplayManager
     {
         TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
         Card _movingCard = GetCard(_firstCardId);
+        
+        Debug.Log($"Moving {_firstCardId} from {_startingPlaceId} to {_finishingPlaceId}");
 
         if (_movingCard == null)
         {
