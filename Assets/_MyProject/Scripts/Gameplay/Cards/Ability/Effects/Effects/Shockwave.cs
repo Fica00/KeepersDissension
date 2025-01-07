@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +21,6 @@ public class Shockwave : AbilityEffect
 
         
         List<Card> _killedCards = new List<Card>();
-        int _amountOfCardsToDamage = 0;
         foreach (var _card in FindObjectsOfType<Card>().ToList())
         {
             if (!_card.IsAttackable())
@@ -32,37 +32,32 @@ public class Shockwave : AbilityEffect
             {
                 continue;
             }
-
-            _amountOfCardsToDamage++;
+            
             GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, _damage, _didKill =>
             {
-                _amountOfCardsToDamage--;
                 if (_didKill)
                 {
                     _killedCards.Add(_card);
                 }
-
-                if (_amountOfCardsToDamage==0)
-                {
-                    Debug.Log("Finished with damaging the cards");
-                    CalculateStrangeMatter();
-                }
             });
         }
 
-        void CalculateStrangeMatter()
+        StartCoroutine(CalculateStrangeMatter(_killedCards));
+    }
+    
+    private IEnumerator CalculateStrangeMatter(List<Card> _killedCards)
+    {
+        yield return new WaitForSeconds(1);
+        int _strangeMatter = 0;
+        foreach (var _killedCard in _killedCards)
         {
-            int _strangeMatter = 0;
-            foreach (var _killedCard in _killedCards)
-            {
-                _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
-                Debug.Log("Added strange matter: "+_strangeMatter);
-            }
-            
-            Debug.Log("Adding strange matter: "+_strangeMatter);
-            GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
-            Finish();
+            _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
+            Debug.Log("Added strange matter: "+_strangeMatter);
         }
+            
+        Debug.Log("Adding strange matter: "+_strangeMatter);
+        GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
+        Finish();
     }
 
     private void Finish()
