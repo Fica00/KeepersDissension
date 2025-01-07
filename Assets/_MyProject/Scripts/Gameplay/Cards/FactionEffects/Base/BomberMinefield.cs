@@ -222,7 +222,7 @@ public class BomberMinefield : CardSpecialAbility
         }
 
 
-        bomberData.PlacedPlace = _placeId;
+        bomberData.PlacedPlace = Card.GetTablePlace().Id;
         foreach (var _markerPlace in _markers)
         {
             GameplayManager.Instance.ChangeSprite(_markerPlace, Card.Details.Faction.Id + 1, true);

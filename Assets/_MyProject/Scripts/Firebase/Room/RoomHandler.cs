@@ -720,18 +720,29 @@ namespace FirebaseMultiplayer.Room
                 return;
             }
 
-            if (string.IsNullOrEmpty(_data.BoardData.ChangeSpriteData.Id))
+            if (_data.BoardData.ChangeSpriteData.Count == 0)
             {
                 return;
             }
 
-            if (_data.BoardData.ChangeSpriteData.Id == _currentRoomData.BoardData.ChangeSpriteData.Id)
+            foreach (var _changeSpriteData in _data.BoardData.ChangeSpriteData)
             {
-                return;
+                bool _found = false;
+                foreach (var _knownChange in _currentRoomData.BoardData.ChangeSpriteData)
+                {
+                    if (_knownChange.Id == _changeSpriteData.Id)
+                    {
+                        _found = true;
+                        break;
+                    }
+                }
+
+                if (_found)
+                {
+                    continue;
+                }
+                GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
             }
-            
-            var _animationData = _data.BoardData.ChangeSpriteData;
-            GameplayManager.Instance.ChangeSpriteAnimate(_animationData.CardId, _animationData.SpriteId, _animationData.ShowPlaceAnimation);
         }        
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 

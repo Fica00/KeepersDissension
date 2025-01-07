@@ -1710,10 +1710,10 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        BoardData.ChangeSpriteData = new ChangeSpriteData
+        BoardData.ChangeSpriteData.Add(new ChangeSpriteData
         {
             Id = Guid.NewGuid().ToString(), CardId = _cardId, SpriteId = _spriteId, ShowPlaceAnimation = _showPlaceAnimation
-        };
+        });
         
         ChangeSpriteAnimate(_cardId,_spriteId,_showPlaceAnimation);
     }
@@ -2544,5 +2544,10 @@ public class GameplayManagerPvp : GameplayManager
         {
             _ability.RotateNormal();
         }
+    }
+
+    public override void ClearChangeSpriteData()
+    {
+        BoardData.ChangeSpriteData.Clear();
     }
 }

@@ -63,6 +63,11 @@ public class GameplayPlayer : MonoBehaviour
                 _slowDown.ClearEffectedCardsForMe();
             }
         }
+
+        if (isMy)
+        {
+            GameplayManager.Instance.ClearChangeSpriteData();
+        }
         
         OnStartedTurn?.Invoke();
     }

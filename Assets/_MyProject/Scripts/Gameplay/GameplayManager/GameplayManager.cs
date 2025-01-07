@@ -1223,4 +1223,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void ClearChangeSpriteData()
+    {
+        throw new Exception();
+    }
 }
