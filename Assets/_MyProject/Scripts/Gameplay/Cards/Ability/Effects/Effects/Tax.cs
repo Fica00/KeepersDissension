@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Tax : AbilityEffect
 {
@@ -55,8 +56,14 @@ public class Tax : AbilityEffect
     void SetAsTax(CardBase _selectedCard)
     {
         AddEffectedCard((_selectedCard as Card)?.UniqueId);
+        Debug.Log("Taxed card: "+(_selectedCard as Card)?.UniqueId);
         OnActivated?.Invoke();
         RemoveAction();
+    }
+
+    public bool IsCardEffected(string _uniqueId)
+    {
+        return EffectedCards[0] == _uniqueId;
     }
 
     protected override void CancelEffect()

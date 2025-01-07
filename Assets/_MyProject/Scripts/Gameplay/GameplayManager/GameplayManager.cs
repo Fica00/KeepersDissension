@@ -830,22 +830,6 @@ public class GameplayManager : MonoBehaviour
         return _vetoCard.IsEffected(_uniqueCardId);
     }
     
-    public bool IsCardTaxed(string _uniqueId)
-    {
-        var _taxedCard = FindObjectOfType<Tax>();
-        if (_taxedCard == null)
-        {
-            return false;
-        }
-
-        if (!_taxedCard.IsActive)
-        {
-            return false;
-        }
-        
-        return _taxedCard.IsEffected(_uniqueId);
-    }
-    
     protected void FinishEffect<T>() where T : MonoBehaviour
     {
         var _ability = FindObjectOfType<T>() as AbilityEffect;
