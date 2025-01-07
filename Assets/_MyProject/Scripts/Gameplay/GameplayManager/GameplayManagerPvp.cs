@@ -1727,6 +1727,10 @@ public class GameplayManagerPvp : GameplayManager
             case 4:
                 return forestMarker;
             default:
+                if (_spriteId<0)
+                {
+                    return FactionSO.Get(_spriteId * -1).BombSprite;
+                }
                 return null;
         }
     }
@@ -2353,8 +2357,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Sprite _bombSprite = _card.GetIsMy() ? MyPlayer.FactionSo.BombSprite : OpponentPlayer.FactionSo.BombSprite;
-        _card.Display.ChangeSprite(_bombSprite);
+        ChangeSprite(_cardId, -MyPlayer.FactionSo.Id);
     }
 
     public override void SaySomethingToAll(string _text)
