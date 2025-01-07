@@ -1234,4 +1234,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void ChangeSpriteAnimate(string _uniqueId, int _spriteId, bool _showPlaceAnimation)
+    {
+        throw new Exception();
+    }
 }

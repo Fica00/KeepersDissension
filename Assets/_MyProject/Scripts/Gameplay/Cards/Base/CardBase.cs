@@ -122,7 +122,7 @@ public class CardBase : MonoBehaviour
         {
             return;
         }
-        
+
         if (name.ToLower().Contains("wall"))
         {
             if (_card.Details.Faction.IsSnow)

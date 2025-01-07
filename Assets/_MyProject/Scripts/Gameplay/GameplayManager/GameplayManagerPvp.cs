@@ -136,7 +136,6 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Debug.Log("Ending game");
         var _winner = _didIWin ? BoardData.MyPlayer.PlayerId : BoardData.OpponentPlayer.PlayerId;
         SetHasGameEnded(true, _winner);
         ShowGameEnded(_winner);
@@ -192,7 +191,6 @@ public class GameplayManagerPvp : GameplayManager
         Card _card = GetCard(_uniqueId);
         if (_card == null)
         {
-            Debug.Log($"Didn't manage to find card with id {_uniqueId}");
             return;
         }
 
@@ -251,8 +249,6 @@ public class GameplayManagerPvp : GameplayManager
         TablePlaceHandler _destination = TableHandler.GetPlace(_finishingPlaceId);
         Card _movingCard = GetCard(_firstCardId);
         
-        Debug.Log($"Moving {_firstCardId} from {_startingPlaceId} to {_finishingPlaceId}");
-
         if (_movingCard == null)
         {
             _callBack?.Invoke();
@@ -346,8 +342,6 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_attackingCard == null || _defendingCard == null)
         {
-            Debug.Log(_attackingCard);
-            Debug.Log(_defendingCard);
             _callBack?.Invoke();
             return;
         }
@@ -702,7 +696,6 @@ public class GameplayManagerPvp : GameplayManager
                 _callBack?.Invoke();
                 if (_didGiveResponseAction && MyPlayer.Actions == 0)
                 {
-                    Debug.Log("Forcing an update because response was given but");
                     RoomUpdater.Instance.ForceUpdate();
                 }
             }
@@ -1053,14 +1046,12 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_cardBase == null)
         {
-            Debug.Log("Got here 4");
             _callBack?.Invoke(true);
             return;
         }
 
         BuyMinion(_cardBase, 0, () =>
         {
-            Debug.Log("Got here 5");
             _callBack?.Invoke(true);
         });
     }
@@ -1585,19 +1576,16 @@ public class GameplayManagerPvp : GameplayManager
         Card _pushedCard = TableHandler.GetPlace(_startingPlace).GetWarrior() as Card;
         if (_pushedCard == null)
         {
-            Debug.Log("Pushed card is null");
             return;
         }
 
         if (!_pushedCard.IsWarrior())
         {
-            Debug.Log("Pushed card is not a warrior");
             return;
         }
 
         if (UnityEngine.Random.Range(0, 100) > _chanceForPush)
         {
-            Debug.Log("Didn't get rng to push");
             return;
         }
 
@@ -1612,21 +1600,17 @@ public class GameplayManagerPvp : GameplayManager
 
         if (!_placeBehindOfPushedCard.IsOccupied)
         {
-            Debug.Log("Place is not occupied, trying to move");
             Card _pushedCardBase = _pushedCardPlace.GetCard();
             if (!_pushedCardBase.CheckCanMove() || _placeBehindOfPushedCard.IsAbility)
             {
-                Debug.Log("I can't move damaging my self");
                 DamageCardByAbility(_pushedCard.UniqueId, 1, null);
                 return;
             }
 
-            Debug.Log("Moving my self");
             ExecuteMove(_pushedCardPlace.Id, _placeBehindOfPushedCard.Id, _pushedCard.UniqueId, null);
             return;
         }
 
-        Debug.Log("Damaging pushed card");
         DamageCardByAbility(_pushedCard.UniqueId, 1, null);
     }
 
@@ -1696,40 +1680,55 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Sprite _sprite = null;
-        switch (_spriteId)
-        {
-            case 0:
-                _sprite = voidMarker;
-                _card.SetIsVoid(true);
-                break;
-            case 1:
-                _sprite = snowMarker;
-                break;
-            case 2:
-                _sprite = cyborgMarker;
-                break;
-            case 3:
-                _sprite = dragonMarker;
-                break;
-            case 4:
-                _sprite = forestMarker;
-                break;
-        }
-
+        Sprite _sprite = GetMarkerSprite(_spriteId);
+        
         if (_card.IsVoid && _sprite != voidMarker)
         {
             return;
         }
 
-        bool _changedSprite = _card.Display.ChangeSprite(_sprite);
+        BoardData.ChangeSpriteData = new ChangeSpriteData
+        {
+            Id = Guid.NewGuid().ToString(), CardId = _cardId, SpriteId = _spriteId, ShowPlaceAnimation = _showPlaceAnimation
+        };
+        
+        ChangeSpriteAnimate(_cardId,_spriteId,_showPlaceAnimation);
+    }
+
+    public override void ChangeSpriteAnimate(string _uniqueId, int _spriteId, bool _showPlaceAnimation)
+    {
+        Card _card = GetCard(_uniqueId);
+        bool _changedSprite = _card.Display.ChangeSprite(GetMarkerSprite(_spriteId));
         if (!_showPlaceAnimation || !_changedSprite)
         {
             return;
         }
 
         _card.transform.localPosition = new Vector3(-2000, 0);
-        _card.MoveToPosition(_card.GetTablePlace(), null);
+        IsAnimating = true;
+        _card.MoveToPosition(_card.GetTablePlace(), () =>
+        {
+            IsAnimating = false;
+        });
+    }
+
+    private Sprite GetMarkerSprite(int _spriteId)
+    {
+        switch (_spriteId)
+        {
+            case 0:
+                return voidMarker;
+            case 1:
+                return snowMarker;
+            case 2:
+                return cyborgMarker;
+            case 3:
+                return dragonMarker;
+            case 4:
+                return forestMarker;
+            default:
+                return null;
+        }
     }
 
     public override void PlayAudioOnBoth(string _key, CardBase _cardBase)
