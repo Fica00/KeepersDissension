@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -261,6 +262,7 @@ public class BomberMinefield : CardSpecialAbility
 
             List<TablePlaceHandler> _placesAround =
                 GameplayManager.Instance.TableHandler.GetPlacesAround(_bomberData.PlacedPlace, CardMovementType.EightDirections);
+            int _delay = 1;
             foreach (var _placeAround in _placesAround)
             {
                 if (!_placeAround.ContainsMarker)
@@ -282,7 +284,8 @@ public class BomberMinefield : CardSpecialAbility
                 {
                     if (_didDie)
                     {
-                        CheckForMine(_markerCard, 0, _placeAround.Id);
+                        StartCoroutine(DelayCheckForMine(_delay,_markerCard,  _placeAround.Id));
+                        _delay++;
                     }
                 });
             }
@@ -292,5 +295,15 @@ public class BomberMinefield : CardSpecialAbility
             Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
             break;
         }   
+    }
+
+    private IEnumerator DelayCheckForMine(int _amountOfTime, CardBase _card, int _place)
+    {
+        for (int _i = 0; _i < _amountOfTime; _i++)
+        {
+            yield return null;
+        }
+        
+        CheckForMine(_card,0,_place);
     }
 }
