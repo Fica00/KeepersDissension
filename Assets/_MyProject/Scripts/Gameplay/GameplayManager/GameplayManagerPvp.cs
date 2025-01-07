@@ -1503,6 +1503,24 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ActivateAbility(string _cardId)
     {
+        if (IsCardTaxed(_cardId))
+        {
+            Debug.Log("Ability is taxed");
+            if (MyStrangeMatter()<=0)
+            {
+                DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
+                return;
+            }
+
+            Debug.Log("Paying tax");
+            ChangeMyStrangeMatter(-1);
+            ChangeOpponentsStrangeMatter(1);
+        }
+        else
+        {
+            Debug.Log("Tax is not activate");
+        }
+        
         AbilityCard _ability = FindObjectsOfType<AbilityCard>().ToList().Find(_ability => _ability.UniqueId == _cardId);
 
         if (_ability.GetTablePlace() == null)

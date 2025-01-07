@@ -155,17 +155,6 @@ public class AbilityCard : CardBase
             return;
         }
         
-        if (GameplayManager.Instance.IsCardTaxed(UniqueId))
-        {
-            if (GameplayManager.Instance.MyStrangeMatter()<=0)
-            {
-                DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
-                return;
-            }
-
-            GameplayManager.Instance.ChangeMyStrangeMatter(-1);
-        }
-        
         GameplayManager.Instance.ActivateAbility(UniqueId);
     }
 
