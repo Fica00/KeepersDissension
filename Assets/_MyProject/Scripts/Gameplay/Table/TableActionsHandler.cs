@@ -324,6 +324,12 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (_placeInFront.GetComponentInChildren<LifeForce>() != null)
+        {
+            Debug.Log("1111111");
+            return;
+        }
         
         if (_dontAddIfItIsAWall && _placeInFront.ContainsWall)
         {
