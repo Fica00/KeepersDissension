@@ -5,9 +5,9 @@ public class Tax : AbilityEffect
 {
     protected override void ActivateForOwner()
     {
-        Activate();
         SetIsActive(true);
         ManageActiveDisplay(true);
+        Activate();
     }
 
     private void Activate()
@@ -20,7 +20,7 @@ public class Tax : AbilityEffect
             bool _shouldSkip = false;
             foreach (var _effect in _card.EffectsHolder.GetComponents<AbilityEffect>())
             {
-                if (_effect.Cooldown > 0)
+                if (_effect.Cooldown <= 0)
                 {
                     _shouldSkip = true;
                     break;
