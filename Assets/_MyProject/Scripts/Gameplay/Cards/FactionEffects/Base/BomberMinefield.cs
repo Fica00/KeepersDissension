@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class BomberMinefield : CardSpecialAbility
 {
@@ -230,12 +231,18 @@ public class BomberMinefield : CardSpecialAbility
         bomberData.Markers.Add(_marker.UniqueId);
     }
 
-    private void CheckDestroyedCard(CardBase _cardBase,int _startingPlaceId,int  _finishingPlaceId)
+    private void CheckDestroyedCard(CardBase _cardBase,int _,int  _finishingPlaceId)
     {
-        if (_cardBase is not Card _)
+        if (_cardBase is not Card _card)
         {
             return;
         }
+
+        if (_card is not Marker)
+        {
+            return;
+        }
+        
         if (Card.CardData.WarriorAbilityData == null)
         {
             return;
@@ -266,9 +273,17 @@ public class BomberMinefield : CardSpecialAbility
                     continue;
                 }
 
-                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1,null);
+                int _markerPlace = _markerCard.GetTablePlace().Id;
+                GameplayManager.Instance.DamageCardByAbility(_markerCard.UniqueId,1, _didDie =>
+                {
+                    if (_didDie)
+                    {
+                        CheckDestroyedCard(_markerCard,0,_markerPlace);
+                    }
+                });
             }
 
+            Debug.Log("Bomb exploded");
             GameplayManager.Instance.BombExploded(_cardBase.GetTablePlace().Id, true);
             Card.CardData.WarriorAbilityData.BomberData.Remove(_bomberData);
             break;
