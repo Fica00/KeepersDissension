@@ -59,6 +59,7 @@ public class Shockwave : AbilityEffect
                 Debug.Log("Added strange matter: "+_strangeMatter);
             }
             
+            Debug.Log("Adding strange matter: "+_strangeMatter);
             GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
             Finish();
         }
