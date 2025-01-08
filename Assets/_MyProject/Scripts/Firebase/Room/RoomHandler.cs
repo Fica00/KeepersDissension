@@ -294,7 +294,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldMoveCard)
                 {
-                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, ConvertOpponentsPosition(_card.PlaceId));
+                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, Utils.ConvertPosition(_card.PlaceId));
                 }
             }
         }
@@ -369,7 +369,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.StrangeMatterAnimation;
-            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,Utils.ConvertPosition(_animationData.PositionId));
         }
 
         private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
@@ -475,13 +475,7 @@ namespace FirebaseMultiplayer.Room
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
-            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId),null);
-        }
-        
-        private int ConvertOpponentsPosition(int _position)
-        {
-            int _totalAmountOfFields = 64;
-            return _totalAmountOfFields - _position;
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertPosition(_placeId),null);
         }
         
         private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)
@@ -523,7 +517,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertPosition(_animationData.PlaceId));
         }
         
         private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
