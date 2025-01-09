@@ -167,15 +167,10 @@ public class ShowCardElarged : MonoBehaviour
 
     private void Flip()
     {
-        Debug.Log(1111);
-        Debug.Log(isShowingFrontSide);
-        Debug.Log(!isGuardianChained);
-
         if (isSelectedCardGuardian)
         {
             if (isShowingFrontSide && !isGuardianChained)
             {
-                Debug.Log(22222);
                 return;
             }
         }
