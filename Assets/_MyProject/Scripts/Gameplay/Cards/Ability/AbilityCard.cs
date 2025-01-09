@@ -49,6 +49,7 @@ public class AbilityCard : CardBase
 
             _name += _char;
         }
+        
         return new AbilityData
         {
             Name = _name,

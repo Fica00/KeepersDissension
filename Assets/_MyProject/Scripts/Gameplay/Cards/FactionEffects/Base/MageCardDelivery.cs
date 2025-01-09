@@ -27,17 +27,14 @@ public class MageCardDelivery : CardSpecialAbility
 
     private void ResetAbilities()
     {
-        Debug.Log("Got here" + Card.CardData.WarriorAbilityData.EffectedCards2.Count, gameObject);
         foreach (var _effectedCard in Card.CardData.WarriorAbilityData.EffectedCards2)
         {
             Card _card = GameplayManager.Instance.GetCard(_effectedCard);
             if (_card == null)
             {
-                Debug.Log("Didn't find effected card");
                 continue;
             }
 
-            Debug.Log("Reseting has delivery");
             _card.CardData.HasDelivery = false;
         }
 

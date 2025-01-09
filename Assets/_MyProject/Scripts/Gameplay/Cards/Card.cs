@@ -47,12 +47,11 @@ public class Card : CardBase
                 Range = Details.Stats.Range,
                 Speed =  Details.Stats.Speed,
                 MaxHealth = Details.Stats.MaxHealth},
+            WarriorAbilityData =
+            {
+                CanUseAbility = true
+            }
         };
-
-        if (this is Keeper)
-        {
-            _cardData.WarriorAbilityData.CanUseAbility = true;
-        }
 
         return _cardData;
     }
