@@ -39,9 +39,19 @@ public class AbilityCard : CardBase
 
     public AbilityData CreateData(string _owner)
     {
+        string _name = string.Empty;
+        foreach (var _char in gameObject.name)
+        {
+            if (!char.IsLetter(_char))
+            {
+                continue;
+            }
+
+            _name += _char;
+        }
         return new AbilityData
         {
-            Name = gameObject.name,
+            Name = _name,
             UniqueId = Guid.NewGuid().ToString(),
             Owner = _owner,
             RemainingCooldown = 0,
