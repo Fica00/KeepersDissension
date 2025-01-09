@@ -1246,4 +1246,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool HasCardResponseAction(string _uniqueId)
+    {
+        throw new Exception();
+    }
 }

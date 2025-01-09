@@ -272,7 +272,21 @@ public class CardActionsDisplay : MonoBehaviour
                 
                 if (!GameplayManager.Instance.IsMyTurn())
                 {
-                    return;
+                    if (!GameplayManager.Instance.IsMyResponseAction())
+                    {
+                        if (GameplayManager.Instance.IsKeeperResponseAction)
+                        {
+                            
+                        }
+                        else if (GameplayManager.Instance.HasCardResponseAction(selectedCard.UniqueId))
+                        {
+                            
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
                 }
 
                 if (!_cardAbility.CanUseAbility)

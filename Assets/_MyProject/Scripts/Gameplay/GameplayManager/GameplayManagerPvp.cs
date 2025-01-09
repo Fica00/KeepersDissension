@@ -2603,4 +2603,10 @@ public class GameplayManagerPvp : GameplayManager
 
         return false;
     }
+
+
+    public override bool HasCardResponseAction(string _uniqueId)
+    {
+        return IdOfCardWithResponseAction() == _uniqueId;
+    }
 }
