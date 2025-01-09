@@ -2550,4 +2550,26 @@ public class GameplayManagerPvp : GameplayManager
     {
         BoardData.ChangeSpriteData.Clear();
     }
+
+    public override bool CanPlayerDoActions()
+    {
+        var _subState = GetGameplaySubState();
+        bool _isOwner = RoomHandler.IsOwner;
+        if (_isOwner)
+        {
+            if (_subState == GameplaySubState.Player2DeliveryReposition)
+            {
+                return false;
+            }    
+        }
+        else
+        {
+            if (_subState == GameplaySubState.Player1ResponseAction)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

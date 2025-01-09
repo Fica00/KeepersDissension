@@ -1231,4 +1231,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool CanPlayerDoActions()
+    {
+        throw new Exception();
+    }
 }
