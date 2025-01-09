@@ -708,7 +708,7 @@ public class GameplayManagerPvp : GameplayManager
     public override void UseDelivery(string _defendingCardId, Action _callBack)
     {
         int _startingPlace = GetCard(_defendingCardId).GetTablePlace().Id;
-        List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces();
+        List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces(_startingPlace);
         if (_emptyPlaces.Count == 0)
         {
             _callBack?.Invoke();
@@ -730,7 +730,7 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    private List<TablePlaceHandler> GetDeliveryPlaces()
+    private List<TablePlaceHandler> GetDeliveryPlaces(int _currentPlace)
     {
         List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(new List<int>()
         {
@@ -817,7 +817,10 @@ public class GameplayManagerPvp : GameplayManager
                 TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
                 if (_place.IsOccupied)
                 {
-                    continue;
+                    if (_place.Id != _currentPlace)
+                    {
+                        continue;
+                    }
                 }
 
                 _places.Add(_place);
