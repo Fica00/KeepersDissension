@@ -429,6 +429,14 @@ public class GameplayManagerPvp : GameplayManager
 
     private void ApplyCyborgAbility(string _attacker, int _wallPosition, Action _callBack)
     {
+        Card _attackerCard = GetCard(_attacker);
+        if (_attackerCard.HasScaler())
+        {
+            if (_attackerCard.GetTablePlace().GetWall() != null)
+            {
+                return;
+            }
+        }
         if (CanPushBackCard(_attacker, _wallPosition))
         {
             PushCardBack(_attacker, _wallPosition, () => { _callBack?.Invoke(); });
