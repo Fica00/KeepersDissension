@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class MageCardDelivery : CardSpecialAbility
 {
     private GameplayPlayer player;
@@ -25,14 +27,17 @@ public class MageCardDelivery : CardSpecialAbility
 
     private void ResetAbilities()
     {
+        Debug.Log("Got here" + Card.CardData.WarriorAbilityData.EffectedCards.Count, gameObject);
         foreach (var _effectedCard in Card.CardData.WarriorAbilityData.EffectedCards)
         {
             Card _card = GameplayManager.Instance.GetCard(_effectedCard);
             if (_card == null)
             {
+                Debug.Log("Didn't find effected card");
                 continue;
             }
 
+            Debug.Log("Reseting has delivery");
             _card.CardData.HasDelivery = false;
         }
 
@@ -61,9 +66,11 @@ public class MageCardDelivery : CardSpecialAbility
         }
 
         TryToPlayAudio();
+        Debug.Log("adding effected card: "+ _card.UniqueId);
         Card.CardData.WarriorAbilityData.EffectedCards.Add(_card.UniqueId);
         GameplayManager.Instance.TellOpponentSomething("Opponent used his Delivery ability");
         _card.CardData.HasDelivery = true;
+        Debug.Log("Setting has delivery");
         
         player.Actions--;
         if (player.Actions>0)
