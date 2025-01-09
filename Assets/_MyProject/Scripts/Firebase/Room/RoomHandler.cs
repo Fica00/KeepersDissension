@@ -153,6 +153,7 @@ namespace FirebaseMultiplayer.Room
             CheckForReduction(_currentRoomState, _data);
             CheckForVetoAnimation(_currentRoomState, _data);
             CheckForSpriteChange(_currentRoomState, _data);
+            CheckForMessages(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -737,6 +738,26 @@ namespace FirebaseMultiplayer.Room
                 }
                 GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
             }
+        }        
+        private void CheckForMessages(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.SaySomethingData == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.SaySomethingData.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.SaySomethingData.Id == _currentRoomData.BoardData.SaySomethingData.Id)
+            {
+                return;
+            }
+
+            var _saySomethingData = _data.BoardData.SaySomethingData;
+            DialogsManager.Instance.ShowOkDialog(_saySomethingData.Message);
         }        
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 

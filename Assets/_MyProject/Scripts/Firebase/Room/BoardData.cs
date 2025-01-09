@@ -31,6 +31,7 @@ namespace FirebaseMultiplayer.Room
         public BoughtStrangeMatterAnimation BoughtStrangeMatterAnimation = new();
         public VetoAnimation VetoAnimation = new();
         public List<ChangeSpriteData> ChangeSpriteData = new();
+        public SaySomethingData SaySomethingData = new();
 
         public string DeliveryCard;
     }

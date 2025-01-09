@@ -110,6 +110,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         DialogsManager.Instance.ShowYesNoDialog(
             $"Are you sure that you want to buy ability for {_price} strange matter?", ()=>
         {
+            GameplayManager.Instance.TellOpponentSomething("Opponent bought ability card");
             GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
             GameplayManager.Instance.ChangeStrangeMaterInEconomy(_price);
             arrowPanel.Hide();

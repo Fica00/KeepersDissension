@@ -16,7 +16,6 @@ public class Void : AbilityEffect
             return;
         }
 
-        GameplayManager.Instance.TellOpponentSomething("Opponent used Void");
         Card _marker = GameplayManager.Instance.GetCardOfTypeNotPlaced(CardType.Marker,true);
         if (_marker==null)
         {

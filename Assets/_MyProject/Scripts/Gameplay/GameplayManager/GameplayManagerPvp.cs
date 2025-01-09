@@ -1456,7 +1456,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void TellOpponentSomething(string _text)
     {
-
+        BoardData.SaySomethingData = new SaySomethingData { Id = Guid.NewGuid().ToString(), Message = _text };
     }
 
     public override void ChangeOwnerOfCard(string _cardId)
@@ -2390,6 +2390,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void SaySomethingToAll(string _text)
     {
+        TellOpponentSomething(_text);
         DialogsManager.Instance.ShowOkDialog(_text);
     }
 
