@@ -127,7 +127,6 @@ namespace FirebaseMultiplayer.Room
             }
             
             roomData = _data;
-            Debug.Log("Setting data, amount of abilities: "+roomData.BoardData.Abilities.Count);
             CheckIfPlayerJoined(_currentRoomState,_data);
             CheckIfPlayerLeft(_currentRoomState,_data);
             if (!SceneManager.IsGameplayScene)

@@ -11,7 +11,6 @@ public class RoomUpdater : MonoBehaviour
 
     public void ForceUpdate()
     {
-        Debug.Log("Amount of abilities: "+ FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Count);
         FirebaseManager.Instance.RoomHandler.UpdateRoomData();
     }
 }
