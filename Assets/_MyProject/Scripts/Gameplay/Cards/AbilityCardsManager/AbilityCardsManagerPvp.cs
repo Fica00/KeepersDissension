@@ -62,6 +62,11 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     {
         int _price = FirebaseManager.Instance.RoomHandler.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange(true);
         
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         if (_abilityData==null)
         {
             return;
@@ -146,6 +151,11 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
     protected override void TryBuyFromHand(CardBase _card)
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         if (_card is not AbilityCard _abilityCard)
         {
             return;

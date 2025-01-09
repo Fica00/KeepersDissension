@@ -112,6 +112,10 @@ public class CardsInHandHandler : MonoBehaviour
 
    private void CheckForBuy(CardBase _card)
    {
+      if (!GameplayManager.Instance.CanPlayerDoActions())
+      {
+         return;
+      }
       if (_card == null)
       {
          return;
@@ -186,6 +190,11 @@ public class CardsInHandHandler : MonoBehaviour
 
    private void CheckForWallPurchase(CardBase _card)
    {
+      if (!GameplayManager.Instance.CanPlayerDoActions())
+      {
+         return;
+      }
+      
       if (_card == null)
       {
          return;

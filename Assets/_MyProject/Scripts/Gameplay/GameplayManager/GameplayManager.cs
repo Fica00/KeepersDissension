@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-    public static bool IsAnimating; 
     public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
@@ -34,6 +33,7 @@ public class GameplayManager : MonoBehaviour
     [HideInInspector] public bool DidOpponentFinish;
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
+    protected bool IsAnimating; 
     
     public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     

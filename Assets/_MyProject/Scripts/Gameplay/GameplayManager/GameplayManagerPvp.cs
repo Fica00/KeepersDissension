@@ -1984,6 +1984,11 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void TryUnchainGuardian()
     {
+        if (!CanPlayerDoActions())
+        {
+            return;
+        }
+        
         if (!IsMyTurn())
         {
             return;
@@ -2555,6 +2560,12 @@ public class GameplayManagerPvp : GameplayManager
     {
         var _subState = GetGameplaySubState();
         bool _isOwner = RoomHandler.IsOwner;
+
+        if (IsAnimating)
+        {
+            return false;
+        }
+        
         if (_isOwner)
         {
             if (_subState == GameplaySubState.Player2DeliveryReposition)

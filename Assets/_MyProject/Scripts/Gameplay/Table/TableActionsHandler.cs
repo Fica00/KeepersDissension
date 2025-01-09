@@ -53,7 +53,7 @@ public class TableActionsHandler : MonoBehaviour
 
     public void ShowPossibleActions(TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
-        if (GameplayManager.IsAnimating)
+        if (!GameplayManager.Instance.CanPlayerDoActions())
         {
             return;
         }
