@@ -33,7 +33,7 @@ public class Card : CardBase
 
     public CardData GenerateCardData(string _owner, string _uniqueId)
     {
-        return new CardData
+        CardData _cardData = new CardData
         {
             Owner = _owner,
             UniqueId = _uniqueId,
@@ -48,6 +48,13 @@ public class Card : CardBase
                 Speed =  Details.Stats.Speed,
                 MaxHealth = Details.Stats.MaxHealth},
         };
+
+        if (this is Keeper)
+        {
+            _cardData.WarriorAbilityData.CanUseAbility = true;
+        }
+
+        return _cardData;
     }
 
     public void SetUniqueId(string _uniqueCardId)
