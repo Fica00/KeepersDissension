@@ -2560,6 +2560,9 @@ public class GameplayManagerPvp : GameplayManager
     {
         var _subState = GetGameplaySubState();
         bool _isOwner = RoomHandler.IsOwner;
+        
+        Debug.Log(_subState);
+        Debug.Log(_isOwner);
 
         if (IsAnimating)
         {
@@ -2575,7 +2578,7 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
-            if (_subState == GameplaySubState.Player1ResponseAction)
+            if (_subState == GameplaySubState.Player1DeliveryReposition)
             {
                 return false;
             }
