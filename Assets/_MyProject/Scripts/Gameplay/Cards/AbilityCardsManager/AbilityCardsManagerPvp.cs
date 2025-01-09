@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AbilityCardsManagerPvp : AbilityCardsManagerBase
@@ -227,6 +228,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     protected override void ShowShop()
     {
         List<AbilityData> _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.FindAll(_ability => _ability.Owner == "shop");
+        _abilitiesInShop = _abilitiesInShop.OrderBy(_ability => _ability.Name).ToList();
 
         foreach (var _shopAbility in ShopAbilitiesDisplays)
         {

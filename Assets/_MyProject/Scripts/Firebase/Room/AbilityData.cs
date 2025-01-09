@@ -6,6 +6,7 @@ public class AbilityData
 {
     private int placeId = -100;
 
+    public string Name;
     public int PlaceRoomOwnerId;
     public string UniqueId;
     public string Owner;

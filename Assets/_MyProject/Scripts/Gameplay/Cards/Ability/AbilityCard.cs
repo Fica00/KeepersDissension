@@ -41,6 +41,7 @@ public class AbilityCard : CardBase
     {
         return new AbilityData
         {
+            Name = gameObject.name,
             UniqueId = Guid.NewGuid().ToString(),
             Owner = _owner,
             RemainingCooldown = 0,
