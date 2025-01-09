@@ -49,6 +49,7 @@ public class GameplayCheats : MonoBehaviour
     private void AddStrangeMatter()
     {
         GameplayManager.Instance.ChangeMyStrangeMatter(20);
+        RoomUpdater.Instance.ForceUpdate();
     }
 
     private void ToggleUnlimitedActions(bool _status)
