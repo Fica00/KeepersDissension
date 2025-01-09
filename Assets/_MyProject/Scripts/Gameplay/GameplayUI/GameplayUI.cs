@@ -55,6 +55,11 @@ public class GameplayUI : MonoBehaviour
 
     private void EndTurn()
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         GameplayManager.Instance.EndTurn();
     }
 
