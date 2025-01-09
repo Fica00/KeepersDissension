@@ -2562,9 +2562,6 @@ public class GameplayManagerPvp : GameplayManager
         var _subState = GetGameplaySubState();
         bool _isOwner = RoomHandler.IsOwner;
         
-        Debug.Log(_subState);
-        Debug.Log(_isOwner);
-
         if (IsAnimating)
         {
             return false;

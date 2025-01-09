@@ -50,7 +50,7 @@ public class AbilityEffect : MonoBehaviour
 
     private void OnDisable()
     {
-        TryToCancel();
+        CancelEffect();
     }
 
     public void TryToCancel()
