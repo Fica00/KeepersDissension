@@ -27,8 +27,8 @@ public class MageCardDelivery : CardSpecialAbility
 
     private void ResetAbilities()
     {
-        Debug.Log("Got here" + Card.CardData.WarriorAbilityData.EffectedCards.Count, gameObject);
-        foreach (var _effectedCard in Card.CardData.WarriorAbilityData.EffectedCards)
+        Debug.Log("Got here" + Card.CardData.WarriorAbilityData.EffectedCards2.Count, gameObject);
+        foreach (var _effectedCard in Card.CardData.WarriorAbilityData.EffectedCards2)
         {
             Card _card = GameplayManager.Instance.GetCard(_effectedCard);
             if (_card == null)
@@ -41,7 +41,7 @@ public class MageCardDelivery : CardSpecialAbility
             _card.CardData.HasDelivery = false;
         }
 
-        Card.CardData.WarriorAbilityData.EffectedCards.Clear();
+        Card.CardData.WarriorAbilityData.EffectedCards2.Clear();
         SetCanUseAbility(true);
     }
 
@@ -67,7 +67,7 @@ public class MageCardDelivery : CardSpecialAbility
 
         TryToPlayAudio();
         Debug.Log("adding effected card: "+ _card.UniqueId);
-        Card.CardData.WarriorAbilityData.EffectedCards.Add(_card.UniqueId);
+        Card.CardData.WarriorAbilityData.EffectedCards2.Add(_card.UniqueId);
         GameplayManager.Instance.TellOpponentSomething("Opponent used his Delivery ability");
         _card.CardData.HasDelivery = true;
         Debug.Log("Setting has delivery");
