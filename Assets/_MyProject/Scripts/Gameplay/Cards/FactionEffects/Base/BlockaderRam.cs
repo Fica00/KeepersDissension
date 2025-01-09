@@ -92,6 +92,18 @@ public class BlockaderRam : CardSpecialAbility
         {
             return false;
         }
+        
+        if (_secondCard is Guardian)
+        {
+            LifeForce _lifeForce =
+                _secondCard.GetIsMy() ? GameplayManager.Instance.GetMyLifeForce() : GameplayManager.Instance.GetOpponentsLifeForce();
+            int _distanceBetweenPlaceAndLifeForce = GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_placeInFront, _lifeForce
+                .GetTablePlace());
+            if (_distanceBetweenPlaceAndLifeForce>1)
+            {
+                return false;
+            }
+        }
 
         return true;
     }
