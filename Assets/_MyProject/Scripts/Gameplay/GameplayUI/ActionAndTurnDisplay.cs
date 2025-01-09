@@ -50,6 +50,24 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _number = 1;
             }
 
+            if (GameplayManager.Instance.IsDeliveryReposition())
+            {
+                var _subState = GameplayManager.Instance.GetGameplaySubState();
+                bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
+                if (_subState is GameplaySubState.Player1DeliveryReposition)
+                {
+                    _text = _isRoomOwner ? "Your delivery reposition action" : "Opponents delivery reposition action";
+                }
+                else
+                {
+                    _text = _isRoomOwner ? "Opponents delivery reposition action" : "Your delivery reposition action";
+                }
+                
+                _number = 1;
+                _color = Color.yellow;
+            }
+          
+
             if (_number==0)
             {
                 yield return new WaitForSeconds(1);

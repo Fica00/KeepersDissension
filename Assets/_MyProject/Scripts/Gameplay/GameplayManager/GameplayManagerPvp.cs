@@ -2583,4 +2583,19 @@ public class GameplayManagerPvp : GameplayManager
 
         return true;
     }
+
+    public override bool IsRoomOwner()
+    {
+        return RoomHandler.IsOwner;
+    }
+
+    public override bool IsDeliveryReposition()
+    {
+        if (GetGameplaySubState() is GameplaySubState.Player1DeliveryReposition or GameplaySubState.Player2DeliveryReposition)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

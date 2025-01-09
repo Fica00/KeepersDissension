@@ -1236,4 +1236,14 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool IsRoomOwner()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsDeliveryReposition()
+    {
+        throw new Exception();
+    }
 }
