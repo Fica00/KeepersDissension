@@ -44,6 +44,7 @@ public class GameplayManager : MonoBehaviour
 
     private void Start()
     {
+        AudioManager.Instance.PlayBackgroundMusic();
         SetupTable();
         MyPlayer.OnUpdatedActions += TryEndTurn;
         StartCoroutine(GameplayRoutine());

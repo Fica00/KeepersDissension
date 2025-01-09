@@ -11,6 +11,10 @@ public class Grounded : AbilityEffect
 
     public bool IsCardEffected(string _uniqueId)
     {
+        if (EffectedCards.Count==0)
+        {
+            return false;
+        }
         return GetEffectedCards()[0].UniqueId == _uniqueId;
     }
 
