@@ -48,9 +48,8 @@ public class GameplayCheats : MonoBehaviour
 
     private void AddStrangeMatter()
     {
-        if (!GameplayManager.Instance.CanPlayerDoActions())
+        if (!CanUseCheats())
         {
-            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
             return;
         }
         
@@ -59,9 +58,8 @@ public class GameplayCheats : MonoBehaviour
 
     private void ToggleUnlimitedActions(bool _status)
     {
-        if (!GameplayManager.Instance.CanPlayerDoActions())
+        if (!CanUseCheats())
         {
-            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
             return;
         }
         
@@ -74,9 +72,8 @@ public class GameplayCheats : MonoBehaviour
     
     private void ToggleCheckForCd(bool _status)
     {
-        if (!GameplayManager.Instance.CanPlayerDoActions())
+        if (!CanUseCheats())
         {
-            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
             return;
         }
         
@@ -85,9 +82,8 @@ public class GameplayCheats : MonoBehaviour
 
     private void HealGuardian()
     {
-        if (!GameplayManager.Instance.CanPlayerDoActions())
+        if (!CanUseCheats())
         {
-            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
             return;
         }
         
@@ -103,9 +99,8 @@ public class GameplayCheats : MonoBehaviour
 
     private void HealKeeper()
     {
-        if (!GameplayManager.Instance.CanPlayerDoActions())
+        if (!CanUseCheats())
         {
-            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
             return;
         }
         
@@ -127,5 +122,16 @@ public class GameplayCheats : MonoBehaviour
     private void Close()
     {
         holder.DOScale(new Vector3(1,0,1), 0.3f);
+    }
+
+    private bool CanUseCheats()
+    {
+        if (GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction())
+        {
+            return true;
+        }
+
+        DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+        return false;
     }
 }
