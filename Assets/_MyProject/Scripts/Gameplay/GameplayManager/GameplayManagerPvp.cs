@@ -536,14 +536,6 @@ public class GameplayManagerPvp : GameplayManager
             bool _canGetResponse = true;
             bool _waitForSomething;
 
-            if (_defendingCard.HasBlockaderAbility())
-            {
-                if (_defendingCard.TryToUseBlockaderAbility())
-                {
-                    _damage--;
-                }
-            }
-
             if (_defendingCard.HasDelivery)
             {
                 _waitForSomething = false;
@@ -622,6 +614,17 @@ public class GameplayManagerPvp : GameplayManager
                 else if (_grounded.IsCardEffected(_defendingCard.UniqueId))
                 {
                     _grounded.EndEffect();
+                }
+            }
+
+            if (_damage>0)
+            {
+                if (_defendingCard.HasBlockaderAbility())
+                {
+                    if (_defendingCard.TryToUseBlockaderAbility())
+                    {
+                        _damage--;
+                    }
                 }
             }
 
