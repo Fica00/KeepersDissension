@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ public class CardsInHandHandler : MonoBehaviour
    [SerializeField] private GameObject backGround;
    [SerializeField] private Button closeButton;
 
-   private List<CardBase> shownCards = new ();
+   private Dictionary<CardBase,CardPlace> shownCards = new ();
    private Vector3 sizeOfCards = new(2, 2, 1);
 
    public void Setup(GameplayPlayer _player)
@@ -72,7 +73,7 @@ public class CardsInHandHandler : MonoBehaviour
          _card.PositionInHand();
          _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
          _card.transform.localScale = sizeOfCards;
-         shownCards.Add(_card);
+         shownCards.Add(_card, _card.CardData.CardPlace);
       }
    }
 
@@ -84,7 +85,7 @@ public class CardsInHandHandler : MonoBehaviour
          _card.PositionInHand(true);
          _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
          _card.transform.localScale = sizeOfCards;
-         shownCards.Add(_card);
+         shownCards.Add(_card, _card.CardData.CardPlace);
       }
    }
 
@@ -92,21 +93,22 @@ public class CardsInHandHandler : MonoBehaviour
    {
       foreach (var _card in shownCards)
       {
-         CardHandInteractions _cardHandInteractions = _card.gameObject.GetComponent<CardHandInteractions>();
+         CardHandInteractions _cardHandInteractions = _card.Key.gameObject.GetComponent<CardHandInteractions>();
          if (_cardHandInteractions != null)
          {
             Destroy(_cardHandInteractions);
          }
 
-         CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
-         if (!(_cardPlace == CardPlace.Hand || _cardPlace == CardPlace.Graveyard))
+         CardPlace _cardPlace = _card.Value;
+         if (!(_cardPlace is CardPlace.Hand or CardPlace.Graveyard))
          {
             continue;
          }
 
-         _card.ReturnFromHand();
+         _card.Key.ReturnFromHand();
       }
 
+      Debug.Log(6666);
       shownCards.Clear();
    }
 
@@ -165,7 +167,7 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (!shownCards.Contains(_card))
+      if (!shownCards.Keys.Contains(_card))
       {
          return;
       }
