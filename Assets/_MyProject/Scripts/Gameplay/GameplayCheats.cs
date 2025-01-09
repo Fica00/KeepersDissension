@@ -48,12 +48,23 @@ public class GameplayCheats : MonoBehaviour
 
     private void AddStrangeMatter()
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+            return;
+        }
+        
         GameplayManager.Instance.ChangeMyStrangeMatter(20);
-        RoomUpdater.Instance.ForceUpdate();
     }
 
     private void ToggleUnlimitedActions(bool _status)
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+            return;
+        }
+        
         UnlimitedActions = _status;
         if (UnlimitedActions)
         {
@@ -63,11 +74,23 @@ public class GameplayCheats : MonoBehaviour
     
     private void ToggleCheckForCd(bool _status)
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+            return;
+        }
+        
         CheckForCd = _status;
     }
 
     private void HealGuardian()
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+            return;
+        }
+        
         Guardian _guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
         if (_guardian==null)
         {
@@ -80,6 +103,12 @@ public class GameplayCheats : MonoBehaviour
 
     private void HealKeeper()
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+            return;
+        }
+        
         Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         if (_keeper==null)
         {
