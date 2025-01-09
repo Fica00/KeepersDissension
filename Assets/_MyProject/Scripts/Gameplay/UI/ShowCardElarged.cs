@@ -168,11 +168,18 @@ public class ShowCardElarged : MonoBehaviour
     private void Flip()
     {
         Debug.Log(1111);
-        if (isShowingFrontSide && !isGuardianChained)
+        Debug.Log(isShowingFrontSide);
+        Debug.Log(!isGuardianChained);
+
+        if (isSelectedCardGuardian)
         {
-            Debug.Log(22222);
-            return;
+            if (isShowingFrontSide && !isGuardianChained)
+            {
+                Debug.Log(22222);
+                return;
+            }
         }
+        
         
         RectTransform _cardBaseTransform = cardDisplay.GetComponent<RectTransform>();
         _cardBaseTransform.DOScale(new Vector3(1,0,1), 0.5f).OnComplete(() =>
