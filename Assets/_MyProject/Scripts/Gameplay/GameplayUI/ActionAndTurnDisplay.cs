@@ -10,6 +10,7 @@ public class ActionAndTurnDisplay : MonoBehaviour
     [SerializeField] private TextMeshProUGUI actionAmountDisplay;
     [SerializeField] private Color myColor;
     [SerializeField] private Color opponentColor;
+    [SerializeField] private Color responseColor;
     [SerializeField] private Sprite[] actionDisplays;
     
     public void Setup()
@@ -46,7 +47,7 @@ public class ActionAndTurnDisplay : MonoBehaviour
             if (GameplayManager.Instance.IsResponseAction())
             {
                 _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
-                _color = Color.magenta;
+                _color = responseColor;
                 _number = 1;
             }
 
@@ -54,17 +55,20 @@ public class ActionAndTurnDisplay : MonoBehaviour
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
                 bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
+                string _myText = "Your delivery reposition action";
+                string _opponentText = "Opponents is choosing delivery spot";
+                
                 if (_subState is GameplaySubState.Player1DeliveryReposition)
                 {
-                    _text = _isRoomOwner ? "Your delivery reposition action" : "Opponents delivery reposition action";
+                    _text = _isRoomOwner ? _myText : _opponentText;
                 }
                 else
                 {
-                    _text = _isRoomOwner ? "Opponents delivery reposition action" : "Your delivery reposition action";
+                    _text = _isRoomOwner ? _opponentText : _myText;
                 }
                 
                 _number = 1;
-                _color = Color.yellow;
+                _color = responseColor;
             }
           
 

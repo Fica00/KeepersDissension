@@ -1990,6 +1990,7 @@ MonoBehaviour:
   actionAmountDisplay: {fileID: 855762342}
   myColor: {r: 0, g: 1, b: 0.030314207, a: 1}
   opponentColor: {r: 1, g: 0, b: 0, a: 1}
+  responseColor: {r: 1, g: 0, b: 0.76788044, a: 1}
   actionDisplays:
   - {fileID: 21300000, guid: c113b85567c1adf409bc07d39bec3105, type: 3}
   - {fileID: 21300000, guid: 8e4f7c5d8a99cb3459ead7437e450189, type: 3}
@@ -10619,6 +10620,7 @@ MonoBehaviour:
   actionAmountDisplay: {fileID: 1819123045}
   myColor: {r: 0, g: 1, b: 0.030314207, a: 1}
   opponentColor: {r: 1, g: 0, b: 0, a: 1}
+  responseColor: {r: 1, g: 0, b: 0.76788044, a: 1}
   actionDisplays:
   - {fileID: 21300000, guid: c113b85567c1adf409bc07d39bec3105, type: 3}
   - {fileID: 21300000, guid: 8e4f7c5d8a99cb3459ead7437e450189, type: 3}
@@ -35818,7 +35820,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -10057674
+      value: -10095199
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
