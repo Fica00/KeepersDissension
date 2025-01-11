@@ -127,25 +127,32 @@ public class TableHandler : MonoBehaviour
             {
                 continue;
             }
+            Debug.Log("Attackable place: ", _availablePlace.gameObject);
 
             var _cardsOnPlace = _availablePlace.GetCards();
+            Debug.Log("Amount of cards: "+_cardsOnPlace.Count);
             if (_cardsOnPlace.Count == 0)
             {
+                Debug.Log("11111");
                 continue;
             }
             if (_cardsOnPlace.Count == 1)
             {
+                Debug.Log(2222222);
                 AddCard(_availablePlace);
             }
             else
             {
-                Card _marker = _availablePlace.GetMarker();
+                Debug.Log(333333);
+                Card _marker = (Card)_availablePlace.GetWall();
                 if (_marker)
                 {
+                Debug.Log(4444);
                     _attackableCards.Add(_marker);
                     continue;
                 }
 
+                Debug.Log(55555);
                 AddCard(_availablePlace);
             }
             
