@@ -465,7 +465,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardsHolder: {fileID: 4273539018917159689}
-  cardPrefab: {fileID: 0}
+  cardPrefab: {fileID: 8019390600755613243, guid: 5b72a512be197ba4da3246ac00005b14,
+    type: 3}
   backGround: {fileID: 4077014192969017152}
   closeButton: {fileID: 6066324680579283283}
 --- !u!1 &1596595229389512688
@@ -995,7 +996,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1043433970895877069
 RectTransform:
   m_ObjectHideFlags: 0
