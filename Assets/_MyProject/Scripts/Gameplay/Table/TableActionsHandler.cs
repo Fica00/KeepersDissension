@@ -713,6 +713,11 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (!CheckForSwitchPlace(_newAction))
+        {
+            return;
+        }
         
         bool _continue =TryHandlePortalMove(_newAction);
         
@@ -973,6 +978,28 @@ public class TableActionsHandler : MonoBehaviour
             }
         }
 
+        return true;
+    }
+    private bool CheckForSwitchPlace(CardAction _action)
+    {
+        if (_action.Type != CardActionType.SwitchPlace)
+        {
+            return true;
+        }
+
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+        bool _isDiagonal = GameplayManager.Instance.TableHandler.AreDiagonal(_card1.GetTablePlace(), _card2.GetTablePlace());
+        if (_isDiagonal)
+        {
+            if (_card1.MovementType == _card2.MovementType)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
         return true;
     }
 }
