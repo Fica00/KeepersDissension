@@ -889,6 +889,7 @@ public class GameplayManagerPvp : GameplayManager
 
                 Debug.Log("Awarding response action");
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
+                RoomUpdater.Instance.ForceUpdate();
                 return true;
             }
         }
