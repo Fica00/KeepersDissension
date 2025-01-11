@@ -16,14 +16,27 @@ public class GroundPound : AbilityEffect
             }
 
             List<CardBase> _cardsOnPlace = _availablePlace.GetCards();
-            foreach (var _cardOnPlace in _cardsOnPlace)
+            if (_cardsOnPlace.Count == 0)
             {
-                Card _card = ((Card)_cardOnPlace);
+                continue;
+            }
+
+            if (_cardsOnPlace.Count>1)
+            {
+                Card _card = _availablePlace.GetMarker();
+                if (_card)
+                {
+                    GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, 1, null);
+                }
+            }
+            else
+            {
+                Card _card = _availablePlace.GetCard();
                 if (!_card.IsAttackable())
                 {
                     continue;
                 }
-
+                
                 GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, 1, null);
             }
         }
