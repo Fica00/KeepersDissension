@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class GroundPound : AbilityEffect
 {
@@ -6,40 +7,14 @@ public class GroundPound : AbilityEffect
     {
         Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
         TablePlaceHandler _keeperPlace = _keeper.GetTablePlace();
-        List<TablePlaceHandler> _availablePlaces = GameplayManager.Instance.TableHandler.GetPlacesAround(_keeperPlace.Id, CardMovementType.EightDirections);
-        
-        foreach (var _availablePlace in _availablePlaces)
+        int _attackingPlaceId = _keeperPlace.Id;
+        List<Card> _availablePlaces = GameplayManager.Instance.TableHandler.GetAttackableCards(_attackingPlaceId,
+            CardMovementType.EightDirections);
+
+        foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            if (!_availablePlace.IsOccupied)
-            {
-                continue;
-            }
-
-            List<CardBase> _cardsOnPlace = _availablePlace.GetCards();
-            if (_cardsOnPlace.Count == 0)
-            {
-                continue;
-            }
-
-            if (_cardsOnPlace.Count>1)
-            {
-                Card _card = _availablePlace.GetMarker();
-                if (_card)
-                {
-                    GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, 1, null);
-                }
-            }
-            else
-            {
-                Card _card = _availablePlace.GetCard();
-                if (!_card.IsAttackable())
-                {
-                    continue;
-                }
-                
-                GameplayManager.Instance.DamageCardByAbility(_card.UniqueId, 1, null);
-            }
-        }
+            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, _keeper.Damage, _ => { GameplayManager.Instance.HideCardActions();});
+        }        
 
         MoveToActivationField();
         OnActivated?.Invoke();

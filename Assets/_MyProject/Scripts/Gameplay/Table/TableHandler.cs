@@ -128,21 +128,46 @@ public class TableHandler : MonoBehaviour
                 continue;
             }
 
+            var _cardsOnPlace = _availablePlace.GetCards();
+            if (_cardsOnPlace.Count == 0)
+            {
+                continue;
+            }
+            if (_cardsOnPlace.Count == 1)
+            {
+                AddCard(_availablePlace);
+            }
+            else
+            {
+                Card _marker = _availablePlace.GetMarker();
+                if (_marker)
+                {
+                    _attackableCards.Add(_marker);
+                    continue;
+                }
+
+                AddCard(_availablePlace);
+            }
+            
+        }
+
+        return _attackableCards;
+
+        void AddCard(TablePlaceHandler _availablePlace)
+        {
             Card _cardOnPlace = _availablePlace.GetCard();
             if (!(_cardOnPlace != null))
             {
-                continue;
+                return;
             }
 
             if (!_cardOnPlace.IsAttackable())
             {
-                continue;
+                return;
             }
 
             _attackableCards.Add(_cardOnPlace);
         }
-
-        return _attackableCards;
     }
 
     public List<TablePlaceHandler> GetPlacesAroundNoCorners(int _id, CardMovementType _movementType, int _range = 1,
