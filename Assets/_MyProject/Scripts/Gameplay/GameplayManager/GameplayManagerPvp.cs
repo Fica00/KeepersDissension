@@ -11,7 +11,7 @@ public class GameplayManagerPvp : GameplayManager
     private RoomHandler RoomHandler => FirebaseManager.Instance.RoomHandler;
     private RoomData RoomData => RoomHandler.RoomData;
     private BoardData BoardData => RoomData.BoardData;
-
+    
     protected override void Awake()
     {
         base.Awake();
@@ -888,8 +888,8 @@ public class GameplayManagerPvp : GameplayManager
                 }
 
                 Debug.Log("Awarding response action");
+                IsFallingResponse = true;
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
-                RoomUpdater.Instance.ForceUpdate();
                 return true;
             }
         }

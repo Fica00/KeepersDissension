@@ -34,6 +34,7 @@ public class GameplayManager : MonoBehaviour
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
     protected bool IsAnimating; 
+    protected bool IsFallingResponse;
     
     public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     
@@ -255,10 +256,18 @@ public class GameplayManager : MonoBehaviour
 
         if (MyPlayer.Actions<=0)
         {
+            if (IsFallingResponse)
+            {
+                IsFallingResponse = false;
+                Debug.Log("Falling response detected");
+                RoomUpdater.Instance.ForceUpdate();
+                return;
+            }
+            
             Debug.Log("Actions are 0, not doing anything");
             return;
         }
-        
+
         Debug.Log("actions are not 0, forcing an update");
         RoomUpdater.Instance.ForceUpdate();
     }
