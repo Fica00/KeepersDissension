@@ -12,7 +12,6 @@ public class CardsInHandHandler : MonoBehaviour
    [SerializeField] private Button closeButton;
 
    private List<CardInHandDisplay> shownCards = new ();
-   private Vector3 sizeOfCards = new(2, 2, 1);
 
    public void Setup(GameplayPlayer _player)
    {
