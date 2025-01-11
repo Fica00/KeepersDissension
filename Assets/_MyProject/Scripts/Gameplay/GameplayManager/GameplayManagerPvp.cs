@@ -715,7 +715,50 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void UseDelivery(string _defendingCardId, Action _callBack)
     {
+        Card _card = GetCard(_defendingCardId);
         int _startingPlace = GetCard(_defendingCardId).GetTablePlace().Id;
+        if (_card is Guardian _guardian)
+        {
+            if (_guardian.IsChained)
+            {
+                List<int> _lifeForcePlaces = new List<int>()
+                {
+                    10,
+                    12,
+                    19,
+                    18,
+                    17
+                };
+                int _currentPlace = _card.GetTablePlace().Id;
+                if (!_lifeForcePlaces.Contains(_currentPlace))
+                {
+                    _lifeForcePlaces.Add(_currentPlace);
+                }
+
+                List<TablePlaceHandler> _possiblePlaces = new();
+                foreach (var _placeId in _lifeForcePlaces)
+                {
+                    var _place = TableHandler.GetPlace(_placeId);
+                    if (_place.IsOccupied)
+                    {
+                        continue;
+                    }
+                    
+                    _possiblePlaces.Add(_place);
+                }
+                
+                if (_possiblePlaces.Count == 1)
+                {
+                    ExecuteMove(_startingPlace, _possiblePlaces[0].Id, _defendingCardId, _callBack);
+                }
+                else
+                {
+                    StartCoroutine(SelectPlace(_possiblePlaces, true, DoPlaceDeliveryCard));
+                }
+                
+                return;
+            }    
+        }
         List<TablePlaceHandler> _emptyPlaces = GetDeliveryPlaces();
         _emptyPlaces.Add(TableHandler.GetPlace(_startingPlace));
         if (_emptyPlaces.Count == 0)
