@@ -725,16 +725,7 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     10,
                     12,
-                    19,
-                    18,
-                    17
                 };
-                int _currentPlace = _card.GetTablePlace().Id;
-                if (!_lifeForcePlaces.Contains(_currentPlace))
-                {
-                    _lifeForcePlaces.Add(_currentPlace);
-                }
-
                 List<TablePlaceHandler> _possiblePlaces = new();
                 foreach (var _placeId in _lifeForcePlaces)
                 {
@@ -745,6 +736,26 @@ public class GameplayManagerPvp : GameplayManager
                     }
                     
                     _possiblePlaces.Add(_place);
+                }
+
+                if (_possiblePlaces.Count==0)
+                {
+                    _lifeForcePlaces = new() { 19, 18, 17 };
+                    foreach (var _placeId in _lifeForcePlaces)
+                    {
+                        var _place = TableHandler.GetPlace(_placeId);
+                        if (_place.IsOccupied)
+                        {
+                            continue;
+                        }
+                    
+                        _possiblePlaces.Add(_place);
+                    }
+                }
+
+                if (_possiblePlaces.Count==0)
+                {
+                    _possiblePlaces.Add(_card.GetTablePlace());
                 }
                 
                 if (_possiblePlaces.Count == 1)
