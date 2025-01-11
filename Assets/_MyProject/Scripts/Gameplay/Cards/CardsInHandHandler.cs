@@ -63,7 +63,7 @@ public class CardsInHandHandler : MonoBehaviour
       foreach (var _ownedCard in GameplayManager.Instance.GetOwnedAbilities(player.IsMy))
       {
          var _cardDisplay = Instantiate(cardPrefab, cardsHolder);
-         _cardDisplay.Setup(_ownedCard.UniqueId);
+         _cardDisplay.Setup(_ownedCard.UniqueId,true);
          shownCards.Add(_cardDisplay);
       }
    }
@@ -73,7 +73,7 @@ public class CardsInHandHandler : MonoBehaviour
       foreach (var _card in GameplayManager.Instance.GetAllCardsOfType(_type,player.IsMy).FindAll(_card => _card.CardData.CardPlace == CardPlace.Deck))
       {
          var _cardDisplay = Instantiate(cardPrefab, cardsHolder);
-         _cardDisplay.Setup(_card.UniqueId);
+         _cardDisplay.Setup(_card.UniqueId,false);
          shownCards.Add(_cardDisplay);
       }
    }
