@@ -707,7 +707,6 @@ public class GameplayManagerPvp : GameplayManager
                 _callBack?.Invoke();
                 if (_didGiveResponseAction && MyPlayer.Actions == 0)
                 {
-                    Debug.Log("I did give response action and actions are 0 so forcing update");
                     RoomUpdater.Instance.ForceUpdate();
                 }
             }
@@ -841,13 +840,11 @@ public class GameplayManagerPvp : GameplayManager
     {
         if (_defendingCard.My == _attackingCard.My)
         {
-            Debug.Log("Trying to award from is my check");
             return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
         }
 
         if (!_defendingCard.IsWarrior())
         {
-            Debug.Log("Trying to award from is warrior check");
             return TryToAwardResponseForFalling(_attackingCard, _defendingCard);
         }
 
@@ -887,7 +884,6 @@ public class GameplayManagerPvp : GameplayManager
                     continue;
                 }
 
-                Debug.Log("Awarding response action");
                 IsFallingResponse = true;
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
                 return true;

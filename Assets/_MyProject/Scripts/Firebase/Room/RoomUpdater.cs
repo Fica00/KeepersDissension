@@ -11,7 +11,6 @@ public class RoomUpdater : MonoBehaviour
 
     public void ForceUpdate()
     {
-        Debug.Log("Forcing room update");
         FirebaseManager.Instance.RoomHandler.UpdateRoomData();
     }
 }
