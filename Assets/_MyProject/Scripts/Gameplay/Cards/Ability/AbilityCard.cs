@@ -126,7 +126,14 @@ public class AbilityCard : CardBase
         
         if (!GameplayManager.Instance.IsMyTurn())
         {
-            return false;
+            if (GameplayManager.Instance.IsKeeperResponseAction)
+            {
+            }
+            else
+            {
+                return false;
+
+            }
         }
 
         if (!My)
