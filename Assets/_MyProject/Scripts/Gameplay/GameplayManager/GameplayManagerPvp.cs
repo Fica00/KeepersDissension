@@ -721,52 +721,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (_guardian.IsChained)
             {
-                List<int> _lifeForcePlaces = new List<int>()
-                {
-                    10,
-                    12,
-                };
-                List<TablePlaceHandler> _possiblePlaces = new();
-                foreach (var _placeId in _lifeForcePlaces)
-                {
-                    var _place = TableHandler.GetPlace(_placeId);
-                    if (_place.IsOccupied)
-                    {
-                        continue;
-                    }
-                    
-                    _possiblePlaces.Add(_place);
-                }
-
-                if (_possiblePlaces.Count==0)
-                {
-                    _lifeForcePlaces = new() { 19, 18, 17 };
-                    foreach (var _placeId in _lifeForcePlaces)
-                    {
-                        var _place = TableHandler.GetPlace(_placeId);
-                        if (_place.IsOccupied)
-                        {
-                            continue;
-                        }
-                    
-                        _possiblePlaces.Add(_place);
-                    }
-                }
-
-                if (_possiblePlaces.Count==0)
-                {
-                    _possiblePlaces.Add(_card.GetTablePlace());
-                }
-                
-                if (_possiblePlaces.Count == 1)
-                {
-                    ExecuteMove(_startingPlace, _possiblePlaces[0].Id, _defendingCardId, _callBack);
-                }
-                else
-                {
-                    StartCoroutine(SelectPlace(_possiblePlaces, true, DoPlaceDeliveryCard));
-                }
-                
+                HandleChainedGuardian();
                 return;
             }    
         }
@@ -785,6 +740,56 @@ public class GameplayManagerPvp : GameplayManager
         else
         {
             StartCoroutine(SelectPlace(_emptyPlaces, true, DoPlaceDeliveryCard));
+        }
+
+
+        void HandleChainedGuardian()
+        {
+            List<int> _lifeForcePlaces = new List<int>()
+            {
+                10,
+                12,
+            };
+            List<TablePlaceHandler> _possiblePlaces = new();
+            foreach (var _placeId in _lifeForcePlaces)
+            {
+                var _place = TableHandler.GetPlace(_placeId);
+                if (_place.IsOccupied)
+                {
+                    continue;
+                }
+                    
+                _possiblePlaces.Add(_place);
+            }
+
+            if (_possiblePlaces.Count==0)
+            {
+                _lifeForcePlaces = new() { 19, 18, 17 };
+                foreach (var _placeId in _lifeForcePlaces)
+                {
+                    var _place = TableHandler.GetPlace(_placeId);
+                    if (_place.IsOccupied)
+                    {
+                        continue;
+                    }
+                    
+                    _possiblePlaces.Add(_place);
+                }
+            }
+
+            if (_possiblePlaces.Count==0)
+            {
+                _possiblePlaces.Add(_card.GetTablePlace());
+            }
+                
+            if (_possiblePlaces.Count == 1)
+            {
+                ExecuteMove(_startingPlace, _possiblePlaces[0].Id, _defendingCardId, _callBack);
+            }
+            else
+            {
+                StartCoroutine(SelectPlace(_possiblePlaces, true, DoPlaceDeliveryCard));
+            }
         }
 
         void DoPlaceDeliveryCard(int _placeId)
