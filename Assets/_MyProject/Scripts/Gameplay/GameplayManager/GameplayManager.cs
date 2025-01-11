@@ -250,13 +250,16 @@ public class GameplayManager : MonoBehaviour
 
     private void FinishActionExecution(CardAction _action)
     {
+        Debug.Log("Finished with action, deducing cost");
         MyPlayer.Actions-=_action.Cost;
 
         if (MyPlayer.Actions<=0)
         {
+            Debug.Log("Actions are 0, not doing anything");
             return;
         }
         
+        Debug.Log("actions are not 0, forcing an update");
         RoomUpdater.Instance.ForceUpdate();
     }
 
