@@ -213,7 +213,6 @@ public class TableActionsHandler : MonoBehaviour
         }
     }
     
-
     public void ClearPossibleActions()
     {
         foreach (var _possibleAction in possibleActions)
@@ -980,6 +979,7 @@ public class TableActionsHandler : MonoBehaviour
 
         return true;
     }
+    
     private bool CheckForSwitchPlace(CardAction _action)
     {
         if (_action.Type != CardActionType.SwitchPlace)
