@@ -95,4 +95,14 @@ public class GameplayUI : MonoBehaviour
     {
         throw new Exception("Show result must be implemented");
     }
+
+    private void Update()
+    {
+        if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+        {
+            return;
+        }
+
+        resignButton.interactable = GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction();
+    }
 }

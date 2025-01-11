@@ -1252,4 +1252,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual GameplayState GetGameplayState()
+    {
+        throw new Exception();
+    }
 }

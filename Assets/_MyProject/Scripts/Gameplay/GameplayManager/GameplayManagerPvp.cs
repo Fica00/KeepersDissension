@@ -2617,4 +2617,9 @@ public class GameplayManagerPvp : GameplayManager
     {
         return IdOfCardWithResponseAction() == _uniqueId;
     }
+
+    public override GameplayState GetGameplayState()
+    {
+        return RoomData.GameplayState;
+    }
 }
