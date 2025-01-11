@@ -151,10 +151,13 @@ public class AbilityCard : CardBase
             }
         }
 
-        if (GameplayManager.Instance.MyPlayer.Actions<=0)
+        if (!GameplayManager.Instance.IsMyResponseAction())
         {
-            DialogsManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
-            return false;
+            if (GameplayManager.Instance.MyPlayer.Actions<=0)
+            {
+                DialogsManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
+                return false;
+            }
         }
 
         if (GameplayManager.Instance.IsAbilityActive<Subdued>())
