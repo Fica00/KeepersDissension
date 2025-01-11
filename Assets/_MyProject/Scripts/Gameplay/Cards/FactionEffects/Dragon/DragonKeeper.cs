@@ -45,7 +45,7 @@ public class DragonKeeper : CardSpecialAbility
         {
             _cards.Add(_availableCard);
         }
-        ChooseCardPanel.Instance.ShowCards(_cards,PlaceMinion,true);
+        ChooseCardImagePanel.Instance.Show(_cards,PlaceMinion,true);
     }
 
     private List<Card> GetAvailableCards()
