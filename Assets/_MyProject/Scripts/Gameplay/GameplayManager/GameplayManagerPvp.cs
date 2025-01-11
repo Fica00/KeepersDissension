@@ -2273,7 +2273,7 @@ public class GameplayManagerPvp : GameplayManager
 
             _place.SetColor(Color.green);
 
-            CardHandInteractions.OnCardClicked += SelectCard;
+            CardInHandDisplay.OnClicked += SelectCard;
             MyPlayer.ShowCards(_type);
 
             yield return new WaitUntil(() => _hasSelectedCard);
@@ -2284,7 +2284,7 @@ public class GameplayManagerPvp : GameplayManager
 
             void SelectCard(CardBase _card)
             {
-                CardHandInteractions.OnCardClicked -= SelectCard;
+                CardInHandDisplay.OnClicked -= SelectCard;
                 _selectedCard = (_card as Card);
                 _hasSelectedCard = true;
             }

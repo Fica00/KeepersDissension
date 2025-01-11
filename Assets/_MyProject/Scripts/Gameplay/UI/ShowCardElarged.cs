@@ -8,6 +8,7 @@ public class ShowCardElarged : MonoBehaviour
 {
     public static Action OnShowed;
     public static Action OnHided;
+    
     [SerializeField] private GameObject holder;
     [SerializeField] private GameObject animationHolder;
     [SerializeField] private Button closeButton;
@@ -25,7 +26,7 @@ public class ShowCardElarged : MonoBehaviour
     private void OnEnable()
     {
         CardTableInteractions.OnCardPressed += Show;
-        CardHandInteractions.OnCardPressed += Show;
+        CardInHandDisplay.OnCardHolded += Show;
         AbilityShopDisplay.OnCardPressed += Show;
         flipButton.onClick.AddListener(Flip);
         flip2Button.onClick.AddListener(Flip);
@@ -35,7 +36,7 @@ public class ShowCardElarged : MonoBehaviour
     private void OnDisable()
     {
         CardTableInteractions.OnCardPressed -= Show;
-        CardHandInteractions.OnCardPressed -= Show;
+        CardInHandDisplay.OnCardHolded -= Show;
         AbilityShopDisplay.OnCardPressed -= Show;
         flipButton.onClick.RemoveListener(Flip);
         flip2Button.onClick.RemoveListener(Flip);
