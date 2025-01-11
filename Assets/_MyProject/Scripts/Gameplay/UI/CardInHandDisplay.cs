@@ -54,7 +54,7 @@ public class CardInHandDisplay : MonoBehaviour, IPointerDownHandler, IPointerUpH
         RectTransform _rect = GetComponent<RectTransform>();
         _rect.sizeDelta = _isAbility ? new Vector2(355,245):new Vector2(245,355);
         Vector3 _rotation = _rect.eulerAngles;
-        _rotation.z = _isAbility ? _rotation.z: 180;
+        _rotation.z = _isAbility ? 180 : _rotation.z;
         _rect.eulerAngles = _rotation;
     }
     
