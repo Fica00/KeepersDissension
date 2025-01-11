@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,6 +24,9 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             _abilityInstance.Setup(_abilityData.UniqueId);
             FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Add(_abilityData);
         }
+
+        FirebaseManager.Instance.RoomHandler.BoardData.Abilities =
+            FirebaseManager.Instance.RoomHandler.BoardData.Abilities.OrderBy(_ => Guid.NewGuid().ToString()).ToList();
     }
 
     protected override void DealAbilities()
