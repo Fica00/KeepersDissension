@@ -7,26 +7,27 @@ public class CardsInHandHandler : MonoBehaviour
    private GameplayPlayer player;
 
    [SerializeField] private Transform cardsHolder;
+   [SerializeField] private CardInHandDisplay cardPrefab;
    [SerializeField] private GameObject backGround;
    [SerializeField] private Button closeButton;
 
-   private List<CardBase> shownCards = new ();
+   private List<CardInHandDisplay> shownCards = new ();
    private Vector3 sizeOfCards = new(2, 2, 1);
 
    public void Setup(GameplayPlayer _player)
    {
       player = _player;
       DeckDisplay.OnDeckClicked += ShowCards;
-      CardHandInteractions.OnCardClicked += CheckForBuy;
-      CardHandInteractions.OnCardClicked += CheckForWallPurchase;
+      CardInHandDisplay.OnClicked += CheckForBuyMinion;
+      CardInHandDisplay.OnClicked += CheckForWallPurchase;
       closeButton.onClick.AddListener(HideCards);
    }
 
    private void OnDisable()
    {
       DeckDisplay.OnDeckClicked -= ShowCards;
-      CardHandInteractions.OnCardClicked -= CheckForBuy;
-      CardHandInteractions.OnCardClicked -= CheckForWallPurchase;
+      CardInHandDisplay.OnClicked -= CheckForBuyMinion;
+      CardInHandDisplay.OnClicked -= CheckForWallPurchase;
       closeButton.onClick.RemoveListener(HideCards);
    }
 
@@ -54,37 +55,27 @@ public class CardsInHandHandler : MonoBehaviour
       }
       else
       {
-         ShowOtherCards(_type);
+         ShowWarriors(_type);
       }
    }
 
-   public void ShowAbilities()
+   private void ShowAbilities()
    {
       foreach (var _ownedCard in GameplayManager.Instance.GetOwnedAbilities(player.IsMy))
       {
-         var _card = GameplayManager.Instance.GetCard(_ownedCard.UniqueId);
-         CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
-         if (_cardPlace== CardPlace.Table)
-         {
-            continue;
-         }
-         _card.transform.SetParent(cardsHolder);
-         _card.PositionInHand();
-         _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
-         _card.transform.localScale = sizeOfCards;
-         shownCards.Add(_card);
+         var _cardDisplay = Instantiate(cardPrefab, cardsHolder);
+         _cardDisplay.Setup(_ownedCard.UniqueId);
+         shownCards.Add(_cardDisplay);
       }
    }
 
-   private void ShowOtherCards(CardType _type)
+   private void ShowWarriors(CardType _type)
    {
       foreach (var _card in GameplayManager.Instance.GetAllCardsOfType(_type,player.IsMy).FindAll(_card => _card.CardData.CardPlace == CardPlace.Deck))
       {
-         _card.transform.SetParent(cardsHolder);
-         _card.PositionInHand(true);
-         _card.gameObject.AddComponent<CardHandInteractions>().Setup(_card);
-         _card.transform.localScale = sizeOfCards;
-         shownCards.Add(_card);
+         var _cardDisplay = Instantiate(cardPrefab, cardsHolder);
+         _cardDisplay.Setup(_card.UniqueId);
+         shownCards.Add(_cardDisplay);
       }
    }
 
@@ -92,25 +83,13 @@ public class CardsInHandHandler : MonoBehaviour
    {
       foreach (var _card in shownCards)
       {
-         CardHandInteractions _cardHandInteractions = _card.gameObject.GetComponent<CardHandInteractions>();
-         if (_cardHandInteractions != null)
-         {
-            Destroy(_cardHandInteractions);
-         }
-
-         CardPlace _cardPlace = GameplayManager.Instance.GetCardPlace(_card);
-         if (!(_cardPlace is CardPlace.Hand or CardPlace.Graveyard))
-         {
-            continue;
-         }
-
-         _card.ReturnFromHand();
+         Destroy(_card.gameObject);
       }
 
       shownCards.Clear();
    }
 
-   private void CheckForBuy(CardBase _card)
+   private void CheckForBuyMinion(CardBase _card)
    {
       if (!GameplayManager.Instance.CanPlayerDoActions())
       {
@@ -165,27 +144,31 @@ public class CardsInHandHandler : MonoBehaviour
          return;
       }
 
-      if (!shownCards.Contains(_card))
+      if (!GameplayManager.Instance.GetAllCardsOfType(CardType.Minion, player.IsMy).Contains(_card as Minion))
       {
          return;
       }
-
-      if (GameplayManager.Instance.GetAllCardsOfType(CardType.Minion,player.IsMy).Contains(_card as Minion))
+      
+      Minion _minion = (Minion)_card;
+      
+      if (!shownCards.Find(_display => _display.UniqueId == _minion.UniqueId))
       {
-         int _buyPrice = 10 - GameplayManager.Instance.StrangeMatterCostChange(true);
-         if (GameplayManager.Instance.MyStrangeMatter() < _buyPrice)
-         {
-            DialogsManager.Instance.ShowOkDialog($"You need {_buyPrice} strange matter to buy minion");
-            return;
-         }
-
-         DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy minion for {_buyPrice} strange matter?",
-            () =>
-            {
-               GameplayManager.Instance.BuyMinion(_card, _buyPrice);
-               HideCards();
-            });
+         return;
       }
+      
+      int _buyPrice = 10 - GameplayManager.Instance.StrangeMatterCostChange(true);
+      if (GameplayManager.Instance.MyStrangeMatter() < _buyPrice)
+      {
+         DialogsManager.Instance.ShowOkDialog($"You need {_buyPrice} strange matter to buy minion");
+         return;
+      }
+
+      DialogsManager.Instance.ShowYesNoDialog($"Do you want to buy minion for {_buyPrice} strange matter?",
+         () =>
+         {
+            GameplayManager.Instance.BuyMinion(_card, _buyPrice);
+            HideCards();
+         });
    }
 
    private void CheckForWallPurchase(CardBase _card)

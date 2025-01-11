@@ -51,14 +51,14 @@ public class AbilityCardsManagerBase : MonoBehaviour
     
     private void OnEnable()
     {
-        CardHandInteractions.OnCardClicked += TryBuyFromHand;
+        CardInHandDisplay.OnClicked += TryBuyFromHand;
         AbilityShopDisplay.OnAbilityClicked += BuyAbility;
         shopPanel.OnOpened += ShowShop;
     }
 
     private void OnDisable()
     {
-        CardHandInteractions.OnCardClicked -= TryBuyFromHand;
+        CardInHandDisplay.OnClicked -= TryBuyFromHand;
         AbilityShopDisplay.OnAbilityClicked -= BuyAbility;
         shopPanel.OnOpened -= ShowShop;
     }
