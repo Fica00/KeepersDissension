@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class BlockaderRam : CardSpecialAbility
@@ -17,6 +18,11 @@ public class BlockaderRam : CardSpecialAbility
         }
         else
         {
+            if (HandlePortal(_firstCardId, _secondCardId))
+            {
+                return;
+            }
+            
             GameplayManager.Instance.DamageCardByAbility(_secondCardId, 1, _didKillCard =>
             {
                 if (!_didKillCard)
@@ -86,8 +92,19 @@ public class BlockaderRam : CardSpecialAbility
         {
             return false;
         }
+        
+        if (_secondCard is Guardian)
+        {
+            LifeForce _lifeForce =
+                _secondCard.GetIsMy() ? GameplayManager.Instance.GetMyLifeForce() : GameplayManager.Instance.GetOpponentsLifeForce();
+            int _distanceBetweenPlaceAndLifeForce = GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_placeInFront, _lifeForce
+                .GetTablePlace());
+            if (_distanceBetweenPlaceAndLifeForce>1)
+            {
+                return false;
+            }
+        }
 
-        Debug.Log(_placeInFront.Id, _placeInFront.gameObject);
         return true;
     }
 
@@ -111,6 +128,43 @@ public class BlockaderRam : CardSpecialAbility
     {
         ReduceActions();
         _callBack?.Invoke();
+    }
+
+    private bool HandlePortal(string _firstCardId, string _secondCardId)
+    {
+        Card _secondCard = GameplayManager.Instance.GetCard(_secondCardId);
+
+        if (!_secondCard.CheckCanMove())
+        {
+            return false;
+        }
+
+        int _firstCardPlace = GameplayManager.Instance.GetCard(_firstCardId).GetTablePlace().Id;
+        int _secondCardPlace = _secondCard.GetTablePlace().Id;
+
+        TablePlaceHandler _placeInFront = GameplayManager.Instance.TableHandler.CheckForPlaceInFront(_firstCardPlace, _secondCardPlace);
+
+        if (_placeInFront == null)
+        {
+            return false;
+        }
+
+        if (_placeInFront.IsAbility)
+        {
+            return false;
+        }
+
+        if (!_placeInFront.ContainsPortal)
+        {
+            return false;
+        }
+        
+        Debug.Log("Trying to push into portal");
+        (Card _enterPortal, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_placeInFront.Id);
+        var _placeBehindExitPortal = GameplayManager.Instance.TableHandler.GetPlace(GameplayManager.Instance.TableHandler.GetTeleportExitIndex
+            (_secondCard.GetTablePlace().Id, _enterPortal.GetTablePlace().Id, _exitPortal.GetTablePlace().Id));
+        Debug.Log("Place behind exit portal: "+_placeBehindExitPortal.Id, _placeBehindExitPortal.gameObject);
+        return true;
     }
 
     private void ReduceActions()

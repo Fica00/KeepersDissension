@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AbilityCardsManagerPvp : AbilityCardsManagerBase
@@ -22,6 +24,9 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
             _abilityInstance.Setup(_abilityData.UniqueId);
             FirebaseManager.Instance.RoomHandler.BoardData.Abilities.Add(_abilityData);
         }
+
+        FirebaseManager.Instance.RoomHandler.BoardData.Abilities =
+            FirebaseManager.Instance.RoomHandler.BoardData.Abilities.OrderBy(_ => Guid.NewGuid().ToString()).ToList();
     }
 
     protected override void DealAbilities()
@@ -61,6 +66,11 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     protected override void BuyAbility(AbilityData _abilityData)
     {
         int _price = FirebaseManager.Instance.RoomHandler.BoardData.AbilityCardPrice - GameplayManager.Instance.StrangeMatterCostChange(true);
+        
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
         
         if (_abilityData==null)
         {
@@ -105,6 +115,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         DialogsManager.Instance.ShowYesNoDialog(
             $"Are you sure that you want to buy ability for {_price} strange matter?", ()=>
         {
+            GameplayManager.Instance.TellOpponentSomething("Opponent bought ability card");
             GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
             GameplayManager.Instance.ChangeStrangeMaterInEconomy(_price);
             arrowPanel.Hide();
@@ -146,6 +157,11 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
     protected override void TryBuyFromHand(CardBase _card)
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         if (_card is not AbilityCard _abilityCard)
         {
             return;
@@ -216,6 +232,7 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
     protected override void ShowShop()
     {
         List<AbilityData> _abilitiesInShop = FirebaseManager.Instance.RoomHandler.BoardData.Abilities.FindAll(_ability => _ability.Owner == "shop");
+        _abilitiesInShop = _abilitiesInShop.OrderBy(_ability => _ability.Name).ToList();
 
         foreach (var _shopAbility in ShopAbilitiesDisplays)
         {

@@ -33,6 +33,8 @@ public class GameplayManager : MonoBehaviour
     [HideInInspector] public bool DidOpponentFinish;
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
+    protected bool IsAnimating; 
+    protected bool IsFallingResponse;
     
     public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
     
@@ -43,6 +45,7 @@ public class GameplayManager : MonoBehaviour
 
     private void Start()
     {
+        AudioManager.Instance.PlayBackgroundMusic();
         SetupTable();
         MyPlayer.OnUpdatedActions += TryEndTurn;
         StartCoroutine(GameplayRoutine());
@@ -61,6 +64,11 @@ public class GameplayManager : MonoBehaviour
     protected virtual void SetupTable()
     {
         throw new NotImplementedException();
+    }
+
+    public virtual Card CreateCard(int _cardId, TableSideHandler _tableSideHandler, string _uniqueId, bool _addCard, string _owner)
+    {
+        throw new Exception();
     }
 
     private IEnumerator GameplayRoutine()
@@ -105,7 +113,10 @@ public class GameplayManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         AbilityCardsManagerBase.Instance.Setup();
-        RoomUpdater.Instance.ForceUpdate();
+        if (FirebaseManager.Instance.RoomHandler.IsOwner)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
         yield return new WaitForSeconds(1f);
 
         FinishedSetup?.Invoke();
@@ -175,6 +186,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual void UnchainOpponentsGuardian()
+    {
+        throw new Exception();
+    }
+
     public virtual void PlaceStartingWall()
     {
         throw new Exception();
@@ -239,9 +255,16 @@ public class GameplayManager : MonoBehaviour
 
         if (MyPlayer.Actions<=0)
         {
+            if (IsFallingResponse)
+            {
+                IsFallingResponse = false;
+                RoomUpdater.Instance.ForceUpdate();
+                return;
+            }
+            
             return;
         }
-        
+
         RoomUpdater.Instance.ForceUpdate();
     }
 
@@ -256,6 +279,16 @@ public class GameplayManager : MonoBehaviour
     }
     
     public virtual void ExecuteMove(int _startingPlaceId,int _finishingPlaceId, string _firstCardId, Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<Card> GetDeadMinions(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void HandleComrade(Action<bool> _callBack)
     {
         throw new Exception();
     }
@@ -414,7 +447,7 @@ public class GameplayManager : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual void PushCardBack(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
+    public virtual void PushCard(int _startingPlace, int _endingPlace, int _chanceForPush = 100)
     {
         throw new NotImplementedException();
     }
@@ -809,22 +842,6 @@ public class GameplayManager : MonoBehaviour
         return _vetoCard.IsEffected(_uniqueCardId);
     }
     
-    public bool IsCardTaxed(string _uniqueId)
-    {
-        var _taxedCard = FindObjectOfType<Tax>();
-        if (_taxedCard == null)
-        {
-            return false;
-        }
-
-        if (!_taxedCard.IsActive)
-        {
-            return false;
-        }
-        
-        return _taxedCard.IsEffected(_uniqueId);
-    }
-    
     protected void FinishEffect<T>() where T : MonoBehaviour
     {
         var _ability = FindObjectOfType<T>() as AbilityEffect;
@@ -965,11 +982,6 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void RemoveAbility(string _uniqueId, bool _forMe)
-    {
-        throw new Exception();
-    }
-
-    public virtual bool ContainsCard(CardData _requestedCard, bool _forMe)
     {
         throw new Exception();
     }
@@ -1187,5 +1199,70 @@ public class GameplayManager : MonoBehaviour
         }
 
         return 0;
+    }
+
+    public virtual void SetGameplaySubStateHelper(GameplaySubState _subState)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplaySubState GetGameplaySubStateHelper()
+    {
+        throw new Exception();
+    }
+
+    public virtual void StartReduction(Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual void UseReduction(Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual void NoteVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ShowVetoAnimation(string _uniqueId, bool _isVetoed)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChangeSpriteAnimate(string _uniqueId, int _spriteId, bool _showPlaceAnimation)
+    {
+        throw new Exception();
+    }
+
+    public virtual void ClearChangeSpriteData()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool CanPlayerDoActions()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsRoomOwner()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsDeliveryReposition()
+    {
+        throw new Exception();
+    }
+
+    public virtual bool HasCardResponseAction(string _uniqueId)
+    {
+        throw new Exception();
+    }
+
+    public virtual GameplayState GetGameplayState()
+    {
+        throw new Exception();
     }
 }

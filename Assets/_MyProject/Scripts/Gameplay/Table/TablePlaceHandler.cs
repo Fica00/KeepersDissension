@@ -243,5 +243,4 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
     {
         imageDisplay.color = _color;
     }
-
 }

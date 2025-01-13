@@ -259,16 +259,25 @@ public class CardActionsDisplay : MonoBehaviour
             AbilityTrigger _abilityTrigger = Instantiate(abilityTriggerPrefab, _abilityHolder);
             _abilityTrigger.Setup(_cardAbility.Sprite, _cardAbility.CanUseAbility,() =>
             {
+                if (!GameplayManager.Instance.CanPlayerDoActions())
+                {
+                    return;
+                }
+                
                 if (!selectedCard.My)
                 {
                     DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
                     return;
                 }
                 
-                if (!GameplayManager.Instance.IsMyTurn())
+                if (!GameplayManager.Instance.IsMyTurn() 
+                    && !GameplayManager.Instance.IsMyResponseAction() 
+                    && !GameplayManager.Instance.IsKeeperResponseAction 
+                    && !GameplayManager.Instance.HasCardResponseAction(selectedCard.UniqueId))
                 {
                     return;
                 }
+
 
                 if (!_cardAbility.CanUseAbility)
                 {

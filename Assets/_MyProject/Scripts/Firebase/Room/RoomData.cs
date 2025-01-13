@@ -14,6 +14,7 @@ namespace FirebaseMultiplayer.Room
         public RoomStatus Status;
         public GameplayState GameplayState;
         public GameplaySubState GameplaySubState;
+        public GameplaySubState GameplaySubStateHelper;
         public int CurrentPlayerTurn = 1;
         public bool HasGameEnded;
         public string Winner;

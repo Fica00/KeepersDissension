@@ -5,6 +5,7 @@ public class Dash : AbilityEffect
     protected override void ActivateForOwner()
     {
         SetIsActive(true);
+        ManageActiveDisplay(true);
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
         AddEffectedCard(_keeper.UniqueId);
         _keeper.ChangeSpeed(speedChange);

@@ -33,7 +33,7 @@ public class Card : CardBase
 
     public CardData GenerateCardData(string _owner, string _uniqueId)
     {
-        return new CardData
+        CardData _cardData = new CardData
         {
             Owner = _owner,
             UniqueId = _uniqueId,
@@ -47,7 +47,13 @@ public class Card : CardBase
                 Range = Details.Stats.Range,
                 Speed =  Details.Stats.Speed,
                 MaxHealth = Details.Stats.MaxHealth},
+            WarriorAbilityData =
+            {
+                CanUseAbility = true
+            }
         };
+
+        return _cardData;
     }
 
     public void SetUniqueId(string _uniqueCardId)
@@ -72,7 +78,7 @@ public class Card : CardBase
         float _amount = Details.Stats.Health - CardData.Stats.Health;
         if (CardData.Stats.MaxHealth != -1)
         {
-            _amount = CardData.Stats.MaxHealth = CardData.Stats.Health;
+            _amount = CardData.Stats.MaxHealth;
         }
         
         ChangeHealth((int)_amount);
@@ -81,14 +87,19 @@ public class Card : CardBase
     
     public void SetHealth(int _amount)
     {
-        int _alteredAmount = Math.Clamp(_amount, 0, Details.Stats.Health);
+        int _alteredAmount = Math.Clamp(_amount, 0, CardData.Stats.MaxHealth == -1 ? Details.Stats.Health : CardData.Stats.MaxHealth);
         CardData.Stats.Health = _alteredAmount;
         UpdatedHealth?.Invoke();
     }
 
     public void ChangeHealth(int _amount)
     {
-        int _newHealth = Math.Clamp(CardData.Stats.Health + _amount, 0, Details.Stats.Health);
+        int _newHealth = Math.Clamp(
+            CardData.Stats.Health + _amount, 
+            0,
+            CardData.Stats.MaxHealth == -1 ? Details.Stats.Health : CardData.Stats.MaxHealth
+        );
+        
         CardData.Stats.Health = _newHealth;
         UpdatedHealth?.Invoke();
     }

@@ -149,6 +149,11 @@ namespace FirebaseMultiplayer.Room
             CheckForDelivery(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
+            CheckForComrade(_currentRoomState, _data);
+            CheckForReduction(_currentRoomState, _data);
+            CheckForVetoAnimation(_currentRoomState, _data);
+            CheckForSpriteChange(_currentRoomState, _data);
+            CheckForMessages(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -289,7 +294,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldMoveCard)
                 {
-                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, ConvertOpponentsPosition(_card.PlaceId));
+                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, Utils.ConvertPosition(_card.PlaceId));
                 }
             }
         }
@@ -364,7 +369,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.StrangeMatterAnimation;
-            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,ConvertOpponentsPosition(_animationData.PositionId));
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,Utils.ConvertPosition(_animationData.PositionId));
         }
 
         private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
@@ -470,13 +475,7 @@ namespace FirebaseMultiplayer.Room
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
-            GameplayManager.Instance.ShowCardMoved(_uniqueId, ConvertOpponentsPosition(_placeId),null);
-        }
-        
-        private int ConvertOpponentsPosition(int _position)
-        {
-            int _totalAmountOfFields = 64;
-            return _totalAmountOfFields - _position;
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertPosition(_placeId),null);
         }
         
         private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)
@@ -518,7 +517,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(ConvertOpponentsPosition(_animationData.PlaceId));
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertPosition(_animationData.PlaceId));
         }
         
         private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
@@ -625,6 +624,141 @@ namespace FirebaseMultiplayer.Room
 
             GameplayManager.Instance.ShowGameEnded(_data.Winner);
         }
+        
+        private void CheckForComrade(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            if (_data.GameplaySubState is GameplaySubState.Player1UseComrade)
+            {
+                if (IsOwner)
+                {
+                     GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseComrade)
+            {
+                if (!IsOwner)
+                {
+                    GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+
+
+            void Finish(bool _)
+            {
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForReduction(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            if (_data.GameplaySubState is GameplaySubState.Player1UseReduction)
+            {
+                if (IsOwner)
+                {
+                     GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseReduction)
+            {
+                if (!IsOwner)
+                {
+                    GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+
+
+            void Finish()
+            {
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForVetoAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.VetoAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.VetoAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.VetoAnimation.Id == _currentRoomData.BoardData.VetoAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.VetoAnimation;
+            GameplayManager.Instance.ShowVetoAnimation(_animationData.CardId, _animationData.IsVetoed);
+        }
+
+        private void CheckForSpriteChange(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.ChangeSpriteData == null)
+            {
+                return;
+            }
+
+            if (_data.BoardData.ChangeSpriteData.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var _changeSpriteData in _data.BoardData.ChangeSpriteData)
+            {
+                bool _found = false;
+                foreach (var _knownChange in _currentRoomData.BoardData.ChangeSpriteData)
+                {
+                    if (_knownChange.Id == _changeSpriteData.Id)
+                    {
+                        _found = true;
+                        break;
+                    }
+                }
+
+                if (_found)
+                {
+                    continue;
+                }
+                GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
+            }
+        }        
+        private void CheckForMessages(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.SaySomethingData == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.SaySomethingData.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.SaySomethingData.Id == _currentRoomData.BoardData.SaySomethingData.Id)
+            {
+                return;
+            }
+
+            var _saySomethingData = _data.BoardData.SaySomethingData;
+            DialogsManager.Instance.ShowOkDialog(_saySomethingData.Message);
+        }        
         
         public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 
                 default)

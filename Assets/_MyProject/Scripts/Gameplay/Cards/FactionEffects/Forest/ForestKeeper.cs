@@ -26,6 +26,7 @@ public class ForestKeeper : CardSpecialAbility
     
     private void Use()
     {
+        GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
         SetCanUseAbility(false);
         Card.ChangeHealth(2);
         GameplayManager.Instance.MyPlayer.Actions--;

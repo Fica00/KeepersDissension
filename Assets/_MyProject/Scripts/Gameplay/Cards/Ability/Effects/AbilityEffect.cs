@@ -50,7 +50,7 @@ public class AbilityEffect : MonoBehaviour
 
     private void OnDisable()
     {
-        TryToCancel();
+        CancelEffect();
     }
 
     public void TryToCancel()
@@ -65,7 +65,6 @@ public class AbilityEffect : MonoBehaviour
 
     protected virtual void CancelEffect()
     {
-        throw new Exception();
     }
 
     public virtual void SetupAfterGameReset()
@@ -83,14 +82,41 @@ public class AbilityEffect : MonoBehaviour
         GameplayManager.Instance.PlaceAbilityOnTable(AbilityCard.UniqueId, GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField.Id);
     }
 
-    protected void RemoveAction()
+    public void RemoveAction()
     {
         if (!AbilityCard.My)
         {
             return;
         }
 
-        if (AbilityCard.Details.Type!=AbilityCardType.Passive)
+        if (AbilityCard.Details.Type == AbilityCardType.Passive)
+        {
+            if (AbilityCard.Details.Id == 1069)
+            {
+                DoRemove();
+            }
+
+            if (AbilityCard.Details.Id == 1031)
+            {
+                DoRemove();
+            }   
+            
+            if (AbilityCard.Details.Id == 1068)
+            {
+                DoRemove();
+            }
+            
+            if (AbilityCard.Details.Id == 1060)
+            {
+                DoRemove();
+            }
+            
+            return;
+        }
+
+        DoRemove();
+
+        void DoRemove()
         {
             GameplayManager.Instance.MyPlayer.Actions--;
             if (GameplayManager.Instance.MyPlayer.Actions>0)
@@ -146,7 +172,7 @@ public class AbilityEffect : MonoBehaviour
         AbilityCard.SetStartingRange(_amount);
     }
     
-    protected void SetRemainingCooldown(int _amount)
+    public void SetRemainingCooldown(int _amount)
     {
         AbilityCard.SetRemainingCooldown(_amount);
     }
@@ -204,7 +230,7 @@ public class AbilityEffect : MonoBehaviour
         return false;
     }
     
-    protected List<Card> GetEffectedCards()
+    public List<Card> GetEffectedCards()
     {
         List<Card> _effectedCards = new();
         List<Card> _allCards = FindObjectsOfType<Card>().ToList();

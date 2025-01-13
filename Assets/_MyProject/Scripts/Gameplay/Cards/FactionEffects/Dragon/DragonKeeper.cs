@@ -38,12 +38,14 @@ public class DragonKeeper : CardSpecialAbility
             return;
         }
 
+        
+        GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
         List<CardBase> _cards = new List<CardBase>();
         foreach (var _availableCard in _availableCards)
         {
             _cards.Add(_availableCard);
         }
-        ChooseCardPanel.Instance.ShowCards(_cards,PlaceMinion,true);
+        ChooseCardImagePanel.Instance.Show(_cards,PlaceMinion,true);
     }
 
     private List<Card> GetAvailableCards()

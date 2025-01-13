@@ -42,8 +42,7 @@ public class ActivationFieldHandler : MonoBehaviour
                 return;
             }
         }
-        
-        if (!GameplayManager.Instance.IsMyTurn())
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }

@@ -55,6 +55,11 @@ public class GameplayUI : MonoBehaviour
 
     private void EndTurn()
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         GameplayManager.Instance.EndTurn();
     }
 
@@ -65,7 +70,6 @@ public class GameplayUI : MonoBehaviour
 
     public void DisableUnchainGuardianButton()
     {
-        
         unchainGuardianButton.interactable = false;
     }
 
@@ -90,5 +94,15 @@ public class GameplayUI : MonoBehaviour
     public virtual void ShowResult(bool _didIWin)
     {
         throw new Exception("Show result must be implemented");
+    }
+
+    private void Update()
+    {
+        if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+        {
+            return;
+        }
+
+        resignButton.interactable = GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction();
     }
 }

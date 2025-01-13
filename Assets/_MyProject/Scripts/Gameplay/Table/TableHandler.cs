@@ -127,22 +127,54 @@ public class TableHandler : MonoBehaviour
             {
                 continue;
             }
+            Debug.Log("Attackable place: ", _availablePlace.gameObject);
 
+            var _cardsOnPlace = _availablePlace.GetCards();
+            Debug.Log("Amount of cards: "+_cardsOnPlace.Count);
+            if (_cardsOnPlace.Count == 0)
+            {
+                Debug.Log("11111");
+                continue;
+            }
+            if (_cardsOnPlace.Count == 1)
+            {
+                Debug.Log(2222222);
+                AddCard(_availablePlace);
+            }
+            else
+            {
+                Debug.Log(333333);
+                Card _marker = (Card)_availablePlace.GetWall();
+                if (_marker)
+                {
+                Debug.Log(4444);
+                    _attackableCards.Add(_marker);
+                    continue;
+                }
+
+                Debug.Log(55555);
+                AddCard(_availablePlace);
+            }
+            
+        }
+
+        return _attackableCards;
+
+        void AddCard(TablePlaceHandler _availablePlace)
+        {
             Card _cardOnPlace = _availablePlace.GetCard();
             if (!(_cardOnPlace != null))
             {
-                continue;
+                return;
             }
 
             if (!_cardOnPlace.IsAttackable())
             {
-                continue;
+                return;
             }
 
             _attackableCards.Add(_cardOnPlace);
         }
-
-        return _attackableCards;
     }
 
     public List<TablePlaceHandler> GetPlacesAroundNoCorners(int _id, CardMovementType _movementType, int _range = 1,
@@ -533,5 +565,25 @@ public class TableHandler : MonoBehaviour
         }
 
         return baseCost;
+    }
+    
+    public (Card, Card) GetPortals(int _enterId)
+    {
+        Card _enteredPortal = null;
+        Card _exitPortal = null;
+        Portal _portal = FindObjectOfType<Portal>();
+
+        var _effectedCards = _portal.GetEffectedCards();
+        for (int _i = 0; _i < _effectedCards.Count; _i++)
+        {
+            Card _currentPortal = _effectedCards[_i];
+            if (_currentPortal.GetTablePlace().Id == _enterId)
+            {
+                _enteredPortal = _currentPortal;
+                _exitPortal = _i == 0 ? _effectedCards[1] : _effectedCards[0];
+            }
+        }
+
+        return (_enteredPortal,_exitPortal);
     }
 }

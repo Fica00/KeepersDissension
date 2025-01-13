@@ -14,8 +14,6 @@ public class ChainHandler : MonoBehaviour
         ShowCardElarged.OnHided += Show;
         ResolveMultipleActions.OnShowed += Hide;
         ResolveMultipleActions.OnHided += Show;
-        ChooseCardPanel.OnShowed += Hide;
-        ChooseCardPanel.OnClosed += Show;
         LootInfoPanel.OnClosed += Show;
         LootInfoPanel.OnShowed += Hide;
         ChooseCardImagePanel.OnShowed += Hide;
@@ -35,8 +33,6 @@ public class ChainHandler : MonoBehaviour
         ShowCardElarged.OnHided -= Show;
         ResolveMultipleActions.OnShowed -= Hide;
         ResolveMultipleActions.OnHided -= Show;
-        ChooseCardPanel.OnShowed -= Hide;
-        ChooseCardPanel.OnClosed -= Show;
         LootInfoPanel.OnClosed -= Show;
         LootInfoPanel.OnShowed -= Hide;
         ChooseCardImagePanel.OnShowed -= Hide;

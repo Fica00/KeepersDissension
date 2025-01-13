@@ -48,11 +48,21 @@ public class GameplayCheats : MonoBehaviour
 
     private void AddStrangeMatter()
     {
+        if (!CanUseCheats())
+        {
+            return;
+        }
+        
         GameplayManager.Instance.ChangeMyStrangeMatter(20);
     }
 
     private void ToggleUnlimitedActions(bool _status)
     {
+        if (!CanUseCheats())
+        {
+            return;
+        }
+        
         UnlimitedActions = _status;
         if (UnlimitedActions)
         {
@@ -62,11 +72,21 @@ public class GameplayCheats : MonoBehaviour
     
     private void ToggleCheckForCd(bool _status)
     {
+        if (!CanUseCheats())
+        {
+            return;
+        }
+        
         CheckForCd = _status;
     }
 
     private void HealGuardian()
     {
+        if (!CanUseCheats())
+        {
+            return;
+        }
+        
         Guardian _guardian = FindObjectsOfType<Guardian>().ToList().Find(_guardian => _guardian.My);
         if (_guardian==null)
         {
@@ -79,6 +99,11 @@ public class GameplayCheats : MonoBehaviour
 
     private void HealKeeper()
     {
+        if (!CanUseCheats())
+        {
+            return;
+        }
+        
         Keeper _keeper = FindObjectsOfType<Keeper>().ToList().Find(_keeper => _keeper.My);
         if (_keeper==null)
         {
@@ -97,5 +122,16 @@ public class GameplayCheats : MonoBehaviour
     private void Close()
     {
         holder.DOScale(new Vector3(1,0,1), 0.3f);
+    }
+
+    private bool CanUseCheats()
+    {
+        if (GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction())
+        {
+            return true;
+        }
+
+        DialogsManager.Instance.ShowOkDialog("You can activate cheats only during your turn");
+        return false;
     }
 }

@@ -53,6 +53,11 @@ public class TableActionsHandler : MonoBehaviour
 
     public void ShowPossibleActions(TablePlaceHandler _clickedPlace, Card _card, CardActionType _type)
     {
+        if (!GameplayManager.Instance.CanPlayerDoActions())
+        {
+            return;
+        }
+        
         ClearPossibleActions();
 
         if (!_card.IsWarrior())
@@ -208,7 +213,6 @@ public class TableActionsHandler : MonoBehaviour
         }
     }
     
-
     public void ClearPossibleActions()
     {
         foreach (var _possibleAction in possibleActions)
@@ -316,6 +320,11 @@ public class TableActionsHandler : MonoBehaviour
         }
 
         if (_placeInFront == default || _placeInFront.ContainsWarrior() || _placeInFront.IsAbility)
+        {
+            return;
+        }
+
+        if (_placeInFront.GetComponentInChildren<LifeForce>() != null)
         {
             return;
         }
@@ -610,6 +619,17 @@ public class TableActionsHandler : MonoBehaviour
 
     private void ExecuteAction(CardAction _action)
     {
+        bool _didAsk = TryAskForAction(_action);
+        if (_didAsk)
+        {
+            return;
+        }
+        
+        YesExecute(_action);
+    }
+
+    private bool TryAskForAction(CardAction _action)
+    {
         CardBase _attackingCard = tableHandler.GetPlace(_action.StartingPlaceId).GetComponentInChildren<CardBase>();
         CardBase _defendingCard = tableHandler.GetPlace(_action.FinishingPlaceId).GetComponentInChildren<CardBase>();
         if (_attackingCard != null && _defendingCard != null)
@@ -643,11 +663,11 @@ public class TableActionsHandler : MonoBehaviour
                 }
 
                 DialogsManager.Instance.ShowYesNoDialog(_question, () => { YesExecute(_action); });
-                return;
+                return true;
             }
         }
 
-        YesExecute(_action);
+        return false;
     }
 
     private void YesExecute(CardAction _action)
@@ -683,9 +703,82 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
 
-        GameplayManager.Instance.ExecuteCardAction(_newAction);
+        if (!CheckForSlowDown(_newAction))
+        {
+            return;
+        }
+
+        if (!CheckForGrounded(_newAction))
+        {
+            return;
+        }
+
+        if (!CheckForSwitchPlace(_newAction))
+        {
+            return;
+        }
+        
+        bool _continue =TryHandlePortalMove(_newAction);
+        
         CardActionsDisplay.Instance.Close();
         ClearPossibleActions();
+        
+        if (_continue)
+        {
+            GameplayManager.Instance.ExecuteCardAction(_newAction);
+        }
+
+        CardActionsDisplay.Instance.Close();
+        ClearPossibleActions();
+    }
+
+    private bool TryHandlePortalMove(CardAction _action)
+    {
+        if (!GameplayManager.Instance.IsAbilityActive<Portal>())
+        {
+            return true;
+        }
+
+        if (_action.Type != CardActionType.Move)
+        {
+            return true;
+        }
+
+        
+        Card _cardThatMoved = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        int _finishingPlace = _action.FinishingPlaceId;
+        int _startingPlace = _action.StartingPlaceId;
+        (Card _enteredPortal, Card _exitPortal) = GameplayManager.Instance.TableHandler.GetPortals(_finishingPlace);
+
+        if (_enteredPortal == null)
+        {
+            return true;
+        }
+        
+
+        int _exitIndex = GameplayManager.Instance.TableHandler.GetTeleportExitIndex(_startingPlace, _enteredPortal.GetTablePlace().Id,
+            _exitPortal.GetTablePlace().Id);
+
+        if (_exitIndex == -1 || GameplayManager.Instance.TableHandler.GetPlace(_exitIndex).IsOccupied)
+        {
+            GameplayManager.Instance.DamageCardByAbility(_cardThatMoved.UniqueId, 1, _ =>
+            {
+                RemoveAction();
+            });
+            return false;
+        }
+
+        GameplayManager.Instance.ExecuteMove(_startingPlace,_exitIndex, _cardThatMoved.UniqueId,RemoveAction);
+        return false;
+
+        void RemoveAction()
+        {
+            GameplayManager.Instance.MyPlayer.Actions--;
+            if (GameplayManager.Instance.MyPlayer.Actions>0)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
     }
 
     private bool TryToUseRam(CardAction _action)
@@ -810,6 +903,103 @@ public class TableActionsHandler : MonoBehaviour
             }
         }
 
+        return true;
+    }
+    
+    private bool CheckForSlowDown(CardAction _action)
+    {
+        if (!GameplayManager.Instance.IsAbilityActive<SlowDown>())
+        {
+            return true;
+        }
+        
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        SlowDown _slowDown = FindObjectOfType<SlowDown>();
+
+        if (_action.Type == CardActionType.Move)
+        {
+            if (!_slowDown.CanMoveCard(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
+        }
+        else if (_action.Type == CardActionType.RamAbility || _action.Type == CardActionType.SwitchPlace)
+        {
+            Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+            
+            if (!_slowDown.CanMoveCard(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
+            
+            if (!_slowDown.CanMoveCard(_card2.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by SlowDown");
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private bool CheckForGrounded(CardAction _action)
+    {
+        if (!GameplayManager.Instance.IsAbilityActive<Grounded>())
+        {
+            return true;
+        }
+        
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Grounded _grounded = FindObjectOfType<Grounded>();
+        
+        if (_action.Type == CardActionType.Move)
+        {
+            if (_grounded.IsCardEffected(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+        }
+        else if (_action.Type == CardActionType.RamAbility || _action.Type == CardActionType.SwitchPlace)
+        {
+            Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+            if (_grounded.IsCardEffected(_card1.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+            if (_grounded.IsCardEffected(_card2.UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Action blocked by Grounded");
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    private bool CheckForSwitchPlace(CardAction _action)
+    {
+        if (_action.Type != CardActionType.SwitchPlace)
+        {
+            return true;
+        }
+
+        Card _card1 = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Card _card2 = GameplayManager.Instance.GetCard(_action.SecondCardId);
+        bool _isDiagonal = GameplayManager.Instance.TableHandler.AreDiagonal(_card1.GetTablePlace(), _card2.GetTablePlace());
+        if (_isDiagonal)
+        {
+            if (_card1.MovementType == _card2.MovementType)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
         return true;
     }
 }

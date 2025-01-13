@@ -17,7 +17,6 @@ public class AbilityCard : CardBase
 
     public bool My => Data.Owner == FirebaseManager.Instance.PlayerId;
     public string UniqueId => Data.UniqueId;
-    public bool IsVetoed => Data.IsVetoed;
     public int PlaceId => Data.PlaceId;
     public bool IsActive => Data.IsActive;
     public bool IsApplied => Data.IsApplied;
@@ -40,11 +39,22 @@ public class AbilityCard : CardBase
 
     public AbilityData CreateData(string _owner)
     {
+        string _name = string.Empty;
+        foreach (var _char in gameObject.name)
+        {
+            if (!char.IsLetter(_char))
+            {
+                continue;
+            }
+
+            _name += _char;
+        }
+        
         return new AbilityData
         {
+            Name = _name,
             UniqueId = Guid.NewGuid().ToString(),
             Owner = _owner,
-            IsVetoed = false,
             RemainingCooldown = 0,
             PlaceId = -100,
             Cooldown = 0,
@@ -108,11 +118,6 @@ public class AbilityCard : CardBase
         {
             return false;
         }
-
-        if (Data.IsVetoed)
-        {
-            return false;
-        }
         
         if (Details.Type!=AbilityCardType.CrowdControl)
         {
@@ -121,18 +126,38 @@ public class AbilityCard : CardBase
         
         if (!GameplayManager.Instance.IsMyTurn())
         {
-            return false;
+            if (GameplayManager.Instance.IsKeeperResponseAction)
+            {
+            }
+            else
+            {
+                return false;
+
+            }
         }
 
         if (!My)
         {
             return false;
         }
-
-        if (GameplayManager.Instance.MyPlayer.Actions<=0)
+        
+        if (GameplayManager.Instance.IsAbilityActive<Veto>())
         {
-            DialogsManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
-            return false;
+            Veto _veto = FindObjectOfType<Veto>();
+            if (_veto.IsCardEffected(UniqueId))
+            {
+                DialogsManager.Instance.ShowOkDialog("Ability blocked by Veto");
+                return false;
+            }
+        }
+
+        if (!GameplayManager.Instance.IsMyResponseAction())
+        {
+            if (GameplayManager.Instance.MyPlayer.Actions<=0)
+            {
+                DialogsManager.Instance.ShowOkDialog("You need 1 action to activate this ability");
+                return false;
+            }
         }
 
         if (GameplayManager.Instance.IsAbilityActive<Subdued>())
@@ -152,17 +177,6 @@ public class AbilityCard : CardBase
             return;
         }
         
-        if (GameplayManager.Instance.IsCardTaxed(UniqueId))
-        {
-            if (GameplayManager.Instance.MyStrangeMatter()<=0)
-            {
-                DialogsManager.Instance.ShowOkDialog("You don't have enough strange matter to pay Tax");
-                return;
-            }
-
-            GameplayManager.Instance.ChangeMyStrangeMatter(-1);
-        }
-        
         GameplayManager.Instance.ActivateAbility(UniqueId);
     }
 
@@ -175,13 +189,9 @@ public class AbilityCard : CardBase
 
     public void Activate()
     {
-        if (Data.IsVetoed)
-        {
-            return;
-        }
-
         if (IsActive)
         {
+            effect.RemoveAction();
             return;
         }
         

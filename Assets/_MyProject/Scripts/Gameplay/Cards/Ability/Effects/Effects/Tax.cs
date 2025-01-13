@@ -5,9 +5,9 @@ public class Tax : AbilityEffect
 {
     protected override void ActivateForOwner()
     {
-        Activate();
         SetIsActive(true);
         ManageActiveDisplay(true);
+        Activate();
     }
 
     private void Activate()
@@ -49,14 +49,20 @@ public class Tax : AbilityEffect
             _cards.Add(_card);
         }
         
-        ChooseCardPanel.Instance.ShowCards(_cards,SetAsTax);
+        ChooseCardImagePanel.Instance.Show(_cards,SetAsTax);
     }
     
     void SetAsTax(CardBase _selectedCard)
     {
-        AddEffectedCard((_selectedCard as Card)?.UniqueId);
+        string _uniqueId = ((AbilityCard)_selectedCard).UniqueId;
+        AddEffectedCard(_uniqueId);
         OnActivated?.Invoke();
         RemoveAction();
+    }
+
+    public bool IsCardEffected(string _uniqueId)
+    {
+        return EffectedCards[0] == _uniqueId;
     }
 
     protected override void CancelEffect()
