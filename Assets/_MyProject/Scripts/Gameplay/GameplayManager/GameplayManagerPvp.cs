@@ -1164,7 +1164,14 @@ public class GameplayManagerPvp : GameplayManager
     {
         var _card = GetCard(_cardId);
         var _availablePlaces = GetAvailablePlaces(_card.GetTablePlace().Id);
-        StartCoroutine(SelectPlace(_availablePlaces, true, DoPlaceKeeper));
+        if (_availablePlaces.Count==1)
+        {
+            DoPlaceKeeper(_availablePlaces[0].Id);
+        }
+        else
+        {
+            StartCoroutine(SelectPlace(_availablePlaces, true, DoPlaceKeeper));
+        }
 
         void DoPlaceKeeper(int _placeId)
         {
