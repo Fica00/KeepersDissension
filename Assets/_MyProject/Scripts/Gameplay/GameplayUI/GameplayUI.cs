@@ -115,5 +115,20 @@ public class GameplayUI : MonoBehaviour
         {
             resignButton.interactable = true;
         }
+
+        if (GameplayManager.Instance.IsRoomOwner())
+        {
+            if (GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.Player1UseKeeperReposition)
+            {
+                resignButton.interactable = true;
+            }
+        }
+        else
+        {
+            if (GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.Player2UseKeeperReposition)
+            {
+                resignButton.interactable = true;
+            }
+        }
     }
 }

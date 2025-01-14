@@ -1270,4 +1270,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual bool IsKeeperRepositionAction()
+    {
+        throw new Exception();
+    }
 }

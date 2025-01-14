@@ -1213,35 +1213,39 @@ public class GameplayManagerPvp : GameplayManager
 
         foreach (var _tier in _tierLists)
         {
-            var _emptyPlaces = GetEmptyPlaces(_tier);
+            List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(_tier);
+
+            if (_tier.Contains(_startingPlace))
+            {
+                TablePlaceHandler _currentPlace = TableHandler.GetPlace(_startingPlace);
+                _emptyPlaces.Add(_currentPlace);
+            }
+
             if (_emptyPlaces.Count > 0)
             {
-                _emptyPlaces.Add(TableHandler.GetPlace(_startingPlace));
                 return _emptyPlaces;
             }
         }
 
-        List<TablePlaceHandler> _tier6 = new();
-        for (int _i = 8; _i <= 56; _i++)
+        List<int> _tier6Ids = Enumerable.Range(8, 56 - 8 + 1).ToList();
+        List<TablePlaceHandler> _tier6Places = GetEmptyPlaces(_tier6Ids);
+
+        // If _startingPlace is within 8..56, it belongs to tier 6, so include it
+        if (_tier6Ids.Contains(_startingPlace))
         {
-            TablePlaceHandler _place = TableHandler.GetPlace(_i);
-            if (!_place.IsOccupied)
-            {
-                _tier6.Add(_place);
-            }
+            _tier6Places.Add(TableHandler.GetPlace(_startingPlace));
         }
 
-        _tier6.Add(TableHandler.GetPlace(_startingPlace));
-
-        return _tier6;
+        return _tier6Places;
 
 
         List<TablePlaceHandler> GetEmptyPlaces(List<int> _placeIds)
         {
-            List<TablePlaceHandler> _results = new();
+            List<TablePlaceHandler> _results = new List<TablePlaceHandler>();
             foreach (int _placeId in _placeIds)
             {
                 TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+                // Add only if NOT occupied
                 if (!_place.IsOccupied)
                 {
                     _results.Add(_place);
@@ -2718,5 +2722,10 @@ public class GameplayManagerPvp : GameplayManager
     public override GameplayState GetGameplayState()
     {
         return RoomData.GameplayState;
+    }
+
+    public override bool IsKeeperRepositionAction()
+    {
+        return GetGameplaySubState() is GameplaySubState.Player1UseKeeperReposition or GameplaySubState.Player2UseKeeperReposition; 
     }
 }
