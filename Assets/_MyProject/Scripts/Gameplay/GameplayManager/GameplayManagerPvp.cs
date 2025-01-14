@@ -2671,7 +2671,12 @@ public class GameplayManagerPvp : GameplayManager
             if (_subState == GameplaySubState.Player2DeliveryReposition)
             {
                 return false;
-            }    
+            } 
+            
+            if (_subState == GameplaySubState.Player2UseKeeperReposition)
+            {
+                return false;
+            }  
         }
         else
         {
@@ -2679,6 +2684,11 @@ public class GameplayManagerPvp : GameplayManager
             {
                 return false;
             }
+            
+            if (_subState == GameplaySubState.Player1UseKeeperReposition)
+            {
+                return false;
+            }  
         }
 
         return true;
