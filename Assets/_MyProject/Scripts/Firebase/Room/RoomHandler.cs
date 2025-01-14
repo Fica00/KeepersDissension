@@ -147,6 +147,7 @@ namespace FirebaseMultiplayer.Room
             CheckForGameEnd(_currentRoomState,_data);
             CheckForAbilityDisplay(_currentRoomState,_data);
             CheckForDelivery(_currentRoomState, _data);
+            CheckForPlaceKeeper(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
             CheckForComrade(_currentRoomState, _data);
@@ -397,6 +398,37 @@ namespace FirebaseMultiplayer.Room
             }
 
             void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForPlaceKeeper(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1UseKeeperReposition)
+                    {
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2UseKeeperReposition)
+                    {
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+
+            void FinishPlacingKeeper()
             {
                 roomData.GameplaySubState = _currentState;
                 RoomUpdater.Instance.ForceUpdate();
@@ -739,6 +771,7 @@ namespace FirebaseMultiplayer.Room
                 GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
             }
         }        
+        
         private void CheckForMessages(RoomData _currentRoomData,RoomData _data)
         {
             if (_data.BoardData.SaySomethingData == null)
