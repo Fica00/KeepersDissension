@@ -46,7 +46,11 @@ public class MageCardStun : CardSpecialAbility
 
     private void YesUseStunAbility()
     {
-        SetCanUseAbility(false);
+        if (Card is Keeper)
+        {
+            SetCanUseAbility(false);
+        }
+        
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, 2, PlaceLookFor.Occupied, Card.MovementType, false,
             LookForCardOwner.Both, SelectedSpot, _ignoreWalls: true);
     }
