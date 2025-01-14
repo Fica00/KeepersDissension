@@ -104,5 +104,9 @@ public class GameplayUI : MonoBehaviour
         }
 
         resignButton.interactable = GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction();
+        if (GameplayManager.Instance.IsResponseAction() && !GameplayManager.Instance.IsMyResponseAction())
+        {
+            resignButton.interactable = false;
+        }
     }
 }

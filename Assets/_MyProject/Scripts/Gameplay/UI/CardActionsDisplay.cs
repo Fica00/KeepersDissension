@@ -254,6 +254,12 @@ public class CardActionsDisplay : MonoBehaviour
             {
                 continue;
             }
+            if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+            {
+                Close();
+                return;
+            }
+            
             Transform _abilityHolder = _cardAbility.IsBaseCardsEffect ? myAbilitiesHolder : effectAbilitiesHolder;
             AbilityTrigger _abilityTrigger = Instantiate(abilityTriggerPrefab, _abilityHolder);
             _abilityTrigger.Setup(_cardAbility.Sprite, _cardAbility.CanUseAbility,() =>
