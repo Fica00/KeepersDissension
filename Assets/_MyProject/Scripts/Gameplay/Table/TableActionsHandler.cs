@@ -57,6 +57,11 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+        {
+            return;
+        }
         
         ClearPossibleActions();
 
