@@ -60,6 +60,7 @@ public class TableActionsHandler : MonoBehaviour
 
         if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
         {
+            CardActionsDisplay.Instance.Close();
             return;
         }
         
