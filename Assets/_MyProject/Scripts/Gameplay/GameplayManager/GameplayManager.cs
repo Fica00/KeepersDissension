@@ -1265,4 +1265,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual void SelectPlaceForKeeper(string _cardId, Action _callBack)
+    {
+        throw new Exception();
+    }
 }

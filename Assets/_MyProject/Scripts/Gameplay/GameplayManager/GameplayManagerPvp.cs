@@ -764,7 +764,7 @@ public class GameplayManagerPvp : GameplayManager
 
             if (_possiblePlaces.Count==0)
             {
-                _lifeForcePlaces = new() { 19, 18, 17 };
+                _lifeForcePlaces = new List<int> { 19, 18, 17 };
                 foreach (var _placeId in _lifeForcePlaces)
                 {
                     var _place = TableHandler.GetPlace(_placeId);
@@ -1033,7 +1033,7 @@ public class GameplayManagerPvp : GameplayManager
                 }
             }
 
-            PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
+            StartCoroutine(PlaceKeeperOnTable(_keeper, FinishPlaceKeeper));
         }
         else
         {
@@ -1128,19 +1128,62 @@ public class GameplayManagerPvp : GameplayManager
         });
     }
 
-    private void PlaceKeeperOnTable(CardBase _card, Action _callBack)
+    private IEnumerator PlaceKeeperOnTable(Keeper _card, Action _callBack)
     {
-        List<int> _placesNearLifeForce;
-
+        bool _waitForSomething = false;
         if (_card.GetIsMy())
         {
-            _placesNearLifeForce = new List<int>()
+            SelectPlaceForKeeper(_card.UniqueId, ContinueWithExecution);
+            yield return new WaitUntil(() => _waitForSomething);
+        }
+        else
+        {
+            var _currentState = GetGameplaySubState();
+            if (RoomHandler.IsOwner)
             {
-                10,
-                12,
-                18,
-                17,
-                19,
+                SetGameplaySubState(GameplaySubState.Player2UseKeeperReposition);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player1UseKeeperReposition);
+            }
+
+            RoomUpdater.Instance.ForceUpdate();
+            yield return new WaitUntil(() => GetGameplaySubState() == _currentState);
+        }
+        
+        _callBack?.Invoke();
+
+        void ContinueWithExecution()
+        {
+            _waitForSomething = true;
+        }
+    }
+
+    public override void SelectPlaceForKeeper(string _cardId, Action _callBack)
+    {
+        var _card = GetCard(_cardId);
+        var _availablePlaces = GetAvailablePlaces(_card.GetTablePlace().Id);
+        StartCoroutine(SelectPlace(_availablePlaces, true, DoPlaceKeeper));
+
+        void DoPlaceKeeper(int _placeId)
+        {
+            ExecuteMove(_card.GetTablePlace().Id, _placeId, _cardId, _callBack);
+        }
+    }
+
+    private List<TablePlaceHandler> GetAvailablePlaces(int _startingPlace)
+    {
+        List<List<int>> _tierLists = new()
+        {
+            new List<int> { 10, 12 },
+
+            new List<int> { 17 },
+
+            new List<int> { 18, 19 },
+
+            new List<int>
+            {
                 9,
                 13,
                 19,
@@ -1150,81 +1193,65 @@ public class GameplayManagerPvp : GameplayManager
                 25,
                 26,
                 27
-            };
-        }
-        else
-        {
-            _placesNearLifeForce = new List<int>()
-            {
-                54,
-                52,
-                46,
-                47,
-                45,
-                55,
-                51,
-                45,
-                48,
-                41,
-                40,
-                39,
-                38,
-                37
-            };
-        }
+            },
 
-
-        foreach (var _placeNear in _placesNearLifeForce)
-        {
-            if (TryPlaceKeeper(_placeNear))
+            new List<int>
             {
-                ReplaceKeeper(_card, _placeNear, _callBack);
-                return;
+                14,
+                8,
+                15,
+                21,
+                28,
+                27,
+                26,
+                25,
+                24,
+                23,
+                22
+            },
+        };
+
+        foreach (var _tier in _tierLists)
+        {
+            var _emptyPlaces = GetEmptyPlaces(_tier);
+            if (_emptyPlaces.Count > 0)
+            {
+                _emptyPlaces.Add(TableHandler.GetPlace(_startingPlace));
+                return _emptyPlaces;
             }
         }
 
-        if (_card.GetIsMy())
+        List<TablePlaceHandler> _tier6 = new();
+        for (int _i = 8; _i <= 56; _i++)
         {
-            for (int _i = 8; _i < 57; _i++)
+            TablePlaceHandler _place = TableHandler.GetPlace(_i);
+            if (!_place.IsOccupied)
             {
-                if (TryPlaceKeeper(_i))
+                _tier6.Add(_place);
+            }
+        }
+
+        _tier6.Add(TableHandler.GetPlace(_startingPlace));
+
+        return _tier6;
+
+
+        List<TablePlaceHandler> GetEmptyPlaces(List<int> _placeIds)
+        {
+            List<TablePlaceHandler> _results = new();
+            foreach (int _placeId in _placeIds)
+            {
+                TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+                if (!_place.IsOccupied)
                 {
-                    ReplaceKeeper(_card, _i, _callBack);
-                    return;
+                    _results.Add(_place);
                 }
             }
-        }
-        else
-        {
-            for (int _i = 57; _i > 8; _i--)
-            {
-                if (TryPlaceKeeper(_i))
-                {
-                    ReplaceKeeper(_card, _i, _callBack);
-                    return;
-                }
-            }
+
+            return _results;
         }
     }
 
-    private bool TryPlaceKeeper(int _placeIndex)
-    {
-        TablePlaceHandler _place = TableHandler.GetPlace(_placeIndex);
-        if (!_place.IsOccupied)
-        {
-            return true;
-        }
-
-        foreach (var _cardOnPlace in _place.GetCards())
-        {
-            if (_cardOnPlace is Keeper { My: true })
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private void HandleLoot(Card _attackingCard, Card _defendingCard, int _placeOfDefendingCard)
     {
