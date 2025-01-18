@@ -676,6 +676,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   object1: {fileID: 89120718}
   object2: {fileID: 2043192626}
+  allowOpeningAtAnyTime: 1
 --- !u!1 &92138208
 GameObject:
   m_ObjectHideFlags: 0
@@ -35050,7 +35051,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -10414154
+      value: -10430801
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
