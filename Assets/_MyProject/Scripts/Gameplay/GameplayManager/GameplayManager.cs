@@ -84,6 +84,12 @@ public class GameplayManager : MonoBehaviour
         ShowGuardianChains();
         
         SetGameState(GameplayState.Gameplay);
+
+        yield return new WaitForSeconds(1);
+        if (IsRoomOwner())
+        {
+            RoomUpdater.Instance.ForceUpdate();   
+        }
         
         while (!HasGameEnded())
         {
@@ -91,6 +97,7 @@ public class GameplayManager : MonoBehaviour
             yield return WaitUntilTheEndOfTurn();
         }
     }
+    
 
     private void ShowGuardianChains()
     {
