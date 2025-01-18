@@ -37,6 +37,7 @@ public class GameplayManager : MonoBehaviour
     protected bool IsFallingResponse;
     
     public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    private bool isFirstUpdate = true;
     
     protected virtual void Awake()
     {
@@ -86,10 +87,6 @@ public class GameplayManager : MonoBehaviour
         SetGameState(GameplayState.Gameplay);
 
         yield return new WaitForSeconds(1);
-        if (IsRoomOwner())
-        {
-            RoomUpdater.Instance.ForceUpdate();   
-        }
         
         while (!HasGameEnded())
         {
@@ -154,6 +151,12 @@ public class GameplayManager : MonoBehaviour
             {
                 DidIFinishMyTurn = true;
                 SetPlayersTurn(false);
+            }
+
+            if (isFirstUpdate && IsRoomOwner())
+            {
+                isFirstUpdate = false;
+                RoomUpdater.Instance.ForceUpdate();
             }
             yield return new WaitUntil(() => DidIFinishMyTurn);
             MyPlayer.EndedTurn();
