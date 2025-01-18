@@ -143,18 +143,6 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        if (GameplayManager.Instance.IsResponseAction())
-        {
-            if (!GameplayManager.Instance.IsMyResponseAction())
-            {
-                return;
-            }
-        }
-        else if (!GameplayManager.Instance.IsMyTurn())
-        {
-            return;
-        }
-        
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;

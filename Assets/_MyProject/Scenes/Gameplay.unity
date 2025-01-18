@@ -6490,7 +6490,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.21960784}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -10244,6 +10244,7 @@ GameObject:
   - component: {fileID: 1390003376}
   - component: {fileID: 1390003378}
   - component: {fileID: 1390003377}
+  - component: {fileID: 1390003379}
   m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
@@ -10309,6 +10310,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1390003375}
   m_CullTransparentMesh: 1
+--- !u!114 &1390003379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1390003375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba63fb9b2a142344a963b2deb668b53d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reference: {fileID: 873876040}
 --- !u!1 &1413508344
 GameObject:
   m_ObjectHideFlags: 0
@@ -35051,7 +35065,7 @@ PrefabInstance:
     - target: {fileID: 4273539018917159689, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -10430801
+      value: -10501656
       objectReference: {fileID: 0}
     - target: {fileID: 4305589239897455956, guid: 2c04be48ad053de4e95ecbbdbb611d2d,
         type: 3}
