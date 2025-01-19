@@ -2473,7 +2473,8 @@ public class GameplayManagerPvp : GameplayManager
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
 
-    public override void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
+    public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
+            "")
     {
         if (IsAbilityActive<HighStakes>())
         {
@@ -2484,7 +2485,15 @@ public class GameplayManagerPvp : GameplayManager
 
         Card _card = GetCard(_uniqueId);
         _card.ChangeHealth(-_damage);
+        bool _didGiveResponseAction = false;
+        if (_checkForResponse)
+        {
+            Card _attackerCard = GetCard(_attacker);
+            _didGiveResponseAction = CheckForResponseAction(_attackerCard, _card);
+        }
         CheckIfDefenderIsDestroyed(_card, _callBack);
+
+        return _didGiveResponseAction;
     }
 
     public override void MarkMarkerAsBomb(string _cardId)

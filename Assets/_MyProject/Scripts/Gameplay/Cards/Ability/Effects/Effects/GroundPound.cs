@@ -13,11 +13,8 @@ public class GroundPound : AbilityEffect
 
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            GameplayManager.Instance.ExecuteAttack(_keeper.UniqueId, _cardOnPlace.UniqueId, () =>
-            {
-                GameplayManager.Instance.HideCardActions();
-            });
-        }
+            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, _keeper.Damage, _ => { GameplayManager.Instance.HideCardActions();});
+        }        
 
         MoveToActivationField();
         OnActivated?.Invoke();

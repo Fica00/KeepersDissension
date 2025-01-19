@@ -26,7 +26,6 @@ public class Guardian: Card
 
         if (GameplayManager.Instance.MyPlayer.Actions != 1 || GameplayCheats.UnlimitedActions)
         {
-            Debug.Log("Added speed");
             ChangeSpeed(1);
         }
         OnUnchained?.Invoke();

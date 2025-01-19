@@ -39,12 +39,15 @@ public class OrgCard : CardSpecialAbility
     private void YesUseGroundPoundAttack()
     {
         PlayAudio();
-        OrgAttack();
+        bool _didGetResponseAction = OrgAttack();
         var _player = GetPlayer();
         _player.Actions--;
-        if (_player.Actions>0)
+        if (!_didGetResponseAction)
         {
-            RoomUpdater.Instance.ForceUpdate();
+            if (_player.Actions>0)
+            {
+                RoomUpdater.Instance.ForceUpdate();
+            }    
         }
     }
 
@@ -69,15 +72,24 @@ public class OrgCard : CardSpecialAbility
     }
     
 
-    private void OrgAttack()
+    private bool OrgAttack()
     {
         int _attackingPlaceId = Card.GetTablePlace().Id;
         List<Card> _availablePlaces = GameplayManager.Instance.TableHandler.GetAttackableCards(_attackingPlaceId,
                 CardMovementType.EightDirections);
 
+        bool _didGetResponseAction = false;
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            GameplayManager.Instance.ExecuteAttack(Card.UniqueId,_cardOnPlace.UniqueId, () => { GameplayManager.Instance.HideCardActions();});
+            bool _gaveResponse = GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage, _ => { GameplayManager.Instance.HideCardActions
+                    ();},
+                true, Card.UniqueId);
+            if (_gaveResponse)
+            {
+                _didGetResponseAction = true;
+            }
         }
+
+        return _didGetResponseAction;
     }
 }
