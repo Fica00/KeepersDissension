@@ -77,7 +77,7 @@ public class OrgCard : CardSpecialAbility
 
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage, _ => { GameplayManager.Instance.HideCardActions();});
+            GameplayManager.Instance.ExecuteAttack(Card.UniqueId,_cardOnPlace.UniqueId, () => { GameplayManager.Instance.HideCardActions();});
         }
     }
 }
