@@ -374,6 +374,11 @@ public class GameplayManagerPvp : GameplayManager
     
     private void TryToApplyWallAbility(Card _defendingCard, Card _attackingCard, Action _callBack, int _defenderPlace)
     {
+        if (_defenderPlace == -1)
+        {
+            _callBack?.Invoke();
+            return;    
+        }
         if (_defendingCard is not Wall _wall)
         {
             _callBack?.Invoke();
@@ -2496,7 +2501,11 @@ public class GameplayManagerPvp : GameplayManager
             return false;
         }
 
-        _defenderPlace = _defendingCard.GetTablePlace().Id;
+        if (_defendingCard.GetTablePlace())
+        {
+            _defenderPlace = _defendingCard.GetTablePlace().Id;
+        }
+        
         _defendingCard.ChangeHealth(-_damage);
         bool _didGiveResponseAction = false;
         if (_checkForResponse)
