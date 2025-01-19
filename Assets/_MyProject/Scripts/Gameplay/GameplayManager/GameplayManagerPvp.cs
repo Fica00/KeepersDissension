@@ -2272,11 +2272,14 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    private IEnumerator PlaceRestOfStartingCards(Action _callBack)
+    private IEnumerator PlaceRestOfStartingCards(Action _callBack, bool _showOkDialog = true)
     {
         yield return PlaceKeeper();
-        DialogsManager.Instance.ShowOkBigDialog(
-            "Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+        if (_showOkDialog)
+        {
+            DialogsManager.Instance.ShowOkBigDialog(
+                "Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+        }
         yield return RequestCardToBePlaced(14, CardType.Minion);
         yield return RequestCardToBePlaced(13, CardType.Minion);
         yield return RequestCardToBePlaced(12, CardType.Minion);
@@ -2284,10 +2287,10 @@ public class GameplayManagerPvp : GameplayManager
         yield return RequestCardToBePlaced(9, CardType.Minion);
         yield return RequestCardToBePlaced(8, CardType.Minion);
         MyPlayer.HideCards();
+        _callBack?.Invoke();
 
         IEnumerator PlaceKeeper()
         {
-            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler> { TableHandler.GetPlace(10), TableHandler.GetPlace(12) };
             foreach (var _available in _availablePlaces)
             {
@@ -2296,6 +2299,8 @@ public class GameplayManagerPvp : GameplayManager
                     yield break;
                 }
             }
+            
+            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             foreach (var _availablePlace in _availablePlaces)
             {
                 _availablePlace.SetColor(Color.green);
@@ -2351,10 +2356,10 @@ public class GameplayManagerPvp : GameplayManager
                 CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
                 CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                 _card.CardData.PlaceId = -100;
-                _card.PositionInHand();
+                _card.CardData.CardPlace = CardPlace.Deck;
                 _card.transform.SetParent(null);
                 _card.transform.position = new Vector3(-10000, 0, 0);
-                StartCoroutine(PlaceRestOfStartingCards(_callBack));
+                StartCoroutine(PlaceRestOfStartingCards(_callBack,false));
             }
         }
 
@@ -2408,10 +2413,10 @@ public class GameplayManagerPvp : GameplayManager
                     CardInHandDisplay.OnClicked -= SelectCard;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                     _card.CardData.PlaceId = -100;
-                    _card.PositionInHand();
+                    _card.CardData.CardPlace = CardPlace.Deck;
                     _card.transform.SetParent(null);
                     _card.transform.position = new Vector3(-10000, 0, 0);
-                    StartCoroutine(PlaceRestOfStartingCards(_callBack));
+                    StartCoroutine(PlaceRestOfStartingCards(_callBack,false));
                 }
             }
         }
