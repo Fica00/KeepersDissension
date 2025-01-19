@@ -2244,10 +2244,12 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override IEnumerator PlaceMinions()
     {
+        bool _canContinue = false;
         SetGameplaySubState(GameplaySubState.Player1SelectMinions);
         if (IsMyTurn())
         {
-            yield return PlaceRestOfStartingCards();
+            StartCoroutine(PlaceRestOfStartingCards(Continue));
+            yield return new WaitUntil(() => _canContinue);
             SetGameplaySubState(GameplaySubState.Player2SelectMinions);
             RoomUpdater.Instance.ForceUpdate();
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedSelectingMinions);
@@ -2255,16 +2257,22 @@ public class GameplayManagerPvp : GameplayManager
         else
         {
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.Player2SelectMinions);
-            yield return PlaceRestOfStartingCards();
+            StartCoroutine(PlaceRestOfStartingCards(Continue));
+            yield return new WaitUntil(() => _canContinue);
             SetGameplaySubState(GameplaySubState.FinishedSelectingMinions);
             RoomUpdater.Instance.ForceUpdate();
         }
 
         SetGameplaySubState(GameplaySubState.Playing);
         yield return new WaitForSeconds(1f);
+
+        void Continue()
+        {
+            _canContinue = true;
+        }
     }
 
-    private IEnumerator PlaceRestOfStartingCards()
+    private IEnumerator PlaceRestOfStartingCards(Action _callBack)
     {
         yield return PlaceKeeper();
         DialogsManager.Instance.ShowOkBigDialog(
@@ -2323,41 +2331,30 @@ public class GameplayManagerPvp : GameplayManager
             
             void UndoPlacement(TablePlaceHandler _selectedPlace)
             {
-                StartCoroutine(UndoPlacementRoutine());
-                IEnumerator UndoPlacementRoutine()
+                if (!_selectedPlace.IsOccupied)
                 {
-                    if (!_selectedPlace.IsOccupied)
-                    {
-                        yield break;
-                    }
+                    return;
+                }
                     
-                    Card _card = _selectedPlace.GetCard();
-                    if (_card is LifeForce or Guardian)
-                    {
-                        yield break;
-                    }
+                Card _card = _selectedPlace.GetCard();
+                if (_card is LifeForce or Guardian)
+                {
+                    return;
+                }
                 
-                    foreach (var _availablePlace in _availablePlaces)
-                    {
-                        _availablePlace.SetColor(Color.white);
-                    }
+                foreach (var _availablePlace in _availablePlaces)
+                {
+                    _availablePlace.SetColor(Color.white);
+                }
 
                     
-                    CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
-                    CardTableInteractions.OnPlaceClicked -= UndoPlacement;
-                    _card.CardData.PlaceId = -100;
-                    _card.PositionInHand();
-                    _card.transform.SetParent(null);
-                    _card.transform.position = new Vector3(-10000, 0, 0);
-                    if (_card is Keeper)
-                    {
-                        yield return PlaceKeeper();
-                    }
-                    else
-                    {
-                        yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
-                    }
-                }
+                CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
+                _card.CardData.PlaceId = -100;
+                _card.PositionInHand();
+                _card.transform.SetParent(null);
+                _card.transform.position = new Vector3(-10000, 0, 0);
+                StartCoroutine(PlaceRestOfStartingCards(_callBack));
             }
         }
 
@@ -2408,23 +2405,13 @@ public class GameplayManagerPvp : GameplayManager
                     }
                     
                     _place.SetColor(Color.white);
-                
                     CardInHandDisplay.OnClicked -= SelectCard;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                     _card.CardData.PlaceId = -100;
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
                     _card.transform.position = new Vector3(-10000, 0, 0);
-                    if (_card is Keeper)
-                    {
-                        yield return PlaceKeeper();
-                    }
-                    else
-                    {
-                        yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
-                    }
-
-                    yield return RequestCardToBePlaced(_placeId, CardType.Minion);
+                    StartCoroutine(PlaceRestOfStartingCards(_callBack));
                 }
             }
         }
