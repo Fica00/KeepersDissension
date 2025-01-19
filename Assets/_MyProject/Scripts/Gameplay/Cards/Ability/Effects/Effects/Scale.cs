@@ -8,7 +8,7 @@ public class Scale : AbilityEffect
         SetIsActive(true);
         ScalerScale _scale = _keeper.EffectsHolder.AddComponent<ScalerScale>();
         _scale.IsBaseCardsEffect = false;
-        _scale.Setup(true,null);
+        _scale.Setup(false,null);
         OnActivated?.Invoke();
         ManageActiveDisplay(true);
         RemoveAction();
