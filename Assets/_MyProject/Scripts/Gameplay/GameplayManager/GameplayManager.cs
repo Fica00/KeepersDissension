@@ -36,7 +36,27 @@ public class GameplayManager : MonoBehaviour
     protected bool IsAnimating; 
     protected bool IsFallingResponse;
     
-    public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    public bool IsKeeperResponseAction
+    {
+        get
+        {
+            foreach (var _keeper in FindObjectsOfType<Keeper>())
+            {
+                if (!_keeper.GetIsMy())
+                {
+                    continue;
+                }
+
+                if (_keeper.UniqueId == IdOfCardWithResponseAction())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
     private bool isFirstUpdate = true;
     
     protected virtual void Awake()

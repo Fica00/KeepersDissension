@@ -486,8 +486,6 @@ public class TableActionsHandler : MonoBehaviour
             return;
         }
         
-        Debug.Log("------ Checking place: ", _attackablePlace.gameObject);
-
         if (!_attackablePlace.IsOccupied)
         {
             if (!_attackablePlace.ContainsMarker)
@@ -520,7 +518,7 @@ public class TableActionsHandler : MonoBehaviour
 
                 }
 
-                if (_placeWithWall.GetCards().Count > 1 && _attackedCard is Minion && _attackingCard.Range <= 1)
+                if (_placeWithWall.GetCards().Count > 1 && _attackedCard.IsWarrior() && _attackingCard.Range <= 1)
                 {
                     continue;
                 }
