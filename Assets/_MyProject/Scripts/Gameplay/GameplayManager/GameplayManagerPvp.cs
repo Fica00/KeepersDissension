@@ -1490,6 +1490,7 @@ public class GameplayManagerPvp : GameplayManager
 
             SetGameplaySubState(GameplaySubState.Playing);
             RoomUpdater.Instance.ForceUpdate();
+            // AudioManager.Instance.PlaySoundEffect("EndTurn");
             return;
         }
 
@@ -2300,6 +2301,7 @@ public class GameplayManagerPvp : GameplayManager
                 }
             }
             
+            MyPlayer.HideCards();
             DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             foreach (var _availablePlace in _availablePlaces)
             {
