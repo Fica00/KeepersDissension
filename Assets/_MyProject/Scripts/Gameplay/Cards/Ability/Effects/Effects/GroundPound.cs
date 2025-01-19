@@ -16,9 +16,7 @@ public class GroundPound : AbilityEffect
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
             bool _gaveResponse = GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, _keeper.Damage, _ => { GameplayManager.Instance
-                    .HideCardActions
-                    ();},
-                true, _keeper.UniqueId);
+                    .HideCardActions();}, true, _keeper.UniqueId, true);
             if (_gaveResponse)
             {
                 _didGetResponseAction = true;
