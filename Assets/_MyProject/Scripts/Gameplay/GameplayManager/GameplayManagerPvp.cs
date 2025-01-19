@@ -2357,8 +2357,6 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
                     }
-                    CardTableInteractions.OnPlaceClicked += DoSelectPlace;
-                    CardTableInteractions.OnPlaceClicked += UndoPlacement;
                 }
             }
         }
@@ -2425,8 +2423,8 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
                     }
-                    CardInHandDisplay.OnClicked += SelectCard;
-                    CardTableInteractions.OnPlaceClicked += UndoPlacement;
+
+                    yield return RequestCardToBePlaced(_placeId, CardType.Minion);
                 }
             }
         }
