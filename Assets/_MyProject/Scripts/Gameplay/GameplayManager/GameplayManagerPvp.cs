@@ -2294,6 +2294,7 @@ public class GameplayManagerPvp : GameplayManager
             }
 
             CardTableInteractions.OnPlaceClicked += DoSelectPlace;
+            CardTableInteractions.OnPlaceClicked += UndoPlacement;
             bool _hasSelectedPlace = false;
             int _selectedPlaceId = 0;
 
@@ -2315,8 +2316,38 @@ public class GameplayManagerPvp : GameplayManager
                 }
 
                 CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                 _selectedPlaceId = _place.Id;
                 _hasSelectedPlace = true;
+            }
+            
+            void UndoPlacement(TablePlaceHandler _selectedPlace)
+            {
+                StartCoroutine(UndoPlacementRoutine());
+                IEnumerator UndoPlacementRoutine()
+                {
+                    if (!_selectedPlace.IsOccupied)
+                    {
+                        yield break;
+                    }
+                
+                    CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                    CardTableInteractions.OnPlaceClicked -= UndoPlacement;
+                    Card _card = _selectedPlace.GetCard();
+                    _card.PositionInHand();
+                    _card.transform.SetParent(null);
+                    _card.transform.position = new Vector3(-10000, 0, 0);
+                    if (_card is Keeper)
+                    {
+                        yield return PlaceKeeper();
+                    }
+                    else
+                    {
+                        yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
+                    }
+                    CardTableInteractions.OnPlaceClicked += DoSelectPlace;
+                    CardTableInteractions.OnPlaceClicked += UndoPlacement;
+                }
             }
         }
 
@@ -2367,7 +2398,14 @@ public class GameplayManagerPvp : GameplayManager
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
                     _card.transform.position = new Vector3(-10000, 0, 0);
-                    yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
+                    if (_card is Keeper)
+                    {
+                        yield return PlaceKeeper();
+                    }
+                    else
+                    {
+                        yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
+                    }
                     CardInHandDisplay.OnClicked += SelectCard;
                     CardTableInteractions.OnPlaceClicked += UndoPlacement;
                 }
