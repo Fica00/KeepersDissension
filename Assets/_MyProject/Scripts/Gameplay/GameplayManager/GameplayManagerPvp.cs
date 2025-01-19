@@ -2332,7 +2332,7 @@ public class GameplayManagerPvp : GameplayManager
                     }
                     
                     Card _card = _selectedPlace.GetCard();
-                    if (_card is not Keeper and Minion)
+                    if (_card is LifeForce or Guardian)
                     {
                         yield break;
                     }
@@ -2404,7 +2404,7 @@ public class GameplayManagerPvp : GameplayManager
                         yield break;
                     }
                     Card _card = _selectedPlace.GetCard();
-                    if (_card is not Keeper and Minion)
+                    if (_card is LifeForce or Guardian)
                     {
                         yield break;
                     }
