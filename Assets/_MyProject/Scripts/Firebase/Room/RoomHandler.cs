@@ -382,6 +382,7 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player1DeliveryReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
                     }
                 }
@@ -392,6 +393,7 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player2DeliveryReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
                     }
                 }
@@ -413,6 +415,7 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player1UseKeeperReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
                     }
                 }
@@ -423,6 +426,7 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player2UseKeeperReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
                     }
                 }

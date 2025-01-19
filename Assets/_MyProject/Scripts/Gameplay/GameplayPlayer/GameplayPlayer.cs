@@ -67,6 +67,7 @@ public class GameplayPlayer : MonoBehaviour
         if (isMy)
         {
             GameplayManager.Instance.ClearChangeSpriteData();
+            AudioManager.Instance.PlaySoundEffect("EndTurn");
         }
         
         OnStartedTurn?.Invoke();

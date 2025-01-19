@@ -1490,7 +1490,7 @@ public class GameplayManagerPvp : GameplayManager
 
             SetGameplaySubState(GameplaySubState.Playing);
             RoomUpdater.Instance.ForceUpdate();
-            // AudioManager.Instance.PlaySoundEffect("EndTurn");
+            AudioManager.Instance.PlaySoundEffect("EndTurn");
             return;
         }
 
