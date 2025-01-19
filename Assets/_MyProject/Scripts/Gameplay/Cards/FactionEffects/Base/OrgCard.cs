@@ -42,12 +42,9 @@ public class OrgCard : CardSpecialAbility
         bool _didGetResponseAction = OrgAttack();
         var _player = GetPlayer();
         _player.Actions--;
-        if (!_didGetResponseAction)
+        if (_didGetResponseAction || player.Actions>0)
         {
-            if (_player.Actions>0)
-            {
-                RoomUpdater.Instance.ForceUpdate();
-            }    
+            RoomUpdater.Instance.ForceUpdate();
         }
     }
 
