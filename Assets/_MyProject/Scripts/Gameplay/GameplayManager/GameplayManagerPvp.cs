@@ -2277,8 +2277,7 @@ public class GameplayManagerPvp : GameplayManager
         yield return PlaceKeeper();
         if (_showOkDialog)
         {
-            DialogsManager.Instance.ShowOkBigDialog(
-                "Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+            GameplayUI.Instance.ShowPreparationText();
         }
         yield return RequestCardToBePlaced(14, CardType.Minion);
         yield return RequestCardToBePlaced(13, CardType.Minion);
@@ -2287,6 +2286,7 @@ public class GameplayManagerPvp : GameplayManager
         yield return RequestCardToBePlaced(9, CardType.Minion);
         yield return RequestCardToBePlaced(8, CardType.Minion);
         MyPlayer.HideCards();
+        GameplayUI.Instance.HidePreparationText();
         _callBack?.Invoke();
 
         IEnumerator PlaceKeeper()
@@ -2351,7 +2351,6 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     _availablePlace.SetColor(Color.white);
                 }
-
                     
                 CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
                 CardTableInteractions.OnPlaceClicked -= UndoPlacement;

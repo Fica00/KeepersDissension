@@ -14,6 +14,7 @@ public class GameplayUI : MonoBehaviour
     [SerializeField] private ActionAndTurnDisplay actionAndTurnDisplay;
     [SerializeField] private StrangeMatterTracker strangeMatterTracker;
     [SerializeField] private SettingsPanel settingsPanel;
+    [SerializeField] private GameObject preparationHolder;
 
     private void Awake()
     {
@@ -130,5 +131,15 @@ public class GameplayUI : MonoBehaviour
                 resignButton.interactable = true;
             }
         }
+    }
+
+    public void ShowPreparationText()
+    {
+        preparationHolder.SetActive(true);
+    }
+
+    public void HidePreparationText()
+    {
+        preparationHolder.SetActive(false);
     }
 }
