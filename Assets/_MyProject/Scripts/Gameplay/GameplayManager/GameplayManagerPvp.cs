@@ -352,7 +352,10 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_attackingCard == _defendingCard)
         {
-            ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility);
+            ResolveEndOfAttack(_attackingCard, _defendingCard, () =>
+            {
+                TryToApplyWallAbility(_defendingCard, _attackingCard, _callBack,_defenderPlace);
+            });
             return;
         }
 
@@ -363,34 +366,36 @@ public class GameplayManagerPvp : GameplayManager
 
 
         AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId,
-            () => { ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility); });
-
-        void TryToApplyWallAbility()
+            () => { ResolveEndOfAttack(_attackingCard, _defendingCard, () =>
+            {
+                TryToApplyWallAbility(_defendingCard, _attackingCard, _callBack,_defenderPlace);
+            }); });
+    }
+    
+    private void TryToApplyWallAbility(Card _defendingCard, Card _attackingCard, Action _callBack, int _defenderPlace)
+    {
+        if (_defendingCard is not Wall _wall)
         {
-            if (_defendingCard is not Wall _wall)
-            {
-                _callBack?.Invoke();
-                return;
-            }
+            _callBack?.Invoke();
+            return;
+        }
 
-            if (IsAbilityActive<Collapse>())
+        if (IsAbilityActive<Collapse>())
+        {
+            DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
             {
-                DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
+                if (_didKill)
                 {
-                    if (_didKill)
-                    {
-                        _callBack?.Invoke();
-                        return;
-                    }
+                    _callBack?.Invoke();
+                    return;
+                }
 
-                    ApplyWallAbility(_wall);
-                });
-            }
-            else
-            {
                 ApplyWallAbility(_wall);
-            }
-
+            });
+        }
+        else
+        {
+            ApplyWallAbility(_wall);
         }
 
         void ApplyWallAbility(Wall _wall)
@@ -398,7 +403,7 @@ public class GameplayManagerPvp : GameplayManager
 
             if (_wall.IsCyber())
             {
-                ApplyCyborgAbility(_firstCardId, _defenderPlace, _callBack);
+                ApplyCyborgAbility(_attackingCard.UniqueId, _defenderPlace, _callBack);
                 return;
             }
 
@@ -2475,7 +2480,7 @@ public class GameplayManagerPvp : GameplayManager
     }
 
     public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
-            "")
+            "", bool _applyWallEffects = false)
     {
         if (IsAbilityActive<HighStakes>())
         {
@@ -2484,15 +2489,22 @@ public class GameplayManagerPvp : GameplayManager
             _damage = 8;
         }
 
-        Card _card = GetCard(_uniqueId);
-        _card.ChangeHealth(-_damage);
+        Card _defendingCard = GetCard(_uniqueId);
+        int _defenderPlace = _defendingCard.GetTablePlace().Id;
+        _defendingCard.ChangeHealth(-_damage);
         bool _didGiveResponseAction = false;
         if (_checkForResponse)
         {
             Card _attackerCard = GetCard(_attacker);
-            _didGiveResponseAction = CheckForResponseAction(_attackerCard, _card);
+            _didGiveResponseAction = CheckForResponseAction(_attackerCard, _defendingCard);
         }
-        CheckIfDefenderIsDestroyed(_card, _callBack);
+
+        if (_applyWallEffects)
+        {
+            Card _attackerCard = GetCard(_attacker);
+            TryToApplyWallAbility(_defendingCard,_attackerCard,null,_defenderPlace);
+        }
+        CheckIfDefenderIsDestroyed(_defendingCard, _callBack);
 
         return _didGiveResponseAction;
     }
