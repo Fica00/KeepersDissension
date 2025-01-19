@@ -23,8 +23,12 @@ public class Guardian: Card
             Display.ChangeSprite(Details.Background);
         });
         chain.gameObject.SetActive(false);
-        
-        ChangeSpeed(1);
+
+        if (GameplayManager.Instance.MyPlayer.Actions != 1 || GameplayCheats.UnlimitedActions)
+        {
+            Debug.Log("Added speed");
+            ChangeSpeed(1);
+        }
         OnUnchained?.Invoke();
     }
     

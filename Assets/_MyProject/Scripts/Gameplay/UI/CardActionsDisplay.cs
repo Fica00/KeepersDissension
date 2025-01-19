@@ -63,7 +63,6 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Close()
     {
-        Debug.Log("Closing ...");
         GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
         holder.SetActive(false);
     }
@@ -152,7 +151,6 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        Debug.Log("Showing...");
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
