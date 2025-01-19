@@ -2490,7 +2490,13 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         Card _defendingCard = GetCard(_uniqueId);
-        int _defenderPlace = _defendingCard.GetTablePlace().Id;
+        int _defenderPlace = -1;
+        if (_defendingCard == null)
+        {
+            return false;
+        }
+
+        _defenderPlace = _defendingCard.GetTablePlace().Id;
         _defendingCard.ChangeHealth(-_damage);
         bool _didGiveResponseAction = false;
         if (_checkForResponse)
