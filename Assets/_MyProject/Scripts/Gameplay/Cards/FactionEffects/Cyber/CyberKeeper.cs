@@ -62,6 +62,11 @@ public class CyberKeeper : CardSpecialAbility
 
         GameplayManager.Instance.TellOpponentSomething("Opponent used his Ultimate!");
         SetCanUseAbility(false);
+        if (GameplayManager.Instance.IsMyResponseAction())
+        {
+            RemoveAction();
+            return;
+        }
         GameplayManager.Instance.ChangeOwnerOfCard(_card.UniqueId);
         Card.CardData.WarriorAbilityData.EffectedCards.Add(_card.UniqueId);
         GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;

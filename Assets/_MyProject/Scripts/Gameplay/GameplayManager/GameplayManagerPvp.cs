@@ -1667,6 +1667,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        Debug.Log("Buying ability");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");

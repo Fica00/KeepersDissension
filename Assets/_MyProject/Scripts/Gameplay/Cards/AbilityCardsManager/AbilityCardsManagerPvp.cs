@@ -202,7 +202,9 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
         {
             if (_abilityCard != null)
             {
+                GameplayManager.Instance.TellOpponentSomething("Opponent bought ability card");
                 GameplayManager.Instance.ChangeMyStrangeMatter(-_price);
+                GameplayManager.Instance.ChangeStrangeMaterInEconomy(_price);
                 GameplayManager.Instance.BuyAbility(_abilityCard.UniqueId);
             }
         });

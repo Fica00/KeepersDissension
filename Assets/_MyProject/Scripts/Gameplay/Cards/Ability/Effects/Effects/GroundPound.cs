@@ -23,10 +23,15 @@ public class GroundPound : AbilityEffect
             {
                 _didGetResponseAction = true;
             }
-        }        
+        }
 
         MoveToActivationField();
         OnActivated?.Invoke();
         RemoveAction();
+        
+        if (_didGetResponseAction)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
     }
 }
