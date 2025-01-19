@@ -2331,9 +2331,16 @@ public class GameplayManagerPvp : GameplayManager
                         yield break;
                     }
                 
+                    foreach (var _availablePlace in _availablePlaces)
+                    {
+                        _availablePlace.SetColor(Color.white);
+                    }
+
+                    
                     CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                     Card _card = _selectedPlace.GetCard();
+                    _card.CardData.PlaceId = -100;
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
                     _card.transform.position = new Vector3(-10000, 0, 0);
@@ -2391,10 +2398,13 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         yield break;
                     }
+                    
+                    _place.SetColor(Color.white);
                 
                     CardInHandDisplay.OnClicked -= SelectCard;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                     Card _card = _selectedPlace.GetCard();
+                    _card.CardData.PlaceId = -100;
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
                     _card.transform.position = new Vector3(-10000, 0, 0);
