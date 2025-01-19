@@ -2330,6 +2330,12 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         yield break;
                     }
+                    
+                    Card _card = _selectedPlace.GetCard();
+                    if (_card is not Keeper and Minion)
+                    {
+                        yield break;
+                    }
                 
                     foreach (var _availablePlace in _availablePlaces)
                     {
@@ -2339,7 +2345,6 @@ public class GameplayManagerPvp : GameplayManager
                     
                     CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
-                    Card _card = _selectedPlace.GetCard();
                     _card.CardData.PlaceId = -100;
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
@@ -2398,12 +2403,16 @@ public class GameplayManagerPvp : GameplayManager
                     {
                         yield break;
                     }
+                    Card _card = _selectedPlace.GetCard();
+                    if (_card is not Keeper and Minion)
+                    {
+                        yield break;
+                    }
                     
                     _place.SetColor(Color.white);
                 
                     CardInHandDisplay.OnClicked -= SelectCard;
                     CardTableInteractions.OnPlaceClicked -= UndoPlacement;
-                    Card _card = _selectedPlace.GetCard();
                     _card.CardData.PlaceId = -100;
                     _card.PositionInHand();
                     _card.transform.SetParent(null);
