@@ -147,6 +147,7 @@ namespace FirebaseMultiplayer.Room
             CheckForGameEnd(_currentRoomState,_data);
             CheckForAbilityDisplay(_currentRoomState,_data);
             CheckForDelivery(_currentRoomState, _data);
+            CheckForResponseActionSound(_currentRoomState, _data);
             CheckForPlaceKeeper(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
@@ -405,6 +406,29 @@ namespace FirebaseMultiplayer.Room
                 RoomUpdater.Instance.ForceUpdate();
             }
         }
+        private void CheckForResponseActionSound(RoomData _currentRoomData,RoomData _data)
+        {
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+        }
         
         private void CheckForPlaceKeeper(RoomData _currentRoomData,RoomData _data)
         {
@@ -512,6 +536,8 @@ namespace FirebaseMultiplayer.Room
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
             GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertPosition(_placeId),null);
+            return;
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertRoomPosition(_placeId, IsOwner),null);
         }
         
         private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)

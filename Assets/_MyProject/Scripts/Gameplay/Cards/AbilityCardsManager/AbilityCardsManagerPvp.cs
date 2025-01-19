@@ -243,7 +243,16 @@ public class AbilityCardsManagerPvp : AbilityCardsManagerBase
 
         for (int _i = 0; _i < _abilitiesInShop.Count; _i++)
         {
-            ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
+            try
+            {
+                ShopAbilitiesDisplays[_i].Setup(_abilitiesInShop[_i]);
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"{_i} => {ShopAbilitiesDisplays.Count} => {_abilitiesInShop.Count}");
+                Debug.Log(e);
+               break;
+            }
         }
     }
 }

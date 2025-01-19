@@ -2348,6 +2348,11 @@ public class GameplayManagerPvp : GameplayManager
                 {
                     return;
                 }
+
+                if (!_card.GetIsMy())
+                {
+                    return;
+                }
                 
                 foreach (var _availablePlace in _availablePlaces)
                 {
@@ -2406,6 +2411,11 @@ public class GameplayManagerPvp : GameplayManager
                     }
                     Card _card = _selectedPlace.GetCard();
                     if (_card is LifeForce or Guardian)
+                    {
+                        yield break;
+                    }
+                    
+                    if (!_card.GetIsMy())
                     {
                         yield break;
                     }
