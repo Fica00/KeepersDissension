@@ -79,7 +79,7 @@ public class OrgCard : CardSpecialAbility
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
             bool _gaveResponse = GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, Card.Damage, _ => { GameplayManager.Instance.HideCardActions
-                    ();}, true, Card.UniqueId, true);
+                    ();}, true, Card.UniqueId, true,true);
             if (_gaveResponse)
             {
                 _didGetResponseAction = true;

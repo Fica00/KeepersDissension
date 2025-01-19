@@ -1182,7 +1182,7 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack, bool _checkForResponse = false, string _attacker
-            = "", bool _applyWallEffects = false)
+            = "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
         throw new Exception();
     }

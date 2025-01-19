@@ -371,8 +371,9 @@ public class GameplayManagerPvp : GameplayManager
                 TryToApplyWallAbility(_defendingCard, _attackingCard, _callBack,_defenderPlace);
             }); });
     }
-    
-    private void TryToApplyWallAbility(Card _defendingCard, Card _attackingCard, Action _callBack, int _defenderPlace)
+
+    private void TryToApplyWallAbility(Card _defendingCard, Card _attackingCard, Action _callBack, int _defenderPlace,
+        bool _ignoreCyborgEffect = false)
     {
         if (_defenderPlace == -1)
         {
@@ -408,6 +409,10 @@ public class GameplayManagerPvp : GameplayManager
 
             if (_wall.IsCyber())
             {
+                if (_ignoreCyborgEffect)
+                {
+                    return;
+                }
                 ApplyCyborgAbility(_attackingCard.UniqueId, _defenderPlace, _callBack);
                 return;
             }
@@ -2276,7 +2281,13 @@ public class GameplayManagerPvp : GameplayManager
         {
             DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler> { TableHandler.GetPlace(10), TableHandler.GetPlace(12) };
-
+            foreach (var _available in _availablePlaces)
+            {
+                if (_available.IsOccupied)
+                {
+                    yield break;
+                }
+            }
             foreach (var _availablePlace in _availablePlaces)
             {
                 _availablePlace.SetColor(Color.green);
@@ -2323,6 +2334,7 @@ public class GameplayManagerPvp : GameplayManager
             _place.SetColor(Color.green);
 
             CardInHandDisplay.OnClicked += SelectCard;
+            CardTableInteractions.OnPlaceClicked += UndoPlacement;
             MyPlayer.ShowCards(_type);
 
             yield return new WaitUntil(() => _hasSelectedCard);
@@ -2334,8 +2346,31 @@ public class GameplayManagerPvp : GameplayManager
             void SelectCard(CardBase _card)
             {
                 CardInHandDisplay.OnClicked -= SelectCard;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                 _selectedCard = (_card as Card);
                 _hasSelectedCard = true;
+            }
+            
+            void UndoPlacement(TablePlaceHandler _selectedPlace)
+            {
+                StartCoroutine(UndoPlacementRoutine());
+                IEnumerator UndoPlacementRoutine()
+                {
+                    if (!_selectedPlace.IsOccupied)
+                    {
+                        yield break;
+                    }
+                
+                    CardInHandDisplay.OnClicked -= SelectCard;
+                    CardTableInteractions.OnPlaceClicked -= UndoPlacement;
+                    Card _card = _selectedPlace.GetCard();
+                    _card.PositionInHand();
+                    _card.transform.SetParent(null);
+                    _card.transform.position = new Vector3(-10000, 0, 0);
+                    yield return RequestCardToBePlaced(_selectedPlace.Id, CardType.Minion);
+                    CardInHandDisplay.OnClicked += SelectCard;
+                    CardTableInteractions.OnPlaceClicked += UndoPlacement;
+                }
             }
         }
     }
@@ -2485,7 +2520,7 @@ public class GameplayManagerPvp : GameplayManager
     }
 
     public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
-            "", bool _applyWallEffects = false)
+            "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
         if (IsAbilityActive<HighStakes>())
         {
@@ -2517,7 +2552,7 @@ public class GameplayManagerPvp : GameplayManager
         if (_applyWallEffects)
         {
             Card _attackerCard = GetCard(_attacker);
-            TryToApplyWallAbility(_defendingCard,_attackerCard,null,_defenderPlace);
+            TryToApplyWallAbility(_defendingCard,_attackerCard,null,_defenderPlace,_ignoreCyborgWallEffect);
         }
         CheckIfDefenderIsDestroyed(_defendingCard, _callBack);
 
