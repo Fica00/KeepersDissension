@@ -249,11 +249,15 @@ public class Card : CardBase
     public bool HasScaler()
     {
         ScalerScale _scale = EffectsHolder.GetComponent<ScalerScale>();
+        
+        Debug.Log(gameObject.name,gameObject);
         if (_scale== null)
         {
+            Debug.Log("Doesn't have scale");
             return false;
         }
 
+        Debug.Log("Has scale");
         return true;
     }    
     

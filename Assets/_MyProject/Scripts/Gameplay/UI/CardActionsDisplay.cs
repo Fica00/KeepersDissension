@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -88,6 +87,10 @@ public class CardActionsDisplay : MonoBehaviour
                 return;
             }
         }
+        else if (!GameplayManager.Instance.IsMyTurn())
+        {
+            return;
+        }
         
         actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Move);
     }
@@ -111,6 +114,10 @@ public class CardActionsDisplay : MonoBehaviour
             {
                 return;
             }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
+        {
+            return;
         }
         
         actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType
@@ -144,18 +151,6 @@ public class CardActionsDisplay : MonoBehaviour
     
     public void Show(int _placeId)
     {
-        if (GameplayManager.Instance.IsResponseAction())
-        {
-            if (!GameplayManager.Instance.IsMyResponseAction())
-            {
-                return;
-            }
-        }
-        else if (!GameplayManager.Instance.IsMyTurn())
-        {
-            return;
-        }
-        
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
@@ -255,6 +250,12 @@ public class CardActionsDisplay : MonoBehaviour
             {
                 continue;
             }
+            if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+            {
+                Close();
+                return;
+            }
+            
             Transform _abilityHolder = _cardAbility.IsBaseCardsEffect ? myAbilitiesHolder : effectAbilitiesHolder;
             AbilityTrigger _abilityTrigger = Instantiate(abilityTriggerPrefab, _abilityHolder);
             _abilityTrigger.Setup(_cardAbility.Sprite, _cardAbility.CanUseAbility,() =>

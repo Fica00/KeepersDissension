@@ -11,13 +11,25 @@ public class GroundPound : AbilityEffect
         List<Card> _availablePlaces = GameplayManager.Instance.TableHandler.GetAttackableCards(_attackingPlaceId,
             CardMovementType.EightDirections);
 
+        bool _didGetResponseAction = false;
+
         foreach (var _cardOnPlace in _availablePlaces.ToList())
         {
-            GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, _keeper.Damage, _ => { GameplayManager.Instance.HideCardActions();});
-        }        
+            bool _gaveResponse = GameplayManager.Instance.DamageCardByAbility(_cardOnPlace.UniqueId, _keeper.Damage, _ => { GameplayManager.Instance
+                    .HideCardActions();}, true, _keeper.UniqueId, true, true);
+            if (_gaveResponse)
+            {
+                _didGetResponseAction = true;
+            }
+        }
 
         MoveToActivationField();
         OnActivated?.Invoke();
         RemoveAction();
+        
+        if (_didGetResponseAction)
+        {
+            RoomUpdater.Instance.ForceUpdate();
+        }
     }
 }

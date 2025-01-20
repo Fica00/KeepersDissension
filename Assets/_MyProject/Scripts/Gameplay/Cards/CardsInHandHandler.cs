@@ -62,6 +62,11 @@ public class CardsInHandHandler : MonoBehaviour
    {
       foreach (var _ownedCard in GameplayManager.Instance.GetOwnedAbilities(player.IsMy))
       {
+         var _ability = GameplayManager.Instance.GetAbility(_ownedCard.UniqueId);
+         if (_ability.GetTablePlace())
+         {
+            continue;  
+         }
          var _cardDisplay = Instantiate(cardPrefab, cardsHolder);
          _cardDisplay.Setup(_ownedCard.UniqueId,true);
          shownCards.Add(_cardDisplay);

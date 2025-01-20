@@ -147,6 +147,8 @@ namespace FirebaseMultiplayer.Room
             CheckForGameEnd(_currentRoomState,_data);
             CheckForAbilityDisplay(_currentRoomState,_data);
             CheckForDelivery(_currentRoomState, _data);
+            CheckForResponseActionSound(_currentRoomState, _data);
+            CheckForPlaceKeeper(_currentRoomState, _data);
             ShouldEndTurn(_currentRoomState,_data);
             CheckIfOpponentEndedTurn(_currentRoomState, _data);
             CheckForComrade(_currentRoomState, _data);
@@ -381,6 +383,7 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player1DeliveryReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
                     }
                 }
@@ -391,12 +394,69 @@ namespace FirebaseMultiplayer.Room
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player2DeliveryReposition)
                     {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
                         GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
                     }
                 }
             }
 
             void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        private void CheckForResponseActionSound(RoomData _currentRoomData,RoomData _data)
+        {
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+        }
+        
+        private void CheckForPlaceKeeper(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1UseKeeperReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2UseKeeperReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+
+            void FinishPlacingKeeper()
             {
                 roomData.GameplaySubState = _currentState;
                 RoomUpdater.Instance.ForceUpdate();
@@ -476,6 +536,8 @@ namespace FirebaseMultiplayer.Room
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
             GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertPosition(_placeId),null);
+            return;
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertRoomPosition(_placeId, IsOwner),null);
         }
         
         private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)
@@ -739,6 +801,7 @@ namespace FirebaseMultiplayer.Room
                 GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
             }
         }        
+        
         private void CheckForMessages(RoomData _currentRoomData,RoomData _data)
         {
             if (_data.BoardData.SaySomethingData == null)

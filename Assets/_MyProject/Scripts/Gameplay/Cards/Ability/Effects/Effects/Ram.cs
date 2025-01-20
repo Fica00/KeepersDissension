@@ -7,7 +7,7 @@ public class Ram : AbilityEffect
         SetIsActive(true);
         BlockaderRam _ram = _keeper.EffectsHolder.AddComponent<BlockaderRam>();
         _ram.IsBaseCardsEffect = false;
-        _ram.Setup(true,null);
+        _ram.Setup(false,null);
         OnActivated?.Invoke();
         ManageActiveDisplay(true);
         RemoveAction();

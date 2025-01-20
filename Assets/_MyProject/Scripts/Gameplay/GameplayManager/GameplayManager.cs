@@ -36,7 +36,28 @@ public class GameplayManager : MonoBehaviour
     protected bool IsAnimating; 
     protected bool IsFallingResponse;
     
-    public bool IsKeeperResponseAction =>  GetMyKeeper().UniqueId == IdOfCardWithResponseAction();
+    public bool IsKeeperResponseAction
+    {
+        get
+        {
+            foreach (var _keeper in FindObjectsOfType<Keeper>())
+            {
+                if (!_keeper.GetIsMy())
+                {
+                    continue;
+                }
+
+                if (_keeper.UniqueId == IdOfCardWithResponseAction())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    private bool isFirstUpdate = true;
     
     protected virtual void Awake()
     {
@@ -84,6 +105,8 @@ public class GameplayManager : MonoBehaviour
         ShowGuardianChains();
         
         SetGameState(GameplayState.Gameplay);
+
+        yield return new WaitForSeconds(1);
         
         while (!HasGameEnded())
         {
@@ -91,6 +114,7 @@ public class GameplayManager : MonoBehaviour
             yield return WaitUntilTheEndOfTurn();
         }
     }
+    
 
     private void ShowGuardianChains()
     {
@@ -147,6 +171,12 @@ public class GameplayManager : MonoBehaviour
             {
                 DidIFinishMyTurn = true;
                 SetPlayersTurn(false);
+            }
+
+            if (isFirstUpdate && IsRoomOwner())
+            {
+                isFirstUpdate = false;
+                RoomUpdater.Instance.ForceUpdate();
             }
             yield return new WaitUntil(() => DidIFinishMyTurn);
             MyPlayer.EndedTurn();
@@ -1151,7 +1181,8 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
+    public virtual bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack, bool _checkForResponse = false, string _attacker
+            = "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
         throw new Exception();
     }
@@ -1262,6 +1293,16 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual GameplayState GetGameplayState()
+    {
+        throw new Exception();
+    }
+
+    public virtual void SelectPlaceForKeeper(string _cardId, Action _callBack)
+    {
+        throw new Exception();
+    }
+
+    public virtual bool IsKeeperRepositionAction()
     {
         throw new Exception();
     }

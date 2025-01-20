@@ -352,7 +352,10 @@ public class GameplayManagerPvp : GameplayManager
 
         if (_attackingCard == _defendingCard)
         {
-            ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility);
+            ResolveEndOfAttack(_attackingCard, _defendingCard, () =>
+            {
+                TryToApplyWallAbility(_defendingCard, _attackingCard, _callBack,_defenderPlace);
+            });
             return;
         }
 
@@ -363,34 +366,42 @@ public class GameplayManagerPvp : GameplayManager
 
 
         AnimateAttack(_attackingCard.UniqueId, _defendingCard.UniqueId,
-            () => { ResolveEndOfAttack(_attackingCard, _defendingCard, TryToApplyWallAbility); });
+            () => { ResolveEndOfAttack(_attackingCard, _defendingCard, () =>
+            {
+                TryToApplyWallAbility(_defendingCard, _attackingCard, _callBack,_defenderPlace);
+            }); });
+    }
 
-        void TryToApplyWallAbility()
+    private void TryToApplyWallAbility(Card _defendingCard, Card _attackingCard, Action _callBack, int _defenderPlace,
+        bool _ignoreCyborgEffect = false)
+    {
+        if (_defenderPlace == -1)
         {
-            if (_defendingCard is not Wall _wall)
-            {
-                _callBack?.Invoke();
-                return;
-            }
+            _callBack?.Invoke();
+            return;    
+        }
+        if (_defendingCard is not Wall _wall)
+        {
+            _callBack?.Invoke();
+            return;
+        }
 
-            if (IsAbilityActive<Collapse>())
+        if (IsAbilityActive<Collapse>())
+        {
+            DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
             {
-                DamageCardByAbility(_attackingCard.UniqueId, 1, _didKill =>
+                if (_didKill)
                 {
-                    if (_didKill)
-                    {
-                        _callBack?.Invoke();
-                        return;
-                    }
+                    _callBack?.Invoke();
+                    return;
+                }
 
-                    ApplyWallAbility(_wall);
-                });
-            }
-            else
-            {
                 ApplyWallAbility(_wall);
-            }
-
+            });
+        }
+        else
+        {
+            ApplyWallAbility(_wall);
         }
 
         void ApplyWallAbility(Wall _wall)
@@ -398,7 +409,11 @@ public class GameplayManagerPvp : GameplayManager
 
             if (_wall.IsCyber())
             {
-                ApplyCyborgAbility(_firstCardId, _defenderPlace, _callBack);
+                if (_ignoreCyborgEffect)
+                {
+                    return;
+                }
+                ApplyCyborgAbility(_attackingCard.UniqueId, _defenderPlace, _callBack);
                 return;
             }
 
@@ -764,7 +779,7 @@ public class GameplayManagerPvp : GameplayManager
 
             if (_possiblePlaces.Count==0)
             {
-                _lifeForcePlaces = new() { 19, 18, 17 };
+                _lifeForcePlaces = new List<int> { 19, 18, 17 };
                 foreach (var _placeId in _lifeForcePlaces)
                 {
                     var _place = TableHandler.GetPlace(_placeId);
@@ -1033,7 +1048,7 @@ public class GameplayManagerPvp : GameplayManager
                 }
             }
 
-            PlaceKeeperOnTable(_defendingCard, FinishPlaceKeeper);
+            StartCoroutine(PlaceKeeperOnTable(_keeper, FinishPlaceKeeper));
         }
         else
         {
@@ -1128,19 +1143,69 @@ public class GameplayManagerPvp : GameplayManager
         });
     }
 
-    private void PlaceKeeperOnTable(CardBase _card, Action _callBack)
+    private IEnumerator PlaceKeeperOnTable(Keeper _card, Action _callBack)
     {
-        List<int> _placesNearLifeForce;
-
+        bool _waitForSomething = false;
         if (_card.GetIsMy())
         {
-            _placesNearLifeForce = new List<int>()
+            SelectPlaceForKeeper(_card.UniqueId, ContinueWithExecution);
+            yield return new WaitUntil(() => _waitForSomething);
+        }
+        else
+        {
+            var _currentState = GetGameplaySubState();
+            if (RoomHandler.IsOwner)
             {
-                10,
-                12,
-                18,
-                17,
-                19,
+                SetGameplaySubState(GameplaySubState.Player2UseKeeperReposition);
+            }
+            else
+            {
+                SetGameplaySubState(GameplaySubState.Player1UseKeeperReposition);
+            }
+
+            RoomUpdater.Instance.ForceUpdate();
+            yield return new WaitUntil(() => GetGameplaySubState() == _currentState);
+        }
+        
+        _callBack?.Invoke();
+
+        void ContinueWithExecution()
+        {
+            _waitForSomething = true;
+        }
+    }
+
+    public override void SelectPlaceForKeeper(string _cardId, Action _callBack)
+    {
+        var _card = GetCard(_cardId);
+        var _availablePlaces = GetAvailablePlaces(_card.GetTablePlace().Id);
+        if (_availablePlaces.Count==1)
+        {
+            DoPlaceKeeper(_availablePlaces[0].Id);
+        }
+        else
+        {
+            StartCoroutine(SelectPlace(_availablePlaces, true, DoPlaceKeeper));
+        }
+
+        void DoPlaceKeeper(int _placeId)
+        {
+            ExecuteMove(_card.GetTablePlace().Id, _placeId, _cardId, _callBack);
+        }
+    }
+
+    private List<TablePlaceHandler> GetAvailablePlaces(int _startingPlace)
+    {
+        List<List<int>> _tierLists = new()
+        {
+            new List<int> { 10, 12 },
+
+            new List<int> { 17 },
+
+            new List<int> { 18, 19 },
+
+            new List<int>
+            {
                 9,
                 13,
                 19,
@@ -1150,81 +1215,69 @@ public class GameplayManagerPvp : GameplayManager
                 25,
                 26,
                 27
-            };
-        }
-        else
-        {
-            _placesNearLifeForce = new List<int>()
-            {
-                54,
-                52,
-                46,
-                47,
-                45,
-                55,
-                51,
-                45,
-                48,
-                41,
-                40,
-                39,
-                38,
-                37
-            };
-        }
+            },
 
-
-        foreach (var _placeNear in _placesNearLifeForce)
-        {
-            if (TryPlaceKeeper(_placeNear))
+            new List<int>
             {
-                ReplaceKeeper(_card, _placeNear, _callBack);
-                return;
+                14,
+                8,
+                15,
+                21,
+                28,
+                27,
+                26,
+                25,
+                24,
+                23,
+                22
+            },
+        };
+
+        foreach (var _tier in _tierLists)
+        {
+            List<TablePlaceHandler> _emptyPlaces = GetEmptyPlaces(_tier);
+
+            if (_tier.Contains(_startingPlace))
+            {
+                TablePlaceHandler _currentPlace = TableHandler.GetPlace(_startingPlace);
+                _emptyPlaces.Add(_currentPlace);
+            }
+
+            if (_emptyPlaces.Count > 0)
+            {
+                return _emptyPlaces;
             }
         }
 
-        if (_card.GetIsMy())
+        List<int> _tier6Ids = Enumerable.Range(8, 56 - 8 + 1).ToList();
+        List<TablePlaceHandler> _tier6Places = GetEmptyPlaces(_tier6Ids);
+
+        // If _startingPlace is within 8..56, it belongs to tier 6, so include it
+        if (_tier6Ids.Contains(_startingPlace))
         {
-            for (int _i = 8; _i < 57; _i++)
+            _tier6Places.Add(TableHandler.GetPlace(_startingPlace));
+        }
+
+        return _tier6Places;
+
+
+        List<TablePlaceHandler> GetEmptyPlaces(List<int> _placeIds)
+        {
+            List<TablePlaceHandler> _results = new List<TablePlaceHandler>();
+            foreach (int _placeId in _placeIds)
             {
-                if (TryPlaceKeeper(_i))
+                TablePlaceHandler _place = TableHandler.GetPlace(_placeId);
+                // Add only if NOT occupied
+                if (!_place.IsOccupied)
                 {
-                    ReplaceKeeper(_card, _i, _callBack);
-                    return;
+                    _results.Add(_place);
                 }
             }
-        }
-        else
-        {
-            for (int _i = 57; _i > 8; _i--)
-            {
-                if (TryPlaceKeeper(_i))
-                {
-                    ReplaceKeeper(_card, _i, _callBack);
-                    return;
-                }
-            }
+
+            return _results;
         }
     }
 
-    private bool TryPlaceKeeper(int _placeIndex)
-    {
-        TablePlaceHandler _place = TableHandler.GetPlace(_placeIndex);
-        if (!_place.IsOccupied)
-        {
-            return true;
-        }
-
-        foreach (var _cardOnPlace in _place.GetCards())
-        {
-            if (_cardOnPlace is Keeper { My: true })
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private void HandleLoot(Card _attackingCard, Card _defendingCard, int _placeOfDefendingCard)
     {
@@ -1437,6 +1490,7 @@ public class GameplayManagerPvp : GameplayManager
 
             SetGameplaySubState(GameplaySubState.Playing);
             RoomUpdater.Instance.ForceUpdate();
+            AudioManager.Instance.PlaySoundEffect("EndTurn");
             return;
         }
 
@@ -1629,6 +1683,7 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
+        Debug.Log("Buying ability");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
@@ -2190,10 +2245,12 @@ public class GameplayManagerPvp : GameplayManager
 
     protected override IEnumerator PlaceMinions()
     {
+        bool _canContinue = false;
         SetGameplaySubState(GameplaySubState.Player1SelectMinions);
         if (IsMyTurn())
         {
-            yield return PlaceRestOfStartingCards();
+            StartCoroutine(PlaceRestOfStartingCards(Continue));
+            yield return new WaitUntil(() => _canContinue);
             SetGameplaySubState(GameplaySubState.Player2SelectMinions);
             RoomUpdater.Instance.ForceUpdate();
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.FinishedSelectingMinions);
@@ -2201,20 +2258,28 @@ public class GameplayManagerPvp : GameplayManager
         else
         {
             yield return new WaitUntil(() => GetGameplaySubState() == GameplaySubState.Player2SelectMinions);
-            yield return PlaceRestOfStartingCards();
+            StartCoroutine(PlaceRestOfStartingCards(Continue));
+            yield return new WaitUntil(() => _canContinue);
             SetGameplaySubState(GameplaySubState.FinishedSelectingMinions);
             RoomUpdater.Instance.ForceUpdate();
         }
 
         SetGameplaySubState(GameplaySubState.Playing);
         yield return new WaitForSeconds(1f);
+
+        void Continue()
+        {
+            _canContinue = true;
+        }
     }
 
-    private IEnumerator PlaceRestOfStartingCards()
+    private IEnumerator PlaceRestOfStartingCards(Action _callBack, bool _showOkDialog = true)
     {
         yield return PlaceKeeper();
-        DialogsManager.Instance.ShowOkBigDialog(
-            "Now pick your minions to go into battle alongside you. Each minion has their own attributes and abilities. You can hold down on any card anytime to zoom in on that card and then you can tap that card to flip it over to see more details.");
+        if (_showOkDialog)
+        {
+            GameplayUI.Instance.ShowPreparationText();
+        }
         yield return RequestCardToBePlaced(14, CardType.Minion);
         yield return RequestCardToBePlaced(13, CardType.Minion);
         yield return RequestCardToBePlaced(12, CardType.Minion);
@@ -2222,18 +2287,29 @@ public class GameplayManagerPvp : GameplayManager
         yield return RequestCardToBePlaced(9, CardType.Minion);
         yield return RequestCardToBePlaced(8, CardType.Minion);
         MyPlayer.HideCards();
+        GameplayUI.Instance.HidePreparationText();
+        _callBack?.Invoke();
 
         IEnumerator PlaceKeeper()
         {
-            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             List<TablePlaceHandler> _availablePlaces = new List<TablePlaceHandler> { TableHandler.GetPlace(10), TableHandler.GetPlace(12) };
-
+            foreach (var _available in _availablePlaces)
+            {
+                if (_available.IsOccupied)
+                {
+                    yield break;
+                }
+            }
+            
+            MyPlayer.HideCards();
+            DialogsManager.Instance.ShowOkDialog("Select which side of your Life force that you, the Keeper, will start.");
             foreach (var _availablePlace in _availablePlaces)
             {
                 _availablePlace.SetColor(Color.green);
             }
 
             CardTableInteractions.OnPlaceClicked += DoSelectPlace;
+            CardTableInteractions.OnPlaceClicked += UndoPlacement;
             bool _hasSelectedPlace = false;
             int _selectedPlaceId = 0;
 
@@ -2255,8 +2331,41 @@ public class GameplayManagerPvp : GameplayManager
                 }
 
                 CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                 _selectedPlaceId = _place.Id;
                 _hasSelectedPlace = true;
+            }
+            
+            void UndoPlacement(TablePlaceHandler _selectedPlace)
+            {
+                if (!_selectedPlace.IsOccupied)
+                {
+                    return;
+                }
+                    
+                Card _card = _selectedPlace.GetCard();
+                if (_card is LifeForce or Guardian)
+                {
+                    return;
+                }
+
+                if (!_card.GetIsMy())
+                {
+                    return;
+                }
+                
+                foreach (var _availablePlace in _availablePlaces)
+                {
+                    _availablePlace.SetColor(Color.white);
+                }
+                    
+                CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
+                _card.CardData.PlaceId = -100;
+                _card.CardData.CardPlace = CardPlace.Deck;
+                _card.transform.SetParent(null);
+                _card.transform.position = new Vector3(-10000, 0, 0);
+                StartCoroutine(PlaceRestOfStartingCards(_callBack,false));
             }
         }
 
@@ -2274,6 +2383,7 @@ public class GameplayManagerPvp : GameplayManager
             _place.SetColor(Color.green);
 
             CardInHandDisplay.OnClicked += SelectCard;
+            CardTableInteractions.OnPlaceClicked += UndoPlacement;
             MyPlayer.ShowCards(_type);
 
             yield return new WaitUntil(() => _hasSelectedCard);
@@ -2285,8 +2395,40 @@ public class GameplayManagerPvp : GameplayManager
             void SelectCard(CardBase _card)
             {
                 CardInHandDisplay.OnClicked -= SelectCard;
+                CardTableInteractions.OnPlaceClicked -= UndoPlacement;
                 _selectedCard = (_card as Card);
                 _hasSelectedCard = true;
+            }
+            
+            void UndoPlacement(TablePlaceHandler _selectedPlace)
+            {
+                StartCoroutine(UndoPlacementRoutine());
+                IEnumerator UndoPlacementRoutine()
+                {
+                    if (!_selectedPlace.IsOccupied)
+                    {
+                        yield break;
+                    }
+                    Card _card = _selectedPlace.GetCard();
+                    if (_card is LifeForce or Guardian)
+                    {
+                        yield break;
+                    }
+                    
+                    if (!_card.GetIsMy())
+                    {
+                        yield break;
+                    }
+                    
+                    _place.SetColor(Color.white);
+                    CardInHandDisplay.OnClicked -= SelectCard;
+                    CardTableInteractions.OnPlaceClicked -= UndoPlacement;
+                    _card.CardData.PlaceId = -100;
+                    _card.CardData.CardPlace = CardPlace.Deck;
+                    _card.transform.SetParent(null);
+                    _card.transform.position = new Vector3(-10000, 0, 0);
+                    StartCoroutine(PlaceRestOfStartingCards(_callBack,false));
+                }
             }
         }
     }
@@ -2435,7 +2577,8 @@ public class GameplayManagerPvp : GameplayManager
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
 
-    public override void DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack)
+    public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
+            "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
         if (IsAbilityActive<HighStakes>())
         {
@@ -2444,9 +2587,34 @@ public class GameplayManagerPvp : GameplayManager
             _damage = 8;
         }
 
-        Card _card = GetCard(_uniqueId);
-        _card.ChangeHealth(-_damage);
-        CheckIfDefenderIsDestroyed(_card, _callBack);
+        Card _defendingCard = GetCard(_uniqueId);
+        int _defenderPlace = -1;
+        if (_defendingCard == null)
+        {
+            return false;
+        }
+
+        if (_defendingCard.GetTablePlace())
+        {
+            _defenderPlace = _defendingCard.GetTablePlace().Id;
+        }
+        
+        _defendingCard.ChangeHealth(-_damage);
+        bool _didGiveResponseAction = false;
+        if (_checkForResponse)
+        {
+            Card _attackerCard = GetCard(_attacker);
+            _didGiveResponseAction = CheckForResponseAction(_attackerCard, _defendingCard);
+        }
+
+        if (_applyWallEffects)
+        {
+            Card _attackerCard = GetCard(_attacker);
+            TryToApplyWallAbility(_defendingCard,_attackerCard,null,_defenderPlace,_ignoreCyborgWallEffect);
+        }
+        CheckIfDefenderIsDestroyed(_defendingCard, _callBack);
+
+        return _didGiveResponseAction;
     }
 
     public override void MarkMarkerAsBomb(string _cardId)
@@ -2644,7 +2812,12 @@ public class GameplayManagerPvp : GameplayManager
             if (_subState == GameplaySubState.Player2DeliveryReposition)
             {
                 return false;
-            }    
+            } 
+            
+            if (_subState == GameplaySubState.Player2UseKeeperReposition)
+            {
+                return false;
+            }  
         }
         else
         {
@@ -2652,6 +2825,11 @@ public class GameplayManagerPvp : GameplayManager
             {
                 return false;
             }
+            
+            if (_subState == GameplaySubState.Player1UseKeeperReposition)
+            {
+                return false;
+            }  
         }
 
         return true;
@@ -2681,5 +2859,10 @@ public class GameplayManagerPvp : GameplayManager
     public override GameplayState GetGameplayState()
     {
         return RoomData.GameplayState;
+    }
+
+    public override bool IsKeeperRepositionAction()
+    {
+        return GetGameplaySubState() is GameplaySubState.Player1UseKeeperReposition or GameplaySubState.Player2UseKeeperReposition; 
     }
 }

@@ -2,6 +2,8 @@ public class CyberKeeper : CardSpecialAbility
 {
     private GameplayPlayer player;
 
+    private bool wasResponseAction;
+
     private void Start()
     {
         if (!GetPlayer().IsMy)
@@ -64,7 +66,15 @@ public class CyberKeeper : CardSpecialAbility
         SetCanUseAbility(false);
         GameplayManager.Instance.ChangeOwnerOfCard(_card.UniqueId);
         Card.CardData.WarriorAbilityData.EffectedCards.Add(_card.UniqueId);
-        GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;
+        wasResponseAction = GameplayManager.Instance.IsMyResponseAction();
+        if (wasResponseAction)
+        {
+            GameplayManager.Instance.MyPlayer.OnStartedTurn += ReturnCard;
+        }
+        else
+        {
+            GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;
+        }
         RemoveAction();
     }
 
@@ -79,7 +89,14 @@ public class CyberKeeper : CardSpecialAbility
 
     private void ReturnCard()
     {
-        GameplayManager.Instance.MyPlayer.OnEndedTurn -= ReturnCard;
+        if (wasResponseAction)
+        {
+            GameplayManager.Instance.MyPlayer.OnStartedTurn -= ReturnCard;
+        }
+        else
+        {
+            GameplayManager.Instance.MyPlayer.OnEndedTurn -= ReturnCard;
+        }
         GameplayManager.Instance.ChangeOwnerOfCard(Card.CardData.WarriorAbilityData.EffectedCards[0]);
         Card.CardData.WarriorAbilityData.EffectedCards.Clear();
         RoomUpdater.Instance.ForceUpdate(); 

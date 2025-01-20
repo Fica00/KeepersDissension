@@ -7,7 +7,7 @@ public class Leapfrog : AbilityEffect
         SetIsActive(true);
         ScalerLeapfrog _delivery = _keeper.EffectsHolder.AddComponent<ScalerLeapfrog>();
         _delivery.IsBaseCardsEffect = false;
-        _delivery.Setup(true,null);
+        _delivery.Setup(false,null);
         OnActivated?.Invoke();
         ManageActiveDisplay(true);
         RemoveAction();

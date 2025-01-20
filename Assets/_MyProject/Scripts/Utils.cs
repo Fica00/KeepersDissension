@@ -5,4 +5,14 @@ public static class Utils
         int _totalAmountOfFields = 64;
         return _totalAmountOfFields - _position;
     }
+
+    public static int ConvertRoomPosition(int _position, bool _isOwner)
+    {
+        if (_isOwner)
+        {
+            return _position;
+        }
+
+        return ConvertPosition(_position);
+    }
 }

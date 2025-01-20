@@ -70,6 +70,26 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _number = 1;
                 _color = responseColor;
             }
+
+            if (GameplayManager.Instance.IsKeeperRepositionAction())
+            {
+                var _subState = GameplayManager.Instance.GetGameplaySubState();
+                bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
+                string _myText = "Your keeper reposition action";
+                string _opponentText = "Opponents is choosing keeper spot";
+                
+                if (_subState is GameplaySubState.Player1UseKeeperReposition)
+                {
+                    _text = _isRoomOwner ? _myText : _opponentText;
+                }
+                else
+                {
+                    _text = _isRoomOwner ? _opponentText : _myText;
+                }
+                
+                _number = 1;
+                _color = responseColor;
+            }
           
 
             if (_number==0)

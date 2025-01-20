@@ -5,6 +5,7 @@ public class SimpleOpenAndClose : MonoBehaviour
 {
     [SerializeField] private GameObject object1;
     [SerializeField] private GameObject object2;
+    [SerializeField] private bool allowOpeningAtAnyTime;
     private Button button;
     
     private void Awake()
@@ -24,10 +25,14 @@ public class SimpleOpenAndClose : MonoBehaviour
 
     private void OpenObject()
     {
-        if (GameplayManager.Instance.GameState() < GameplayState.Gameplay)
+        if (!allowOpeningAtAnyTime)
         {
-            return;
+            if (GameplayManager.Instance.GameState() < GameplayState.Gameplay)
+            {
+                return;
+            }
         }
+        
         object1.transform.localScale = Vector3.zero;
         object2.transform.localScale = Vector3.one;
         var _actions = object2.GetComponent<ElipsisActionsController>();

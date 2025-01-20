@@ -19,4 +19,6 @@ public enum GameplaySubState
     Player2UseComrade=13,
     Player1UseReduction=14,
     Player2UseReduction=15,
+    Player1UseKeeperReposition = 16,
+    Player2UseKeeperReposition = 16,
 }

@@ -14,6 +14,7 @@ public class GameplayUI : MonoBehaviour
     [SerializeField] private ActionAndTurnDisplay actionAndTurnDisplay;
     [SerializeField] private StrangeMatterTracker strangeMatterTracker;
     [SerializeField] private SettingsPanel settingsPanel;
+    [SerializeField] private GameObject preparationHolder;
 
     private void Awake()
     {
@@ -103,6 +104,42 @@ public class GameplayUI : MonoBehaviour
             return;
         }
 
-        resignButton.interactable = GameplayManager.Instance.IsMyTurn() || GameplayManager.Instance.IsMyResponseAction();
+        resignButton.interactable = false;
+        if (GameplayManager.Instance.IsResponseAction())
+        {
+            if (GameplayManager.Instance.IsMyResponseAction())
+            {
+                resignButton.interactable = true;
+            }
+        }
+        else if (GameplayManager.Instance.IsMyTurn())
+        {
+            resignButton.interactable = true;
+        }
+
+        if (GameplayManager.Instance.IsRoomOwner())
+        {
+            if (GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.Player1UseKeeperReposition)
+            {
+                resignButton.interactable = true;
+            }
+        }
+        else
+        {
+            if (GameplayManager.Instance.GetGameplaySubState() == GameplaySubState.Player2UseKeeperReposition)
+            {
+                resignButton.interactable = true;
+            }
+        }
+    }
+
+    public void ShowPreparationText()
+    {
+        preparationHolder.SetActive(true);
+    }
+
+    public void HidePreparationText()
+    {
+        preparationHolder.SetActive(false);
     }
 }

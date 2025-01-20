@@ -57,6 +57,12 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
+
+        if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+        {
+            CardActionsDisplay.Instance.Close();
+            return;
+        }
         
         ClearPossibleActions();
 
@@ -356,21 +362,19 @@ public class TableActionsHandler : MonoBehaviour
             {
                 if (_step.IsOccupied)
                 {
-                    _pathCost += 2;
+                    if (_type == CardActionType.Attack)
+                    {
+                        _pathCost += 1;
+                    }
+                    else
+                    {
+                        _pathCost += 2;
+                    }
                 }
                 else
                 {
                     _pathCost += 1;
                 }
-            }
-        }
-
-        for (int _i = 0; _i < _path.Count; _i++)
-        {
-            if (_path[_i].IsOccupied)
-            {
-                _pathCost = 99;
-                break;
             }
         }
 
@@ -481,7 +485,7 @@ public class TableActionsHandler : MonoBehaviour
         {
             return;
         }
-
+        
         if (!_attackablePlace.IsOccupied)
         {
             if (!_attackablePlace.ContainsMarker)
@@ -514,7 +518,7 @@ public class TableActionsHandler : MonoBehaviour
 
                 }
 
-                if (_placeWithWall.GetCards().Count > 1 && _attackedCard is Minion && _attackingCard.Range <= 1)
+                if (_placeWithWall.GetCards().Count > 1 && _attackedCard.IsWarrior() && _attackingCard.Range <= 1)
                 {
                     continue;
                 }
@@ -538,14 +542,18 @@ public class TableActionsHandler : MonoBehaviour
 
             if (_attackingCard.Range != 0)
             {
+                Debug.Log("Range: "+_attackingCard.Range);
+                Debug.Log("Cost: "+CalculatePathCost(_attackingCardPlace, _attackablePlace, _attackingCard.MovementType, 1, CardActionType.Attack));
                 if (_attackingCard.Range <
                     CalculatePathCost(_attackingCardPlace, _attackablePlace, _attackingCard.MovementType, 1, CardActionType.Attack))
                 {
+                    Debug.Log(7777);
                     continue;
                 }
             }
             else if (_attackingCard.Range < _distance)
             {
+                    Debug.Log(8888);
                 continue;
             }
 
@@ -558,6 +566,7 @@ public class TableActionsHandler : MonoBehaviour
             }
 
             
+            Debug.Log("Looks like I can attack: ", _attackablePlace.gameObject);
             possibleActions.Add(new CardAction()
             {
                 FirstCardId = _attackingCard.UniqueId,
