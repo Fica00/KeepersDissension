@@ -37,7 +37,7 @@ public class CyberKeeper : CardSpecialAbility
         if (_placeId == -1)
         {
             Waste();
-            DialogsManager.Instance.ShowOkDialog("There are no opponent warriors in range");
+            DialogsManager.Instance.ShowOkDialog("Ultimate was used but no enemy Warrior nearby to be selected");
             return;
         }
 
