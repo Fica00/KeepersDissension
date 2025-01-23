@@ -2299,7 +2299,11 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (_available.IsOccupied)
                 {
-                    yield break;
+                    Keeper _keeper = _available.GetComponentInChildren<Keeper>();
+                    if (_keeper != null)
+                    {
+                        yield break;
+                    }
                 }
             }
             

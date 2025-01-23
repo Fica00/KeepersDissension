@@ -42,11 +42,6 @@ public class GameplayManager : MonoBehaviour
         {
             foreach (var _keeper in FindObjectsOfType<Keeper>())
             {
-                if (!_keeper.GetIsMy())
-                {
-                    continue;
-                }
-
                 if (_keeper.UniqueId == IdOfCardWithResponseAction())
                 {
                     return true;
