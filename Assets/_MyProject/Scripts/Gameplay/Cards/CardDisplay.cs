@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,13 +8,26 @@ public class CardDisplay: CardDisplayBase
     [SerializeField] private GameObject redBorder;
     [SerializeField] private Image foregroundDisplay;
     [SerializeField] private Image whiteBox;
+    [SerializeField] private TextMeshProUGUI nameHolder;
     private Card card;
     
     public override void Setup(Card _card)
     {
         card = _card;
+        SetName();
         TryShowRedBox();
         foregroundDisplay.sprite = card.Details.Foreground;
+    }
+
+    private void SetName()
+    {
+        string[] _nameSplit = card.name.Split("_");
+        string _name = _nameSplit[^1];
+        if (_name == "LifeForce")
+        {
+            _name = "Life Force";
+        }
+        nameHolder.text = _name;
     }
 
     public override bool ChangeSprite(Sprite _sprite)
@@ -53,5 +67,10 @@ public class CardDisplay: CardDisplayBase
         {
             redBorder.SetActive(true);
         }
+    }
+
+    public override void ManageNameDisplay(bool _status)
+    {
+        nameHolder.gameObject.SetActive(_status);
     }
 }

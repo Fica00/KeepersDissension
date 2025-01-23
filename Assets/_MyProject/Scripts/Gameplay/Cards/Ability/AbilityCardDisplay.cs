@@ -11,4 +11,9 @@ public class AbilityCardDisplay : CardDisplayBase
         abilityCard = _card;
         foreground.sprite = abilityCard.Details.Foreground;
     }
+
+    public override void ManageNameDisplay(bool _status)
+    {
+        
+    }
 }

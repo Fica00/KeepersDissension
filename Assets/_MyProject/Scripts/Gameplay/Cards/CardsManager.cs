@@ -47,6 +47,7 @@ public class CardsManager : MonoBehaviour
     {
         Card _desiredCard = GetCardData(_cardId);
         Card _cardObject = Instantiate(_desiredCard);
+        _cardObject.name = _desiredCard.name;
         return _cardObject;
         
          Card GetCardData(int _cardId) 
@@ -65,7 +66,6 @@ public class CardsManager : MonoBehaviour
             {
                 throw new System.Exception("Cant find prefab for card with id: " + _cardId);
             }
-
             return _desiredCard;
         }
     }

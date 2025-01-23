@@ -19,6 +19,11 @@ public class CardDisplayBase : MonoBehaviour
         throw new Exception("Change sprite must be implemented");
     }
 
+    public virtual void ManageNameDisplay(bool _status)
+    {
+        throw new Exception();
+    }
+
     public void Hide()
     {
         hideObj.SetActive(true);
