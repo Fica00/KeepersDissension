@@ -5,7 +5,12 @@ using UnityEngine;
 [Serializable]
 public class CardData
 {
-    private int placeId = -100;
+    public CardData()
+    {
+        PlaceId = -100;
+    }
+    
+    private int placeId;
 
     public int PlaceRoomOwnerId;
     
