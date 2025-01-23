@@ -38,7 +38,7 @@ public class AbilityData
         set
         {
             placeId = value;
-            if (placeId<=0)
+            if (placeId<=0 || placeId>=64)
             {
                 PlaceRoomOwnerId = placeId;
             }

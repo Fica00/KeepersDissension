@@ -13,7 +13,7 @@ public static class Utils
             return _position;
         }
 
-        if (_position<=0)
+        if (_position<=0 || _position>=64)
         {
             return _position;
         }
