@@ -1303,7 +1303,8 @@ public class GameplayManagerPvp : GameplayManager
         AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
         BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
         {
-            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = _placeOfDefendingCard,
+            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeOfDefendingCard,
+                RoomHandler.IsOwner),
         };
     }
 
@@ -1607,7 +1608,8 @@ public class GameplayManagerPvp : GameplayManager
             DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions(); });
         }
 
-        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = _placeId };
+        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = Utils.ConvertRoomPosition(_placeId, RoomHandler
+            .IsOwner) };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);
     }

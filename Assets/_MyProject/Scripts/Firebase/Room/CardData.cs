@@ -32,7 +32,14 @@ public class CardData
         set
         {
             placeId = value;
-            PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
+            if (placeId<0)
+            {
+                PlaceRoomOwnerId = placeId;
+            }
+            else
+            {
+                PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
+            }
         }
     }
 }
