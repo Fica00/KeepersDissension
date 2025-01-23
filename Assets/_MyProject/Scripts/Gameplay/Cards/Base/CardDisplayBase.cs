@@ -4,6 +4,7 @@ using UnityEngine;
 public class CardDisplayBase : MonoBehaviour
 {
     [SerializeField] private GameObject hideObj;
+    
     public virtual void Setup(Card _card)
     {
         throw new Exception("Setup card must be implemented");

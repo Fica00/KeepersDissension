@@ -16,4 +16,23 @@ public class AbilityCardDisplay : CardDisplayBase
     {
         
     }
+
+    private void Update()
+    {
+        TablePlaceHandler _place = GetComponentInParent<TablePlaceHandler>();
+        if (_place==null)
+        {
+            return;
+        }
+
+        if (!_place.IsActivationField)
+        {
+            Color _color = foreground.color;
+            _color.a = 1;
+            foreground.color = _color;
+            return;
+        }
+        
+        
+    }
 }
