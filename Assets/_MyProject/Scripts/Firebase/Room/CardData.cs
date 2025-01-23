@@ -38,16 +38,13 @@ public class CardData
         set
         {
             placeId = value;
-            Debug.Log("Setting place id: "+placeId);
             if (placeId<=0 || placeId>=64)
             {
-                Debug.Log(placeId);
                 PlaceRoomOwnerId = placeId;
             }
             else
             {
                 PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
-                Debug.Log(PlaceRoomOwnerId);
             }
         }
     }
