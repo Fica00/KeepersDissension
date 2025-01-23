@@ -36,14 +36,15 @@ public class CyberKeeper : CardSpecialAbility
     {
         if (_placeId == -1)
         {
-            RemoveAction();
-            SetCanUseAbility(false);
+            Waste();
+            DialogsManager.Instance.ShowOkDialog("There are no opponent warriors in range");
             return;
         }
 
         CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_placeId).GetCard();
         if (!(_cardAtSpot != null))
         {
+            Waste();
             DialogsManager.Instance.ShowOkDialog("Select warrior");
             return;
         }
@@ -52,12 +53,14 @@ public class CyberKeeper : CardSpecialAbility
         
         if (!_card.IsWarrior())
         {
+            Waste();
             DialogsManager.Instance.ShowOkDialog("Select warrior");
             return;
         }
 
         if (_card.My)
         {
+            Waste();
             DialogsManager.Instance.ShowOkDialog("Select opponents card");
             return;
         }
@@ -76,6 +79,12 @@ public class CyberKeeper : CardSpecialAbility
             GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;
         }
         RemoveAction();
+    }
+
+    private void Waste()
+    {
+        RemoveAction();
+        SetCanUseAbility(false);
     }
 
     private void RemoveAction()

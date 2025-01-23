@@ -7,6 +7,7 @@ public class Armor : AbilityEffect
         AddEffectedCard(_keeper.UniqueId);
         BlockaderCard _blockader = _keeper.EffectsHolder.AddComponent<BlockaderCard>();
         _blockader.Activate();
+        ManageActiveDisplay(true);
         EffectedCards.Add(_keeper.UniqueId);
         RemoveAction();
         OnActivated?.Invoke();

@@ -16,6 +16,7 @@ public class Scale : AbilityEffect
     {
         Card _keeper = GetEffectedCards()[0];
         _keeper.CardData.HasScaler = false;
+        RemoveEffectedCard(_keeper.UniqueId);
         ManageActiveDisplay(false);
         SetIsActive(false);
     }
