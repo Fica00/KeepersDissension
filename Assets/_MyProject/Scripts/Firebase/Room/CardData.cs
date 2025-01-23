@@ -32,7 +32,7 @@ public class CardData
         set
         {
             placeId = value;
-            if (placeId<0)
+            if (placeId<=0)
             {
                 PlaceRoomOwnerId = placeId;
             }
