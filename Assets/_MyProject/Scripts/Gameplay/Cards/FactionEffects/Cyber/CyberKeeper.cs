@@ -54,14 +54,14 @@ public class CyberKeeper : CardSpecialAbility
         if (!_card.IsWarrior())
         {
             Waste();
-            DialogsManager.Instance.ShowOkDialog("Select warrior");
+            DialogsManager.Instance.ShowOkDialog("Select warrior, wasted ultimate");
             return;
         }
 
         if (_card.My)
         {
             Waste();
-            DialogsManager.Instance.ShowOkDialog("Select opponents card");
+            DialogsManager.Instance.ShowOkDialog("Select opponents card, wasted ultimate");
             return;
         }
 
