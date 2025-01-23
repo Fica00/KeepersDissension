@@ -261,6 +261,10 @@ public class TableActionsHandler : MonoBehaviour
 
         foreach (var _placeAround in _neighborPlaces)
         {
+            if (_placeAround.ContainsPortal && _warriorCard is Guardian)
+            {
+                continue;
+            }
             bool _skip = false;
             if (_placeAround.IsOccupied)
             {
