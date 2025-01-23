@@ -953,10 +953,14 @@ public class GameplayManagerPvp : GameplayManager
                     continue;
                 }
 
+                Debug.Log("Checking if card has scaler");
                 if (!_card.HasScaler())
                 {
+                    Debug.Log("Card doesn't have scaler", _card.gameObject);
                     continue;
                 }
+
+                Debug.Log("Card has scaler", _card.gameObject);
 
                 IsFallingResponse = true;
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);

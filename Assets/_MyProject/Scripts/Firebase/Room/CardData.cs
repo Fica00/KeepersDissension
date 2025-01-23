@@ -25,6 +25,7 @@ public class CardData
     public bool HasSnowWallEffect;
     public bool HasSnowUltimateEffect;
     public int PercentageOfHealthToRecover=100;
+    public bool HasScaler;
     public CardPlace CardPlace = CardPlace.Deck;
     public WarriorAbilityData WarriorAbilityData = new ();
 

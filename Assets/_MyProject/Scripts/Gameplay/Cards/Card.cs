@@ -252,7 +252,7 @@ public class Card : CardBase
         
         if (_scale== null)
         {
-            return false;
+            return CardData.HasScaler;
         }
 
         return true;
