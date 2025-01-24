@@ -395,7 +395,7 @@ public class GameplayManager : MonoBehaviour
             StartCoroutine(SelectPlace(_availablePlaces, _ignoreWalls, _callBack,_allowWaste));
     }
     
-    protected IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack, bool _allowWaste)
+    protected IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack, bool _allowWaste=false)
     {
         foreach (var _availablePlace in _availablePlaces.ToList())
         {
@@ -431,16 +431,21 @@ public class GameplayManager : MonoBehaviour
 
         void DoSelectPlace(TablePlaceHandler _place)
         {
+            int _placeId = _place.Id;
             if (!_availablePlaces.Contains(_place))
             {
-                if (!_allowWaste)
+                if (_allowWaste)
+                {
+                    _placeId = -1;
+                }
+                else
                 {
                     return;
                 }
             }
 
             CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
-            _selectedPlaceId = _place.Id;
+            _selectedPlaceId = _placeId;
             _hasSelectedPlace = true;
         }
     }

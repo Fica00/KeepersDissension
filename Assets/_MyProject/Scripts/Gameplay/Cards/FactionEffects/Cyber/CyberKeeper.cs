@@ -29,7 +29,7 @@ public class CyberKeeper : CardSpecialAbility
     private void Activate()
     {
         GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, Card.Range, PlaceLookFor.Both,
-            CardMovementType.EightDirections, false, LookForCardOwner.Enemy, SelectedSpot);
+            CardMovementType.EightDirections, false, LookForCardOwner.Enemy, SelectedSpot, _allowWaste:true);
     }
 
     private void SelectedSpot(int _placeId)
@@ -84,8 +84,8 @@ public class CyberKeeper : CardSpecialAbility
     private void Waste()
     {
         GameplayManager.Instance.TellOpponentSomething("Opponent wasted his ultimate");
-        RemoveAction();
         SetCanUseAbility(false);
+        RemoveAction();
     }
 
     private void RemoveAction()
