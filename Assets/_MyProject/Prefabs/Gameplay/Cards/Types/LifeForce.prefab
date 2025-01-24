@@ -220,6 +220,11 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 88465185494110218, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 26.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4433261327810439544, guid: ee97601f94a7d25478ba75ae480050a0,
         type: 3}
       propertyPath: m_Pivot.x
@@ -357,24 +362,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <EffectsHolder>k__BackingField: {fileID: 6367512578200885801}
   Display: {fileID: 1727122813389235026}
-  MovementType: 0
+  AllowCardEffectOnDeath: 0
   Details:
     <Id>k__BackingField: 0
     <Type>k__BackingField: 6
     <Foreground>k__BackingField: {fileID: 0}
     <Background>k__BackingField: {fileID: 0}
     <Stats>k__BackingField:
+      MaxHealth: -1
       health: 0
-      Speed: 0
       Range: 0
       Damage: 0
+      Speed: 0
     <Faction>k__BackingField: {fileID: 0}
-  Stats:
-    health: 0
-    Speed: 0
-    Range: 0
-    Damage: 0
-  CanMoveOnWall: 0
   lifeForceDisplay: {fileID: 6378927646626708215}
 --- !u!224 &1727122812145846430 stripped
 RectTransform:

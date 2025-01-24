@@ -1,10 +1,16 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine;
 
 [Serializable]
 public class CardData
 {
-    private int placeId = -100;
+    public CardData()
+    {
+        PlaceId = -100;
+    }
+    
+    private int placeId;
 
     public int PlaceRoomOwnerId;
     
@@ -19,6 +25,7 @@ public class CardData
     public bool HasSnowWallEffect;
     public bool HasSnowUltimateEffect;
     public int PercentageOfHealthToRecover=100;
+    public bool HasScaler;
     public CardPlace CardPlace = CardPlace.Deck;
     public WarriorAbilityData WarriorAbilityData = new ();
 
@@ -32,7 +39,14 @@ public class CardData
         set
         {
             placeId = value;
-            PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
+            if (placeId<=0 || placeId>=64)
+            {
+                PlaceRoomOwnerId = placeId;
+            }
+            else
+            {
+                PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
+            }
         }
     }
 }

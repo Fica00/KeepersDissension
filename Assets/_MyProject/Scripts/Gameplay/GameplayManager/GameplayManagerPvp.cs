@@ -953,10 +953,14 @@ public class GameplayManagerPvp : GameplayManager
                     continue;
                 }
 
+                Debug.Log("Checking if card has scaler");
                 if (!_card.HasScaler())
                 {
+                    Debug.Log("Card doesn't have scaler", _card.gameObject);
                     continue;
                 }
+
+                Debug.Log("Card has scaler", _card.gameObject);
 
                 IsFallingResponse = true;
                 SetResponseAction(_card.My && RoomHandler.IsOwner, _card.UniqueId);
@@ -1303,7 +1307,8 @@ public class GameplayManagerPvp : GameplayManager
         AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
         BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
         {
-            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = _placeOfDefendingCard,
+            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeOfDefendingCard,
+                RoomHandler.IsOwner),
         };
     }
 
@@ -1607,7 +1612,8 @@ public class GameplayManagerPvp : GameplayManager
             DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions(); });
         }
 
-        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = _placeId };
+        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = Utils.ConvertRoomPosition(_placeId, RoomHandler
+            .IsOwner) };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);
     }
@@ -2297,7 +2303,11 @@ public class GameplayManagerPvp : GameplayManager
             {
                 if (_available.IsOccupied)
                 {
-                    yield break;
+                    Keeper _keeper = _available.GetComponentInChildren<Keeper>();
+                    if (_keeper != null)
+                    {
+                        yield break;
+                    }
                 }
             }
             

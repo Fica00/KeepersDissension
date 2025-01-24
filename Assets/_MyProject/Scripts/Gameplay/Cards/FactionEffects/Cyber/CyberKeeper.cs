@@ -28,22 +28,23 @@ public class CyberKeeper : CardSpecialAbility
 
     private void Activate()
     {
-        GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, Card.Range, PlaceLookFor.Occupied,
-            CardMovementType.EightDirections, false, LookForCardOwner.Enemy, SelectedSpot);
+        GameplayManager.Instance.SelectPlaceForSpecialAbility(TablePlaceHandler.Id, Card.Range, PlaceLookFor.Both,
+            CardMovementType.EightDirections, false, LookForCardOwner.Enemy, SelectedSpot, _allowWaste:true);
     }
 
     private void SelectedSpot(int _placeId)
     {
         if (_placeId == -1)
         {
-            RemoveAction();
-            SetCanUseAbility(false);
+            Waste();
+            DialogsManager.Instance.ShowOkDialog("Ultimate was used but no enemy Warrior nearby to be selected");
             return;
         }
 
         CardBase _cardAtSpot = GameplayManager.Instance.TableHandler.GetPlace(_placeId).GetCard();
         if (!(_cardAtSpot != null))
         {
+            Waste();
             DialogsManager.Instance.ShowOkDialog("Select warrior");
             return;
         }
@@ -52,13 +53,15 @@ public class CyberKeeper : CardSpecialAbility
         
         if (!_card.IsWarrior())
         {
-            DialogsManager.Instance.ShowOkDialog("Select warrior");
+            Waste();
+            DialogsManager.Instance.ShowOkDialog("Select warrior, wasted ultimate");
             return;
         }
 
         if (_card.My)
         {
-            DialogsManager.Instance.ShowOkDialog("Select opponents card");
+            Waste();
+            DialogsManager.Instance.ShowOkDialog("Select opponents card, wasted ultimate");
             return;
         }
 
@@ -75,6 +78,13 @@ public class CyberKeeper : CardSpecialAbility
         {
             GameplayManager.Instance.MyPlayer.OnEndedTurn += ReturnCard;
         }
+        RemoveAction();
+    }
+
+    private void Waste()
+    {
+        GameplayManager.Instance.TellOpponentSomething("Opponent wasted his ultimate");
+        SetCanUseAbility(false);
         RemoveAction();
     }
 

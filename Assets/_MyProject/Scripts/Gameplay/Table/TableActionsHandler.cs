@@ -261,6 +261,13 @@ public class TableActionsHandler : MonoBehaviour
 
         foreach (var _placeAround in _neighborPlaces)
         {
+            if (_placeAround.ContainsPortal && _warriorCard is Guardian _guardian)
+            {
+                if (_guardian.IsChained)
+                {
+                    continue;
+                }
+            }
             bool _skip = false;
             if (_placeAround.IsOccupied)
             {
@@ -449,25 +456,6 @@ public class TableActionsHandler : MonoBehaviour
         {
             if (_attackablePlace.ContainsPortal)
             {
-                TablePlaceHandler _placeOfExitPortal = FindObjectsOfType<PortalCard>().ToList().Find(_portal =>
-                    _portal.GetTablePlace().Id != _attackablePlace.Id).GetTablePlace();
-                int _distanceBetween = tableHandler.DistanceBetweenPlaces(_attackingCardPlace, _attackablePlace);
-                int _newRange = _attackingCard.Range - (_distanceBetween-1);
-                List<TablePlaceHandler> _placesAroundPortal = tableHandler.GetPlacesAround(_placeOfExitPortal.Id, _attackingCard.MovementType, _newRange);
-
-                foreach (var _placeAroundPortal in _placesAroundPortal)
-                {
-                    int _newDistance = tableHandler.DistanceBetweenPlaces(_placeOfExitPortal, _placeAroundPortal);
-                    TablePlaceHandler _newPlaceWithWall = tableHandler.GetPlaceWithWallInPath(_placeOfExitPortal, _placeAroundPortal);
-                    if (tableHandler.GetDirection(_attackablePlace.Id, _attackingCardPlace.Id) ==
-                        tableHandler.GetDirection(_placeOfExitPortal.Id, _placeAroundPortal.Id))
-                    {
-                        continue;
-                    }
-
-                    CheckAttackingPlace(_attackingCard, _placeAroundPortal, _newDistance, _placeOfExitPortal, _newPlaceWithWall);
-                }
-
                 continue;
             }
 

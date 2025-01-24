@@ -42,11 +42,6 @@ public class GameplayManager : MonoBehaviour
         {
             foreach (var _keeper in FindObjectsOfType<Keeper>())
             {
-                if (!_keeper.GetIsMy())
-                {
-                    continue;
-                }
-
                 if (_keeper.UniqueId == IdOfCardWithResponseAction())
                 {
                     return true;
@@ -340,7 +335,7 @@ public class GameplayManager : MonoBehaviour
 
     public void SelectPlaceForSpecialAbility(int _startingPosition, int _range, PlaceLookFor _lookForPlace,
         CardMovementType _movementType, bool _includeSelf, LookForCardOwner _lookFor, Action<int> _callBack,
-        bool _ignoreMarkers = true, bool _ignoreWalls=false)
+        bool _ignoreMarkers = true, bool _ignoreWalls=false, bool _allowWaste=false)
     {
        TableHandler.ActionsHandler.ClearPossibleActions();
         List<TablePlaceHandler> _availablePlaces = TableHandler.GetPlacesAround(_startingPosition, _movementType, _range, _includeSelf);
@@ -397,10 +392,10 @@ public class GameplayManager : MonoBehaviour
                 }
             }
 
-            StartCoroutine(SelectPlace(_availablePlaces, _ignoreWalls, _callBack));
+            StartCoroutine(SelectPlace(_availablePlaces, _ignoreWalls, _callBack,_allowWaste));
     }
     
-    protected IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack)
+    protected IEnumerator SelectPlace(List<TablePlaceHandler> _availablePlaces, bool _ignoreWalls, Action<int> _callBack, bool _allowWaste=false)
     {
         foreach (var _availablePlace in _availablePlaces.ToList())
         {
@@ -436,13 +431,21 @@ public class GameplayManager : MonoBehaviour
 
         void DoSelectPlace(TablePlaceHandler _place)
         {
+            int _placeId = _place.Id;
             if (!_availablePlaces.Contains(_place))
             {
-                return;
+                if (_allowWaste)
+                {
+                    _placeId = -1;
+                }
+                else
+                {
+                    return;
+                }
             }
 
             CardTableInteractions.OnPlaceClicked -= DoSelectPlace;
-            _selectedPlaceId = _place.Id;
+            _selectedPlaceId = _placeId;
             _hasSelectedPlace = true;
         }
     }

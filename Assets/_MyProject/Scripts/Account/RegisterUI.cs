@@ -64,6 +64,11 @@ public class RegisterUI : MonoBehaviour, IPanel
 
     private void Anonymous()
     {
+        DialogsManager.Instance.ShowYesNoDialog("Your progress won't be saved and your rank won't be recorded.\nContinue?",DoAnonymousAuth);
+    }
+
+    private void DoAnonymousAuth()
+    {
         HandleInteractables(false);
         AuthenticationCredentials _credentials = new AuthenticationCredentials { Email = GetEmail(), Password = GetPassword() , IsAnonymous = true};
         string _playerName = "Player" + Random.Range(1000, 10000);

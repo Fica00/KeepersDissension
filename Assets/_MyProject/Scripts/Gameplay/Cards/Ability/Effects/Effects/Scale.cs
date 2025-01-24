@@ -5,10 +5,8 @@ public class Scale : AbilityEffect
     {
         var _keeper = GameplayManager.Instance.GetMyKeeper();
         AddEffectedCard(_keeper.UniqueId);
+        _keeper.CardData.HasScaler = true;
         SetIsActive(true);
-        ScalerScale _scale = _keeper.EffectsHolder.AddComponent<ScalerScale>();
-        _scale.IsBaseCardsEffect = false;
-        _scale.Setup(false,null);
         OnActivated?.Invoke();
         ManageActiveDisplay(true);
         RemoveAction();
@@ -17,13 +15,8 @@ public class Scale : AbilityEffect
     protected override void CancelEffect()
     {
         Card _keeper = GetEffectedCards()[0];
-        ScalerScale _scale = _keeper.EffectsHolder.GetComponent<ScalerScale>();
-        if (_scale==null)
-        {
-            return;
-        }
-        
-        Destroy(_scale);
+        _keeper.CardData.HasScaler = false;
+        RemoveEffectedCard(_keeper.UniqueId);
         ManageActiveDisplay(false);
         SetIsActive(false);
     }

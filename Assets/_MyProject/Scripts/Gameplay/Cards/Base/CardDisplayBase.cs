@@ -4,6 +4,7 @@ using UnityEngine;
 public class CardDisplayBase : MonoBehaviour
 {
     [SerializeField] private GameObject hideObj;
+    
     public virtual void Setup(Card _card)
     {
         throw new Exception("Setup card must be implemented");
@@ -17,6 +18,11 @@ public class CardDisplayBase : MonoBehaviour
     public virtual bool ChangeSprite(Sprite _sprite)
     {
         throw new Exception("Change sprite must be implemented");
+    }
+
+    public virtual void ManageNameDisplay(bool _status)
+    {
+        throw new Exception();
     }
 
     public void Hide()

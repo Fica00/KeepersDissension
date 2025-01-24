@@ -220,6 +220,11 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 88465185494110218, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 27.3
+      objectReference: {fileID: 0}
     - target: {fileID: 4433261327810439544, guid: ee97601f94a7d25478ba75ae480050a0,
         type: 3}
       propertyPath: m_Pivot.x
@@ -334,7 +339,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4433261327810439544, guid: ee97601f94a7d25478ba75ae480050a0,
         type: 3}
-      insertIndex: -1
+      insertIndex: 3
       addedObject: {fileID: 8607104443703822240}
   m_SourcePrefab: {fileID: 100100000, guid: ee97601f94a7d25478ba75ae480050a0, type: 3}
 --- !u!114 &3187610984078535945 stripped
@@ -375,27 +380,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <EffectsHolder>k__BackingField: {fileID: 3814543914664211004}
   Display: {fileID: 3187610984078535945}
-  MovementType: 1
-  HasDied: 0
-  CanBeUsed: 1
-  Effects: []
+  AllowCardEffectOnDeath: 0
   Details:
     <Id>k__BackingField: 0
     <Type>k__BackingField: 4
     <Foreground>k__BackingField: {fileID: 0}
     <Background>k__BackingField: {fileID: 0}
     <Stats>k__BackingField:
+      MaxHealth: -1
       health: 0
       Range: 0
       Damage: 0
+      Speed: 0
     <Faction>k__BackingField: {fileID: 0}
-  Stats:
-    health: 0
-    Range: 0
-    Damage: 0
-  CanMoveOnWall: 0
-  Speed: 0
-  IsVoid: 0
   healthDisplay: {fileID: 5252065355753097969}
   healthHolder: {fileID: 3810480732120836737}
 --- !u!1 &3814543914664211004 stripped
@@ -404,6 +401,22 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1277528045495316413}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1693386187587430182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3814543914664211004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55d95c1e5c744b54f819a0f698675f3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsClickable>k__BackingField: 1
+  <Sprite>k__BackingField: {fileID: 21300000, guid: aac1d71f5b1b388449c72c3ffab85c10,
+    type: 3}
+  IsBaseCardsEffect: 1
 --- !u!114 &7237155615699631251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,22 +459,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 313a2ec91bb05844e99169467dac4edb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <IsClickable>k__BackingField: 1
-  <Sprite>k__BackingField: {fileID: 21300000, guid: aac1d71f5b1b388449c72c3ffab85c10,
-    type: 3}
-  IsBaseCardsEffect: 1
---- !u!114 &1693386187587430182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3814543914664211004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55d95c1e5c744b54f819a0f698675f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   <IsClickable>k__BackingField: 1

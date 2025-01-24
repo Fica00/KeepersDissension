@@ -217,9 +217,9 @@ namespace FirebaseMultiplayer.Room
                 if (_shouldSpawnCard)
                 {
                     GameplayManager.Instance.OpponentCreatedCard(_card);
-                    if (_card.PlaceId != -100)
+                    if (_card.PlaceRoomOwnerId != -100)
                     {
-                        ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                        ShowCardMoved(_card.UniqueId, _card.PlaceRoomOwnerId);
                     }
                 }
             }
@@ -261,7 +261,7 @@ namespace FirebaseMultiplayer.Room
                         continue;
                     }
                     
-                    if (_card.PlaceId != _existingCard.PlaceId)
+                    if (_card.PlaceRoomOwnerId != _existingCard.PlaceRoomOwnerId)
                     {
                         _shouldMoveCard = true;
                         break;
@@ -270,7 +270,7 @@ namespace FirebaseMultiplayer.Room
 
                 if (_shouldMoveCard)
                 {
-                    ShowCardMoved(_card.UniqueId, _card.PlaceId);
+                    ShowCardMoved(_card.UniqueId, _card.PlaceRoomOwnerId);
                 }
             }
         }
@@ -371,7 +371,8 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.StrangeMatterAnimation;
-            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,Utils.ConvertPosition(_animationData.PositionId));
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,Utils.ConvertRoomPosition(_animationData
+                .PositionId, IsOwner));
         }
 
         private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
@@ -535,8 +536,6 @@ namespace FirebaseMultiplayer.Room
 
         private void ShowCardMoved(string _uniqueId, int _placeId)
         {
-            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertPosition(_placeId),null);
-            return;
             GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertRoomPosition(_placeId, IsOwner),null);
         }
         
@@ -579,7 +578,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertPosition(_animationData.PlaceId));
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceId, IsOwner));
         }
         
         private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
