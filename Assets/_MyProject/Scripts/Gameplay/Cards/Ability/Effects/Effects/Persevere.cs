@@ -1,3 +1,6 @@
+using System.Collections;
+using UnityEngine;
+
 public class Persevere : AbilityEffect
 {
     private int attackChange=1;
@@ -5,12 +8,21 @@ public class Persevere : AbilityEffect
     protected override void ActivateForOwner()
     {
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
-        GameplayManager.OnStartedResponseAction += CheckKeeper;
+        GameplayManager.OnStartedResponseAction += CheckWithDelay;
         AddEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth += CheckKeeper;
         CheckKeeper(_keeper);
         RemoveAction();
         OnActivated?.Invoke();
+    }
+
+    private void CheckWithDelay()
+    {
+        StartCoroutine(CheckRoutine());
+        IEnumerator CheckRoutine()
+        {
+            yield return new WaitForSeconds(1);
+        }
     }
 
     private void CheckKeeper()
@@ -23,8 +35,10 @@ public class Persevere : AbilityEffect
     {
         if (!GameplayManager.Instance.IsMyTurn())
         {
+            Debug.Log("It is not my turn");
             if (!GameplayManager.Instance.IsMyResponseAction())
             {
+                Debug.Log("It is not my response actions");
                 return;
             }
         }
@@ -45,7 +59,7 @@ public class Persevere : AbilityEffect
 
     protected override void CancelEffect()
     {
-        GameplayManager.OnStartedResponseAction -= CheckKeeper;
+        GameplayManager.OnStartedResponseAction -= CheckWithDelay;
         Card _keeper = GetEffectedCards()[0];
         RemoveEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth -= CheckKeeper;
