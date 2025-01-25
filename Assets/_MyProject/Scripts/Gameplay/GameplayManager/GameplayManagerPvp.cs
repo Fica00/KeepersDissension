@@ -2917,6 +2917,7 @@ public class GameplayManagerPvp : GameplayManager
         {
             IdOfCardWithResponse = _uniqueId;
             BoardData.IdsOfCardWithResponseAction.Remove(_uniqueId);
+            OnStartedResponseAction?.Invoke();
         }
     }
 

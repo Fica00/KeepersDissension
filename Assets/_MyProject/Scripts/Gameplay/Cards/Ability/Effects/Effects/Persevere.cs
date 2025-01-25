@@ -5,6 +5,7 @@ public class Persevere : AbilityEffect
     protected override void ActivateForOwner()
     {
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
+        GameplayManager.OnStartedResponseAction += CheckKeeper;
         AddEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth += CheckKeeper;
         CheckKeeper(_keeper);
@@ -44,6 +45,7 @@ public class Persevere : AbilityEffect
 
     protected override void CancelEffect()
     {
+        GameplayManager.OnStartedResponseAction -= CheckKeeper;
         Card _keeper = GetEffectedCards()[0];
         RemoveEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth -= CheckKeeper;
