@@ -141,12 +141,12 @@ public class BomberMinefield : CardSpecialAbility
 
             foreach (var _bomberData in _cardData.WarriorAbilityData.BomberData)
             {
-                if (bomberData.BombPlace == -1)
+                if (bomberData.BombPlaceOwner == -1)
                 {
                     continue;
                 }
 
-                if (_bomberData.BombPlace != _placeId)
+                if (_bomberData.BombPlaceOwner != Utils.ConvertRoomPosition(_placeId, GameplayManager.Instance.IsRoomOwner()))
                 {
                     continue;
                 }
@@ -195,7 +195,7 @@ public class BomberMinefield : CardSpecialAbility
             {
                 if (_place.Id == _placeId)
                 {
-                    bomberData.BombPlace = _place.Id;
+                    bomberData.BombPlaceOwner = Utils.ConvertRoomPosition(_place.Id, GameplayManager.Instance.IsRoomOwner());
                 }
                 _markers.Add(_place.GetMarker().UniqueId);
                 continue;
@@ -215,14 +215,14 @@ public class BomberMinefield : CardSpecialAbility
             _markers.Add(_marker.UniqueId);
             if (_place.Id == _placeId)
             {
-                bomberData.BombPlace = _placeId;
+                bomberData.BombPlaceOwner = Utils.ConvertRoomPosition(_placeId, GameplayManager.Instance.IsRoomOwner());
             }
             GameplayManager.Instance.PlaceCard(_marker, _place.Id);
             GameplayManager.Instance.TableHandler.ActionsHandler.ClearPossibleActions();
         }
 
 
-        bomberData.PlacedPlace = Card.GetTablePlace().Id;
+        bomberData.PlacedPlaceOwner = Utils.ConvertRoomPosition(Card.GetTablePlace().Id, GameplayManager.Instance.IsRoomOwner());
         foreach (var _markerPlace in _markers)
         {
             GameplayManager.Instance.ChangeSprite(_markerPlace, Card.Details.Faction.Id + 1, true);
@@ -249,18 +249,21 @@ public class BomberMinefield : CardSpecialAbility
 
         foreach (var _bomberData in Card.CardData.WarriorAbilityData.BomberData)
         {
-            if (_bomberData.BombPlace == -1)
+            if (_bomberData.BombPlaceOwner == -1)
             {
                 continue;
             }
 
-            if (_bomberData.BombPlace != _finishingPlaceId)
+            if (_bomberData.BombPlaceOwner != Utils.ConvertRoomPosition(_finishingPlaceId, GameplayManager.Instance.IsRoomOwner()))
             {
                 continue;
             }
 
             List<TablePlaceHandler> _placesAround =
-                GameplayManager.Instance.TableHandler.GetPlacesAround(_bomberData.PlacedPlace, CardMovementType.EightDirections);
+                GameplayManager.Instance.TableHandler.GetPlacesAround(Utils.ConvertRoomPosition(_bomberData.PlacedPlaceOwner, GameplayManager
+                .Instance.IsRoomOwner()), 
+                CardMovementType
+                .EightDirections);
             
             foreach (var _placeAround in _placesAround)
             {

@@ -613,7 +613,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceId, IsOwner));
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceIdOwner, IsOwner));
         }
         
         private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)

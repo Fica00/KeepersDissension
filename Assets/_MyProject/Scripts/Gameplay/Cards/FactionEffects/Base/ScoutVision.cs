@@ -42,7 +42,7 @@ public class ScoutVision : CardSpecialAbility
 
                 foreach (var _bomberData in _card.WarriorAbilityData.BomberData)
                 {
-                    if (_bomberData.BombPlace == _cardAround.GetTablePlace().Id)
+                    if (_bomberData.BombPlaceOwner == Utils.ConvertRoomPosition(_cardAround.GetTablePlace().Id, GameplayManager.Instance.IsRoomOwner()))
                     {
                         GameplayManager.Instance.MarkMarkerAsBomb(_cardAround.UniqueId);
                         _skip = true;

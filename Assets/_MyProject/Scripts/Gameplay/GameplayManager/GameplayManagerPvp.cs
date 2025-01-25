@@ -1618,7 +1618,7 @@ public class GameplayManagerPvp : GameplayManager
             DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions(); });
         }
 
-        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = Utils.ConvertRoomPosition(_placeId, RoomHandler
+        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceIdOwner = Utils.ConvertRoomPosition(_placeId, RoomHandler
             .IsOwner) };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);

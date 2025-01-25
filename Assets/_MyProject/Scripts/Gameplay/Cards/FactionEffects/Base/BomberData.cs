@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 
 [Serializable]
 public class BomberData
 {
-    public int BombPlace = -1;
-    public int PlacedPlace = -1;
+    public int BombPlaceOwner = -1;
+    public int PlacedPlaceOwner = -1;
 }
