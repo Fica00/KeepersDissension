@@ -21,6 +21,13 @@ public class CardDisplay: CardDisplayBase
 
     private void SetName()
     {
+        if (card is Wall or Marker)
+        {
+            nameHolder.text = string.Empty;
+            nameHolder.gameObject.SetActive(false);
+            return;
+        }
+        
         string[] _nameSplit = card.name.Split("_");
         string _name = _nameSplit[^1];
         if (_name == "LifeForce")
