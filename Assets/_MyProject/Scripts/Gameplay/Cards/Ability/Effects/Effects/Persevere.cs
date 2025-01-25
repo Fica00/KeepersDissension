@@ -7,7 +7,6 @@ public class Persevere : AbilityEffect
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
         AddEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth += CheckKeeper;
-        GameplayManager.Instance.MyPlayer.OnStartedTurn += CheckKeeper;
         CheckKeeper(_keeper);
         RemoveAction();
         OnActivated?.Invoke();
@@ -25,6 +24,7 @@ public class Persevere : AbilityEffect
         {
             return;
         }
+        
         if (IsApplied&&_keeper.Health>2)
         {
             SetIsApplied(false);
@@ -41,7 +41,6 @@ public class Persevere : AbilityEffect
 
     protected override void CancelEffect()
     {
-        GameplayManager.Instance.MyPlayer.OnStartedTurn -= CheckKeeper;
         Card _keeper = GetEffectedCards()[0];
         RemoveEffectedCard(_keeper.UniqueId);
         _keeper.UpdatedHealth -= CheckKeeper;
