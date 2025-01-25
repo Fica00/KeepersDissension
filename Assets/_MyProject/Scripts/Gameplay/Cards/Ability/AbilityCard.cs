@@ -320,7 +320,7 @@ public class AbilityCard : CardBase
         var _activationFiled = GetIsMy()
             ? GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField
             : GameplayManager.Instance.OpponentPlayer.TableSideHandler.ActivationField;
-        int _amountOfCardsInActivationField = _activationFiled.GetCards().Count ;
+        int _amountOfCardsInActivationField = _activationFiled.GetCards().Count;
         float _amountOfCardsOnTop = _amountOfCardsInActivationField - Data.PlaceInActivationField; 
         float _percentage;
         if (_amountOfCardsOnTop == 0)
@@ -336,7 +336,7 @@ public class AbilityCard : CardBase
             }
         }
 
-        if (_percentage > _minTransparency)
+        if (_percentage < _minTransparency)
         {
             _percentage = _minTransparency;
         }
