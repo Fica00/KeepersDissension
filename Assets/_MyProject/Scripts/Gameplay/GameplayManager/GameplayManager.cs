@@ -18,6 +18,7 @@ public class GameplayManager : MonoBehaviour
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
+    protected string IdOfCardWithResponse;
     
     [SerializeField] private HealthTracker healthTracker;
 
@@ -1306,6 +1307,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual bool IsKeeperRepositionAction()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChooseCardForResponseAction()
     {
         throw new Exception();
     }

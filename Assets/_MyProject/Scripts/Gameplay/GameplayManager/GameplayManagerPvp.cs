@@ -973,7 +973,7 @@ public class GameplayManagerPvp : GameplayManager
 
     private void SetResponseAction(bool _forMe, string _uniqueCardId)
     {
-        BoardData.IdOfCardWithResponseAction = _uniqueCardId;
+        BoardData.IdsOfCardWithResponseAction.Add(_uniqueCardId);
         if (_forMe)
         {
             if (RoomHandler.IsOwner)
@@ -1493,6 +1493,12 @@ public class GameplayManagerPvp : GameplayManager
                 return;
             }
 
+            if (BoardData.IdsOfCardWithResponseAction.Count>0)
+            {
+                ChooseCardForResponseAction();
+                return;
+            }
+
             SetGameplaySubState(GameplaySubState.Playing);
             RoomUpdater.Instance.ForceUpdate();
             AudioManager.Instance.PlaySoundEffect("EndTurn");
@@ -1949,12 +1955,7 @@ public class GameplayManagerPvp : GameplayManager
 
     public override string IdOfCardWithResponseAction()
     {
-        return BoardData.IdOfCardWithResponseAction;
-    }
-
-    private void SetIdOfCardWithResponseAction(string _cardId)
-    {
-        BoardData.IdOfCardWithResponseAction = _cardId;
+        return IdOfCardWithResponse;
     }
 
     public override void ChangeLootAmountForMe(int _amount)
@@ -2860,7 +2861,6 @@ public class GameplayManagerPvp : GameplayManager
         return false;
     }
 
-
     public override bool HasCardResponseAction(string _uniqueId)
     {
         return IdOfCardWithResponseAction() == _uniqueId;
@@ -2874,5 +2874,51 @@ public class GameplayManagerPvp : GameplayManager
     public override bool IsKeeperRepositionAction()
     {
         return GetGameplaySubState() is GameplaySubState.Player1UseKeeperReposition or GameplaySubState.Player2UseKeeperReposition; 
+    }
+
+    public override void ChooseCardForResponseAction()
+    {
+        List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
+        foreach (var _possibleCard in _possibleCards.ToList())
+        {
+            Card _card = GetCard(_possibleCard);
+            if (!_card.GetIsMy())
+            {
+                _possibleCards.Remove(_card.UniqueId);
+            }
+        }
+
+        if (_possibleCards.Count==0)
+        {
+            return;
+        }
+        
+        if (_possibleCards.Count==1)
+        {
+            IdOfCardWithResponse = _possibleCards[0];
+        }
+        else
+        {
+            List<CardBase> _cards = new List<CardBase>();
+            foreach (var _possibleCardId in _possibleCards)
+            {
+                var _card = GetCard(_possibleCardId);
+                if (!_card.GetIsMy())
+                {
+                    continue;
+                }
+                _cards.Add(_card);
+            }
+            
+            ChooseCardImagePanel.Instance.Show(_cards,SetAsResponseCard,false,true);
+        }
+        
+        void SetAsResponseCard(CardBase _cardBase)
+        {
+            Card _card = _cardBase as Card;
+            string _uniqueId = _card.UniqueId;
+            IdOfCardWithResponse = _uniqueId;
+            BoardData.IdsOfCardWithResponseAction.Remove(_uniqueId);
+        }
     }
 }

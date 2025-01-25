@@ -156,6 +156,7 @@ namespace FirebaseMultiplayer.Room
             CheckForVetoAnimation(_currentRoomState, _data);
             CheckForSpriteChange(_currentRoomState, _data);
             CheckForMessages(_currentRoomState, _data);
+            CheckForResponseAction(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -407,6 +408,38 @@ namespace FirebaseMultiplayer.Room
                 RoomUpdater.Instance.ForceUpdate();
             }
         }
+        
+        private void CheckForResponseAction(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Playing)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Playing)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+
+            void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
         private void CheckForResponseActionSound(RoomData _currentRoomData,RoomData _data)
         {
             if (IsOwner)
