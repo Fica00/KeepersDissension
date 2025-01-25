@@ -315,7 +315,9 @@ public class AbilityCard : CardBase
 
     public float GetBringBackPercentage()
     {
-        float _minTransparency = 0.2f;
+        float _maxValue = 1;
+        float _minTransparency = 0.5f;
+        float _leftOver = _maxValue - _minTransparency;
         
         var _activationFiled = GetIsMy()
             ? GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField
@@ -341,6 +343,6 @@ public class AbilityCard : CardBase
             _percentage = _minTransparency;
         }
 
-        return _percentage;
+        return _maxValue-(_leftOver-_leftOver*_percentage);
     }
 }
