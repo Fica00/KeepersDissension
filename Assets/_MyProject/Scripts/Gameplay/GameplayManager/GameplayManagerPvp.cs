@@ -2876,7 +2876,7 @@ public class GameplayManagerPvp : GameplayManager
         return GetGameplaySubState() is GameplaySubState.Player1UseKeeperReposition or GameplaySubState.Player2UseKeeperReposition; 
     }
 
-    public override void ChooseCardForResponseAction()
+    public override void ChooseCardForResponseAction(bool _reduceManaIfPossible = false)
     {
         List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
         Debug.Log("Possible cards: "+_possibleCards.Count);
@@ -2901,6 +2901,10 @@ public class GameplayManagerPvp : GameplayManager
         }
         else
         {
+            if (_reduceManaIfPossible)
+            {
+                BoardData.OpponentPlayer.ActionsLeft--;
+            }
             List<CardBase> _cards = new List<CardBase>();
             foreach (var _possibleCardId in _possibleCards)
             {

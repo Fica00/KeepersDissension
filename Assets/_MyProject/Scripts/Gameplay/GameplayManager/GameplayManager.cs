@@ -1311,7 +1311,7 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public virtual void ChooseCardForResponseAction()
+    public virtual void ChooseCardForResponseAction(bool _reduceManaIfPossible=false)
     {
         throw new Exception();
     }
