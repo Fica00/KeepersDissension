@@ -22,6 +22,7 @@ public class Persevere : AbilityEffect
         IEnumerator CheckRoutine()
         {
             yield return new WaitForSeconds(1);
+            CheckKeeper();
         }
     }
 
@@ -43,6 +44,7 @@ public class Persevere : AbilityEffect
             }
         }
         
+        Debug.Log($"Is active: {IsApplied}, health: {_keeper.Health}");
         if (IsApplied&&_keeper.Health>2)
         {
             SetIsApplied(false);
