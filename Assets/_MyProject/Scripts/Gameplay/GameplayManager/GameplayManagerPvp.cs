@@ -347,7 +347,6 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         AudioManager.Instance.PlaySoundEffect("Attack");
-        int _attackerPlace = _attackingCard.GetTablePlace().Id;
         int _defenderPlace = _defendingCard.GetTablePlace().Id;
 
         if (_attackingCard == _defendingCard)
@@ -1041,7 +1040,7 @@ public class GameplayManagerPvp : GameplayManager
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
-            _lifeForce.ChangeHealth(-_defendingCard.Health);
+            _lifeForce.ChangeHealth(-5);
 
             if (IsAbilityActive<Explode>())
             {
@@ -1473,12 +1472,6 @@ public class GameplayManagerPvp : GameplayManager
                 _availablePlaces.Add(_place);
             }
         }
-    }
-
-    private void ReplaceKeeper(CardBase _card, int _placeId, Action _callBack)
-    {
-        PlaceCard(_card, _placeId);
-        _callBack?.Invoke();
     }
 
     public override void EndTurn()

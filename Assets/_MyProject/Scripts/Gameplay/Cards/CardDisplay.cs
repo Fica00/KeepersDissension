@@ -21,10 +21,10 @@ public class CardDisplay: CardDisplayBase
 
     private void SetName()
     {
+        ManageNameDisplay(false);
         if (card is Wall or Marker)
         {
             nameHolder.text = string.Empty;
-            nameHolder.gameObject.SetActive(false);
             return;
         }
         
