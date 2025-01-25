@@ -28,14 +28,16 @@ public class Persevere : AbilityEffect
         if (IsApplied&&_keeper.Health>2)
         {
             SetIsApplied(false);
-            _keeper.ChangeDamage(-attackChange) ;
+            _keeper.ChangeDamage(-attackChange);
             ManageActiveDisplay(false);
+            RoomUpdater.Instance.ForceUpdate();
         }
         else if (!IsApplied&& _keeper.Health<=2)
         {
             SetIsApplied(true);
             _keeper.ChangeDamage(attackChange);
             ManageActiveDisplay(true);
+            RoomUpdater.Instance.ForceUpdate();
         }
     }
 
