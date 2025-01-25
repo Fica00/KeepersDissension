@@ -28,6 +28,12 @@ public class CardDisplay: CardDisplayBase
             _name = "Life Force";
         }
         nameHolder.text = _name;
+        
+        //set font color
+        Material _newMaterial = Instantiate(nameHolder.fontMaterial);
+        _newMaterial.SetColor(ShaderUtilities.ID_OutlineColor, card.GetIsMy() ? card.Details.Faction.NameColor: card.Details.Faction.NameColorOpponent);
+
+        nameHolder.fontMaterial = _newMaterial;
     }
 
     public override bool ChangeSprite(Sprite _sprite)

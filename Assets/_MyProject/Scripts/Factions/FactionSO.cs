@@ -12,6 +12,8 @@ public class FactionSO : ScriptableObject
     public Sprite Board;
     public Sprite CardBackground;
     public Sprite BombSprite;
+    [ColorUsage(true,true)]public Color NameColor;
+    [ColorUsage(true,true)]public Color NameColorOpponent;
 
     public bool IsSnow => Id == 0;
     public bool IsCyber => Id == 1;
