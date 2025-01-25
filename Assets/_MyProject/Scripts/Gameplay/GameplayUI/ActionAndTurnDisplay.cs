@@ -44,6 +44,7 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _color = opponentColor;
             }
             
+            Debug.Log(GameplayManager.Instance.IsResponseAction());
             if (GameplayManager.Instance.IsResponseAction())
             {
                 _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";

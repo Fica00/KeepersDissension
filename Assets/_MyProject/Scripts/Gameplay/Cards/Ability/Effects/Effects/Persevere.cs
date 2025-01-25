@@ -22,7 +22,10 @@ public class Persevere : AbilityEffect
     {
         if (!GameplayManager.Instance.IsMyTurn())
         {
-            return;
+            if (!GameplayManager.Instance.IsMyResponseAction())
+            {
+                return;
+            }
         }
         
         if (IsApplied&&_keeper.Health>2)
