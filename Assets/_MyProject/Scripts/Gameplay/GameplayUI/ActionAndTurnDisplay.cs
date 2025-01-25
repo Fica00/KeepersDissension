@@ -50,7 +50,8 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _color = responseColor;
                 _number = GameplayManager.Instance.AmountOfResponseActions(GameplayManager.Instance.IsMyResponseAction());
             }
-            else if (GameplayManager.Instance.IsKeeperRepositionAction())
+            
+            if (GameplayManager.Instance.IsKeeperRepositionAction())
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
                 bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
@@ -69,7 +70,8 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _number = 1;
                 _color = responseColor;
             }
-            else if (GameplayManager.Instance.IsDeliveryReposition())
+            
+            if (GameplayManager.Instance.IsDeliveryReposition())
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
                 bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
