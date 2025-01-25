@@ -414,7 +414,7 @@ namespace FirebaseMultiplayer.Room
             var _currentState = _currentRoomData.GameplaySubState;
             if (IsOwner)
             {
-                if (_data.GameplaySubState == GameplaySubState.Playing)
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
                     {
@@ -425,7 +425,7 @@ namespace FirebaseMultiplayer.Room
             }
             else
             {
-                if (_data.GameplaySubState == GameplaySubState.Playing)
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
                 {
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
                     {
