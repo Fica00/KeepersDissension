@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ public class ActivationFiledAbilityDisplay : MonoBehaviour
     public static Action<AbilityCard> OnClicked;
     [SerializeField] private Image image;
     [SerializeField] private Button button;
+    [SerializeField] private TextMeshProUGUI progress;
 
     private AbilityCard abilityCard;
     public AbilityCard AbilityCard => abilityCard;
@@ -15,6 +17,8 @@ public class ActivationFiledAbilityDisplay : MonoBehaviour
     {
         abilityCard = _abilityCard;
         image.sprite = CardsManager.Instance.GetAbilityImage(_abilityCard.Details.Id);
+        button.interactable = abilityCard.CanReturnFromActivationField();
+        progress.text = abilityCard.GetTextForActivationField();
     }
 
     private void OnEnable()
