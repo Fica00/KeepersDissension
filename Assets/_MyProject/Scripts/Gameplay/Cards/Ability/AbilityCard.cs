@@ -312,4 +312,35 @@ public class AbilityCard : CardBase
     {
         ActiveDisplay.gameObject.SetActive(_status);
     }
+
+    public float GetBringBackPercentage()
+    {
+        float _minTransparency = 0.2f;
+        
+        var _activationFiled = GetIsMy()
+            ? GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField
+            : GameplayManager.Instance.OpponentPlayer.TableSideHandler.ActivationField;
+        int _amountOfCardsInActivationField = _activationFiled.GetCards().Count +1 ;
+        float _amountOfCardsOnTop = _amountOfCardsInActivationField - Data.PlaceInActivationField; 
+        float _percentage;
+        if (_amountOfCardsOnTop == 0)
+        {
+            _percentage = 0;
+        }
+        else
+        {
+            _percentage = _amountOfCardsOnTop / effect.Cooldown;
+            if (_percentage > 1)
+            {
+                _percentage = 1;
+            }
+        }
+
+        if (_percentage > _minTransparency)
+        {
+            _percentage = _minTransparency;
+        }
+
+        return _percentage;
+    }
 }
