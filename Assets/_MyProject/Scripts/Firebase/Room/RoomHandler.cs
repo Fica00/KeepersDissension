@@ -419,7 +419,7 @@ namespace FirebaseMultiplayer.Room
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
                     {
                         Debug.Log("Detected response action");
-                        GameplayManager.Instance.ChooseCardForResponseAction(true);
+                        GameplayManager.Instance.ChooseCardForResponseAction();
                     }
                 }
             }
@@ -430,7 +430,7 @@ namespace FirebaseMultiplayer.Room
                     if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
                     {
                         Debug.Log("Detected response action");
-                        GameplayManager.Instance.ChooseCardForResponseAction(true);
+                        GameplayManager.Instance.ChooseCardForResponseAction();
                     }
                 }
             }
