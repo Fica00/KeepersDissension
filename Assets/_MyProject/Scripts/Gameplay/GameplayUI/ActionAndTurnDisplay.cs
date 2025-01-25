@@ -44,12 +44,12 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _color = opponentColor;
             }
             
-            Debug.Log(GameplayManager.Instance.IsResponseAction());
             if (GameplayManager.Instance.IsResponseAction())
             {
                 _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
                 _color = responseColor;
-                _number = GameplayManager.Instance.AmountOfResponseActions(GameplayManager.Instance.IsMyResponseAction());
+                int _actions = GameplayManager.Instance.AmountOfResponseActions(GameplayManager.Instance.IsMyResponseAction());
+                _number = _actions > 1 ? _actions : 1;
             }
             
             if (GameplayManager.Instance.IsKeeperRepositionAction())
