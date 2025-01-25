@@ -1,7 +1,7 @@
 public class Persevere : AbilityEffect
 {
     private int attackChange=1;
-    
+
     protected override void ActivateForOwner()
     {
         Card _keeper = GameplayManager.Instance.GetMyKeeper();
@@ -30,14 +30,12 @@ public class Persevere : AbilityEffect
             SetIsApplied(false);
             _keeper.ChangeDamage(-attackChange);
             ManageActiveDisplay(false);
-            RoomUpdater.Instance.ForceUpdate();
         }
         else if (!IsApplied&& _keeper.Health<=2)
         {
             SetIsApplied(true);
             _keeper.ChangeDamage(attackChange);
             ManageActiveDisplay(true);
-            RoomUpdater.Instance.ForceUpdate();
         }
     }
 

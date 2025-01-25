@@ -48,7 +48,7 @@ public class AbilityEffect : MonoBehaviour
         
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         CancelEffect();
     }
