@@ -2879,13 +2879,11 @@ public class GameplayManagerPvp : GameplayManager
     public override void ChooseCardForResponseAction()
     {
         List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
-        Debug.Log("Possible cards: "+_possibleCards.Count);
         foreach (var _possibleCard in _possibleCards.ToList())
         {
             Card _card = GetCard(_possibleCard);
             if (!_card.GetIsMy())
             {
-                Debug.Log("Not mine....");
                 _possibleCards.Remove(_card.UniqueId);
             }
         }
@@ -2927,5 +2925,20 @@ public class GameplayManagerPvp : GameplayManager
             IdOfCardWithResponse = _uniqueId;
             BoardData.IdsOfCardWithResponseAction.Remove(_uniqueId);
         }
+    }
+
+    public override int AmountOfResponseActions(bool _forMe)
+    {
+        List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
+        foreach (var _possibleCard in _possibleCards.ToList())
+        {
+            Card _card = GetCard(_possibleCard);
+            if (_card.GetIsMy() == _forMe)
+            {
+                _possibleCards.Remove(_card.UniqueId);
+            }
+        }
+
+        return _possibleCards.Count;
     }
 }

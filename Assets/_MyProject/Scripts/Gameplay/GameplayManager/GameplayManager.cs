@@ -1315,4 +1315,9 @@ public class GameplayManager : MonoBehaviour
     {
         throw new Exception();
     }
+
+    public virtual int AmountOfResponseActions(bool _forMe)
+    {
+        throw new Exception();
+    }
 }

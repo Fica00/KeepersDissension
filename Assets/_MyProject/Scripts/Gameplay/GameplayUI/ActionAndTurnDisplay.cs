@@ -44,33 +44,6 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _color = opponentColor;
             }
 
-            if (GameplayManager.Instance.IsResponseAction())
-            {
-                _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
-                _color = responseColor;
-                _number = 1;
-            }
-
-            if (GameplayManager.Instance.IsDeliveryReposition())
-            {
-                var _subState = GameplayManager.Instance.GetGameplaySubState();
-                bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
-                string _myText = "Your delivery reposition action";
-                string _opponentText = "Opponents is choosing delivery spot";
-                
-                if (_subState is GameplaySubState.Player1DeliveryReposition)
-                {
-                    _text = _isRoomOwner ? _myText : _opponentText;
-                }
-                else
-                {
-                    _text = _isRoomOwner ? _opponentText : _myText;
-                }
-                
-                _number = 1;
-                _color = responseColor;
-            }
-
             if (GameplayManager.Instance.IsKeeperRepositionAction())
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
@@ -89,6 +62,31 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 
                 _number = 1;
                 _color = responseColor;
+            }
+            else if (GameplayManager.Instance.IsDeliveryReposition())
+            {
+                var _subState = GameplayManager.Instance.GetGameplaySubState();
+                bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
+                string _myText = "Your delivery reposition action";
+                string _opponentText = "Opponents is choosing delivery spot";
+                
+                if (_subState is GameplaySubState.Player1DeliveryReposition)
+                {
+                    _text = _isRoomOwner ? _myText : _opponentText;
+                }
+                else
+                {
+                    _text = _isRoomOwner ? _opponentText : _myText;
+                }
+                
+                _number = 1;
+                _color = responseColor;
+            }
+            else if (GameplayManager.Instance.IsResponseAction())
+            {
+                _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
+                _color = responseColor;
+                _number = GameplayManager.Instance.AmountOfResponseActions(GameplayManager.Instance.IsMyResponseAction());
             }
           
 
