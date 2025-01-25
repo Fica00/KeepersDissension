@@ -19,6 +19,10 @@ public class ActivationFiledAbilityDisplay : MonoBehaviour
         image.sprite = CardsManager.Instance.GetAbilityImage(_abilityCard.Details.Id);
         button.interactable = abilityCard.CanReturnFromActivationField();
         progress.text = abilityCard.GetTextForActivationField();
+        if (!_abilityCard.GetIsMy())
+        {
+            button.interactable = false;
+        }
     }
 
     private void OnEnable()
