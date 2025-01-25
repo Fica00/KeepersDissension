@@ -36,15 +36,12 @@ public class Persevere : AbilityEffect
     {
         if (!GameplayManager.Instance.IsMyTurn())
         {
-            Debug.Log("It is not my turn");
             if (!GameplayManager.Instance.IsMyResponseAction())
             {
-                Debug.Log("It is not my response actions");
                 return;
             }
         }
         
-        Debug.Log($"Is active: {IsApplied}, health: {_keeper.Health}");
         if (IsApplied&&_keeper.Health>2)
         {
             SetIsApplied(false);

@@ -19,6 +19,7 @@ public class AbilityData
     public int CardId;
     public AbilityColor Color;
     public bool CanBeGivenToPlayer;
+    public int PlaceInActivationField = -1;
     
     //helpers
     public bool IsLightUp;
