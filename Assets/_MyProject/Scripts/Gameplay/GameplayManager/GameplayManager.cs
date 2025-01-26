@@ -32,7 +32,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected Sprite dragonMarker;
     [SerializeField] protected Sprite forestMarker;
     [SerializeField] protected GameObject bombEffect;
-
+    [SerializeField] protected StrangeMatterOnTableHandler strangeMatterOnTableHandler;
     [HideInInspector] public bool DidOpponentFinish;
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
@@ -262,9 +262,23 @@ public class GameplayManager : MonoBehaviour
                     FinishActionExecution(_action);
                 });
                 break;
+            case CardActionType.Transfer:
+                ExecuteTransfer(_action, () =>
+                {
+                    FinishActionExecution(_action);
+                });
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void ExecuteTransfer(CardAction _action, Action _callBack)
+    {
+        Card _firstCard = GetCard(_action.FirstCardId);
+        Card _secondCard = GetCard(_action.SecondCardId);
+        strangeMatterOnTableHandler.TransferStrangeMatter(_firstCard, _secondCard);
+        _callBack?.Invoke();
     }
 
     public void HideCardActions()
@@ -1314,6 +1328,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void NoteStrangeMatterAnimation(int _amount, bool _forMe, int _placeId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveStrangeMatterFromPlace(int _placeId)
     {
         throw new Exception();
     }

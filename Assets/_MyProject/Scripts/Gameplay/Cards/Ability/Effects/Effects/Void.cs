@@ -27,6 +27,7 @@ public class Void : AbilityEffect
 
         GameplayManager.Instance.PlaceCard(_marker,_placeId);
         _marker.SetIsVoid(true);
+        GameplayManager.Instance.RemoveStrangeMatterFromPlace(_placeId);
         GameplayManager.Instance.ChangeSprite(_marker.UniqueId,0,true);
         SetIsActive(true);
         OnActivated?.Invoke();

@@ -17,10 +17,6 @@ public class AbilityCardDisplay : CardDisplayBase
         
     }
 
-    private void Update()
-    {
-       SetTransparency();
-    }
 
     private void SetTransparency()
     {

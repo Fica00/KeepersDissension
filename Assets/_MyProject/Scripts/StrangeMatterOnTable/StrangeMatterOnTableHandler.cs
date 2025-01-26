@@ -6,14 +6,12 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
     {
         CardBase.OnGotDestroyed += PlaceStrangeMatter;
         GameplayManager.OnCardMoved += TryPickUpStrangeMatter;
-        GameplayManager.OnCardMoved += TryAddStrangeMatterToPlayer;
     }
 
     private void OnDisable()
     {
         CardBase.OnGotDestroyed -= PlaceStrangeMatter;
         GameplayManager.OnCardMoved -= TryPickUpStrangeMatter;
-        GameplayManager.OnCardMoved -= TryAddStrangeMatterToPlayer;
     }
 
     private void TryPickUpStrangeMatter(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace)
@@ -39,7 +37,7 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         CarryStrangeMatter(_card, _amount);
         if (_card is Keeper)
         {
-            PickUpStrangeMatter(_card);
+            TransferStrangeMatterToPlayer(_card);
         }
         
         GameplayManager.Instance.RemoveStrangeMatterFromTable(_strangeMatter);
@@ -68,7 +66,23 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
             return;
         }
 
-        GameplayManager.Instance.AddStrangeMatterOnTable(_placeHandler.Id,GetStrangeMatterForCard(_card));
+        int _amountOfStrangeMatter = GetStrangeMatterForCard(_card) + _card.CardData.CarryingStrangeMatter;
+        if (_card is Keeper)
+        {
+            if (_card.GetIsMy())
+            {
+                _amountOfStrangeMatter += GameplayManager.Instance.MyStrangeMatter();
+                GameplayManager.Instance.ChangeMyStrangeMatter(-GameplayManager.Instance.MyStrangeMatter());
+            }
+            else
+            {
+                _amountOfStrangeMatter += GameplayManager.Instance.OpponentsStrangeMatter();
+                GameplayManager.Instance.ChangeOpponentsStrangeMatter(-GameplayManager.Instance.OpponentsStrangeMatter());
+            }
+        }
+
+        _card.CardData.CarryingStrangeMatter = 0;
+        GameplayManager.Instance.AddStrangeMatterOnTable(_placeHandler.Id,_amountOfStrangeMatter);
     }
     
     private int GetStrangeMatterForCard(Card _card)
@@ -103,62 +117,8 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
 
         return true;
     }
-    
-    private void TryAddStrangeMatterToPlayer(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace)
-    {
-        if (!ShouldIHandleStrangeMatter())
-        {
-            return;
-        }
 
-        if (_cardThatMoved is not Card _card)
-        {
-            return;
-        }
-
-        if (_card is Keeper)
-        {
-            return;
-        }
-
-        if (_card.CardData.CarryingStrangeMatter==0)
-        {
-            return;
-        }
-
-        if (!IsKeeperInRange(_finishingPlace, _card))
-        {
-            return;
-        }
-
-        PickUpStrangeMatter(_card);
-        GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
-    }
-
-    private bool IsKeeperInRange(int _place, Card _card)
-    {
-        foreach (var _placeAround in GameplayManager.Instance.TableHandler.GetPlacesAround(_place, _card.MovementType, _card.Range, false))
-        {
-            if (!_placeAround.IsOccupied)
-            {
-                continue;
-            }
-
-            foreach (var _cardOnPlace in _placeAround.GetCards())
-            {
-                if (_cardOnPlace is not Keeper)
-                {
-                    continue;
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void PickUpStrangeMatter(Card _card)
+    private void TransferStrangeMatterToPlayer(Card _card)
     {
         if (_card.GetIsMy())
         {
@@ -168,7 +128,21 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         {
             GameplayManager.Instance.ChangeOpponentsStrangeMatter(_card.CardData.CarryingStrangeMatter);
         }
+        
         GameplayManager.Instance.NoteStrangeMatterAnimation(_card.CardData.CarryingStrangeMatter, _card.GetIsMy(), _card.GetTablePlace().Id);
         _card.CardData.CarryingStrangeMatter = 0;
+    }
+
+    public void TransferStrangeMatter(Card _firstCard, Card _secondCard)
+    {
+        _secondCard.CardData.CarryingStrangeMatter += _firstCard.CardData.CarryingStrangeMatter;
+        _firstCard.CardData.CarryingStrangeMatter = 0;
+        
+        if (_secondCard is Keeper)
+        {
+            TransferStrangeMatterToPlayer(_secondCard);
+        }
+        
+        GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
     }
 }

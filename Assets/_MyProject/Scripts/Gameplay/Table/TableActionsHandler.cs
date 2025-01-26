@@ -88,6 +88,7 @@ public class TableActionsHandler : MonoBehaviour
                 AddSwitchActions(_movablePlaces, _card, _movingSpace);
                 AddRamAbility(_movablePlaces, _card);
                 AddMovementActions(_card, _movingSpace);
+                AddTransferActions(_card, _movingSpace);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(_type), _type, null);
@@ -248,6 +249,67 @@ public class TableActionsHandler : MonoBehaviour
         HashSet<TablePlaceHandler> _processedPlaces = new HashSet<TablePlaceHandler>();
         ProcessMovement(_startingPlace, _warriorCard, _speed, _processedPlaces);
     }
+    private void AddTransferActions(CardBase _cardBase, int _speed)
+    {
+        Card _warriorCard = (_cardBase as Card);
+        TablePlaceHandler _startingPlace = _cardBase.GetTablePlace();
+
+        if (_warriorCard == null || _speed <= 0)
+        {
+            return;
+        }
+
+        HashSet<TablePlaceHandler> _processedPlaces = new HashSet<TablePlaceHandler>();
+        ProcessTransfer(_startingPlace, _warriorCard, _speed, _processedPlaces);
+    }
+        private void ProcessTransfer(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
+    {
+        int _actionCost = 1;
+        if (_remainingSpeed <= 0 || !_processedPlaces.Add(_currentPlace))
+        {
+            return;
+        }
+
+        List<TablePlaceHandler> _neighborPlaces = tableHandler.GetPlacesAround(_currentPlace.Id, _warriorCard.MovementType, 1);
+
+        foreach (var _placeAround in _neighborPlaces)
+        {
+            if (!_placeAround.IsOccupied)
+            {
+                continue;
+            }
+            
+            if (_placeAround.ContainsPortal && _warriorCard is Guardian _guardian)
+            {
+                if (_guardian.IsChained)
+                {
+                    continue;
+                }
+            }
+
+            var _warrior = _placeAround.GetWarrior();
+            if (_warrior == null)
+            {
+                continue;
+            }
+
+            var _warriorOnPlace = _warrior as Card;
+
+            int _processCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
+            if (_remainingSpeed >= _processCost)
+            {
+                possibleActions.Add(new CardAction()
+                {
+                    FirstCardId = _warriorCard.UniqueId, SecondCardId = _warriorOnPlace.UniqueId, Type = CardActionType.Transfer, Cost = 1,
+                });
+
+                _placeAround.SetColor(Color.white);
+
+                ProcessTransfer(_placeAround, _warriorCard, _remainingSpeed - _processCost, _processedPlaces);
+            }
+        }
+    }
+
 
     private void ProcessMovement(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
     {
@@ -357,6 +419,8 @@ public class TableActionsHandler : MonoBehaviour
         });
         _placeInFront.SetColor(Color.magenta);
     }
+    
+
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType _movementType,
         int _startingPathCost, CardActionType _type)
@@ -562,7 +626,7 @@ public class TableActionsHandler : MonoBehaviour
             _attackablePlace.SetColor(Color.green);
         }
     }
-
+    
     private void CheckForAction(TablePlaceHandler _placeClicked)
     {
         List<CardAction> _triggeredActions = new List<CardAction>();
@@ -706,6 +770,11 @@ public class TableActionsHandler : MonoBehaviour
         }
 
         if (!CheckForSwitchPlace(_newAction))
+        {
+            return;
+        }
+
+        if (!CheckForTransfer(_newAction))
         {
             return;
         }
@@ -992,6 +1061,30 @@ public class TableActionsHandler : MonoBehaviour
             return false;
         }
         
+        return true;
+    }
+    
+    private bool CheckForTransfer(CardAction _action)
+    {
+        if (_action.Type != CardActionType.Transfer)
+        {
+            return true;
+        }
+
+        Card _firstCard = GameplayManager.Instance.GetCard(_action.FirstCardId);
+        Card _secondCard = GameplayManager.Instance.GetCard(_action.SecondCardId);
+
+        if (_firstCard == null || _secondCard == null)
+        {
+            return false;
+        }
+
+        if (_firstCard.CardData.CarryingStrangeMatter == 0)
+        {
+            DialogsManager.Instance.ShowOkDialog("Monster is not carrying any loot");
+            return false;
+        }
+
         return true;
     }
 }

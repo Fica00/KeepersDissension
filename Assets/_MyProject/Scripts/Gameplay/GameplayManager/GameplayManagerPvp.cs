@@ -2935,4 +2935,9 @@ public class GameplayManagerPvp : GameplayManager
         };
 
     }
+    
+    public override void RemoveStrangeMatterFromPlace(int _placeId)
+    {
+        RemoveStrangeMatterFromTable(GetStrangeMatterOnPlace(_placeId));;
+    }
 }

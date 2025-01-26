@@ -277,4 +277,9 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
     {
         imageDisplay.color = _color;
     }
+
+    private void Update()
+    {
+        strangeMatterHolder.transform.SetSiblingIndex(5);
+    }
 }
