@@ -441,6 +441,22 @@ namespace FirebaseMultiplayer.Room
             if (_currentRoomData.BoardData.StrangeMatterOntable.Count != _data.BoardData.StrangeMatterOntable.Count)
             {
                 GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                return;
+            }
+            
+            foreach (var _card in _currentRoomData.BoardData.Cards)
+            {
+                var _cardNewData = _data.BoardData.Cards.Find(_cardData => _cardData.UniqueId == _card.UniqueId);
+                if (_cardNewData==null)
+                {
+                    continue;
+                }
+
+                if (_cardNewData.CarryingStrangeMatter != _card.CarryingStrangeMatter)
+                {
+                    GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                    return;
+                }
             }
         }
         

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class TableActionsHandler : MonoBehaviour
@@ -249,6 +250,7 @@ public class TableActionsHandler : MonoBehaviour
         HashSet<TablePlaceHandler> _processedPlaces = new HashSet<TablePlaceHandler>();
         ProcessMovement(_startingPlace, _warriorCard, _speed, _processedPlaces);
     }
+    
     private void AddTransferActions(CardBase _cardBase, int _speed)
     {
         Card _warriorCard = (_cardBase as Card);
@@ -262,10 +264,15 @@ public class TableActionsHandler : MonoBehaviour
         HashSet<TablePlaceHandler> _processedPlaces = new HashSet<TablePlaceHandler>();
         ProcessTransfer(_startingPlace, _warriorCard, _speed, _processedPlaces);
     }
-        private void ProcessTransfer(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
+
+    private void ProcessTransfer(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
     {
-        int _actionCost = 1;
         if (_remainingSpeed <= 0 || !_processedPlaces.Add(_currentPlace))
+        {
+            return;
+        }
+
+        if (_warriorCard.CardData.CarryingStrangeMatter==0)
         {
             return;
         }
@@ -286,7 +293,7 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
             }
-
+            
             var _warrior = _placeAround.GetWarrior();
             if (_warrior == null)
             {
@@ -296,20 +303,21 @@ public class TableActionsHandler : MonoBehaviour
             var _warriorOnPlace = _warrior as Card;
 
             int _processCost = CalculatePathCost(_currentPlace, _placeAround, _warriorCard.MovementType, 1, CardActionType.Move);
+            
             if (_remainingSpeed >= _processCost)
             {
-                possibleActions.Add(new CardAction()
+                possibleActions.Add(new CardAction
                 {
-                    FirstCardId = _warriorCard.UniqueId, SecondCardId = _warriorOnPlace.UniqueId, Type = CardActionType.Transfer, Cost = 1,
+                    FirstCardId = _warriorCard.UniqueId, SecondCardId = _warriorOnPlace.UniqueId, Type = CardActionType.Transfer, Cost = 1, 
+                        FinishingPlaceId = _placeAround.Id
                 });
-
+                Debug.Log("Adding place: ", _placeAround.gameObject);
                 _placeAround.SetColor(Color.white);
 
                 ProcessTransfer(_placeAround, _warriorCard, _remainingSpeed - _processCost, _processedPlaces);
             }
         }
     }
-
 
     private void ProcessMovement(TablePlaceHandler _currentPlace, Card _warriorCard, int _remainingSpeed, HashSet<TablePlaceHandler> _processedPlaces)
     {
@@ -419,8 +427,6 @@ public class TableActionsHandler : MonoBehaviour
         });
         _placeInFront.SetColor(Color.magenta);
     }
-    
-
 
     private int CalculatePathCost(TablePlaceHandler _startingPlace, TablePlaceHandler _placeAround, CardMovementType _movementType,
         int _startingPathCost, CardActionType _type)
@@ -644,6 +650,7 @@ public class TableActionsHandler : MonoBehaviour
         }
 
         List<CardAction> _uniqueActions = new List<CardAction>();
+        Debug.Log($"Unique actions: {_uniqueActions.Count} : {JsonConvert.SerializeObject(_uniqueActions)}");
         foreach (var _triggeredAction in _triggeredActions)
         {
             bool _skip = false;
