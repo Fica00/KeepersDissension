@@ -4,14 +4,23 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
 {
     private void OnEnable()
     {
+        GameplayManager.OnPlacedCard += TryPickUpStrangeMatter;
         CardBase.OnGotDestroyed += PlaceStrangeMatter;
         GameplayManager.OnCardMoved += TryPickUpStrangeMatter;
+        GameplayManager.OnKeeperDied += PlaceStrangeMatter;
     }
 
     private void OnDisable()
     {
+        GameplayManager.OnPlacedCard -= TryPickUpStrangeMatter;
         CardBase.OnGotDestroyed -= PlaceStrangeMatter;
         GameplayManager.OnCardMoved -= TryPickUpStrangeMatter;
+        GameplayManager.OnKeeperDied -= PlaceStrangeMatter;
+    }
+
+    private void TryPickUpStrangeMatter(CardBase _card)
+    {
+        TryPickUpStrangeMatter(_card, -1, ((Card)_card).GetTablePlace().Id);
     }
 
     private void TryPickUpStrangeMatter(CardBase _cardThatMoved, int _startingPlace, int _finishingPlace)
@@ -117,7 +126,7 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
     {
         if (!GameplayManager.Instance.IsMyTurn())
         {
-            if (!GameplayManager.Instance.IsMyResponseAction())
+            if (!GameplayManager.Instance.IsAnySortOfMyResponseAction())
             {
                 return false;
             }

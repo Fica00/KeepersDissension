@@ -2534,6 +2534,38 @@ public class GameplayManagerPvp : GameplayManager
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
+    
+    public override bool IsAnySortOfMyResponseAction()
+    {
+        if (IsRoomOwner())
+        {
+            if (Instance.GetGameplaySubStateHelper() is
+                GameplaySubState.Player1ResponseAction or 
+                GameplaySubState.Player1DeliveryReposition or
+                GameplaySubState.Player1UseComrade or
+                GameplaySubState.Player1UseReduction or 
+                GameplaySubState.Player1UseKeeperReposition)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Instance.GetGameplaySubStateHelper() is
+                GameplaySubState.Player2ResponseAction or 
+                GameplaySubState.Player2DeliveryReposition or
+                GameplaySubState.Player2UseComrade or
+                GameplaySubState.Player2UseReduction or 
+                GameplaySubState.Player2UseKeeperReposition)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
 
     public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
             "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)

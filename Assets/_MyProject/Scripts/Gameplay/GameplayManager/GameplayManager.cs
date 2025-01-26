@@ -1196,6 +1196,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual bool IsAnySortOfMyResponseAction()
+    {
+        throw new Exception();
+    }
+
     public virtual bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack, bool _checkForResponse = false, string _attacker
             = "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
