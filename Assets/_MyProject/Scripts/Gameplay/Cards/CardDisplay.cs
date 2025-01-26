@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,8 +11,41 @@ public class CardDisplay: CardDisplayBase
     [SerializeField] private Image foregroundDisplay;
     [SerializeField] private Image whiteBox;
     [SerializeField] private TextMeshProUGUI nameHolder;
-    private Card card;
+    [SerializeField] private GameObject strangeMatterHolder;
+    [SerializeField] private TextMeshProUGUI strangeMatterDisplay;
     
+    private Card card;
+
+    private void OnEnable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable += TryToShowStrangeMatterCarry;
+    }
+
+    private void OnDisable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable -= TryToShowStrangeMatterCarry;
+    }
+
+    private void TryToShowStrangeMatterCarry()
+    {
+        TablePlaceHandler _place = card.GetTablePlace();
+        if (_place == null)
+        {
+            return;
+        }
+
+        int _amount = card.CardData.CarryingStrangeMatter;
+        if (_amount == 0)
+        {
+            strangeMatterHolder.SetActive(false);
+        }
+        else
+        {
+            strangeMatterHolder.SetActive(true);
+            strangeMatterDisplay.text = _amount.ToString();
+        }
+    }
+
     public override void Setup(Card _card)
     {
         card = _card;

@@ -40,21 +40,6 @@ public class Shockwave : AbilityEffect
                 }
             });
         }
-
-        StartCoroutine(CalculateStrangeMatter(_killedCards));
-    }
-    
-    private IEnumerator CalculateStrangeMatter(List<Card> _killedCards)
-    {
-        yield return new WaitForSeconds(1);
-        int _strangeMatter = 0;
-        foreach (var _killedCard in _killedCards)
-        {
-            _strangeMatter += GameplayManager.Instance.GetStrangeMatterForCard(_killedCard);
-        }
-            
-        GameplayManager.Instance.ChangeStrangeMaterInEconomy(_strangeMatter);
-        Finish();
     }
 
     private void Finish()

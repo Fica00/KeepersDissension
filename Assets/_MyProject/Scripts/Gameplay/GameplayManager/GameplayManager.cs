@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
+    public static Action OnUpdatedStrangeMatterOnTable;
     public static Action OnStartedResponseAction;
     public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
@@ -1217,26 +1218,6 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
-    public int GetStrangeMatterForCard(Card _card)
-    {
-        if (_card is Minion)
-        {
-            return 2;
-        }
-
-        if (_card is Guardian)
-        {
-            return 10;
-        }
-
-        if (_card is Keeper)
-        {
-            return 5;
-        }
-
-        return 0;
-    }
-
     public virtual void SetGameplaySubStateHelper(GameplaySubState _subState)
     {
         throw new Exception();
@@ -1318,6 +1299,21 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual int AmountOfResponseActions(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AddStrangeMatterOnTable(int _placeId, int _strangeMatter)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<StrangeMatterData> GetStrangeMatterOnPlace(int _id)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveStrangeMatterFromTable(List<StrangeMatterData> _strangeMatter)
     {
         throw new Exception();
     }

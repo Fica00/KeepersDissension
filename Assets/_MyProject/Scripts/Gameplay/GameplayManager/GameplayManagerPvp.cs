@@ -688,8 +688,6 @@ public class GameplayManagerPvp : GameplayManager
                         EndGame(!_defendingCard.My);
                         return;
                     }
-
-                    HandleLoot(_attackingCard, _defendingCard, _defendingPosition);
                 }
                 else
                 {
@@ -1028,7 +1026,7 @@ public class GameplayManagerPvp : GameplayManager
             }
 
             int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.CardData.Stats.MaxHealth;
-            float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
+            float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100f;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             if (IsAbilityActive<Subdued>())
@@ -1281,17 +1279,6 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-
-    private void HandleLoot(Card _attackingCard, Card _defendingCard, int _placeOfDefendingCard)
-    {
-        int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
-        bool _didIAttack = _attackingCard.GetIsMy();
-        int _amount = _additionalMatter;
-        _amount += GetStrangeMatterForCard(_defendingCard);
-
-        AddStrangeMatter(_amount, _didIAttack, _placeOfDefendingCard);
-    }
-
     private void AddStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
         if (_forMe)
@@ -1318,16 +1305,6 @@ public class GameplayManagerPvp : GameplayManager
         {
             EconomyPanelHandler.Instance.ShowBoughtMatter(_forMe, _startingPosition);
         }
-    }
-
-    private int LootChangeForRoomOwner()
-    {
-        return RoomHandler.IsOwner ? BoardData.MyPlayer.LootChange : BoardData.OpponentPlayer.LootChange;
-    }
-
-    private int LootChangeForOther()
-    {
-        return RoomHandler.IsOwner ? BoardData.OpponentPlayer.LootChange : BoardData.MyPlayer.LootChange;
     }
 
     private IEnumerator GetPlaceOnTable(Action<int> _callBack, bool _wholeTable = false)
@@ -2769,7 +2746,6 @@ public class GameplayManagerPvp : GameplayManager
 
             TablePlaceHandler.OnPlaceClicked -= TryToPlaceReduction;
             Card _card = _place.GetCardNoWall();
-            AddStrangeMatter(GetStrangeMatterForCard(_card),true,_place.Id);
            
             DamageCardByAbility(_card.UniqueId,_card.CardData.Stats.Health, _ =>
             {
@@ -2935,5 +2911,39 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         return _possibleCards.Count;
+    }
+
+    public override void AddStrangeMatterOnTable(int _placeId, int _strangeMatter)
+    {
+        BoardData.StrangeMatterOntable.Add(new StrangeMatterData
+        {
+            OwnerPlaceId = Utils.ConvertRoomPosition(_placeId, IsRoomOwner()),
+            Amount = _strangeMatter,
+            DidOwnerKill = IsRoomOwner()
+        });
+    }
+
+    public override List<StrangeMatterData> GetStrangeMatterOnPlace(int _id)
+    {
+        List<StrangeMatterData> _strangeMatter = new();
+        foreach (var _strangeData in BoardData.StrangeMatterOntable)
+        {
+            if (_strangeData.OwnerPlaceId == Utils.ConvertRoomPosition(_id, GameplayManager.Instance.IsRoomOwner()))
+            {
+                _strangeMatter.Add(_strangeData);
+            }
+        }
+
+        return _strangeMatter;
+    }
+
+    public override void RemoveStrangeMatterFromTable(List<StrangeMatterData> _strangeMatter)
+    {
+        foreach (var _data in _strangeMatter)
+        {
+            BoardData.StrangeMatterOntable.Remove(_data);
+        }
+        
+        OnUpdatedStrangeMatterOnTable?.Invoke();
     }
 }
