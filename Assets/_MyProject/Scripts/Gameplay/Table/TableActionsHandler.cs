@@ -312,7 +312,7 @@ public class TableActionsHandler : MonoBehaviour
                         FinishingPlaceId = _placeAround.Id
                 });
                 Debug.Log("Adding place: ", _placeAround.gameObject);
-                _placeAround.SetColor(Color.white);
+                _placeAround.SetColor(Color.black);
 
                 ProcessTransfer(_placeAround, _warriorCard, _remainingSpeed - _processCost, _processedPlaces);
             }
@@ -650,7 +650,6 @@ public class TableActionsHandler : MonoBehaviour
         }
 
         List<CardAction> _uniqueActions = new List<CardAction>();
-        Debug.Log($"Unique actions: {_uniqueActions.Count} : {JsonConvert.SerializeObject(_uniqueActions)}");
         foreach (var _triggeredAction in _triggeredActions)
         {
             bool _skip = false;
