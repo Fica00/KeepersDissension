@@ -492,6 +492,15 @@ public class TableActionsHandler : MonoBehaviour
                     continue;
                 }
 
+                if (_cardAtPlace is Guardian { IsChained: true })
+                {
+                    if (GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_card.GetTablePlace(), GameplayManager.Instance.GetMyLifeForce()
+                        .GetTablePlace()) >1)
+                    {
+                        continue;
+                    }
+                }
+
                 if (_card.Speed == 0)
                 {
                     continue;

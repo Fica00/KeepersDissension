@@ -67,6 +67,10 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         }
 
         int _amountOfStrangeMatter = GetStrangeMatterForCard(_card) + _card.CardData.CarryingStrangeMatter;
+        if (GameplayManager.Instance.IsAbilityActiveForMe<BountyHunter>())
+        {
+            _amountOfStrangeMatter += 2;
+        }
         if (_amountOfStrangeMatter == 0)
         {
             return;
