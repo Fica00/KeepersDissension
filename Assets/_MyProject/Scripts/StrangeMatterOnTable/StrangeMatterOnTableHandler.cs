@@ -67,6 +67,10 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         }
 
         int _amountOfStrangeMatter = GetStrangeMatterForCard(_card) + _card.CardData.CarryingStrangeMatter;
+        if (_amountOfStrangeMatter == 0)
+        {
+            return;
+        }
         if (_card is Keeper)
         {
             if (_card.GetIsMy())
