@@ -36,14 +36,18 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         }
 
         Card _card = _cardThatMoved as Card;
-        
-        _card.CardData.CarryingStrangeMatter = _amount;
+        CarryStrangeMatter(_card, _amount);
         if (_card is Keeper)
         {
             PickUpStrangeMatter(_card);
         }
         
         GameplayManager.Instance.RemoveStrangeMatterFromTable(_strangeMatter);
+    }
+
+    private void CarryStrangeMatter(Card _card, int _amount)
+    {
+        _card.CardData.CarryingStrangeMatter += _amount;
     }
 
     private void PlaceStrangeMatter(CardBase _cardBase)
