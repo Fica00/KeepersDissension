@@ -2921,6 +2921,8 @@ public class GameplayManagerPvp : GameplayManager
             Amount = _strangeMatter,
             DidOwnerKill = IsRoomOwner()
         });
+        
+        OnUpdatedStrangeMatterOnTable?.Invoke();
     }
 
     public override List<StrangeMatterData> GetStrangeMatterOnPlace(int _id)
