@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 public class RoomGameplayPlayer
 {
     public string PlayerId;
-    public int LootChange;
     public int StrangeMatter;
     public int AmountOfAbilitiesPlayerCanBuy;
     public bool DidUnchainGuardian;

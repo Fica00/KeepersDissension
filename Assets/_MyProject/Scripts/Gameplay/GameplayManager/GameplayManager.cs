@@ -921,11 +921,6 @@ public class GameplayManager : MonoBehaviour
 
         return _ability.IsActive;
     }
-
-    public virtual void ChangeLootAmountForMe(int _amount)
-    {
-        throw new Exception();
-    }
     
     public List<Card> GetAllCards()
     {
@@ -1314,6 +1309,11 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual void RemoveStrangeMatterFromTable(List<StrangeMatterData> _strangeMatter)
+    {
+        throw new Exception();
+    }
+
+    public virtual void NoteStrangeMatterAnimation(int _amount, bool _forMe, int _placeId)
     {
         throw new Exception();
     }

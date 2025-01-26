@@ -92,7 +92,6 @@ public class MatchMakingHandler : MonoBehaviour
         RoomGameplayPlayer _gameplayPLayer = new()
         {
             PlayerId = FirebaseManager.Instance.Authentication.UserId,
-            LootChange = 0,
             StrangeMatter = 0,
             AmountOfAbilitiesPlayerCanBuy = 7
         };
@@ -150,7 +149,6 @@ public class MatchMakingHandler : MonoBehaviour
                         new ()
                         {
                             PlayerId = FirebaseManager.Instance.Authentication.UserId,
-                            LootChange = 0,
                             StrangeMatter = 0,
                             AmountOfAbilitiesPlayerCanBuy = 7
                         }

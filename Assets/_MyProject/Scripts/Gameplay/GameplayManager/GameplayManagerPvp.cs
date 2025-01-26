@@ -1279,25 +1279,6 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    private void AddStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
-    {
-        if (_forMe)
-        {
-            BoardData.MyPlayer.StrangeMatter += _amount;
-        }
-        else
-        {
-            BoardData.OpponentPlayer.StrangeMatter += _amount;
-        }
-
-        AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
-        BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
-        {
-            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeOfDefendingCard,
-                RoomHandler.IsOwner),
-        };
-    }
-
     public override void AnimateStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
         var _startingPosition = TableHandler.GetPlace(_placeOfDefendingCard).transform.position;
@@ -1928,12 +1909,7 @@ public class GameplayManagerPvp : GameplayManager
     {
         return IdOfCardWithResponse;
     }
-
-    public override void ChangeLootAmountForMe(int _amount)
-    {
-        BoardData.MyPlayer.LootChange += _amount;
-    }
-
+    
     public override int MyStrangeMatter()
     {
         return BoardData.MyPlayer.StrangeMatter;
@@ -2947,5 +2923,16 @@ public class GameplayManagerPvp : GameplayManager
         }
         
         OnUpdatedStrangeMatterOnTable?.Invoke();
+    }
+
+    public override void NoteStrangeMatterAnimation(int _amount, bool _forMe, int _placeId)
+    {
+        AnimateStrangeMatter(_amount, _forMe, _placeId);
+        BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
+        {
+            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeId,
+                RoomHandler.IsOwner),
+        };
+
     }
 }

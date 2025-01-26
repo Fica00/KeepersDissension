@@ -168,7 +168,7 @@ public class StrangeMatterOnTableHandler : MonoBehaviour
         {
             GameplayManager.Instance.ChangeOpponentsStrangeMatter(_card.CardData.CarryingStrangeMatter);
         }
-        
+        GameplayManager.Instance.NoteStrangeMatterAnimation(_card.CardData.CarryingStrangeMatter, _card.GetIsMy(), _card.GetTablePlace().Id);
         _card.CardData.CarryingStrangeMatter = 0;
     }
 }
