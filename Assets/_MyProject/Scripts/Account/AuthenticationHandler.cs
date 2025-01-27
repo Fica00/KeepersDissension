@@ -82,13 +82,11 @@ public class AuthenticationHandler : MonoBehaviour
    {
       if (!_result.IsSuccessful)
       {  
-         Debug.Log(6666666);
          ShowRegister();
          DialogsManager.Instance.ShowOkDialog("Email already in use");
          return;
       }
 
-      Debug.Log(77777);
       FirebaseManager.Instance.SendEmailVerification();
       DataManager.Instance.CreateNewPlayer();
       DataManager.Instance.PlayerData.Name = _name;
@@ -98,10 +96,8 @@ public class AuthenticationHandler : MonoBehaviour
    
    private void HandleFinishedUpdatingPlayerData(bool _result)
    {
-      Debug.Log(8888888);
       if (!_result)
       {
-         Debug.Log(9999999);
          DialogsManager.Instance.ShowOkDialog("Something went wrong while setting starting data");
          return;
       }
@@ -167,7 +163,6 @@ public class AuthenticationHandler : MonoBehaviour
 
       if (_user.IsEmailVerified || credentials.IsAnonymous)
       {
-         Debug.Log("Email is verified!");
          emailVerifyCallback?.Invoke();
          yield break;
       }

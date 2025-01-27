@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Firebase.Database;
 using FirebaseGameplay.Responses;
-using GameplayActions;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace FirebaseMultiplayer.Room
 {
+    [Serializable]
     public class RoomHandler
     {
         public static Action<RoomPlayer> OnPlayerJoined;
@@ -17,9 +17,9 @@ namespace FirebaseMultiplayer.Room
 
         private DatabaseReference database;
 
-        private const string LEAVE_ROOM = "https://leaveroom-e3mmrpwoya-uc.a.run.app";
+        private const string LEAVE_ROOM = "https://us-central1-keepersdissension.cloudfunctions.net/leaveRoom";
         private const string JOIN_ROOM = "https://joinroom-e3mmrpwoya-uc.a.run.app";
-        private const string CREATE_ROOM = "https://createroom-e3mmrpwoya-uc.a.run.app";
+        private const string CREATE_ROOM = "https://us-central1-keepersdissension.cloudfunctions.net/createRoom";
 
         private string roomsPath;
         private RoomData roomData;
@@ -27,6 +27,7 @@ namespace FirebaseMultiplayer.Room
 
         public bool IsOwner => roomData.Owner == localPlayerId;
         public RoomData RoomData => roomData;
+        public BoardData BoardData => roomData.BoardData;
         private string RoomPath => roomsPath + "/" + roomData.Id;
 
         public bool IsTestingRoom => RoomData.Type == RoomType.Debug;
@@ -68,9 +69,8 @@ namespace FirebaseMultiplayer.Room
             }, _ => { Debug.Log(_); });
         }
 
-        public void SubscribeToRoom(RoomData _roomData)
+        public void SubscribeToRoom()
         {
-            roomData = _roomData;
             database.Child(RoomPath).ValueChanged += RoomUpdated;
         }
 
@@ -90,6 +90,7 @@ namespace FirebaseMultiplayer.Room
         {
             if (_args == null)
             {
+                Debug.Log("Updated but without args?");
                 return;
             }
 
@@ -100,30 +101,70 @@ namespace FirebaseMultiplayer.Room
 
             if (roomData == null)
             {
+                Debug.Log("Room data is null?");
                 return;
             }
 
             RoomData _data = JsonConvert.DeserializeObject<RoomData>(_args.Snapshot.GetRawJsonValue());
             if (_data == null)
             {
+                Debug.Log("Didn't manage to convert: "+_args.Snapshot.GetRawJsonValue()+" to roomdata");
                 return;
             }
 
             if (_data.RoomPlayers == null)
             {
+                Debug.Log("Players dont exist");
                 return;
             }
 
-            CheckIfPlayerJoined(_data);
-            CheckIfPlayerLeft(_data);
+            var _currentRoomState = JsonConvert.DeserializeObject<RoomData>(JsonConvert.SerializeObject(roomData));
+
+            if (_currentRoomState == roomData)
+            {
+                Debug.Log("Data is the same");
+                return;
+            }
+            
             roomData = _data;
+            CheckIfPlayerJoined(_currentRoomState,_data);
+            CheckIfPlayerLeft(_currentRoomState,_data);
+            if (!SceneManager.IsGameplayScene)
+            {
+                return;
+            }
+            CheckIfCreatedCard(_currentRoomState,_data);
+            CheckIfAbilityCard(_currentRoomState,_data);
+            CheckIfCardMoved(_currentRoomState,_data);
+            CheckIfAbilityPlaced(_currentRoomState, _data);
+            CheckForAttackAnimation(_currentRoomState,_data);
+            CheckIfCardDied(_currentRoomState,_data);
+            CheckForStrangeMatterAnimation(_currentRoomState,_data);
+            CheckForSoundAnimation(_currentRoomState,_data);
+            CheckForBombAnimation(_currentRoomState,_data);
+            CheckForBoughtStrangeMatterAnimation(_currentRoomState,_data);
+            CheckForUnchain(_currentRoomState,_data);
+            CheckForGameEnd(_currentRoomState,_data);
+            CheckForAbilityDisplay(_currentRoomState,_data);
+            CheckForDelivery(_currentRoomState, _data);
+            CheckForResponseActionSound(_currentRoomState, _data);
+            CheckForPlaceKeeper(_currentRoomState, _data);
+            ShouldEndTurn(_currentRoomState,_data);
+            CheckIfOpponentEndedTurn(_currentRoomState, _data);
+            CheckForComrade(_currentRoomState, _data);
+            CheckForReduction(_currentRoomState, _data);
+            CheckForVetoAnimation(_currentRoomState, _data);
+            CheckForSpriteChange(_currentRoomState, _data);
+            CheckForMessages(_currentRoomState, _data);
+            CheckForResponseAction(_currentRoomState, _data);
+            CheckForStrangeMatterOnBoard(_currentRoomState, _data);
         }
 
-        private void CheckIfPlayerJoined(RoomData _data)
+        private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
         {
             foreach (var _player in _data.RoomPlayers)
             {
-                if (DoesPlayerExist(_player.Id, roomData.RoomPlayers))
+                if (DoesPlayerExist(_player.Id, _currentRoomData.RoomPlayers))
                 {
                     continue;
                 }
@@ -132,9 +173,9 @@ namespace FirebaseMultiplayer.Room
             }
         }
 
-        private void CheckIfPlayerLeft(RoomData _data)
+        private void CheckIfPlayerLeft(RoomData _currentRoomData,RoomData _data)
         {
-            foreach (var _player in roomData.RoomPlayers)
+            foreach (var _player in _currentRoomData.RoomPlayers)
             {
                 if (DoesPlayerExist(_player.Id, _data.RoomPlayers))
                 {
@@ -158,34 +199,714 @@ namespace FirebaseMultiplayer.Room
             return false;
         }
 
-        public void JoinRoom(RoomPlayer _playerData, RoomType _type, Action<NewJoinRoom> _callBack, string _name = default)
+        private void CheckIfCreatedCard(RoomData _currentRoomData,RoomData _data)
         {
-            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(_playerData), Type = _type, Name = _name });
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _shouldSpawnCard = true;
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    _shouldSpawnCard = false;
+                    break;
+                }
+
+
+                if (_shouldSpawnCard)
+                {
+                    GameplayManager.Instance.OpponentCreatedCard(_card);
+                    if (_card.PlaceRoomOwnerId != -100)
+                    {
+                        ShowCardMoved(_card.UniqueId, _card.PlaceRoomOwnerId);
+                    }
+                }
+            }
+        }
+        
+        private void CheckIfAbilityCard(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldSpawnCard = true;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_card.UniqueId != _existingCard.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    _shouldSpawnCard = false;
+                    break;
+                }
+
+
+                if (_shouldSpawnCard)
+                {
+                    GameplayManager.Instance.OpponentCreatedAbility(_card);
+                }
+            }
+        }
+        
+        private void CheckIfCardMoved(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _shouldMoveCard = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.PlaceRoomOwnerId != _existingCard.PlaceRoomOwnerId)
+                    {
+                        _shouldMoveCard = true;
+                        break;
+                    }
+                }
+
+                if (_shouldMoveCard)
+                {
+                    ShowCardMoved(_card.UniqueId, _card.PlaceRoomOwnerId);
+                }
+            }
+        }
+        
+        private void CheckIfAbilityPlaced(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Abilities)
+            {
+                bool _shouldMoveCard = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Abilities)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.PlaceId != _existingCard.PlaceId)
+                    {
+                        _shouldMoveCard = true;
+                        break;
+                    }
+                }
+
+                if (_shouldMoveCard)
+                {
+                    GameplayManager.Instance.ShowAbilityOnTable(_card.UniqueId, Utils.ConvertPosition(_card.PlaceId));
+                }
+            }
+        }
+        
+        private void CheckForAttackAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.AttackAnimation == null)
+            {
+               return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.AttackAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.AttackAnimation.Id == _currentRoomData.BoardData.AttackAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.AttackAnimation;
+            GameplayManager.Instance.AnimateAttack(_animationData.AttackerId,_animationData.DefenderId);
+        }
+        
+        private void CheckIfCardDied(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _card in _data.BoardData.Cards)
+            {
+                bool _didCardDie = false;
+                foreach (var _existingCard in _currentRoomData.BoardData.Cards)
+                {
+                    if (_existingCard.UniqueId != _card.UniqueId)
+                    {
+                        continue;
+                    }
+
+                    if (!_card.HasDied)
+                    {
+                        continue;
+                    }
+                    
+                    if (_card.HasDied != _existingCard.HasDied)
+                    {
+                        _didCardDie = true;
+                        break;
+                    }
+                }
+
+                if (_didCardDie)
+                {
+                    GameplayManager.Instance.ShowCardAsDead(_card.UniqueId);
+                }
+            }
+        }
+        
+        private void CheckForStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.StrangeMatterAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.StrangeMatterAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.StrangeMatterAnimation.Id == _currentRoomData.BoardData.StrangeMatterAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.StrangeMatterAnimation;
+            GameplayManager.Instance.AnimateStrangeMatter(_animationData.Amount,_animationData.ForMe,Utils.ConvertRoomPosition(_animationData
+                .PositionId, IsOwner));
+        }
+
+        private void CheckForDelivery(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1DeliveryReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2DeliveryReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2DeliveryReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.UseDelivery(_data.BoardData.DeliveryCard, FinishDelivery);
+                    }
+                }
+            }
+
+            void FinishDelivery()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForResponseAction(RoomData _currentRoomData,RoomData _data)
+        {
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        Debug.Log("Detected response action");
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        Debug.Log("Detected response action");
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+        }
+        
+        private void CheckForStrangeMatterOnBoard(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.BoardData.StrangeMatterOntable.Count != _data.BoardData.StrangeMatterOntable.Count)
+            {
+                GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                return;
+            }
+            
+            foreach (var _card in _currentRoomData.BoardData.Cards)
+            {
+                var _cardNewData = _data.BoardData.Cards.Find(_cardData => _cardData.UniqueId == _card.UniqueId);
+                if (_cardNewData==null)
+                {
+                    continue;
+                }
+
+                if (_cardNewData.CarryingStrangeMatter != _card.CarryingStrangeMatter)
+                {
+                    GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                    return;
+                }
+            }
+        }
+        
+        private void CheckForResponseActionSound(RoomData _currentRoomData,RoomData _data)
+        {
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                    }
+                }
+            }
+        }
+        
+        private void CheckForPlaceKeeper(RoomData _currentRoomData,RoomData _data)
+        {
+            var _currentState = _currentRoomData.GameplaySubState;
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1UseKeeperReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2UseKeeperReposition)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2UseKeeperReposition)
+                    {
+                        AudioManager.Instance.PlaySoundEffect("EndTurn");
+                        GameplayManager.Instance.SelectPlaceForKeeper(GameplayManager.Instance.GetMyKeeper().UniqueId, FinishPlacingKeeper);
+                    }
+                }
+            }
+
+            void FinishPlacingKeeper()
+            {
+                roomData.GameplaySubState = _currentState;
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void ShouldEndTurn(RoomData _currentRoomData,RoomData _data)
+        {
+            bool _shouldEndTurn = false;
+            if (IsOwner)
+            {
+                if (_currentRoomData.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_data.GameplaySubState == GameplaySubState.Playing)
+                    {
+                        if (_data.BoardData.MyPlayer.ActionsLeft == 0)
+                        {
+                            _shouldEndTurn = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (_currentRoomData.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_data.GameplaySubState == GameplaySubState.Playing)
+                    {
+                        if (_data.BoardData.MyPlayer.ActionsLeft == 0)
+                        {
+                            _shouldEndTurn = true;
+                        }
+                    }
+                }
+            }
+
+            if (!_shouldEndTurn)
+            {
+                return;
+            }
+            
+            GameplayManager.Instance.EndTurn();
+        }
+        
+        private void CheckIfOpponentEndedTurn(RoomData _currentRoomData,RoomData _data)
+        {
+            bool _didOpponentEndTurn = false;
+            if (IsOwner)
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 2)
+                {
+                    if (_data.CurrentPlayerTurn == 1)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+            else
+            {
+                if (_currentRoomData.CurrentPlayerTurn == 1)
+                {
+                    if (_data.CurrentPlayerTurn == 2)
+                    {
+                        _didOpponentEndTurn = true;
+                    }
+                }
+            }
+
+            if (!_didOpponentEndTurn)
+            {
+                return;
+            }
+
+            GameplayManager.Instance.DidOpponentFinish = true;
+        }
+
+        private void ShowCardMoved(string _uniqueId, int _placeId)
+        {
+            GameplayManager.Instance.ShowCardMoved(_uniqueId, Utils.ConvertRoomPosition(_placeId, IsOwner),null);
+        }
+        
+        private void CheckForSoundAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.SoundAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.SoundAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.SoundAnimation.Id == _currentRoomData.BoardData.SoundAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.SoundAnimation;
+            GameplayManager.Instance.AnimateSoundEffect(_animationData.Key,_animationData.CardId);
+        }        
+        
+        private void CheckForBombAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.BombAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.BombAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.BombAnimation.Id == _currentRoomData.BoardData.BombAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.BombAnimation;
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceIdOwner, IsOwner));
+        }
+        
+        private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
+        {
+            foreach (var _currentAbility in _currentRoomData.BoardData.Abilities)
+            {
+                foreach (var _newAbility in _data.BoardData.Abilities)
+                {
+                    if (_newAbility.UniqueId != _currentAbility.UniqueId)
+                    {
+                        continue;
+                    }
+                    
+                    if (_currentAbility.IsLightUp == _newAbility.IsLightUp)
+                    {
+                        continue;
+                    }
+
+                    GameplayManager.Instance.ManageAbilityActive(_newAbility.UniqueId, _newAbility.IsLightUp);
+                }
+            }
+        }
+        
+        private void CheckForBoughtStrangeMatterAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.BoughtStrangeMatterAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.BoughtStrangeMatterAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.BoughtStrangeMatterAnimation.Id == _currentRoomData.BoardData.BoughtStrangeMatterAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.BoughtStrangeMatterAnimation;
+            GameplayManager.Instance.ShowBoughtMatter(IsOwner && _animationData.DidOwnerBuy);
+        }        
+        
+        private void CheckForUnchain(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData == null)
+            {
+                return;
+            }
+            
+            if (_currentRoomData.BoardData == null)
+            {
+                return;
+            }
+
+            if (_data.BoardData.MyPlayer == null)
+            {
+                return;
+            }
+            
+            if (_currentRoomData.BoardData.MyPlayer == null)
+            {
+                return;
+            }
+            
+            if (_data.BoardData.OpponentPlayer == null)
+            {
+                return;
+            }
+            
+            if (_currentRoomData.BoardData.OpponentPlayer == null)
+            {
+                return;
+            }
+            
+            if (_data.BoardData.MyPlayer.DidUnchainGuardian && _data.BoardData.MyPlayer.DidUnchainGuardian != _currentRoomData.BoardData.MyPlayer.DidUnchainGuardian)
+            {
+                GameplayManager.Instance.ShowGuardianUnchained(true);
+            }
+            
+            if (_data.BoardData.OpponentPlayer.DidUnchainGuardian && _data.BoardData.OpponentPlayer.DidUnchainGuardian != _currentRoomData.BoardData.OpponentPlayer.DidUnchainGuardian)
+            {
+                GameplayManager.Instance.ShowGuardianUnchained(false);
+            }
+        }        
+        
+        private void CheckForGameEnd(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.HasGameEnded == false)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.Winner))
+            {
+                return;
+            }
+
+            if (_currentRoomData.Winner == _data.Winner)
+            {
+                return;
+            }
+
+            GameplayManager.Instance.ShowGameEnded(_data.Winner);
+        }
+        
+        private void CheckForComrade(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            if (_data.GameplaySubState is GameplaySubState.Player1UseComrade)
+            {
+                if (IsOwner)
+                {
+                     GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseComrade)
+            {
+                if (!IsOwner)
+                {
+                    GameplayManager.Instance.SetGameplaySubStateHelper(_currentRoomData.GameplaySubState);
+                    GameplayManager.Instance.HandleComrade(Finish);
+                }
+            }
+
+
+            void Finish(bool _)
+            {
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForReduction(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.GameplaySubState == _data.GameplaySubState)
+            {
+                return;
+            }
+            
+            if (_data.GameplaySubState is GameplaySubState.Player1UseReduction)
+            {
+                if (IsOwner)
+                {
+                     GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+            else if (_data.GameplaySubState is GameplaySubState.Player2UseReduction)
+            {
+                if (!IsOwner)
+                {
+                    GameplayManager.Instance.UseReduction(Finish);
+                }
+            }
+
+
+            void Finish()
+            {
+                GameplayManager.Instance.SetGameplaySubState(GameplayManager.Instance.GetGameplaySubStateHelper());
+                RoomUpdater.Instance.ForceUpdate();
+            }
+        }
+        
+        private void CheckForVetoAnimation(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.VetoAnimation == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.VetoAnimation.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.VetoAnimation.Id == _currentRoomData.BoardData.VetoAnimation.Id)
+            {
+                return;
+            }
+            
+            var _animationData = _data.BoardData.VetoAnimation;
+            GameplayManager.Instance.ShowVetoAnimation(_animationData.CardId, _animationData.IsVetoed);
+        }
+
+        private void CheckForSpriteChange(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.ChangeSpriteData == null)
+            {
+                return;
+            }
+
+            if (_data.BoardData.ChangeSpriteData.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var _changeSpriteData in _data.BoardData.ChangeSpriteData)
+            {
+                bool _found = false;
+                foreach (var _knownChange in _currentRoomData.BoardData.ChangeSpriteData)
+                {
+                    if (_knownChange.Id == _changeSpriteData.Id)
+                    {
+                        _found = true;
+                        break;
+                    }
+                }
+
+                if (_found)
+                {
+                    continue;
+                }
+                GameplayManager.Instance.ChangeSpriteAnimate(_changeSpriteData.CardId, _changeSpriteData.SpriteId, _changeSpriteData.ShowPlaceAnimation);
+            }
+        }        
+        
+        private void CheckForMessages(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_data.BoardData.SaySomethingData == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_data.BoardData.SaySomethingData.Id))
+            {
+                return;
+            }
+
+            if (_data.BoardData.SaySomethingData.Id == _currentRoomData.BoardData.SaySomethingData.Id)
+            {
+                return;
+            }
+
+            var _saySomethingData = _data.BoardData.SaySomethingData;
+            DialogsManager.Instance.ShowOkDialog(_saySomethingData.Message);
+        }        
+        
+        public void JoinRoom(RoomPlayer _playerData, RoomGameplayPlayer _gamePlayerData, RoomType _type, Action<JoinRoom> _callBack, string _name = 
+                default)
+        {
+            string _postData = JsonConvert.SerializeObject(new { PlayerData = JsonConvert.SerializeObject(new {playerData = _playerData, 
+                gamePlayerData = _gamePlayerData }), Type = _type, Name = _name,  GameVersion = Application.version });
 
             WebRequests.Instance.Post(JOIN_ROOM, _postData, _response =>
             {
-                NewJoinRoom _responseData = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _responseData = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 roomData = _responseData.Room;
                 _responseData.Name = _name;
                 _responseData.Type = _type;
                 _callBack?.Invoke(_responseData);
             }, _response =>
             {
-                Debug.Log(_response);
-                NewJoinRoom _data = JsonConvert.DeserializeObject<NewJoinRoom>(_response);
+                JoinRoom _data = JsonConvert.DeserializeObject<JoinRoom>(_response);
                 _callBack?.Invoke(_data);
             }, _includeHeader: false);
         }
 
-        public void CreateRoom(RoomData _roomData, Action<NewCreateRoom> _callBack)
+        public void CreateRoom(RoomData _roomData, Action<CreateRoom> _callBack)
         {
-            string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData) });
+            string _postData = JsonConvert.SerializeObject(new { _roomData.Id, JsonData = JsonConvert.SerializeObject(_roomData),GameVersion = Application.version });
 
             WebRequests.Instance.Post(CREATE_ROOM, _postData, _response =>
             {
                 roomData = _roomData;
-                _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response));
-            }, _response => { _callBack?.Invoke(JsonConvert.DeserializeObject<NewCreateRoom>(_response)); });
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
+            }, _response =>
+            {
+                _callBack?.Invoke(JsonConvert.DeserializeObject<CreateRoom>(_response));
+            });
         }
 
         public RoomPlayer GetOpponent()
@@ -202,10 +923,53 @@ namespace FirebaseMultiplayer.Room
 
             throw new Exception("Can't find opponent");
         }
-
-        public void AddAction(ActionType _type, string _jsonData)
+        
+        public RoomPlayer GetMyPlayer()
         {
-            //todo modify me
+            foreach (var _player in roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    return _player;
+                }
+
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+        
+        public RoomPlayer GetOpponent(RoomData _roomData)
+        {
+            foreach (var _player in _roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    continue;
+                }
+
+                return _player;
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+        
+        public RoomPlayer GetMyPlayer(RoomData _roomData)
+        {
+            foreach (var _player in _roomData.RoomPlayers)
+            {
+                if (_player.Id == localPlayerId)
+                {
+                    return _player;
+                }
+
+            }
+
+            throw new Exception("Can't find opponent");
+        }
+        
+        public void UpdateRoomData()
+        {
+            database.Child(RoomPath).SetRawJsonValueAsync(JsonConvert.SerializeObject(roomData));
         }
     }
 }

@@ -19,7 +19,7 @@ public class FirebaseManager : MonoBehaviour
     public RoomHandler RoomHandler = new();
     private DatabaseReference database;
 
-    public string PlayerId => Authentication.UserId;
+    public string PlayerId => RoomHandler.GetMyPlayer().Id;
     public string OpponentId => RoomHandler.GetOpponent().Id;
 
     private void Awake()

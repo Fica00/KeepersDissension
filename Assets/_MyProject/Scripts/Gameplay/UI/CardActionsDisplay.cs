@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +15,6 @@ public class CardActionsDisplay : MonoBehaviour
     [SerializeField] private AbilityTrigger abilityTriggerPrefab;
     [SerializeField] private Transform myAbilitiesHolder;
     [SerializeField] private Transform effectAbilitiesHolder;
-    [SerializeField] private EffectDisplay effectPrefab;
     [SerializeField] private Transform effectsHolder;
     [SerializeField] private Button unchainButton;
     [SerializeField] private Image xDisplay;
@@ -55,7 +53,7 @@ public class CardActionsDisplay : MonoBehaviour
         useMoveAction.onClick.RemoveListener(UseMoveAction);
         useAttackAction.onClick.RemoveListener(UseAttackAction);
         flip.onClick.RemoveListener(Flip);
-        unchainButton.onClick.AddListener(Unchain);
+        unchainButton.onClick.RemoveListener(Unchain);
     }
 
     private void Unchain()
@@ -82,11 +80,19 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.GameState != GameplayState.Playing && GameplayManager.Instance.GameState != GameplayState.AttackResponse)
+        if (GameplayManager.Instance.IsResponseAction())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction())
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
-        actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType.Move);
+        
+        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType.Move);
     }
 
     private void UseAttackAction()
@@ -102,12 +108,19 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
         
-        if (GameplayManager.Instance.GameState != GameplayState.Playing && GameplayManager.Instance.GameState != GameplayState.AttackResponse)
+        if (GameplayManager.Instance.IsResponseAction())
+        {
+            if (!GameplayManager.Instance.IsMyResponseAction())
+            {
+                return;
+            }
+        }
+        else if (!GameplayManager.Instance.IsMyTurn())
         {
             return;
         }
         
-        actionsHandler.ShowPossibleActions(GameplayManager.Instance.MyPlayer,selectedPlace,selectedCard,CardActionType
+        actionsHandler.ShowPossibleActions(selectedPlace,selectedCard,CardActionType
         .Attack);
     }
 
@@ -136,24 +149,30 @@ public class CardActionsDisplay : MonoBehaviour
         }
     }
     
-    public void Show(int _placeId, GameplayPlayer _player)
+    public void Show(int _placeId)
     {
         if (!actionsHandler.ContinueWithShowingPossibleActions(_placeId))
         {
             return;
         }
 
-        ResetDisplays();
-        if (GameplayManager.Instance.GameState == GameplayState.AttackResponse && !GameplayManager.Instance.IsKeeperResponseAction)
+        if (GameplayManager.Instance.IsResponseAction())
         {
-            int _id = FindObjectsOfType<Card>().ToList().Find(_card =>
-                _card.Details.Id == GameplayManager.Instance.IdOfCardWithResponseAction && _card.My).GetTablePlace().Id;
-            if (_id != _placeId)
+            if (!GameplayManager.Instance.IsKeeperResponseAction)
             {
-                _placeId = _id;
-                DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                int _id = GameplayManager.Instance.GetCard(GameplayManager.Instance.IdOfCardWithResponseAction()).GetTablePlace().Id;
+                if (_id != _placeId)
+                {
+                    _placeId = _id;
+                    if (FindObjectOfType<YesNoDialog>() == null)
+                    {
+                        DialogsManager.Instance.ShowOkDialog("Due to response action you are forced to play with this card");
+                    }
+                }
             }
         }
+
+        ResetDisplays();
         
         selectedPlace = tableHandler.GetPlace(_placeId);
         selectedCard = selectedPlace.GetCardNoWall();
@@ -163,7 +182,7 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        if (!selectedCard.CanBeUsed)
+        if (selectedCard.HasSnowWallEffect)
         {
             DialogsManager.Instance.ShowOkDialog("This card can't be used!");
             selectedCard = null;
@@ -225,26 +244,48 @@ public class CardActionsDisplay : MonoBehaviour
             return;
         }
 
-        foreach (var _cardAbility in _cardAbilities)
+        foreach (CardSpecialAbility _cardAbility in _cardAbilities)
         {
             if (!_cardAbility.IsClickable)
             {
                 continue;
             }
+            if (GameplayManager.Instance.GetGameplayState() < GameplayState.Gameplay)
+            {
+                Close();
+                return;
+            }
+            
             Transform _abilityHolder = _cardAbility.IsBaseCardsEffect ? myAbilitiesHolder : effectAbilitiesHolder;
             AbilityTrigger _abilityTrigger = Instantiate(abilityTriggerPrefab, _abilityHolder);
             _abilityTrigger.Setup(_cardAbility.Sprite, _cardAbility.CanUseAbility,() =>
             {
+                if (!GameplayManager.Instance.CanPlayerDoActions())
+                {
+                    return;
+                }
+                
                 if (!selectedCard.My)
                 {
                     DialogsManager.Instance.ShowOkDialog("Selected card is not yours");
                     return;
                 }
                 
-                if (GameplayManager.Instance.GameState != GameplayState.Playing)
+                if (!GameplayManager.Instance.IsMyTurn() 
+                    && !GameplayManager.Instance.IsMyResponseAction() 
+                    && !GameplayManager.Instance.IsKeeperResponseAction 
+                    && !GameplayManager.Instance.HasCardResponseAction(selectedCard.UniqueId))
                 {
                     return;
                 }
+
+
+                if (!_cardAbility.CanUseAbility)
+                {
+                    DialogsManager.Instance.ShowOkDialog("This ability has already been used");
+                    return;
+                }
+                
                 _cardAbility.UseAbility();
                 ShowAbilities();
             });

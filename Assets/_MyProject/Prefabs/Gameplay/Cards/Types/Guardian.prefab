@@ -369,6 +369,16 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 88465185494110218, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 26.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1031796209713536580, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4433261327810439544, guid: ee97601f94a7d25478ba75ae480050a0,
         type: 3}
       propertyPath: m_Pivot.x
@@ -479,6 +489,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Guardian
       objectReference: {fileID: 0}
+    - target: {fileID: 7644353684032398244, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7644353684032398244, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4433261326902133431, guid: ee97601f94a7d25478ba75ae480050a0,
@@ -520,6 +540,19 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 325226430534213383}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3165768659805014090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4108817809919800956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5edd14acbba828842bf9c1fbda1b8750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chain: {fileID: 2112918612}
 --- !u!114 &6539500135950436284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -534,44 +567,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <EffectsHolder>k__BackingField: {fileID: 2438176040542503558}
   Display: {fileID: 4108817808961691059}
-  MovementType: 1
-  HasDied: 0
-  Effects: []
   Details:
     <Id>k__BackingField: 0
     <Type>k__BackingField: 5
     <Foreground>k__BackingField: {fileID: 0}
     <Background>k__BackingField: {fileID: 0}
     <Stats>k__BackingField:
+      MaxHealth: -1
       health: 0
-      Speed: 0
       Range: 0
       Damage: 0
+      Speed: 0
     <Faction>k__BackingField: {fileID: 0}
-  Stats:
-    health: 0
-    Speed: 0
-    Range: 0
-    Damage: 0
-  CanMoveOnWall: 0
-  GainStatsOnUnchaining:
-    health: 0
-    Speed: 0
-    Range: 0
-    Damage: 0
   healthDisplay: {fileID: 2169567523179890834}
   chain: {fileID: 2112918615}
-  IsChained: 1
---- !u!114 &3165768659805014090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4108817809919800956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5edd14acbba828842bf9c1fbda1b8750, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chain: {fileID: 2112918612}

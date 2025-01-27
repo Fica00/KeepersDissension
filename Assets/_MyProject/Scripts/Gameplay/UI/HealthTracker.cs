@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -29,69 +28,34 @@ public class HealthTracker : MonoBehaviour
         opponentKeeper = GameplayManager.Instance.GetOpponentKeeper();
         myLifeForce = GameplayManager.Instance.GetMyLifeForce();
         opponentLifeForce = GameplayManager.Instance.GetOpponentsLifeForce();
-
-        myGuardian.UpdatedHealth += ShowMyGuardianHealth;
-        opponentGuardian.UpdatedHealth += ShowOpponentGuardianHealth;
-        myKeeper.UpdatedHealth += ShowMyKeeperHealth;
-        opponentKeeper.UpdatedHealth += ShowOpponentKeeperHealth;
-        myLifeForce.UpdatedHealth += ShowMyLifeForceHealth;
-        opponentLifeForce.UpdatedHealth += ShowOpponentLifeForceHealth;
+        StartCoroutine(ShowHealthRoutine());
     }
 
     private void OnDisable()
     {
-        if (myGuardian==null)
+        StopAllCoroutines();
+    }
+
+    private IEnumerator ShowHealthRoutine()
+    {
+        while (gameObject.activeSelf)
         {
-            return;
-        }
-        myGuardian.UpdatedHealth -= ShowMyGuardianHealth;
-        opponentGuardian.UpdatedHealth += ShowOpponentGuardianHealth;
-        myKeeper.UpdatedHealth -= ShowMyKeeperHealth;
-        opponentKeeper.UpdatedHealth -= ShowOpponentKeeperHealth;
-        myLifeForce.UpdatedHealth -= ShowMyLifeForceHealth;
-        opponentLifeForce.UpdatedHealth -= ShowOpponentLifeForceHealth;
-    }
+            myGuardianHealth.text = myGuardian.Health.ToString();
+            opponentGuardianHealth.text = opponentGuardian.Health.ToString();
+            myKeeperHealth.text = myKeeper.Health.ToString();
+            opponentKeeperHealth.text = opponentKeeper.Health.ToString();
+            myLifeForceHealth.text = myLifeForce.Health.ToString();
+            opponentLifeForceHealth.text = opponentLifeForce.Health.ToString();
+            if (myKeeper!=null)
+            {
+                myUltimateIndicator.SetActive(myKeeper.SpecialAbilities[0].CanUseAbility);
+            }
 
-    private void ShowMyGuardianHealth()
-    {
-        myGuardianHealth.text = myGuardian.Health.ToString();
-    }
-
-    private void ShowOpponentGuardianHealth()
-    {
-        opponentGuardianHealth.text = opponentGuardian.Health.ToString();
-    }
-
-    private void ShowMyKeeperHealth()
-    {
-        myKeeperHealth.text = myKeeper.Health.ToString();
-    }
-
-    private void ShowOpponentKeeperHealth()
-    {
-        opponentKeeperHealth.text = opponentKeeper.Health.ToString();
-    }
-
-    private void ShowMyLifeForceHealth()
-    {
-        myLifeForceHealth.text = myLifeForce.Health.ToString();
-    }
-
-    private void ShowOpponentLifeForceHealth()
-    {
-        opponentLifeForceHealth.text = opponentLifeForce.Health.ToString();
-    }
-
-    private void Update()
-    {
-        if (myKeeper!=null)
-        {
-            myUltimateIndicator.SetActive(myKeeper.SpecialAbilities[0].CanUseAbility);
-        }
-
-        if (opponentKeeper!=null)
-        {
-            opponentUltimateIndicator.SetActive(opponentKeeper.SpecialAbilities[0].CanUseAbility);
+            if (opponentKeeper!=null)
+            {
+                opponentUltimateIndicator.SetActive(opponentKeeper.SpecialAbilities[0].CanUseAbility);
+            }
+            yield return new WaitForSeconds(1);
         }
     }
 }

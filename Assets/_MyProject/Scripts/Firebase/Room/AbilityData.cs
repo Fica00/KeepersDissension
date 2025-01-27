@@ -4,16 +4,25 @@ using System.Collections.Generic;
 [Serializable]
 public class AbilityData
 {
+    private int placeId = -100;
+
+    public string Name;
+    public int PlaceRoomOwnerId;
     public string UniqueId;
     public string Owner;
-    public bool IsVetoed;
     public int RemainingCooldown;
-    public int PlaceId;
     public int Cooldown;
     public bool IsActive;
+    public AbilityCardType Type;
     public List<string> EffectedCards = new();
+    public CardPlace CardPlace = CardPlace.Deck;
+    public int CardId;
+    public AbilityColor Color;
+    public bool CanBeGivenToPlayer;
+    public int PlaceInActivationField = -1;
     
     //helpers
+    public bool IsLightUp;
     public bool IsApplied;
     public int Multiplayer;
     public bool CanExecuteThisTurn;
@@ -23,4 +32,21 @@ public class AbilityData
     public bool HasMyRequiredCardDied;
     public bool HasOpponentsRequiredCardDied;
     public int OpponentsStartingHealth;
+
+    public int PlaceId
+    {
+        get => placeId;
+        set
+        {
+            placeId = value;
+            if (placeId<=0 || placeId>=64)
+            {
+                PlaceRoomOwnerId = placeId;
+            }
+            else
+            {
+                PlaceRoomOwnerId = FirebaseManager.Instance.RoomHandler.IsOwner ? placeId : Utils.ConvertPosition(placeId);
+            }
+        }
+    }
 }

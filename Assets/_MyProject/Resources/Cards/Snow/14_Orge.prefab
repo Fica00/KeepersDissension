@@ -49,7 +49,7 @@ PrefabInstance:
     - target: {fileID: 1665138479093259250, guid: b3d19a30cfce3e142a3ba995c83591ef,
         type: 3}
       propertyPath: Details.<Stats>k__BackingField.Damage
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1665138479093259250, guid: b3d19a30cfce3e142a3ba995c83591ef,
         type: 3}
@@ -195,4 +195,4 @@ MonoBehaviour:
   <IsClickable>k__BackingField: 1
   <Sprite>k__BackingField: {fileID: 21300000, guid: 98392c50149d8224b8044a95ce14bfe4,
     type: 3}
-  UseAOEAttack: 0
+  IsBaseCardsEffect: 1

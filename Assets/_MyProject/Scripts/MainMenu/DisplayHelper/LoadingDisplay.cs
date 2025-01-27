@@ -20,6 +20,11 @@ namespace DisplayHelpers
             SetUp();
         }
 
+        private void OnDisable()
+        {
+            StopAllCoroutines();
+        }
+
         private void SetUp()
         {
             loadingText.text = startingText;

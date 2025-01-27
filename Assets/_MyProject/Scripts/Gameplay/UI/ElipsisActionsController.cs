@@ -7,6 +7,6 @@ public class ElipsisActionsController : MonoBehaviour
 
     public void Setup()
     {
-        endTurn.interactable = !GameplayManager.Instance.IsSettingUpTable;
+        endTurn.interactable = !GameplayManager.Instance.IsSettingUpTable();
     }
 }
