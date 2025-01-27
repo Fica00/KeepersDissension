@@ -15,7 +15,7 @@ public class AbilityTrigger : MonoBehaviour
         
         image.sprite = _sprite;
         callBack = _callBack;
-        button.interactable = _canUse;
+        button.gameObject.SetActive(_canUse);
         button.onClick.AddListener(OnClicked);
     }
 

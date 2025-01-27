@@ -16,8 +16,8 @@ public class Portal : AbilityEffect
     {
         Card _portal = GameplayManager.Instance.CreateCard(portalId, GameplayManager.Instance.MyPlayer.TableSideHandler, Guid.NewGuid().ToString(),
             true, FirebaseManager.Instance.PlayerId);
-
         GameplayManager.Instance.PlaceCard(_portal, _selectedPlace);
+        GameplayManager.Instance.RemoveStrangeMatterFromPlace(_selectedPlace);
         AddEffectedCard(_portal.UniqueId);
         
         if (GetEffectedCards().Count == 2)

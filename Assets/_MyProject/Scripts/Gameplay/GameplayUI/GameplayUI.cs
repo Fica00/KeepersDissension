@@ -135,6 +135,11 @@ public class GameplayUI : MonoBehaviour
 
     public void ShowPreparationText()
     {
+        if (!DataManager.Instance.PlayerData.GameplayNotifications)
+        {
+            return;
+        }
+        
         preparationHolder.SetActive(true);
     }
 

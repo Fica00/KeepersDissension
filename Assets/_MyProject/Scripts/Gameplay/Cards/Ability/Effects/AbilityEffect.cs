@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -48,7 +47,7 @@ public class AbilityEffect : MonoBehaviour
         
     }
 
-    private void OnDisable()
+    protected void OnDisable()
     {
         CancelEffect();
     }
@@ -80,6 +79,8 @@ public class AbilityEffect : MonoBehaviour
         }
         
         GameplayManager.Instance.PlaceAbilityOnTable(AbilityCard.UniqueId, GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField.Id);
+        AbilityCard.Data.PlaceInActivationField = GameplayManager.Instance.TableHandler
+            .GetPlace(GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField.Id).GetCards().IndexOf(AbilityCard)+1;
     }
 
     public void RemoveAction()

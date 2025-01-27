@@ -9,8 +9,41 @@ public class CardDisplay: CardDisplayBase
     [SerializeField] private Image foregroundDisplay;
     [SerializeField] private Image whiteBox;
     [SerializeField] private TextMeshProUGUI nameHolder;
-    private Card card;
+    [SerializeField] private GameObject strangeMatterHolder;
+    [SerializeField] private TextMeshProUGUI strangeMatterDisplay;
     
+    private Card card;
+
+    private void OnEnable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable += TryToShowStrangeMatterCarry;
+    }
+
+    private void OnDisable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable -= TryToShowStrangeMatterCarry;
+    }
+
+    private void TryToShowStrangeMatterCarry()
+    {
+        TablePlaceHandler _place = card.GetTablePlace();
+        if (_place == null)
+        {
+            return;
+        }
+
+        int _amount = card.CardData.CarryingStrangeMatter;
+        if (_amount == 0)
+        {
+            strangeMatterHolder.SetActive(false);
+        }
+        else
+        {
+            strangeMatterHolder.SetActive(true);
+            strangeMatterDisplay.text = _amount.ToString();
+        }
+    }
+
     public override void Setup(Card _card)
     {
         card = _card;
@@ -21,6 +54,13 @@ public class CardDisplay: CardDisplayBase
 
     private void SetName()
     {
+        ManageNameDisplay(false);
+        if (card is Wall or Marker)
+        {
+            nameHolder.text = string.Empty;
+            return;
+        }
+        
         string[] _nameSplit = card.name.Split("_");
         string _name = _nameSplit[^1];
         if (_name == "LifeForce")
@@ -28,6 +68,8 @@ public class CardDisplay: CardDisplayBase
             _name = "Life Force";
         }
         nameHolder.text = _name;
+
+        nameHolder.color = card.GetIsMy() ? Color.green: Color.red;
     }
 
     public override bool ChangeSprite(Sprite _sprite)

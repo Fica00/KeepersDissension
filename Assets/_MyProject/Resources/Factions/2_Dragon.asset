@@ -18,3 +18,5 @@ MonoBehaviour:
   Board: {fileID: 21300000, guid: 8adb5f8d22d1d9b45bf8dd09f59d97e6, type: 3}
   CardBackground: {fileID: 21300000, guid: f8c103edfa2f9f145affdcc85511909c, type: 3}
   BombSprite: {fileID: 21300000, guid: 035ed9c477dcca7489aae491269e0265, type: 3}
+  NameColor: {r: 0.18431371, g: 0.27978685, b: 0.9137255, a: 1}
+  NameColorOpponent: {r: 0.18431373, g: 0.2784314, b: 0.9137255, a: 1}

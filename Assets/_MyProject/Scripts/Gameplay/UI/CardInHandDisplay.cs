@@ -32,7 +32,6 @@ public class CardInHandDisplay : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     private void Select()
     {
-        Debug.Log("Click detected");
         OnClicked?.Invoke(card);
     }
 

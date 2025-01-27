@@ -4,5 +4,5 @@ using System;
 public class BombAnimation
 {
     public string Id;
-    public int PlaceId;
+    public int PlaceIdOwner;
 }

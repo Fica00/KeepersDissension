@@ -17,22 +17,28 @@ public class AbilityCardDisplay : CardDisplayBase
         
     }
 
-    private void Update()
+
+    private void SetTransparency()
     {
+
+        Color _color = foreground.color;
+
+        _color.a = 1;
+        foreground.color = _color;
+
         TablePlaceHandler _place = GetComponentInParent<TablePlaceHandler>();
-        if (_place==null)
+        if (_place == null)
         {
             return;
         }
 
         if (!_place.IsActivationField)
         {
-            Color _color = foreground.color;
-            _color.a = 1;
-            foreground.color = _color;
             return;
         }
         
-        
+        _color.a = abilityCard.GetBringBackPercentage();
+        foreground.color = _color;
     }
+
 }

@@ -43,22 +43,23 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _text = "Opponent's turn";
                 _color = opponentColor;
             }
-
+            
             if (GameplayManager.Instance.IsResponseAction())
             {
                 _text = GameplayManager.Instance.IsMyResponseAction() ? "Your response" : "Opponents response";
                 _color = responseColor;
-                _number = 1;
+                int _actions = GameplayManager.Instance.AmountOfResponseActions(GameplayManager.Instance.IsMyResponseAction());
+                _number = _actions > 1 ? _actions : 1;
             }
-
-            if (GameplayManager.Instance.IsDeliveryReposition())
+            
+            if (GameplayManager.Instance.IsKeeperRepositionAction())
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
                 bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
-                string _myText = "Your delivery reposition action";
-                string _opponentText = "Opponents is choosing delivery spot";
+                string _myText = "Your keeper reposition action";
+                string _opponentText = "Opponents is choosing keeper spot";
                 
-                if (_subState is GameplaySubState.Player1DeliveryReposition)
+                if (_subState is GameplaySubState.Player1UseKeeperReposition)
                 {
                     _text = _isRoomOwner ? _myText : _opponentText;
                 }
@@ -70,15 +71,15 @@ public class ActionAndTurnDisplay : MonoBehaviour
                 _number = 1;
                 _color = responseColor;
             }
-
-            if (GameplayManager.Instance.IsKeeperRepositionAction())
+            
+            if (GameplayManager.Instance.IsDeliveryReposition())
             {
                 var _subState = GameplayManager.Instance.GetGameplaySubState();
                 bool _isRoomOwner = GameplayManager.Instance.IsRoomOwner();
-                string _myText = "Your keeper reposition action";
-                string _opponentText = "Opponents is choosing keeper spot";
+                string _myText = "Your delivery reposition action";
+                string _opponentText = "Opponents is choosing delivery spot";
                 
-                if (_subState is GameplaySubState.Player1UseKeeperReposition)
+                if (_subState is GameplaySubState.Player1DeliveryReposition)
                 {
                     _text = _isRoomOwner ? _myText : _opponentText;
                 }

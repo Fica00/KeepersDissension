@@ -60,6 +60,9 @@ public class ResolveMultipleActions : MonoBehaviour
                 case CardActionType.RamAbility:
                     _actionDesc = "Use Ram";
                     break;
+                case CardActionType.Transfer:
+                    _actionDesc = "Transfer loot";
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

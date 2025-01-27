@@ -13,24 +13,13 @@ public class CardBase : MonoBehaviour
     [field: SerializeField] public GameObject EffectsHolder { get; private set; }
     public List<CardSpecialAbility> SpecialAbilities => EffectsHolder.GetComponents<CardSpecialAbility>().ToList();
     public CardDisplayBase Display;
-    public bool AllowCardEffectOnDeath;
 
     protected Transform Parent;
+    private bool isDestroyed;
 
-    public void PositionInHand(bool _rotateHorizontally=false)
-    {
-        SetPlace(CardPlace.Hand);
-        RotateCard(_rotateHorizontally);
-        OnPositionedInHand?.Invoke(this);
-    }
-
-    public void RotateCard(bool _rotateHorizontally=false)
-    {
-        transform.rotation = Quaternion.Euler(_rotateHorizontally ? new Vector3(0, 0, 90) : new Vector3(0, 0, 0));
-    }
-    
     public void PositionOnTable(TablePlaceHandler _tablePosition)
     {
+        isDestroyed = false;
         SetPlace(CardPlace.Table);
         MoveToPosition(_tablePosition,null);
         OnPositionedOnTable?.Invoke(this);
@@ -38,6 +27,7 @@ public class CardBase : MonoBehaviour
 
     public void ReturnFromHand()
     {
+        isDestroyed = false;
         SetPlace(CardPlace.Deck);
         PositionAsDead();
     }
@@ -116,6 +106,12 @@ public class CardBase : MonoBehaviour
 
     public void Destroy()
     {
+        if (isDestroyed)
+        {
+            return;
+        }
+
+        isDestroyed = true;
         OnGotDestroyed?.Invoke(this);
         Card _card = GetComponent<Card>();
         if (_card == null)

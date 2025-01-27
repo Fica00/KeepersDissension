@@ -9,10 +9,11 @@ namespace FirebaseMultiplayer.Room
     public class BoardData
     {
         public int StrangeMaterInEconomy;
-        public string IdOfCardWithResponseAction;
+        public List<string> IdsOfCardWithResponseAction = new ();
         public List<RoomGameplayPlayer> PlayersData = new ();
         public List<CardData> Cards = new();
         public List<AbilityData> Abilities = new();
+        public List<StrangeMatterData> StrangeMatterOntable = new ();
         
         [JsonIgnore] public RoomGameplayPlayer MyPlayer => PlayersData.First(_player => _player.IsMy);
         [JsonIgnore] public RoomGameplayPlayer OpponentPlayer => PlayersData.First(_player => !_player.IsMy);

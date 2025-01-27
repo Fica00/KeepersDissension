@@ -37,9 +37,15 @@ public class Snipe : AbilityEffect
             return;
         }
 
-        Card _card = _place.GetCard();
+        Card _card = _place.GetCardNoWall();
+        if (_card==null)
+        {
+            Finish();
+            return;
+        }
+        
         Keeper _keeper = GameplayManager.Instance.GetMyKeeper();
-        if (_card is Wall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_keeper.GetTablePlace(), _place) > 1)
+        if (_place.ContainsWall && GameplayManager.Instance.TableHandler.DistanceBetweenPlaces(_keeper.GetTablePlace(), _place) > 1)
         {
             Finish();
             return;

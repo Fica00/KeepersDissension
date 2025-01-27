@@ -1957,6 +1957,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   object1: {fileID: 5771632732364127522}
   object2: {fileID: 6783867028081482572}
+  allowOpeningAtAnyTime: 0
 --- !u!1 &6783867028081482572
 GameObject:
   m_ObjectHideFlags: 0
@@ -3219,6 +3220,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8545707144411139836, guid: 2e4cddb6f969b2245920acb714154632,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.000030517578
+      objectReference: {fileID: 0}
+    - target: {fileID: 8545707144411139836, guid: 2e4cddb6f969b2245920acb714154632,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 12.200001
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7282030990953007776, guid: 2e4cddb6f969b2245920acb714154632,
@@ -3425,6 +3436,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8545707144411139836, guid: 2e4cddb6f969b2245920acb714154632,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.000030517578
+      objectReference: {fileID: 0}
+    - target: {fileID: 8545707144411139836, guid: 2e4cddb6f969b2245920acb714154632,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 12.200001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:

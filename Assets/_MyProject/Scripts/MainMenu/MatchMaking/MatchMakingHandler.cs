@@ -92,7 +92,6 @@ public class MatchMakingHandler : MonoBehaviour
         RoomGameplayPlayer _gameplayPLayer = new()
         {
             PlayerId = FirebaseManager.Instance.Authentication.UserId,
-            LootChange = 0,
             StrangeMatter = 0,
             AmountOfAbilitiesPlayerCanBuy = 7
         };
@@ -144,13 +143,12 @@ public class MatchMakingHandler : MonoBehaviour
                 BoardData = new BoardData
                 {
                     StrangeMaterInEconomy = 20,
-                    IdOfCardWithResponseAction = string.Empty,
+                    IdsOfCardWithResponseAction = new (),
                     PlayersData = new List<RoomGameplayPlayer>()
                     {
                         new ()
                         {
                             PlayerId = FirebaseManager.Instance.Authentication.UserId,
-                            LootChange = 0,
                             StrangeMatter = 0,
                             AmountOfAbilitiesPlayerCanBuy = 7
                         }

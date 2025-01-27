@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
+    public static Action OnUpdatedStrangeMatterOnTable;
+    public static Action OnStartedResponseAction;
     public static Action<CardBase, int, int> OnCardMoved;
     public static Action<CardBase, CardBase, int> OnCardAttacked;
     public static Action<CardBase, CardBase> OnSwitchedPlace;
@@ -18,6 +20,7 @@ public class GameplayManager : MonoBehaviour
     public GameplayPlayer MyPlayer;
     public GameplayPlayer OpponentPlayer;
     public TableHandler TableHandler;
+    protected string IdOfCardWithResponse;
     
     [SerializeField] private HealthTracker healthTracker;
 
@@ -29,7 +32,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] protected Sprite dragonMarker;
     [SerializeField] protected Sprite forestMarker;
     [SerializeField] protected GameObject bombEffect;
-
+    [SerializeField] protected StrangeMatterOnTableHandler strangeMatterOnTableHandler;
     [HideInInspector] public bool DidOpponentFinish;
     protected bool DidIFinishMyTurn;
     private bool doIPlayFirst;
@@ -259,9 +262,23 @@ public class GameplayManager : MonoBehaviour
                     FinishActionExecution(_action);
                 });
                 break;
+            case CardActionType.Transfer:
+                ExecuteTransfer(_action, () =>
+                {
+                    FinishActionExecution(_action);
+                });
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void ExecuteTransfer(CardAction _action, Action _callBack)
+    {
+        Card _firstCard = GetCard(_action.FirstCardId);
+        Card _secondCard = GetCard(_action.SecondCardId);
+        strangeMatterOnTableHandler.TransferStrangeMatter(_firstCard, _secondCard);
+        _callBack?.Invoke();
     }
 
     public void HideCardActions()
@@ -918,11 +935,6 @@ public class GameplayManager : MonoBehaviour
 
         return _ability.IsActive;
     }
-
-    public virtual void ChangeLootAmountForMe(int _amount)
-    {
-        throw new Exception();
-    }
     
     public List<Card> GetAllCards()
     {
@@ -1184,6 +1196,11 @@ public class GameplayManager : MonoBehaviour
         throw new Exception();
     }
 
+    public virtual bool IsAnySortOfMyResponseAction()
+    {
+        throw new Exception();
+    }
+
     public virtual bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack, bool _checkForResponse = false, string _attacker
             = "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
     {
@@ -1213,26 +1230,6 @@ public class GameplayManager : MonoBehaviour
     public virtual List<AbilityData> GetPurchasedAbilities(bool _forMe)
     {
         throw new Exception();
-    }
-
-    public int GetStrangeMatterForCard(Card _card)
-    {
-        if (_card is Minion)
-        {
-            return 2;
-        }
-
-        if (_card is Guardian)
-        {
-            return 10;
-        }
-
-        if (_card is Keeper)
-        {
-            return 5;
-        }
-
-        return 0;
     }
 
     public virtual void SetGameplaySubStateHelper(GameplaySubState _subState)
@@ -1306,6 +1303,41 @@ public class GameplayManager : MonoBehaviour
     }
 
     public virtual bool IsKeeperRepositionAction()
+    {
+        throw new Exception();
+    }
+
+    public virtual void ChooseCardForResponseAction()
+    {
+        throw new Exception();
+    }
+
+    public virtual int AmountOfResponseActions(bool _forMe)
+    {
+        throw new Exception();
+    }
+
+    public virtual void AddStrangeMatterOnTable(int _placeId, int _strangeMatter)
+    {
+        throw new Exception();
+    }
+
+    public virtual List<StrangeMatterData> GetStrangeMatterOnPlace(int _id)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveStrangeMatterFromTable(List<StrangeMatterData> _strangeMatter)
+    {
+        throw new Exception();
+    }
+
+    public virtual void NoteStrangeMatterAnimation(int _amount, bool _forMe, int _placeId)
+    {
+        throw new Exception();
+    }
+
+    public virtual void RemoveStrangeMatterFromPlace(int _placeId)
     {
         throw new Exception();
     }

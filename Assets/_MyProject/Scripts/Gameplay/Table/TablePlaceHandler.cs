@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,7 +12,9 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
     [SerializeField] private int id;
     [SerializeField] private bool isAbility;
     [SerializeField] private Image imageDisplay;
-
+    [SerializeField] private GameObject strangeMatterHolder;
+    [SerializeField] private TextMeshProUGUI strangeMatterDisplay;
+    
     public int Id => id;
     public bool IsAbility => isAbility;
     public bool IsOccupied => GetComponentInChildren<CardBase>()!=null;
@@ -80,6 +83,37 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
             }
 
             return false;
+        }
+    }
+
+    private void OnEnable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable += TryToShowStrangeMatter;
+    }
+
+    private void OnDisable()
+    {
+        GameplayManager.OnUpdatedStrangeMatterOnTable -= TryToShowStrangeMatter;
+    }
+
+    private void TryToShowStrangeMatter()
+    {
+        List<StrangeMatterData> _strangeMatter = GameplayManager.Instance.GetStrangeMatterOnPlace(id);
+
+        if (_strangeMatter.Count == 0)
+        {
+            strangeMatterHolder.SetActive(false);
+        }
+        else
+        {
+            strangeMatterHolder.SetActive(true);
+            int _amount = 0;
+            foreach (var _matter in _strangeMatter)
+            {
+                _amount += _matter.Amount;
+            }
+
+            strangeMatterDisplay.text = _amount.ToString();
         }
     }
 
@@ -242,5 +276,10 @@ public class TablePlaceHandler : MonoBehaviour,IPointerClickHandler
     public void SetColor(Color _color)
     {
         imageDisplay.color = _color;
+    }
+
+    private void Update()
+    {
+        strangeMatterHolder.transform.SetSiblingIndex(5);
     }
 }

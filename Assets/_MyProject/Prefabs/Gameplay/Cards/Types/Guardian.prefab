@@ -374,6 +374,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 26.1
       objectReference: {fileID: 0}
+    - target: {fileID: 1031796209713536580, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4433261327810439544, guid: ee97601f94a7d25478ba75ae480050a0,
         type: 3}
       propertyPath: m_Pivot.x
@@ -484,6 +489,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Guardian
       objectReference: {fileID: 0}
+    - target: {fileID: 7644353684032398244, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7644353684032398244, guid: ee97601f94a7d25478ba75ae480050a0,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4433261326902133431, guid: ee97601f94a7d25478ba75ae480050a0,
@@ -552,7 +567,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <EffectsHolder>k__BackingField: {fileID: 2438176040542503558}
   Display: {fileID: 4108817808961691059}
-  AllowCardEffectOnDeath: 0
   Details:
     <Id>k__BackingField: 0
     <Type>k__BackingField: 5

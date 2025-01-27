@@ -53,7 +53,7 @@ public class CardActionsDisplay : MonoBehaviour
         useMoveAction.onClick.RemoveListener(UseMoveAction);
         useAttackAction.onClick.RemoveListener(UseAttackAction);
         flip.onClick.RemoveListener(Flip);
-        unchainButton.onClick.AddListener(Unchain);
+        unchainButton.onClick.RemoveListener(Unchain);
     }
 
     private void Unchain()

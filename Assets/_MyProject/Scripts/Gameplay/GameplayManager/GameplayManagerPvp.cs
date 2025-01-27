@@ -347,7 +347,6 @@ public class GameplayManagerPvp : GameplayManager
         }
 
         AudioManager.Instance.PlaySoundEffect("Attack");
-        int _attackerPlace = _attackingCard.GetTablePlace().Id;
         int _defenderPlace = _defendingCard.GetTablePlace().Id;
 
         if (_attackingCard == _defendingCard)
@@ -689,8 +688,6 @@ public class GameplayManagerPvp : GameplayManager
                         EndGame(!_defendingCard.My);
                         return;
                     }
-
-                    HandleLoot(_attackingCard, _defendingCard, _defendingPosition);
                 }
                 else
                 {
@@ -973,7 +970,7 @@ public class GameplayManagerPvp : GameplayManager
 
     private void SetResponseAction(bool _forMe, string _uniqueCardId)
     {
-        BoardData.IdOfCardWithResponseAction = _uniqueCardId;
+        BoardData.IdsOfCardWithResponseAction.Add(_uniqueCardId);
         if (_forMe)
         {
             if (RoomHandler.IsOwner)
@@ -1029,7 +1026,7 @@ public class GameplayManagerPvp : GameplayManager
             }
 
             int _maxHealth = _keeper.CardData.Stats.MaxHealth == -1 ? _keeper.Details.Stats.Health : _keeper.CardData.Stats.MaxHealth;
-            float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100;
+            float _healthToRecover = _maxHealth * _keeper.PercentageOfHealthToRecover / 100f;
             int _heal = Mathf.RoundToInt(_healthToRecover + .3f);
 
             if (IsAbilityActive<Subdued>())
@@ -1041,7 +1038,7 @@ public class GameplayManagerPvp : GameplayManager
             OnKeeperDied?.Invoke(_keeper);
             _defendingCard.SetHealth(_heal);
             var _lifeForce = _defendingCard.My ? GetMyLifeForce() : GetOpponentsLifeForce();
-            _lifeForce.ChangeHealth(-_defendingCard.Health);
+            _lifeForce.ChangeHealth(-5);
 
             if (IsAbilityActive<Explode>())
             {
@@ -1282,36 +1279,6 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-
-    private void HandleLoot(Card _attackingCard, Card _defendingCard, int _placeOfDefendingCard)
-    {
-        int _additionalMatter = FirebaseManager.Instance.RoomHandler.IsOwner ? LootChangeForRoomOwner() : LootChangeForOther();
-        bool _didIAttack = _attackingCard.GetIsMy();
-        int _amount = _additionalMatter;
-        _amount += GetStrangeMatterForCard(_defendingCard);
-
-        AddStrangeMatter(_amount, _didIAttack, _placeOfDefendingCard);
-    }
-
-    private void AddStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
-    {
-        if (_forMe)
-        {
-            BoardData.MyPlayer.StrangeMatter += _amount;
-        }
-        else
-        {
-            BoardData.OpponentPlayer.StrangeMatter += _amount;
-        }
-
-        AnimateStrangeMatter(_amount, _forMe, _placeOfDefendingCard);
-        BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
-        {
-            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeOfDefendingCard,
-                RoomHandler.IsOwner),
-        };
-    }
-
     public override void AnimateStrangeMatter(int _amount, bool _forMe, int _placeOfDefendingCard)
     {
         var _startingPosition = TableHandler.GetPlace(_placeOfDefendingCard).transform.position;
@@ -1319,16 +1286,6 @@ public class GameplayManagerPvp : GameplayManager
         {
             EconomyPanelHandler.Instance.ShowBoughtMatter(_forMe, _startingPosition);
         }
-    }
-
-    private int LootChangeForRoomOwner()
-    {
-        return RoomHandler.IsOwner ? BoardData.MyPlayer.LootChange : BoardData.OpponentPlayer.LootChange;
-    }
-
-    private int LootChangeForOther()
-    {
-        return RoomHandler.IsOwner ? BoardData.OpponentPlayer.LootChange : BoardData.MyPlayer.LootChange;
     }
 
     private IEnumerator GetPlaceOnTable(Action<int> _callBack, bool _wholeTable = false)
@@ -1475,12 +1432,6 @@ public class GameplayManagerPvp : GameplayManager
         }
     }
 
-    private void ReplaceKeeper(CardBase _card, int _placeId, Action _callBack)
-    {
-        PlaceCard(_card, _placeId);
-        _callBack?.Invoke();
-    }
-
     public override void EndTurn()
     {
         CloseAllPanels();
@@ -1490,6 +1441,12 @@ public class GameplayManagerPvp : GameplayManager
         {
             if (!IsMyResponseAction())
             {
+                return;
+            }
+
+            if (BoardData.IdsOfCardWithResponseAction.Count>0)
+            {
+                ChooseCardForResponseAction();
                 return;
             }
 
@@ -1612,7 +1569,7 @@ public class GameplayManagerPvp : GameplayManager
             DamageCardByAbility(_cardOnPlace.UniqueId, 3, _ => { HideCardActions(); });
         }
 
-        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceId = Utils.ConvertRoomPosition(_placeId, RoomHandler
+        BombAnimation _animation = new BombAnimation { Id = Guid.NewGuid().ToString(), PlaceIdOwner = Utils.ConvertRoomPosition(_placeId, RoomHandler
             .IsOwner) };
         BoardData.BombAnimation = _animation;
         ShowBombAnimation(_placeId);
@@ -1689,7 +1646,6 @@ public class GameplayManagerPvp : GameplayManager
             return;
         }
 
-        Debug.Log("Buying ability");
         _ability.Owner = FirebaseManager.Instance.PlayerId;
         ChangeAmountOfAbilitiesICanBuy(-1);
         AudioManager.Instance.PlaySoundEffect("AbilityCardPurchased");
@@ -1792,6 +1748,8 @@ public class GameplayManagerPvp : GameplayManager
 
     public override void ReturnAbilityFromActivationField(string _abilityId)
     {
+        var _ability = GetAbility(_abilityId);
+        _ability.Data.PlaceInActivationField = -1;
         PlaceAbilityOnTable(_abilityId);
         MyPlayer.Actions--;
         if (MyPlayer.Actions > 0)
@@ -1949,19 +1907,9 @@ public class GameplayManagerPvp : GameplayManager
 
     public override string IdOfCardWithResponseAction()
     {
-        return BoardData.IdOfCardWithResponseAction;
+        return IdOfCardWithResponse;
     }
-
-    private void SetIdOfCardWithResponseAction(string _cardId)
-    {
-        BoardData.IdOfCardWithResponseAction = _cardId;
-    }
-
-    public override void ChangeLootAmountForMe(int _amount)
-    {
-        BoardData.MyPlayer.LootChange += _amount;
-    }
-
+    
     public override int MyStrangeMatter()
     {
         return BoardData.MyPlayer.StrangeMatter;
@@ -2586,6 +2534,38 @@ public class GameplayManagerPvp : GameplayManager
     {
         return GetGameplaySubState() is GameplaySubState.Player1ResponseAction or GameplaySubState.Player2ResponseAction;
     }
+    
+    public override bool IsAnySortOfMyResponseAction()
+    {
+        if (IsRoomOwner())
+        {
+            if (Instance.GetGameplaySubStateHelper() is
+                GameplaySubState.Player1ResponseAction or 
+                GameplaySubState.Player1DeliveryReposition or
+                GameplaySubState.Player1UseComrade or
+                GameplaySubState.Player1UseReduction or 
+                GameplaySubState.Player1UseKeeperReposition)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Instance.GetGameplaySubStateHelper() is
+                GameplaySubState.Player2ResponseAction or 
+                GameplaySubState.Player2DeliveryReposition or
+                GameplaySubState.Player2UseComrade or
+                GameplaySubState.Player2UseReduction or 
+                GameplaySubState.Player2UseKeeperReposition)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
 
     public override bool DamageCardByAbility(string _uniqueId, int _damage, Action<bool> _callBack,bool _checkForResponse = false, string _attacker =
             "", bool _applyWallEffects = false, bool _ignoreCyborgWallEffect = false)
@@ -2774,7 +2754,6 @@ public class GameplayManagerPvp : GameplayManager
 
             TablePlaceHandler.OnPlaceClicked -= TryToPlaceReduction;
             Card _card = _place.GetCardNoWall();
-            AddStrangeMatter(GetStrangeMatterForCard(_card),true,_place.Id);
            
             DamageCardByAbility(_card.UniqueId,_card.CardData.Stats.Health, _ =>
             {
@@ -2860,7 +2839,6 @@ public class GameplayManagerPvp : GameplayManager
         return false;
     }
 
-
     public override bool HasCardResponseAction(string _uniqueId)
     {
         return IdOfCardWithResponseAction() == _uniqueId;
@@ -2874,5 +2852,124 @@ public class GameplayManagerPvp : GameplayManager
     public override bool IsKeeperRepositionAction()
     {
         return GetGameplaySubState() is GameplaySubState.Player1UseKeeperReposition or GameplaySubState.Player2UseKeeperReposition; 
+    }
+
+    public override void ChooseCardForResponseAction()
+    {
+        List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
+        foreach (var _possibleCard in _possibleCards.ToList())
+        {
+            Card _card = GetCard(_possibleCard);
+            if (!_card.GetIsMy())
+            {
+                _possibleCards.Remove(_card.UniqueId);
+            }
+        }
+
+        if (_possibleCards.Count==0)
+        {
+            return;
+        }
+        
+        if (_possibleCards.Count==1)
+        {
+            SetResponseAction(_possibleCards[0]);
+        }
+        else
+        {
+            List<CardBase> _cards = new List<CardBase>();
+            foreach (var _possibleCardId in _possibleCards)
+            {
+                var _card = GetCard(_possibleCardId);
+                if (!_card.GetIsMy())
+                {
+                    continue;
+                }
+                _cards.Add(_card);
+            }
+            
+            ChooseCardImagePanel.Instance.Show(_cards,SetAsResponseCard,false,true);
+        }
+        
+        void SetAsResponseCard(CardBase _cardBase)
+        {
+            Card _card = _cardBase as Card;
+            string _uniqueId = _card.UniqueId;
+            SetResponseAction(_uniqueId);
+        }
+
+        void SetResponseAction(string _uniqueId)
+        {
+            IdOfCardWithResponse = _uniqueId;
+            BoardData.IdsOfCardWithResponseAction.Remove(_uniqueId);
+            OnStartedResponseAction?.Invoke();
+        }
+    }
+
+    public override int AmountOfResponseActions(bool _forMe)
+    {
+        List<string> _possibleCards = BoardData.IdsOfCardWithResponseAction.ToList();
+        foreach (var _possibleCard in _possibleCards.ToList())
+        {
+            Card _card = GetCard(_possibleCard);
+            if (_card.GetIsMy() == _forMe)
+            {
+                _possibleCards.Remove(_card.UniqueId);
+            }
+        }
+
+        return _possibleCards.Count;
+    }
+
+    public override void AddStrangeMatterOnTable(int _placeId, int _strangeMatter)
+    {
+        BoardData.StrangeMatterOntable.Add(new StrangeMatterData
+        {
+            OwnerPlaceId = Utils.ConvertRoomPosition(_placeId, IsRoomOwner()),
+            Amount = _strangeMatter,
+            DidOwnerKill = IsRoomOwner()
+        });
+        
+        OnUpdatedStrangeMatterOnTable?.Invoke();
+    }
+
+    public override List<StrangeMatterData> GetStrangeMatterOnPlace(int _id)
+    {
+        List<StrangeMatterData> _strangeMatter = new();
+        foreach (var _strangeData in BoardData.StrangeMatterOntable)
+        {
+            if (_strangeData.OwnerPlaceId == Utils.ConvertRoomPosition(_id, GameplayManager.Instance.IsRoomOwner()))
+            {
+                _strangeMatter.Add(_strangeData);
+            }
+        }
+
+        return _strangeMatter;
+    }
+
+    public override void RemoveStrangeMatterFromTable(List<StrangeMatterData> _strangeMatter)
+    {
+        foreach (var _data in _strangeMatter)
+        {
+            BoardData.StrangeMatterOntable.Remove(_data);
+        }
+        
+        OnUpdatedStrangeMatterOnTable?.Invoke();
+    }
+
+    public override void NoteStrangeMatterAnimation(int _amount, bool _forMe, int _placeId)
+    {
+        AnimateStrangeMatter(_amount, _forMe, _placeId);
+        BoardData.StrangeMatterAnimation = new StrangeMatterAnimation
+        {
+            Id = Guid.NewGuid().ToString(), Amount = _amount, ForMe = _forMe, PositionId = Utils.ConvertRoomPosition(_placeId,
+                RoomHandler.IsOwner),
+        };
+
+    }
+    
+    public override void RemoveStrangeMatterFromPlace(int _placeId)
+    {
+        RemoveStrangeMatterFromTable(GetStrangeMatterOnPlace(_placeId));;
     }
 }

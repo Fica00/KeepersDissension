@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,7 @@ public class ActivationFieldHandler : MonoBehaviour
     [SerializeField] private Transform cardsHolder;
     [SerializeField] private ActivationFiledAbilityDisplay activationFiledAbilityDisplay;
     private List<ActivationFiledAbilityDisplay> shownCards = new();
+    private List<AbilityCard> shownAbilities;
     
     private void OnEnable()
     {
@@ -28,7 +30,7 @@ public class ActivationFieldHandler : MonoBehaviour
         closeButton.onClick.RemoveListener(Close);
     }
     
-    private void CheckIfCanBringBack(AbilityCard _abilityCards)
+    private void CheckIfCanBringBack(AbilityCard _abilityCard)
     {
         if (GameplayManager.Instance.IsResponseAction())
         {
@@ -53,36 +55,24 @@ public class ActivationFieldHandler : MonoBehaviour
             return;
         }
 
-        int _indexOfCard = 1;
-        foreach (var _shownCard in shownCards)
-        {
-            if (_shownCard.AbilityCard==_abilityCards)
-            {
-                break;
-            }
-
-            _indexOfCard++;
-        }
-
-        AbilityEffect _effect = _abilityCards.Effect;
-        int _amountOfCardsOnTop = shownCards.Count - _indexOfCard;
-        bool _canReturn = _effect.Cooldown <= _amountOfCardsOnTop;
-        
+        bool _canReturn = _abilityCard.CanReturnFromActivationField();        
         if (!GameplayCheats.CheckForCd)
         {
             _canReturn = true;
         }
+
+        int _indexOfAbility = shownAbilities.IndexOf(_abilityCard);
+        for (int _i = _indexOfAbility+1; _i < shownAbilities.Count; _i++)
+        {
+            shownAbilities[_i].Data.PlaceInActivationField -= 1;
+        }
         
         if (_canReturn)
         {
-            GameplayManager.Instance.ReturnAbilityFromActivationField(_abilityCards.UniqueId);
-            Close();
+            GameplayManager.Instance.ReturnAbilityFromActivationField(_abilityCard.UniqueId);
         }
-        else
-        {
-            DialogsManager.Instance.ShowOkDialog($"This card needs {_effect.Cooldown} on top of it but there is only " +
-                                            $"{_amountOfCardsOnTop}");
-        }
+        
+        Close();
     }
 
     private void CheckPlace(TablePlaceHandler _clickedPlace)
@@ -107,11 +97,13 @@ public class ActivationFieldHandler : MonoBehaviour
             return;
         }
 
-        foreach (var _card in _cardBase)
+        shownAbilities = _cardBase.Cast<AbilityCard>().ToList();
+        shownAbilities = shownAbilities.OrderBy(_abilityCard => _abilityCard.Data.PlaceInActivationField).ToList();
+        
+        foreach (var _card in shownAbilities)
         {
-            AbilityCard _abilityCard = _card as AbilityCard;
             var _display = Instantiate(activationFiledAbilityDisplay, cardsHolder);
-            _display.Setup(_abilityCard);
+            _display.Setup(_card);
             shownCards.Add(_display);
         }
         

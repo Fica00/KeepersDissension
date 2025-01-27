@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AbilityCard : CardBase
@@ -311,5 +312,55 @@ public class AbilityCard : CardBase
     public void ManageActiveDisplay(bool _status)
     {
         ActiveDisplay.gameObject.SetActive(_status);
+    }
+
+    public float GetBringBackPercentage()
+    {
+        float _maxValue = 1;
+        float _minTransparency = 0.5f;
+        float _leftOver = _maxValue - _minTransparency;
+        float _amountOfCardsOnTop = GetAmountOfCardsOnTop();
+
+        float _percentage;
+        if (_amountOfCardsOnTop == 0)
+        {
+            _percentage = 0;
+        }
+        else
+        {
+            _percentage = _amountOfCardsOnTop / effect.Cooldown;
+            if (_percentage > 1)
+            {
+                _percentage = 1;
+            }
+        }
+
+        if (_percentage < _minTransparency)
+        {
+            _percentage = _minTransparency;
+        }
+
+        return _maxValue-(_leftOver-_leftOver*_percentage);
+    }
+
+    public bool CanReturnFromActivationField()
+    {
+        return Mathf.Approximately(GetBringBackPercentage(), 1f);
+    }
+
+    public string GetTextForActivationField()
+    {
+        return  $"({GetAmountOfCardsOnTop()}/{effect.Cooldown} cards on top)";
+    }
+
+    private float GetAmountOfCardsOnTop()
+    {
+        var _activationFiled = GetIsMy()
+            ? GameplayManager.Instance.MyPlayer.TableSideHandler.ActivationField
+            : GameplayManager.Instance.OpponentPlayer.TableSideHandler.ActivationField;
+        int _amountOfCardsInActivationField = _activationFiled.GetCards().Count;
+        float _amountOfCardsOnTop = _amountOfCardsInActivationField - Data.PlaceInActivationField;
+
+        return _amountOfCardsOnTop;
     }
 }

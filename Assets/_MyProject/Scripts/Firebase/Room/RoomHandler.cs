@@ -156,6 +156,8 @@ namespace FirebaseMultiplayer.Room
             CheckForVetoAnimation(_currentRoomState, _data);
             CheckForSpriteChange(_currentRoomState, _data);
             CheckForMessages(_currentRoomState, _data);
+            CheckForResponseAction(_currentRoomState, _data);
+            CheckForStrangeMatterOnBoard(_currentRoomState, _data);
         }
 
         private void CheckIfPlayerJoined(RoomData _currentRoomData,RoomData _data)
@@ -407,6 +409,57 @@ namespace FirebaseMultiplayer.Room
                 RoomUpdater.Instance.ForceUpdate();
             }
         }
+        
+        private void CheckForResponseAction(RoomData _currentRoomData,RoomData _data)
+        {
+            if (IsOwner)
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player1ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player1ResponseAction)
+                    {
+                        Debug.Log("Detected response action");
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+            else
+            {
+                if (_data.GameplaySubState == GameplaySubState.Player2ResponseAction)
+                {
+                    if (_currentRoomData.GameplaySubState != GameplaySubState.Player2ResponseAction)
+                    {
+                        Debug.Log("Detected response action");
+                        GameplayManager.Instance.ChooseCardForResponseAction();
+                    }
+                }
+            }
+        }
+        
+        private void CheckForStrangeMatterOnBoard(RoomData _currentRoomData,RoomData _data)
+        {
+            if (_currentRoomData.BoardData.StrangeMatterOntable.Count != _data.BoardData.StrangeMatterOntable.Count)
+            {
+                GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                return;
+            }
+            
+            foreach (var _card in _currentRoomData.BoardData.Cards)
+            {
+                var _cardNewData = _data.BoardData.Cards.Find(_cardData => _cardData.UniqueId == _card.UniqueId);
+                if (_cardNewData==null)
+                {
+                    continue;
+                }
+
+                if (_cardNewData.CarryingStrangeMatter != _card.CarryingStrangeMatter)
+                {
+                    GameplayManager.OnUpdatedStrangeMatterOnTable?.Invoke();
+                    return;
+                }
+            }
+        }
+        
         private void CheckForResponseActionSound(RoomData _currentRoomData,RoomData _data)
         {
             if (IsOwner)
@@ -578,7 +631,7 @@ namespace FirebaseMultiplayer.Room
             }
             
             var _animationData = _data.BoardData.BombAnimation;
-            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceId, IsOwner));
+            GameplayManager.Instance.ShowBombAnimation(Utils.ConvertRoomPosition(_animationData.PlaceIdOwner, IsOwner));
         }
         
         private void CheckForAbilityDisplay(RoomData _currentRoomData,RoomData _data)
